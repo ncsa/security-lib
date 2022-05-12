@@ -28,7 +28,7 @@ import static edu.uiuc.ncsa.qdl.state.QDLConstants.FUNCTION_REFERENCE_MARKER2;
  * <p>Created by Jeff Gaynor<br>
  * on 1/22/20 at  10:53 AM
  */
-public class FunctionEvaluator extends AbstractFunctionEvaluator {
+public class FunctionEvaluator extends AbstractEvaluator {
     public static long serialVersionUID = 0xcafed00d2L;
     public static final String FUNCTION_NAMESPACE = "function";
 

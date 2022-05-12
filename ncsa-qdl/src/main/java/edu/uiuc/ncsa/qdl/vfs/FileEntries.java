@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 
-import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.*;
+import static edu.uiuc.ncsa.qdl.evaluate.AbstractEvaluator.*;
 import static edu.uiuc.ncsa.qdl.vfs.FileEntry.*;
 
 /**

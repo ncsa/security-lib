@@ -9,7 +9,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.getOperator;
+import static edu.uiuc.ncsa.qdl.evaluate.AbstractEvaluator.getOperator;
 
 /**
  * <p>Created by Jeff Gaynor<br>

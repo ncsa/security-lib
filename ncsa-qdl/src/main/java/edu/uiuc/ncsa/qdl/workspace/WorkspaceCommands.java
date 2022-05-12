@@ -70,8 +70,8 @@ import java.util.zip.GZIPOutputStream;
 
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants.*;
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils.*;
-import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_BINARY;
-import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_TEXT_STRING;
+import static edu.uiuc.ncsa.qdl.evaluate.AbstractEvaluator.FILE_OP_BINARY;
+import static edu.uiuc.ncsa.qdl.evaluate.AbstractEvaluator.FILE_OP_TEXT_STRING;
 import static edu.uiuc.ncsa.qdl.util.InputFormUtil.*;
 import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
@@ -804,7 +804,7 @@ public class WorkspaceCommands implements Logable, Serializable {
                     say("sorry but you do not have permission to write to \"" + newPath + "\".");
                     return RC_NO_OP;
                 }
-                if (vfs.get(newPath, AbstractFunctionEvaluator.FILE_OP_AUTO) != null) {
+                if (vfs.get(newPath, AbstractEvaluator.FILE_OP_AUTO) != null) {
                     say("sorry but \"" + newPath + "\" is a file.");
                     return RC_NO_OP;
                 }
@@ -1354,9 +1354,9 @@ public class WorkspaceCommands implements Logable, Serializable {
         int i = 0;
         if (obj instanceof StemVariable) {
             StemVariable stemVariable = (StemVariable) obj;
-            for (String key : stemVariable.keySet()) {
+            for (Object key : stemVariable.keySet()) {
                 i++;
-                say(stemVariable.get(key).toString());
+                say(String.valueOf(stemVariable.get(key)));
             }
             say(i + " entries");
         } else {

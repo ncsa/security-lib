@@ -136,16 +136,24 @@ public class TokenImpl implements NewToken {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(getClass().getSimpleName() + "[");
         stringBuilder.append("jti" + "=" + getJti());
-        if(isJWT) {
+        if (isJWT) {
             if (getToken() == null) {
                 stringBuilder.append(", token=(null)");
             } else {
                 stringBuilder.append(", token=" + getToken());
             }
         }
-        stringBuilder.append(", " + TIMESTAMP_TAG + "=" + getIssuedAt());
-        stringBuilder.append(", " + LIFETIME_TAG + "=" + getLifetime());
-        stringBuilder.append(", " + VERSION_TAG + "=" + getVersion());
+        if (params == null || params.isEmpty()) {
+            stringBuilder.append(", " + TIMESTAMP_TAG + "=" + getIssuedAt());
+            stringBuilder.append(", " + LIFETIME_TAG + "=" + getLifetime());
+            stringBuilder.append(", " + VERSION_TAG + "=" + getVersion());
+
+        } else {
+            for (Object x : params.keySet()) {
+                String key = (String) x;
+                stringBuilder.append(", " + key + "=" + params.getString(key));
+            }
+        }
         return stringBuilder;
 
     }
@@ -158,7 +166,7 @@ public class TokenImpl implements NewToken {
 
     @Override
     public boolean isExpired() {
-        if(DebugUtil.isEnabled()){
+        if (DebugUtil.isEnabled()) {
             Date expireTS = new Date();
             expireTS.setTime(getLifetime() + getIssuedAt());
             DebugUtil.trace(this, "current time " + (new Date()) + " exp at " + expireTS);
@@ -249,5 +257,12 @@ public class TokenImpl implements NewToken {
         URI newToken = URI.create(rawToken);
         setToken(newToken);
         init(newToken);
+    }
+
+    public static void main(String[] args) {
+        String token = "https://dev.cilogon.org/oauth2/5b8c19145ec68a66c32eeedd228faf12?type=accessToken&ts=1652301290756&version=v2.0&lifetime=900000";
+        token = token + "&eid=" + "898611f963df7c8bf48351a7350813adee417e57";
+        TokenImpl token1 = new TokenImpl(URI.create(token));
+        System.out.println(token1);
     }
 }

@@ -96,7 +96,7 @@ public class StemTest extends AbstractQDLTester {
 
         StemVariable result = (StemVariable) polyad.getResult();
         assert result.size() == sourceStem.size();
-        for (String key : sourceStem.keySet()) {
+        for (Object key : sourceStem.keySet()) {
             assert result.containsKey(result.get(key));
             assert result.get(key).equals(key);
         }
@@ -148,7 +148,7 @@ public class StemTest extends AbstractQDLTester {
         assert keys.containsKey("1");
         assert keys.containsKey("2");
         assert keys.containsKey("3");
-        for (String key : keys.keySet()) {
+        for (Object key : keys.keySet()) {
             assert sourceStem.containsKey(keys.get(key));
         }
     }
@@ -1943,9 +1943,9 @@ public class StemTest extends AbstractQDLTester {
         // Next line is a simple regression test that the keys and indices coincide with the rank 1 case.
         // A change to how QDL lists were handled silently broke this at one point so this was added
         addLine(script, "ok := ξ.keys(ξ.).0 == 'foo' == ξ.indices(ξ.).0;");
-        addLine(script, "ok0 := reduce(@∧,  [0,1,'a','s','d'] ≡ α.); ");
-        addLine(script, "ok1 := reduce(@∧,reduce(@∧, [['foo',0],['foo',1],['foo',2],['foo','tyu'],['foo','ghjjh'],['foo','rty']] ≡ β.)); ");
-        addLine(script, "ok2 := reduce(@∧,reduce(@∧, [['foo','woof','a3tyu'],['foo','woof','a3rty'],['foo','woof','a3ghjjh']] ≡ γ.)); ");
+        addLine(script, "ok0 := reduce(@∧,  [0,1,'a','d','s'] ≡ α.); ");
+        addLine(script, "ok1 := reduce(@∧,reduce(@∧, [['foo',0],['foo',1],['foo',2],['foo','ghjjh'],['foo','rty'],['foo','tyu']] ≡ β.)); ");
+        addLine(script, "ok2 := reduce(@∧,reduce(@∧, [['foo','woof','a3ghjjh'] ,['foo','woof','a3rty'], ['foo','woof','a3tyu']] ≡ γ.)); ");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
         interpreter.execute(script.toString());

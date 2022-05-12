@@ -55,7 +55,7 @@ import static edu.uiuc.ncsa.security.core.util.DebugConstants.*;
  * <p>Created by Jeff Gaynor<br>
  * on 1/18/20 at  11:49 AM
  */
-public class SystemEvaluator extends AbstractFunctionEvaluator {
+public class SystemEvaluator extends AbstractEvaluator {
     public static final String SYS_NAMESPACE = "sys";
     public static final String SYS_FQ = SYS_NAMESPACE + State.NS_DELIMITER;
     public static final int SYSTEM_BASE_VALUE = 5000;
@@ -672,7 +672,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             }
             commands = new ArrayList<>();
 
-            for (String key : stemVariable.keySet()) {
+            for (Object key : stemVariable.keySet()) {
                 Object line = stemVariable.get(key);
                 if (!(line instanceof String)) {
                     throw new BadArgException(WS_MACRO + " the argument '" + line + "' is not a string", polyad.getArgAt(0));
@@ -721,7 +721,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         if (aliases == null) {
             throw new BadArgException(MODULE_REMOVE + " unknown argument type '" + result + "'", polyad.getArgAt(0));
         }
-        for (String key : aliases.keySet()) {
+        for (Object key : aliases.keySet()) {
             Object object2 = aliases.get(key);
             if (!isString(object2)) {
                 throw new BadArgException(MODULE_REMOVE + " second argument must be a string.", polyad.getArgAt(1));
@@ -821,7 +821,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             }
             Object lastResult = null;
             ArrayList<Object> args = new ArrayList<>();
-            for (String key : stemVariable.keySet()) {
+            for (Object key : stemVariable.keySet()) {
                 Object nextValue = stemVariable.get(key);
                 if (lastResult == null) {
                     // first pass
@@ -945,21 +945,25 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         @Override
         public Object action(StemVariable inStem) {
             StemVariable output = new StemVariable();
-            Set<String> keySet = inStem.keySet();
-            Iterator<String> iterator = keySet.iterator();
+            //Set<String> keySet = inStem.keySet();
+            Iterator iterator = inStem.keySet().iterator();
 
             Object lastValue = inStem.get(iterator.next()); // grab one before loop starts
             output.listAppend(lastValue);
 
             while (iterator.hasNext()) {
-                String key = iterator.next();
+                Object key = iterator.next();
                 Object currentValue = inStem.get(key);
                 ArrayList<StatementWithResultInterface> argList = new ArrayList<>();
                 argList.add(new ConstantNode(lastValue, Constant.getType(lastValue)));
                 argList.add(new ConstantNode(currentValue, Constant.getType(currentValue)));
                 operator.setArguments(argList);
                 operator.evaluate(state);
-                output.put(key, operator.getResult());
+                if(key instanceof Long){
+                    output.put((Long)key, operator.getResult());
+                }else{
+                    output.put((String)key, operator.getResult());
+                }
                 lastValue = operator.getResult();
             }
             return output;
@@ -1803,7 +1807,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
 
     public static void runnit(Polyad polyad, State state, String commandName, boolean hasNewState) {
         if (polyad.isSizeQuery()) {
-            polyad.setResult(AbstractFunctionEvaluator.getBigArgList());
+            polyad.setResult(AbstractEvaluator.getBigArgList());
             polyad.setEvaluated(true);
             return;
         }
@@ -1990,7 +1994,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
 
         StemVariable argStem = convertArgsToStem(polyad, arg, state, MODULE_LOAD);
         StemVariable outStem = new StemVariable();
-        for (String key : argStem.keySet()) {
+        for (Object key : argStem.keySet()) {
             Object value = argStem.get(key);
             int loadTarget = LOAD_FILE;
             String resourceName = null;
@@ -2021,7 +2025,11 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                     newEntry = innerStem;
                 }
             }
-            outStem.put(key, newEntry);
+            if(key instanceof Long){
+                outStem.put((Long)key, newEntry);
+            }else{
+                outStem.put((String)key, newEntry);
+            }
         }
         polyad.setEvaluated(true);
         if (outStem.size() == 1) {
@@ -2425,10 +2433,10 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             throw new ExtraArgException(TO_BOOLEAN + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
-        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+        AbstractEvaluator.fPointer pointer = new AbstractEvaluator.fPointer() {
             @Override
-            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
-                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+            public AbstractEvaluator.fpResult process(Object... objects) {
+                AbstractEvaluator.fpResult r = new AbstractEvaluator.fpResult();
                 switch (Constant.getType(objects[0])) {
                     case Constant.BOOLEAN_TYPE:
                         r.result = ((Boolean) objects[0]);
@@ -2479,10 +2487,10 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             throw new ExtraArgException(TO_NUMBER + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
-        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+        AbstractEvaluator.fPointer pointer = new AbstractEvaluator.fPointer() {
             @Override
-            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
-                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+            public AbstractEvaluator.fpResult process(Object... objects) {
+                AbstractEvaluator.fpResult r = new AbstractEvaluator.fpResult();
                 switch (Constant.getType(objects[0])) {
                     case Constant.BOOLEAN_TYPE:
                         r.result = ((Boolean) objects[0]) ? 1L : 0L;
@@ -2578,7 +2586,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
 
                         result = ((StemVariable) temp).toString(1);
                     } else {
-                        result = temp.toString();
+                        result = String.valueOf(temp);
                     }
                 } else {
                     if (temp instanceof BigDecimal) {

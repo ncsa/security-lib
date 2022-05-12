@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.qdl.vfs;
 
-import edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.AbstractEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLIOException;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
@@ -100,7 +100,7 @@ public abstract class AbstractVFSFileProvider implements VFSFileProvider {
     @Override
     public XProperties getFileInfo(String path) throws Throwable {
         checkPath(path);
-        return get(path, AbstractFunctionEvaluator.FILE_OP_AUTO).getProperties();
+        return get(path, AbstractEvaluator.FILE_OP_AUTO).getProperties();
     }
 
     String currentDir = null;

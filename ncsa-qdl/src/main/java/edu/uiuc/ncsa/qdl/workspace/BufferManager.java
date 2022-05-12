@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.qdl.workspace;
 
-import edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.AbstractEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
@@ -251,7 +251,7 @@ public class BufferManager implements Serializable {
     protected List<String> readFile(String fName) {
         Polyad request = new Polyad(IOEvaluator.READ_FILE);
         request.addArgument(new ConstantNode(fName, Constant.STRING_TYPE));
-        request.addArgument(new ConstantNode(new Long(AbstractFunctionEvaluator.FILE_OP_TEXT_STEM), Constant.LONG_TYPE));
+        request.addArgument(new ConstantNode(new Long(AbstractEvaluator.FILE_OP_TEXT_STEM), Constant.LONG_TYPE));
         getState().getMetaEvaluator().evaluate(request, getState());
         if (request.getResultType() != Constant.STEM_TYPE) {
             throw new IllegalStateException("Error: Could not read file \"" + fName + "\"");

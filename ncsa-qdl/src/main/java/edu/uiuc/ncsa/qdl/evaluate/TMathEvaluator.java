@@ -15,7 +15,7 @@ import java.math.RoundingMode;
  * <p>Created by Jeff Gaynor<br>
  * on 3/18/21 at  6:27 AM
  */
-public class TMathEvaluator extends AbstractFunctionEvaluator {
+public class TMathEvaluator extends AbstractEvaluator {
     public static final String TMATH_NAMESPACE = "tmath";
 
     @Override
@@ -273,10 +273,10 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
             throw new ExtraArgException(N_ROOT + " requires at most 2 arguments", polyad.getArgAt(2));
         }
 
-        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+        AbstractEvaluator.fPointer pointer = new AbstractEvaluator.fPointer() {
             @Override
-            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
-                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+            public AbstractEvaluator.fpResult process(Object... objects) {
+                AbstractEvaluator.fpResult r = new AbstractEvaluator.fpResult();
                 Object arg1 = objects[0];
                 Object arg2 = objects[1];
                 if (isBoolean(arg1) || isString(arg1) || arg1 == QDLNull.getInstance()) {

@@ -84,11 +84,11 @@ public class AbstractQDLTester extends TestBase {
      */
     protected boolean areEqual(StemVariable stem1, StemVariable stem2) {
         if (stem1.size() != stem2.size()) return false;
-        for (String key1 : stem1.keySet()) {
+        for (Object key1 : stem1.keySet()) {
             Object v1 = null;
             Object v2 = null;
-            if (stem1.isLongIndex(key1)) {
-                Long k1 = Long.parseLong(key1);
+            if (key1 instanceof Long) {
+                Long k1 = (Long)key1;
                 if (!stem2.containsKey(k1)) return false;
                 v1 = stem1.get(k1);
                 v2 = stem2.get(k1);

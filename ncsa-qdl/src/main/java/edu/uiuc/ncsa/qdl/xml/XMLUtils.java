@@ -125,9 +125,9 @@ public class XMLUtils implements XMLConstants {
     public static void write(XMLStreamWriter xsw, StemVariable stem) throws XMLStreamException {
         xsw.writeStartElement(STEM_TAG);
         if (0 < stem.size()) {
-            for (String key : stem.keySet()) {
+            for (Object key : stem.keySet()) {
                 xsw.writeStartElement(STEM_ENTRY_TAG);
-                xsw.writeAttribute(STEM_KEY_TAG, key);
+                xsw.writeAttribute(STEM_KEY_TAG, String.valueOf(key));
                 write(xsw, stem.get(key));
                 xsw.writeEndElement();
             }

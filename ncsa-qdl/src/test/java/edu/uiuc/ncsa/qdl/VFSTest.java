@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_AUTO;
-import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_INPUT_STREAM;
+import static edu.uiuc.ncsa.qdl.evaluate.AbstractEvaluator.FILE_OP_AUTO;
+import static edu.uiuc.ncsa.qdl.evaluate.AbstractEvaluator.FILE_OP_INPUT_STREAM;
 import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.PATH_SEPARATOR;
 import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
 

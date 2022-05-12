@@ -21,7 +21,7 @@ import java.util.Locale;
  * <p>Created by Jeff Gaynor<br>
  * on 1/16/20 at  9:18 AM
  */
-public class MathEvaluator extends AbstractFunctionEvaluator {
+public class MathEvaluator extends AbstractEvaluator {
     @Override
     public String getNamespace() {
         return MATH_NAMESPACE;
@@ -239,10 +239,10 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             throw new ExtraArgException((isEncode ? ENCODE_B64 : DECODE_B64) + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
-        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+        AbstractEvaluator.fPointer pointer = new AbstractEvaluator.fPointer() {
             @Override
-            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
-                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+            public AbstractEvaluator.fpResult process(Object... objects) {
+                AbstractEvaluator.fpResult r = new AbstractEvaluator.fpResult();
                 if (objects[0] instanceof String) {
                     if (isEncode) {
                         r.result = TokenUtil.b32EncodeToken(objects[0].toString());
@@ -305,10 +305,10 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             throw new ExtraArgException(ABS_VALUE + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
-        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+        AbstractEvaluator.fPointer pointer = new AbstractEvaluator.fPointer() {
             @Override
-            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
-                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+            public AbstractEvaluator.fpResult process(Object... objects) {
+                AbstractEvaluator.fpResult r = new AbstractEvaluator.fpResult();
                 // If a long or decimal, take the absolute value. If anything else (e.g. a string) return argument.
                 switch (Constant.getType(objects[0])) {
                     case Constant.LONG_TYPE:
@@ -487,10 +487,10 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             throw new ExtraArgException(HASH + " requires 1 argument", polyad.getArgAt(1));
         }
 
-        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+        AbstractEvaluator.fPointer pointer = new AbstractEvaluator.fPointer() {
             @Override
-            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
-                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+            public AbstractEvaluator.fpResult process(Object... objects) {
+                AbstractEvaluator.fpResult r = new AbstractEvaluator.fpResult();
                 if (objects[0] instanceof String) {
                     r.result = DigestUtils.sha1Hex(objects[0].toString());
                     r.resultType = Constant.STRING_TYPE;
@@ -518,10 +518,10 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             throw new ExtraArgException((isEncode ? ENCODE_B64 : DECODE_B64) + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
-        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+        AbstractEvaluator.fPointer pointer = new AbstractEvaluator.fPointer() {
             @Override
-            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
-                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+            public AbstractEvaluator.fpResult process(Object... objects) {
+                AbstractEvaluator.fpResult r = new AbstractEvaluator.fpResult();
                 if (objects[0] instanceof String) {
                     if (isEncode) {
                         r.result = Base64.encodeBase64URLSafeString(objects[0].toString().getBytes());
@@ -553,10 +553,10 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             throw new ExtraArgException((toHex ? ENCODE_B16 : DECODE_B16) + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
-        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+        AbstractEvaluator.fPointer pointer = new AbstractEvaluator.fPointer() {
             @Override
-            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
-                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+            public AbstractEvaluator.fpResult process(Object... objects) {
+                AbstractEvaluator.fpResult r = new AbstractEvaluator.fpResult();
                 Long ll = null;
 
                 if (objects[0] instanceof String) {
@@ -600,10 +600,10 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             throw new ExtraArgException(MOD + " requires 2 arguments", polyad.getArgAt(2));
         }
 
-        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+        AbstractEvaluator.fPointer pointer = new AbstractEvaluator.fPointer() {
             @Override
-            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
-                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+            public AbstractEvaluator.fpResult process(Object... objects) {
+                AbstractEvaluator.fpResult r = new AbstractEvaluator.fpResult();
                 if (!areAllNumbers(objects)) {
                     // Contract is that if there are not numbers, just return the
                     // first argument unaltered.
@@ -679,10 +679,10 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             }
             return;
         }
-        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+        AbstractEvaluator.fPointer pointer = new AbstractEvaluator.fPointer() {
             @Override
-            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
-                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+            public AbstractEvaluator.fpResult process(Object... objects) {
+                AbstractEvaluator.fpResult r = new AbstractEvaluator.fpResult();
                 if (isInMillis) {
                     if (isLong(objects[0])) {
                         // do nothing. hand it back.
@@ -741,10 +741,10 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             throw new ExtraArgException((isMax ? MAX : MIN) + " requires 2 arguments", polyad.getArgAt(2));
         }
 
-        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+        AbstractEvaluator.fPointer pointer = new AbstractEvaluator.fPointer() {
             @Override
-            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
-                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+            public AbstractEvaluator.fpResult process(Object... objects) {
+                AbstractEvaluator.fpResult r = new AbstractEvaluator.fpResult();
                 if (!areAllNumbers(objects)) {
                     Statement s = null;
                     if(!isNumber(objects[0])){

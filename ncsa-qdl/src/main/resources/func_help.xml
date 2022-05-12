@@ -3922,7 +3922,7 @@ environment so that the user does not have their variables and other
 functions redefined seemingly at random.
 
 Functions should be easily available but there is a collision with
-Church's Lambda Calculus ("everything is a function!") is the
+Church's Lambda Calculus ("everything is a function!") with the
 reality of state management on a computer. So we have the define keyword
 which is more computer sciencey and is what you normally want when
 writing libraries (and include auto documentation)and lambda
@@ -3950,7 +3950,7 @@ but global variables are always there
 10
 
 Lambdas.
-Using lamdas there is a hierarchy for blocks
+Using lambdas there is a hierarchy for blocks
 
  local  - only arguments passed in are visible
   block - ambient is visible, but new definitions stay local
@@ -3975,21 +3975,17 @@ than a define statement.
    is_defined(y)
 false
 
-Lambdas are normally completely ambient, but .
+Lambdas are normally completely ambient, but
   zz(x)->y:=x^2;
   zz(4)
 16
   is_defined(y)
-false
-
-  ]]>
+false]]>
        </body>
        <example>
    <![CDATA[   f(x,y,z) -> block[q:=x; q:=q+y ; q:= q+z ; return(q);];
    f(3,2,1)
-6
-
-   ]]>
+6]]>
         </example>
     </entry>
 

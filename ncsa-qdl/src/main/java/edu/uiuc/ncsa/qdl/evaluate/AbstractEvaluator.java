@@ -5,10 +5,7 @@ import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.functions.*;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
-import edu.uiuc.ncsa.qdl.variables.Constant;
-import edu.uiuc.ncsa.qdl.variables.QDLSet;
-import edu.uiuc.ncsa.qdl.variables.StemUtility;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.*;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import org.apache.commons.codec.binary.Base32;
@@ -20,10 +17,11 @@ import java.util.*;
 import static edu.uiuc.ncsa.qdl.variables.Constant.UNKNOWN_TYPE;
 
 /**
+ * Top level. All evaluators should extend this.
  * <p>Created by Jeff Gaynor<br>
  * on 1/16/20 at  10:59 AM
  */
-public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
+public abstract class AbstractEvaluator implements EvaluatorInterface {
 
     protected String[] fNames = null;
 
@@ -50,14 +48,14 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         for (String key : fnames) {
             try {
                 int[] argCount = MetaEvaluator.getInstance().getArgCount(key);
-                if(AbstractFunctionEvaluator.MAX_ARG_COUNT <= argCount.length){
+                if (AbstractEvaluator.MAX_ARG_COUNT <= argCount.length) {
                     names.add(key + "([" + argCount[0] + "," + argCount[1] + "," + argCount[2] + ",...])");
-                }else{
+                } else {
                     String aaa = Arrays.toString(argCount);
                     aaa = aaa.replace(" ", ""); // remove blanks
                     names.add(key + "(" + aaa + ")");
                 }
-            }catch(Throwable t) {
+            } catch (Throwable t) {
                 System.out.println("key = " + key + " failed");
                 t.printStackTrace();
             }
@@ -114,12 +112,15 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         return true;
     }
 
-    protected  boolean areAllSets(Object... objects){
-        for(Object obj : objects){
-            if(!isSet(obj)){return false;}
+    protected boolean areAllSets(Object... objects) {
+        for (Object obj : objects) {
+            if (!isSet(obj)) {
+                return false;
+            }
         }
         return true;
     }
+
     protected boolean areAllStems(Object... objects) {
         return StemUtility.areAllStems(objects);
     }
@@ -228,7 +229,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                             fPointer pointer,
                             String name,
                             State state) {
-        if(polyad.getArgCount() == 0){
+        if (polyad.getArgCount() == 0) {
             throw new MissingArgException(name + " requires at least 1 argument", polyad);
         }
         if (1 < polyad.getArgCount()) {
@@ -268,16 +269,25 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
      * @param pointer
      */
     protected void processStem1(StemVariable outStem, StemVariable stemVariable, fPointer pointer) {
-        for (String key : stemVariable.keySet()) {
+        for (Object key : stemVariable.keySet()) {
             Object object = stemVariable.get(key);
+            boolean isLongKey = key instanceof Long;
             if (object instanceof StemVariable) {
                 StemVariable newOut = new StemVariable();
                 processStem1(newOut, (StemVariable) object, pointer);
                 if (!newOut.isEmpty()) {
-                    outStem.put(key, newOut);
+                    if (isLongKey) {
+                        outStem.put((Long) key, newOut);
+                    } else {
+                        outStem.put((String) key, newOut);
+                    }
                 }
             } else {
-                outStem.put(key, pointer.process(stemVariable.get(key)).result);
+                if (isLongKey) {
+                    outStem.put((Long) key, pointer.process(stemVariable.get(key)).result);
+                } else {
+                    outStem.put((String) key, pointer.process(stemVariable.get(key)).result);
+                }
             }
         }
     }
@@ -286,7 +296,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     protected void processSet1(QDLSet outSet, QDLSet arg, fPointer pointer) {
         for (Object key : arg) {
             if (key instanceof StemVariable) {
-              // Do something here???
+                // Do something here???
             } else {
                 outSet.add(pointer.process(key).result);
             }
@@ -375,15 +385,15 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         QDLSet leftSet = null;
         QDLSet rightSet = null;
         if ((arg1 instanceof QDLSet) && (arg2 instanceof StemVariable)) {
-                 if(((StemVariable)arg2).isEmpty()){
-                     arg2 = new QDLSet();// make the empty set
-                 }
+            if (((StemVariable) arg2).isEmpty()) {
+                arg2 = new QDLSet();// make the empty set
+            }
         }
 
         if ((arg2 instanceof QDLSet) && (arg1 instanceof StemVariable)) {
-                 if(((StemVariable)arg1).isEmpty()){
-                     arg1 = new QDLSet();// make the empty set
-                 }
+            if (((StemVariable) arg1).isEmpty()) {
+                arg1 = new QDLSet();// make the empty set
+            }
         }
 
         if (arg1 instanceof QDLSet) {
@@ -441,6 +451,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
 
     /**
      * Operations on two sets can return either a set (e.g. intersection) or a scalar (e.g. subset of)
+     *
      * @param leftSet
      * @param rightSet
      * @param pointer
@@ -525,10 +536,12 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                                 StemVariable stem2,
                                 fPointer pointer,
                                 ExpressionImpl polyad, boolean optionalArgs) {
-        Set<String> keys = getCommonKeys(stem1, stem2);
+        CommonKeyIterator iterator = getCommonKeys(stem1, stem2);
         // now we loop -- note that we must still preserve which is the first and second argument
         // so all this is basically to figure out how to loop over what.
-        for (String key : keys) {
+        while (iterator.hasNext()) {
+            Object key = iterator.next();
+            boolean keyIsLong = key instanceof Long;
             fpResult r = null;
             Object[] objects;
             if (optionalArgs) {
@@ -548,11 +561,19 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                 StemVariable newOut = new StemVariable();
                 processStem2(newOut, toStem(objects[0]), toStem(objects[1]), pointer, polyad, optionalArgs);
                 if (!newOut.isEmpty()) {
-                    outStem.put(key, newOut);
+                    if(keyIsLong){
+                        outStem.put((Long)key, newOut);
+                    }else{
+                        outStem.put((String)key, newOut);
+                    }
                 }
             } else {
                 r = pointer.process(objects);
-                outStem.put(key, r.result);
+                if(keyIsLong){
+                    outStem.put((Long)key, r.result);
+                }else{
+                    outStem.put((String)key, r.result);
+                }
             }
         }
 
@@ -609,10 +630,12 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                                 StemVariable stem3,
                                 fPointer pointer,
                                 ExpressionImpl polyad, boolean optionalArgs) {
-        Set<String> keys = getCommonKeys(stem1, stem2, stem3);
+        CommonKeyIterator iterator = getCommonKeys(stem1, stem2, stem3);
         // now we loop -- note that we must still preserve which is the first and second argument
         // so all this is basically to figure out how to loop over what.
-        for (String key : keys) {
+        while (iterator.hasNext()) {
+            Object key = iterator.next();
+            boolean keyIsLong = key instanceof Long;
             fpResult r = null;
             Object[] objects;
             if (optionalArgs) {
@@ -638,18 +661,26 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                         toStem(objects[2]),
                         pointer, polyad, optionalArgs);
                 if (!newOut.isEmpty()) {
-                    outStem.put(key, newOut);
+                    if(keyIsLong){
+                        outStem.put((Long)key, newOut);
+                    }else{
+                        outStem.put((String)key, newOut);
+                    }
                 }
                 //r = pointer.process(objects);
             } else {
                 r = pointer.process(objects);
-                outStem.put(key, r.result);
+                if(keyIsLong){
+                    outStem.put((Long)key, r.result);
+                }else{
+                    outStem.put((String)key, r.result);
+                }
             }
         }
 
     }
 
-    /**
+    /*
      * This checks each stem for a default value and then if there is not one, it checks
      * the key. Best we can do is jump out of the loop when we hit a dud.
      *
@@ -657,31 +688,91 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
      * @param stems
      * @return
      */
-    protected boolean allHaveKey(String key, StemVariable... stems) {
+/*    protected boolean allHaveKey(String key, StemVariable... stems) {
         for (StemVariable stem : stems) {
             if (!stem.isEmpty()) {
                 if (!stem.containsKey(key)) return false;
             }
         }
         return true;
+    }*/
+
+    public class CommonKeyIterator implements Iterator {
+        ArrayList<StemKeys> stemKeys = new ArrayList<>();
+
+        public void add(StemKeys keys) {
+            if (smallestKeys == null) {
+                smallestKeys = keys;
+            } else {
+                smallestKeys = keys.size() < smallestKeys.size() ? keys : smallestKeys;
+                stemKeys.add(keys);
+            }
+        }
+
+        StemKeys smallestKeys = null;
+        Iterator iterator = null;
+
+        Object nextValue;
+
+        @Override
+        public boolean hasNext() {
+            if (iterator == null) {
+                iterator = smallestKeys.iterator();
+            }
+            while (iterator.hasNext()) {
+                Object v = iterator.next();
+                if(allHaveValue(v)){
+                    nextValue = v;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        protected boolean allHaveValue(Object value) {
+            for (StemKeys keys : stemKeys) {
+                if (!keys.contains(value)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public Object next() {
+            return nextValue;
+        }
     }
 
-    protected Set<String> getCommonKeys(StemVariable... stems) {
-        QDLSet keys = new QDLSet();
+    protected CommonKeyIterator getCommonKeys(StemVariable... stems) {
+        CommonKeyIterator iterator = new CommonKeyIterator();
+        for (StemVariable stem : stems) {
+            if (stem.hasDefaultValue()) {
+                continue;
+            }
+            if(!stem.isEmpty()){
+                iterator.add(stem.keySet());
+            }
+        }
+        return iterator;
+/*
+        StemKeys stemKeys = new StemKeys();
         // First find one that has some keys.
         for (StemVariable stem : stems) {
-            if(stem.hasDefaultValue()){
+            if (stem.hasDefaultValue()) {
                 continue;
             }
             if (!stem.isEmpty()) {
-                if (keys.isEmpty()) {
-                    keys.addAll(stem.keySet());
-                }else{
-                    keys  = keys.intersection(new QDLSet(stem.keySet()));
+                if (stemKeys.isEmpty()) {
+                    stemKeys.addAll(stem.keySet());
+                } else {
+                    stemKeys.intersection(stem.keySet());
                 }
             }
         }
-        return keys;
+
+        return stemKeys;
+*/
 /*
         Set<String> foundKeys = new HashSet<>();
         // now look for common keys.
@@ -785,9 +876,9 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         ExpressionImpl operator;
         String operatorName = frNode.getFunctionName();
         if (state.getOpEvaluator().isMathOperator(operatorName)) {
-            if(nAry == 1){
-             operator = new Monad(state.getOperatorType(operatorName), false); // only post fix allowed for monads here
-            }else {
+            if (nAry == 1) {
+                operator = new Monad(state.getOperatorType(operatorName), false); // only post fix allowed for monads here
+            } else {
                 operator = new Dyad(state.getOperatorType(operatorName));
             }
         } else {
@@ -844,12 +935,14 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     /**
      * Checks if the argument is some form of a function reference. This lets you test for
      * overloading before invoking one of {@link #getFunctionReferenceNode(State, StatementWithResultInterface)}
+     *
      * @param arg0
      * @return
      */
-    public boolean isFunctionRef(StatementWithResultInterface arg0){
-        return (arg0 instanceof LambdaDefinitionNode) || (arg0 instanceof FunctionDefinitionStatement) ||(arg0 instanceof FunctionReferenceNode);
+    public boolean isFunctionRef(StatementWithResultInterface arg0) {
+        return (arg0 instanceof LambdaDefinitionNode) || (arg0 instanceof FunctionDefinitionStatement) || (arg0 instanceof FunctionReferenceNode);
     }
+
     /**
      * This will take a node that is either a function reference, {@link FunctionDefinitionStatement}
      * or perhaps a {@link LambdaDefinitionNode} and determine the right {@link FunctionReferenceNode},
@@ -908,9 +1001,10 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         return frn;
     }
 
-    public boolean isScalar(Object arg){
+    public boolean isScalar(Object arg) {
         return !isStem(arg) && !isSet(arg);
     }
+
     /**
      * Takes a list of Java objects and converts them to QDL constants to be used as
      * arguments to functions. Checks also that there are no illegal values first.
@@ -930,6 +1024,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         }
         return args;
     }
+
     protected FunctionReferenceNode getFunctionReferenceNode(State state, StatementWithResultInterface arg0) {
         return getFunctionReferenceNode(state, arg0, false);
     }
@@ -947,7 +1042,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         }
         if (swri instanceof VariableNode) {
             VariableNode vNode = (VariableNode) swri;
-            throw new UnknownSymbolException("unknown symbol '" + vNode.getVariableReference() + "'",vNode);
+            throw new UnknownSymbolException("unknown symbol '" + vNode.getVariableReference() + "'", vNode);
         }
         throw new UnknownSymbolException("unknown symbol", swri);
     }
@@ -976,36 +1071,40 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
             throw unknownSymbolException;
         }
     }
-   static protected int[] bigArgList = null;
+
+    static protected int[] bigArgList = null;
     static protected int[] bigArgList0 = null;
 
     public static int MAX_ARG_COUNT = 10;
+
     /**
      * Used in arg count queries. Returns [1,2,... {@link #MAX_ARG_COUNT}].
      * Note that this does not limit argument lists, but it used in dereferencing
      * function references. See {@link FunctionEvaluator#resolveArguments(FunctionRecord, Polyad, State, State)}.
+     *
      * @return
      */
-    protected static int[] getBigArgList(){
-        if(bigArgList == null){
-              bigArgList = new int[MAX_ARG_COUNT];
-              for(int i = 1 ; i < MAX_ARG_COUNT+1; i++){
-                  bigArgList[i-1] = i;
-              }
+    protected static int[] getBigArgList() {
+        if (bigArgList == null) {
+            bigArgList = new int[MAX_ARG_COUNT];
+            for (int i = 1; i < MAX_ARG_COUNT + 1; i++) {
+                bigArgList[i - 1] = i;
+            }
         }
         return bigArgList;
     }
 
     /**
      * returns integers [0,1,..., {@link #MAX_ARG_COUNT}
+     *
      * @return
      */
-    protected static int[] getBigArgList0(){
-        if(bigArgList0== null){
-              bigArgList0 = new int[MAX_ARG_COUNT+1];
-              for(int i = 0 ; i < MAX_ARG_COUNT+1; i++){
-                  bigArgList0[i] = i;
-              }
+    protected static int[] getBigArgList0() {
+        if (bigArgList0 == null) {
+            bigArgList0 = new int[MAX_ARG_COUNT + 1];
+            for (int i = 0; i < MAX_ARG_COUNT + 1; i++) {
+                bigArgList0[i] = i;
+            }
         }
         return bigArgList0;
     }

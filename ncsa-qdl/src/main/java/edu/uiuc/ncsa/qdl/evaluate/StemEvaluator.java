@@ -29,7 +29,7 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
  * <p>Created by Jeff Gaynor<br>
  * on 1/16/20 at  9:19 AM
  */
-public class StemEvaluator extends AbstractFunctionEvaluator {
+public class StemEvaluator extends AbstractEvaluator {
     public static final String STEM_NAMESPACE = "stem";
 
     @Override
@@ -370,7 +370,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(REMAP + " requires at least two arguments", polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
+            throw new MissingArgException(REMAP + " requires at least two arguments", polyad.getArgCount() == 1 ? polyad.getArgAt(0) : polyad);
         }
         if (3 < polyad.getArgCount()) {
             throw new ExtraArgException(REMAP + " takes at most 3 arguments", polyad.getArgAt(3));
@@ -459,7 +459,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         StemVariable out = new StemVariable();
         Object object0 = polyad.evalArg(0, state);
         checkNull(object0, polyad.getArgAt(0));
-                                  QDLSet outSet;
+        QDLSet outSet;
         if (isStem(object0)) {
             StemVariable inStem = (StemVariable) object0;
             outSet = inStem.valueSet();
@@ -542,13 +542,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         // special case single args. Otherwise have to special case a bunch of stuff in forEachRecursion
 
         if (stems.length == 1) {
-            for (String key0 : stems[0].keySet()) {
+            for (Object key0 : stems[0].keySet()) {
                 Object obj = stems[0].get(key0);
                 ArrayList<Object> rawArgs = new ArrayList<>();
                 rawArgs.add(obj);
                 f.setArguments(toConstants(rawArgs));
                 f.evaluate(state);
-                output.put(key0, f.getResult());
+                output.putLongOrString( key0, f.getResult());
             }
         } else {
             forEachRecursion(output, f, state, stems);
@@ -561,12 +561,12 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     protected void forEachRecursion(StemVariable output, ExpressionImpl f, State state, StemVariable[] stems) {
         int argCount = stems.length - 1;
-        for (String key : stems[0].keySet()) {
+        for (Object key : stems[0].keySet()) {
             ArrayList<Object> rawArgs = new ArrayList<>();
             rawArgs.add(stems[0].get(key));
             StemVariable output1 = new StemVariable();
             forEachRecursion(output1, f, state, stems, rawArgs, argCount - 1);
-            output.put(key, output1);
+            output.putLongOrString( key, output1);
         }
     }
 
@@ -584,22 +584,21 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         } else {
             rawArgs.add(null);
         }
-        for (String key : stems[currentIndex].keySet()) {
+        for (Object key : stems[currentIndex].keySet()) {
             if (depth == 0) {
                 Object o = stems[currentIndex].get(key);
                 args.set(currentIndex, new ConstantNode(o, Constant.getType(o)));
                 f.setArguments(args);
                 f.evaluate(state);
-                output.put(key, f.getResult());
+                output.putLongOrString(key, f.getResult());
             } else {
                 rawArgs.set(currentIndex, stems[currentIndex].get(key));
                 StemVariable output1 = new StemVariable();
                 forEachRecursion(output1, f, state, stems, rawArgs, depth - 1);
-                output.put(key, output1);
+                output.putLongOrString( key, output1);
             }
         }
     }
-
 
 
     protected void doJPathQuery(Polyad polyad, State state) {
@@ -609,7 +608,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(JSON_PATH_QUERY + " requries at least 2 arguments", polyad.getArgCount()==1?polyad.getArgAt(0): polyad);
+            throw new MissingArgException(JSON_PATH_QUERY + " requries at least 2 arguments", polyad.getArgCount() == 1 ? polyad.getArgAt(0) : polyad);
         }
         if (3 < polyad.getArgCount()) {
             throw new ExtraArgException(JSON_PATH_QUERY + " accepts at most 3 arguments", polyad.getArgAt(3));
@@ -753,7 +752,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() == 0) {
-            throw new MissingArgException(DIMENSION + " requires an argument",polyad);
+            throw new MissingArgException(DIMENSION + " requires an argument", polyad);
         }
         if (1 < polyad.getArgCount()) {
             throw new ExtraArgException(DIMENSION + " requires a single argument", polyad.getArgAt(1));
@@ -781,7 +780,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgCount() < 1) {
             throw new MissingArgException("the " + UNIQUE_VALUES + " function requires 1 argument", polyad);
         }
-        if (1 < polyad.getArgCount() ) {
+        if (1 < polyad.getArgCount()) {
             throw new ExtraArgException("the " + UNIQUE_VALUES + " function requires at most 1 argument", polyad.getArgAt(1));
         }
 
@@ -831,44 +830,50 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
             if (isStem(rightArg)) {
                 StemVariable rStem = (StemVariable) rightArg;
-                for (String lkey : lStem.keySet()) {
-                    result.put(lkey, rStem.hasValue(lStem.get(lkey)));
-/*
-                    Boolean rc = Boolean.FALSE;
-                    for (String rKey : rStem.keySet()) {
-                        if (lStem.get(lkey).equals(rStem.get(rKey))) {
-                            rc = Boolean.TRUE;
-                            break;
-                        }
-                    }
-                    result.put(lkey, rc);
-*/
+                for (Object lkey : lStem.keySet()) {
+                    result.putLongOrString( lkey, rStem.hasValue(lStem.get(lkey)));
                 }
             } else {
                 if (isSet(rightArg)) {
                     QDLSet rSet = (QDLSet) rightArg;
-                    for (String key : lStem.keySet()) {
+                    for (Object key : lStem.keySet()) {
+                        boolean keyIsLong = key instanceof Long;
                         Object ooo = lStem.get(key);
                         if (ooo instanceof BigDecimal) {
-                            result.put(key, Boolean.FALSE);
+                            if (keyIsLong) {
+                                result.put((Long) key, Boolean.FALSE);
+                            } else {
+                                result.put((String) key, Boolean.FALSE);
+                            }
+                            ;
                             for (Object element : rSet) {
                                 if (element instanceof BigDecimal) {
                                     boolean tempB = bdEquals((BigDecimal) ooo, (BigDecimal) element);
                                     if (tempB) {
-                                        result.put(key, Boolean.TRUE);
+                                        if (keyIsLong) {
+                                            result.put((Long) key, Boolean.TRUE);
+                                        } else {
+                                            result.put((String) key, Boolean.TRUE);
+                                        }
                                         break;
                                     }
                                 }
                             }
 
                         } else {
-                            result.put(key, rSet.contains(ooo));
+                            if (keyIsLong) {
+                                result.put((Long) key, rSet.contains(ooo));
+
+                            } else {
+                                result.put((String) key, rSet.contains(ooo));
+
+                            }
                         }
                     }
                 } else {
                     // check if each element in the left stem matches the value of the right arg.
-                    for (String lKey : lStem.keySet()) {
-                        result.put(lKey, lStem.get(lKey).equals(rightArg) ? Boolean.TRUE : Boolean.FALSE); // got to finagle these are right Java objects
+                    for (Object lKey : lStem.keySet()) {
+                        result.putLongOrString( lKey, lStem.get(lKey).equals(rightArg) ? Boolean.TRUE : Boolean.FALSE); // got to finagle these are right Java objects
                     }
                 }
             }
@@ -881,14 +886,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             if (isStem(rightArg)) {
                 StemVariable rStem = (StemVariable) rightArg;
                 result = rStem.hasValue(leftArg);
-/*
-                for (String rKey : rStem.keySet()) {
-                    if (leftArg.equals(rStem.get(rKey))) {
-                        result = Boolean.TRUE;
-                        break;
-                    }
-                }
-*/
             } else {
                 if (isSet(rightArg)) {
                     if (leftArg instanceof BigDecimal) {
@@ -1126,7 +1123,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         State localState = state.newCleanState();
         QDLCodec codec = new QDLCodec();
 
-        for (String key : stem.keySet()) {
+        for (Object k : stem.keySet()) {
+            // implicit in contract that all the keys are string, not integers
+            String key = (String) k;
             Object ob = stem.get(key);
             key = key + (isStem(ob) ? STEM_INDEX_MARKER : "");
             if (safeMode) {
@@ -1136,8 +1135,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 if (state.isDefined(key)) {
                     throw new IllegalArgumentException("name clash in safe mode for '" + key + "'");
                 }
-
-
             } else {
                 if (!pattern.matcher(key).matches()) {
                     throw new IllegalArgumentException("the variable name '" + key + "' is not a legal variable name.");
@@ -1206,7 +1203,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgCount() < 1) {
             throw new MissingArgException("the " + SIZE + " function requires 1 argument", polyad);
         }
-        if (1 < polyad.getArgCount() ) {
+        if (1 < polyad.getArgCount()) {
             throw new ExtraArgException("the " + SIZE + " function requires 1 argument", polyad.getArgAt(1));
         }
         Object arg = polyad.evalArg(0, state);
@@ -1287,43 +1284,55 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         StemVariable out = new StemVariable();
         if (returnByType) {
             long i = 0L;
-            for (String key : stemVariable.keySet()) {
+            for (Object key : stemVariable.keySet()) {
                 if (returnType == Constant.getType(stemVariable.get(key))) {
-                    if (out.isLongIndex(key)) {
+                    out.put(i++, key);
+/*
+                    if (key instanceof Long) {
                         out.put(i++, Long.parseLong(key));
                     } else {
                         out.put(i++, key);
                     }
+*/
                 }
             }
         } else {
             long i = 0L;
 
-            for (String key : stemVariable.keySet()) {
+            for (Object key : stemVariable.keySet()) {
                 switch (returnScope) {
                     case all_keys:
+                        out.put(i++, key);
+/*
                         if (out.isLongIndex(key)) {
                             out.put(i++, Long.parseLong(key));
                         } else {
                             out.put(i++, key);
                         }
+*/
                         break;
                     case only_scalars:
                         if (Constant.getType(stemVariable.get(key)) != STEM_TYPE) {
+                            out.put(i++, key);
+/*
                             if (out.isLongIndex(key)) {
                                 out.put(i++, Long.parseLong(key));
                             } else {
                                 out.put(i++, key);
                             }
+*/
                         }
                         break;
                     case only_stems:
                         if (Constant.getType(stemVariable.get(key)) == STEM_TYPE) {
+                            out.put(i++, key);
+/*
                             if (out.isLongIndex(key)) {
                                 out.put(i++, Long.parseLong(key));
                             } else {
                                 out.put(i++, key);
                             }
+*/
                         }
                         break;
                 }
@@ -1395,14 +1404,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         StemVariable out = new StemVariable();
 
         if (returnByType) {
-            int i = 0;
-            for (String key : stemVariable.keySet()) {
+            for (Object key : stemVariable.keySet()) {
                 if (returnType == Constant.getType(stemVariable.get(key))) {
                     putLongOrStringKey(out, key);
                 }
             }
         } else {
-            for (String key : stemVariable.keySet()) {
+            for (Object key : stemVariable.keySet()) {
                 switch (returnScope) {
                     case all_keys:
                         putLongOrStringKey(out, key);
@@ -1434,13 +1442,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      * @param out
      * @param key
      */
-    protected void putLongOrStringKey(StemVariable out, String key) {
-        Long k = null;
-        if (out.isLongIndex(key)) {
-            k = Long.parseLong(key);
+    protected void putLongOrStringKey(StemVariable out, Object key) {
+        if (key instanceof Long) {
+            Long k =  (Long) key;
             out.put(k, k);
         } else {
-            out.put(key, key);
+            String k = (String) key;
+            out.put(k, k);
         }
 
     }
@@ -1458,7 +1466,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(HAS_KEYS + " requires 2 arguments", polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
+            throw new MissingArgException(HAS_KEYS + " requires 2 arguments", polyad.getArgCount() == 1 ? polyad.getArgAt(0) : polyad);
         }
         if (2 < polyad.getArgCount()) {
             throw new ExtraArgException(HAS_KEYS + " requires 2 arguments", polyad.getArgAt(2));
@@ -1535,7 +1543,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             } else {
                 StemVariable fillStem = (StemVariable) lastArg;
                 if (!fillStem.isList()) {
-                    throw new BadArgException("fill argument must be a list of scalars", polyad.getArgAt(polyad.getArgCount()-1)); // last arg is fill list
+                    throw new BadArgException("fill argument must be a list of scalars", polyad.getArgAt(polyad.getArgCount() - 1)); // last arg is fill list
                 }
                 QDLList qdlList = fillStem.getQDLList();
                 fill = qdlList.toArray(true, false);
@@ -1716,7 +1724,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             if (v instanceof StemVariable) {
                 StemVariable ii = (StemVariable) v;
                 if (!ii.isList()) {
-                    throw new BadArgException("stem index " + ii + " must be a list." , polyad.getArgAt(1));
+                    throw new BadArgException("stem index " + ii + " must be a list.", polyad.getArgAt(1));
                 }
                 IndexList indexList = new IndexList(ii);
                 IndexList returnedIL = arg0.get(indexList, true);
@@ -1729,11 +1737,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 gotValue = arg0.get(v);
             }
             if (gotValue != null) {
-                if (key instanceof Long) {
-                    output.put((Long) key, gotValue);
-                } else {
-                    output.put((String) key, gotValue);
-                }
+                output.putLongOrString( key, gotValue);
             }
         }
 
@@ -1891,7 +1895,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(INCLUDE_KEYS + " requires 2 argument", polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
+            throw new MissingArgException(INCLUDE_KEYS + " requires 2 argument", polyad.getArgCount() == 1 ? polyad.getArgAt(0) : polyad);
         }
 
         if (2 < polyad.getArgCount()) {
@@ -1937,7 +1941,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (2 < polyad.getArgCount()) {
-            throw new MissingArgException(EXCLUDE_KEYS + " requires 2 arguments", polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
+            throw new MissingArgException(EXCLUDE_KEYS + " requires 2 arguments", polyad.getArgCount() == 1 ? polyad.getArgAt(0) : polyad);
         }
 
         if (polyad.getArgCount() < 2) {
@@ -1957,8 +1961,12 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (!isStem(arg2)) {
             StemVariable result = new StemVariable();
             String excluded = arg2.toString();
-            for (String ndx : target.keySet()) {
-                result.put(ndx, target.get(ndx));
+            for (Object ndx : target.keySet()) {
+                if (ndx instanceof Long) {
+                    result.put((Long) ndx, target.get(ndx));
+                } else {
+                    result.put((String) ndx, target.get(ndx));
+                }
             }
             result.remove(excluded);
             polyad.setResult(result);
@@ -1998,7 +2006,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(SHUFFLE + " requires 2 arguments",polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
+            throw new MissingArgException(SHUFFLE + " requires 2 arguments", polyad.getArgCount() == 1 ? polyad.getArgAt(0) : polyad);
         }
 
         if (2 < polyad.getArgCount()) {
@@ -2041,23 +2049,27 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         StemVariable target = (StemVariable) arg;
         StemVariable newKeyStem = (StemVariable) arg2;
-        Set<String> newKeys = newKeyStem.keySet();
-        Set<String> usedKeys = target.keySet();
+        StemKeys newKeys = newKeyStem.keySet();
+        StemKeys usedKeys = target.keySet();
 
         StemVariable output = new StemVariable();
 
-        Set<String> keys = target.keySet();
+        StemKeys keys = target.keySet();
         // easy check is to count. If this fails, then we throw and exception.
         if (keys.size() != newKeys.size()) {
             throw new BadArgException(" the supplied set of keys must match every key in the source stem.", polyad.getArgAt(0));
         }
 
-        for (String key : keys) {
+        for (Object key : keys) {
             if (newKeys.contains(key)) {
-                String kk = newKeyStem.getString(key);
+                Object kk = newKeyStem.get(key);
                 usedKeys.remove(kk);
                 Object vv = target.get(kk);
-                output.put(key, vv);
+                if(key instanceof Long){
+                    output.put((Long)key, vv);
+                }  else{
+                    output.put((String)key, vv);
+                }
             } else {
                 throw new BadArgException("'" + key + "' is not a key in the second argument.", polyad.getArgAt(1));
             }
@@ -2102,7 +2114,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(RENAME_KEYS + " requires at least 2 arguments.", polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
+            throw new MissingArgException(RENAME_KEYS + " requires at least 2 arguments.", polyad.getArgCount() == 1 ? polyad.getArgAt(0) : polyad);
         }
         if (3 < polyad.getArgCount()) {
             throw new ExtraArgException(RENAME_KEYS + " takes at most 3 arguments", polyad.getArgAt(3));
@@ -2159,7 +2171,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(COMMON_KEYS + " requires 2 arguments",polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
+            throw new MissingArgException(COMMON_KEYS + " requires 2 arguments", polyad.getArgCount() == 1 ? polyad.getArgAt(0) : polyad);
         }
 
         if (2 < polyad.getArgCount()) {
@@ -2202,7 +2214,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (2 < polyad.getArgCount()) {
-            throw new MissingArgException(SET_DEFAULT + " requires 2 arguments", polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
+            throw new MissingArgException(SET_DEFAULT + " requires 2 arguments", polyad.getArgCount() == 1 ? polyad.getArgAt(0) : polyad);
         }
         if (2 < polyad.getArgCount()) {
             throw new ExtraArgException(SET_DEFAULT + " requires 2 arguments", polyad.getArgAt(2));
@@ -2235,7 +2247,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(MASK + " requires 2 arguments",polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
+            throw new MissingArgException(MASK + " requires 2 arguments", polyad.getArgCount() == 1 ? polyad.getArgAt(0) : polyad);
         }
 
         if (2 < polyad.getArgCount()) {
@@ -2251,7 +2263,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
 
         if (!areAllStems(obj1, obj2)) {
-            Statement s = isStem(obj1)?polyad.getArgAt(0):polyad.getArgAt(1);
+            Statement s = isStem(obj1) ? polyad.getArgAt(0) : polyad.getArgAt(1);
             throw new BadArgException("the " + MASK + " requires both arguments be stem variables", s);
         }
         StemVariable stem1 = (StemVariable) obj1;
@@ -2348,7 +2360,7 @@ z. :=  join3(q.,w.)
         }
 
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(JOIN + " requires at least 2 arguments",polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
+            throw new MissingArgException(JOIN + " requires at least 2 arguments", polyad.getArgCount() == 1 ? polyad.getArgAt(0) : polyad);
         }
         if (3 < polyad.getArgCount()) {
             throw new ExtraArgException(JOIN + " takes at most 3 arguments", polyad.getArgAt(3));
@@ -2410,9 +2422,12 @@ z. :=  join3(q.,w.)
         }
         StemUtility.DyadAxisAction joinAction = new StemUtility.DyadAxisAction() {
             @Override
-            public void action(StemVariable out, String key, StemVariable leftStem, StemVariable rightStem) {
-                out.put(key, leftStem.union(rightStem));
-
+            public void action(StemVariable out, Object key, StemVariable leftStem, StemVariable rightStem) {
+                if (key instanceof Long) {
+                    out.put((Long) key, leftStem.union(rightStem));
+                } else {
+                    out.put((String) key, leftStem.union(rightStem));
+                }
             }
         };
         if (Math.max(leftStem.getRank(), rightStem.getRank()) <= axis) {

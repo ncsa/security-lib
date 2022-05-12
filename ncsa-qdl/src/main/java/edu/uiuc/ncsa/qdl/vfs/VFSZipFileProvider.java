@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.qdl.vfs;
 
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants;
-import edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.AbstractEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLIOException;
 
 import java.io.File;
@@ -82,7 +82,7 @@ public class VFSZipFileProvider extends AbstractVFSFileProvider {
         public FileEntry getFE() throws Throwable {
             if (fe == null) {
                 // Don't do it unless they ask.
-                fe = FileEntries.toEntry(ze, content, AbstractFunctionEvaluator.FILE_OP_AUTO);
+                fe = FileEntries.toEntry(ze, content, AbstractEvaluator.FILE_OP_AUTO);
             }
             return fe;
         }

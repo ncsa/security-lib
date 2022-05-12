@@ -5,7 +5,7 @@
    Currently this is under construction. QDL runs it fine, but Java gives a stack overflow,
    at 222 calls to arg() (out of 700+ expected), so to test this probably needs JVM tweaking
    to run in the current implementation. The stack, however, seems to show it is working fine
-   otherwise.
+   otherwise for small numbers.
    http://rosettacode.org/wiki/Man_or_boy_test
 */
 b()-> 0;

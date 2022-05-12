@@ -139,7 +139,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         polyad.evaluate(state);
         StemVariable result = (StemVariable) polyad.getResult();
         assert result.size() == 4;
-        for (String key : result.keySet()) {
+        for (Object key : result.keySet()) {
             assert result.get(key).equals(expected.get(key));
         }
     }

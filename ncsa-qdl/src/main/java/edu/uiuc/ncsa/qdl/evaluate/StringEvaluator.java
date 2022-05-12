@@ -31,7 +31,7 @@ Note that there is an inheritance hierarchy here with String being a super class
 This is driven by Java because it is better to have small classes that specialize in, say, String
 functions rather than a massive single class. So the inheritence is just encapsulating the logic of this.
  */
-public class StringEvaluator extends AbstractFunctionEvaluator {
+public class StringEvaluator extends AbstractEvaluator {
     public static final String STRING_NAMESPACE = "string";
 
     @Override
@@ -557,23 +557,23 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
 
             if (isStem(rightArg)) {
                 StemVariable rightStem = (StemVariable) rightArg;
-                for (String key : leftStem.keySet()) {
+                for (Object key : leftStem.keySet()) {
                     if (rightStem.containsKey(key)) {
                         String delim = "";
 
                         if (isPrepend) {
                             if (omitDanglingDelimiter && currentCount == 0) {
-                                result = leftStem.getString(key);
+                                result = String.valueOf(leftStem.get(key));
                             } else {
-                                result = result + rightStem.getString(key) + leftStem.getString(key);
+                                result = result + rightStem.get(key) + leftStem.get(key);
                             }
                         } else {
                             if (omitDanglingDelimiter && currentCount == lsize - 1) {
 
-                                result = result + leftStem.getString(key);
+                                result = result + leftStem.get(key);
                             } else {
 
-                                result = result + leftStem.getString(key) + rightStem.getString(key);
+                                result = result + leftStem.get(key) + rightStem.get(key);
                             }
 
                         }
@@ -583,21 +583,21 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             } else {
                 // propagate the right arg as delimiter everywhere.
 
-                for (String key : leftStem.keySet()) {
+                for (Object key : leftStem.keySet()) {
                     if (isPrepend) {
                         if (omitDanglingDelimiter && currentCount == 0) {
 
-                            result = leftStem.getString(key);
+                            result = String.valueOf(leftStem.get(key));
                         } else {
-                            result = result + rightArg + leftStem.getString(key);
+                            result = result + rightArg + leftStem.get(key);
 
                         }
 
                     } else {
                         if (omitDanglingDelimiter && currentCount == lsize - 1) {
-                            result = result + leftStem.getString(key);
+                            result = result + leftStem.get(key);
                         } else {
-                            result = result + leftStem.getString(key) + rightArg;
+                            result = result + leftStem.get(key) + rightArg;
                         }
                     }
                     currentCount++;

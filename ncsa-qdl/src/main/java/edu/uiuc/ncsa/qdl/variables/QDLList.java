@@ -94,6 +94,7 @@ public class QDLList implements List, Serializable {
         if (Integer.MAX_VALUE < size) {
             throw new NotImplementedException("need to implement long lists");
         }
+        getArrayList().ensureCapacity((int)size);
         for (long i = 0L; i < size; i++) {
             arrayList.add(i);
         }
@@ -104,6 +105,7 @@ public class QDLList implements List, Serializable {
         if (Integer.MAX_VALUE < size) {
             throw new NotImplementedException("need to implement long lists");
         }
+        getArrayList().ensureCapacity((int)size);
         int fillSize = -1;
         if (fill != null && fill.length != 0) {
             fillSize = fill.length;
@@ -497,6 +499,7 @@ public class QDLList implements List, Serializable {
      *
      * @return
      */
+/*
     public List<Long> getKeys() {
         List<Long> keys = new ArrayList<>();
         for (long i = 0; i < getArrayList().size(); i++) {
@@ -507,6 +510,7 @@ public class QDLList implements List, Serializable {
         }
         return keys;
     }
+*/
 
     /**
      * Get the keys in a linked hash set. This is specifically for cases where stems have to
@@ -514,7 +518,18 @@ public class QDLList implements List, Serializable {
      *
      * @return
      */
-    public LinkedHashSet<String> getKeysAsStrings() {
+    public StemKeys orderedKeys() {
+        StemKeys stemKeys = new StemKeys();
+        TreeSet<Long> treeSet = new TreeSet<>();
+        for (long i = 0; i < getArrayList().size(); i++) {
+            treeSet.add(i);
+        }
+        for (SparseEntry sparseEntry : getSparseEntries()) {
+            treeSet.add(sparseEntry.index);
+        }
+        stemKeys.setListkeys(treeSet);
+        return stemKeys;
+/*
         LinkedHashSet<String> keys = new LinkedHashSet<>();
         for (int i = 0; i < getArrayList().size(); i++) {
             keys.add(Integer.toString(i));
@@ -523,6 +538,7 @@ public class QDLList implements List, Serializable {
             keys.add(Long.toString(sparseEntry.index));
         }
         return keys;
+*/
     }
 
     @Override

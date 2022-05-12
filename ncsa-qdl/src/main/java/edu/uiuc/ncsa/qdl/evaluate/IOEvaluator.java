@@ -28,7 +28,7 @@ import static edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils.setupMySQLDat
  * <p>Created by Jeff Gaynor<br>
  * on 1/16/20 at  9:18 AM
  */
-public class IOEvaluator extends AbstractFunctionEvaluator {
+public class IOEvaluator extends AbstractEvaluator {
 
     public static final String IO_NAMESPACE = "io";
     public static final int IO_FUNCTION_BASE_VALUE = 4000;
@@ -381,7 +381,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 1) {
-            throw new MissingArgException(DIR + " requires at least 1 argument",polyad);
+            throw new MissingArgException(DIR + " requires at least 1 argument", polyad);
         }
 
         if (1 < polyad.getArgCount()) {
@@ -548,8 +548,9 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                 break;
             case VFS_TYPE_MYSQL:
                 Map<String, String> myCfg = new HashMap<>();
-                for (String key : cfg.keySet()) {
-                    myCfg.put(key, cfg.getString(key));
+                for (Object key : cfg.keySet()) {
+                    Object v = cfg.get(key);
+                    myCfg.put(String.valueOf(key), v == null ? null : v.toString());
                 }
                 VFSDatabase db = setupMySQLDatabase(null, myCfg);
                 vfs = new VFSMySQLProvider(db,
@@ -700,14 +701,14 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
 
     private String convertToIni(StemVariable obj2) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (String key0 : obj2.keySet()) {
+        for (Object key0 : obj2.keySet()) {
             stringBuilder.append("[" + key0 + "]\n");
             Object obj = obj2.get(key0);
             if (!(obj instanceof StemVariable)) {
                 throw new IllegalArgumentException("ini files must have stems as entries.");
             }
             StemVariable innerStem = (StemVariable) obj;
-            for (String key1 : innerStem.keySet()) {
+            for (Object key1 : innerStem.keySet()) {
                 Object innerObject = innerStem.get(key1);
                 if (!isStem(innerObject)) {
                     stringBuilder.append(key1 + " := " + InputFormUtil.inputForm(innerObject) + "\n");
@@ -715,7 +716,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                     StemVariable innerInnerObject = (StemVariable) innerObject;
                     String out = "";
                     boolean isFirst = true;
-                    for (String key2 : innerInnerObject.keySet()) {
+                    for (Object key2 : innerInnerObject.keySet()) {
                         Object object2 = innerInnerObject.get(key2);
                         if (isStem(object2)) {
                             throw new IllegalArgumentException("Ini files do not support nexted stems");
@@ -739,7 +740,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 1) {
-            throw new MissingArgException(READ_FILE + " requires at least 1 argument",polyad);
+            throw new MissingArgException(READ_FILE + " requires at least 1 argument", polyad);
         }
 
         if (2 < polyad.getArgCount()) {

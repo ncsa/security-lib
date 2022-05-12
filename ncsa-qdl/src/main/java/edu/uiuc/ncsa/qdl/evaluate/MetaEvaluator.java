@@ -19,10 +19,10 @@ import java.util.*;
 
 This inherits from all the other built in functions and does very little except be a facade for them.
  */
-public class MetaEvaluator extends AbstractFunctionEvaluator {
+public class MetaEvaluator extends AbstractEvaluator {
     /**
      * Factory method. You should not override this class to add more of your own evaluators. Just
-     * get the instance and {@link #addEvaluator(int, AbstractFunctionEvaluator)} to it at
+     * get the instance and {@link #addEvaluator(int, AbstractEvaluator)} to it at
      * index 0 (or it will get missed -- last index is for functions and throws and
      * exception if no function found. It will snoop
      * through your evaluator too. If you are writing your own evaluator, your type numbers
@@ -51,13 +51,13 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
         return metaEvaluator;
     }
 
-    static protected void addE(AbstractFunctionEvaluator evaluator) {
+    static protected void addE(AbstractEvaluator evaluator) {
         metaEvaluator.addEvaluator(0, evaluator);  //  3000
         lookupByNS.put(evaluator.getNamespace(), evaluator);
         systemNamespaces.add(evaluator.getNamespace());
     }
 
-    static Map<String, AbstractFunctionEvaluator> lookupByNS = new HashMap<>();
+    static Map<String, AbstractEvaluator> lookupByNS = new HashMap<>();
 
     /**
      * Given the name of a built in function, find the number of possible arguments it
@@ -116,20 +116,20 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
     static MetaEvaluator metaEvaluator = null;
 
     public static final int META_BASE_VALUE = 6000;
-    List<AbstractFunctionEvaluator> evaluators = new ArrayList<>();
+    List<AbstractEvaluator> evaluators = new ArrayList<>();
 
-    public void addEvaluator(AbstractFunctionEvaluator evaluator) {
+    public void addEvaluator(AbstractEvaluator evaluator) {
         evaluators.add(evaluator);
     }
 
-    public void addEvaluator(int index, AbstractFunctionEvaluator evaluator) {
+    public void addEvaluator(int index, AbstractEvaluator evaluator) {
         evaluators.add(index, evaluator);
     }
 
 
     @Override
     public int getType(String name) {
-        for (AbstractFunctionEvaluator evaluator : evaluators) {
+        for (AbstractEvaluator evaluator : evaluators) {
             int type = evaluator.getType(name);
             if (type != UNKNOWN_VALUE) {
                 return type;
@@ -175,13 +175,13 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
                     throw qdlExceptionWithTrace;
                 }
             }
-            for (AbstractFunctionEvaluator evaluator : evaluators) {
+            for (AbstractEvaluator evaluator : evaluators) {
                 if (evaluator.evaluate(polyad, state)) return true;
             }
 
         } else {
             try {
-                for (AbstractFunctionEvaluator evaluator : evaluators) {
+                for (AbstractEvaluator evaluator : evaluators) {
                     if (evaluator.evaluate(polyad, state)) return true;
                 }
                 return getFunctionEvaluator().evaluate(polyad, state);
@@ -197,7 +197,7 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
 
     public boolean evaluateOLD(Polyad polyad, State state) {
         FunctionArgException farg = null;
-        for (AbstractFunctionEvaluator evaluator : evaluators) {
+        for (AbstractEvaluator evaluator : evaluators) {
             try {
                 if (evaluator.evaluate(polyad, state)) return true;
             }catch(FunctionArgException functionArgException){
@@ -225,7 +225,7 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
 
     public boolean evaluate(String alias, Polyad polyad, State state) {
 
-        for (AbstractFunctionEvaluator evaluator : evaluators) {
+        for (AbstractEvaluator evaluator : evaluators) {
             if (evaluator.evaluate(alias, polyad, state)) return true;
         }
         throw new UndefinedFunctionException("unknown function '" + polyad.getName() + "'", polyad);
@@ -233,7 +233,7 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
 
     public TreeSet<String> listFunctions(boolean listFQ) {
         TreeSet<String> names = new TreeSet<>();
-        for (AbstractFunctionEvaluator evaluator : evaluators) {
+        for (AbstractEvaluator evaluator : evaluators) {
             names.addAll(evaluator.listFunctions(listFQ));
         }
         return names;
@@ -245,7 +245,7 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
     public String[] getFunctionNames() {
         if (allNames == null) {
             ArrayList<String> namesList = new ArrayList<>();
-            for (AbstractFunctionEvaluator evaluator : evaluators) {
+            for (AbstractEvaluator evaluator : evaluators) {
                 namesList.addAll(Arrays.asList(evaluator.getFunctionNames()));
             }
             allNames = new String[namesList.size()];

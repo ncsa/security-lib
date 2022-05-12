@@ -93,6 +93,9 @@ public class StemVariable extends HashMap<String, Object> {
         return new BigDecimal(obj.toString());
     }
 
+    /*
+     get call with a conversion to a string or null if the object is null. This invokes to string on the object.
+     */
     public String getString(Long key) {
         Object obj = get(key);
         if (obj == null) {
@@ -101,6 +104,9 @@ public class StemVariable extends HashMap<String, Object> {
         return obj.toString();
     }
 
+    /*
+     get call with a conversion to a string or null if the object is null. This invokes to string on the object.
+     */
     public String getString(String key) {
         Object obj = get(key);
         if (obj == null) {
@@ -180,10 +186,6 @@ public class StemVariable extends HashMap<String, Object> {
 
     public Object remove(Long key) {
         getQDLList().removeByIndex(key);
-/*
-        StemEntry stemEntry = new StemEntry(key);
-        getStemList().remove(stemEntry);
-*/
         return null;
     }
 
@@ -220,16 +222,6 @@ public class StemVariable extends HashMap<String, Object> {
      */
     public void addList(List list) {
         getQDLList().addAll(list);
-/*
-        long startIndex = -1L;
-        if (!getQDLList().isEmpty()) {
-            startIndex = getQDLList().last().index;
-        }
-        for (int i = 0; i < list.size(); i++) {
-            SparseEntry sparseEntry = new SparseEntry(i + startIndex + 1, list.get(i));
-            getQDLList().add(sparseEntry);
-        }
-*/
     }
 
 
@@ -304,40 +296,6 @@ public class StemVariable extends HashMap<String, Object> {
 
     }
 
-    /**
-     * Initialize a stem variable with all the same value. Very useful when floating a single value
-     * to a stem.
-     *
-     * @param template
-     * @param value
-     * @return
-     */
- /*   public StemVariable fillStem(StemVariable template, Object value) {
-        clear();
-        for (String key : template.keySet()) {
-            put(key, value);
-        }
-        return this;
-    }
-*/
-
-    /**
-     * returns the set of keys common to this stem and its argument. The list may be empty.
-     *
-     * @param x
-     * @return
-     */
-/*
-    public List<String> getCommonKeys(StemVariable x) {
-        ArrayList<String> commonKeys = new ArrayList<>();
-        for (String key : x.keySet()) {
-            if (containsKey(key)) {
-                commonKeys.add(key);
-            }
-        }
-        return commonKeys;
-    }
-*/
 
     /**
      * Make a shallow copy of this stem variable.
@@ -347,21 +305,13 @@ public class StemVariable extends HashMap<String, Object> {
     @Override
     public Object clone() {
         StemVariable output = new StemVariable();
-       /* next bit does not work if there are cycles in the stem or nulls.
-       JSON json = toJSON();
-        if(json.isArray()){
-            output.fromJSON((JSONArray) json);
-
-        }else {
-            output.fromJSON((JSONObject) json);
-        }*/
-
-        for (String key : keySet()) {
+        for (Object key : keySet()) {
             Object obj = get(key);
+            boolean isLongKey = key instanceof Long;
             if (obj instanceof StemVariable) {
-                output.put(key, ((StemVariable) obj).clone());
+                output.putLongOrString(key,((StemVariable) obj).clone());
             } else {
-                output.put(key, obj);
+                output.putLongOrString(key, obj);
             }
         }
 
@@ -371,7 +321,7 @@ public class StemVariable extends HashMap<String, Object> {
     public StemVariable mask(StemVariable stem2) {
         StemVariable result = new StemVariable();
 
-        for (String key : stem2.keySet()) {
+        for (Object key : stem2.keySet()) {
             if (!containsKey(key)) {
                 throw new IllegalArgumentException("'" + key + "' is not a key in the first stem. " +
                         "Every key in the second argument must be a key in the first.");
@@ -382,7 +332,7 @@ public class StemVariable extends HashMap<String, Object> {
             }
             Boolean b = (Boolean) rawBit;
             if (b) {
-                result.put(key, get(key));
+                result.putLongOrString(key, get(key));;
             }
         }
         return result;
@@ -391,7 +341,7 @@ public class StemVariable extends HashMap<String, Object> {
     public StemVariable commonKeys(StemVariable arg2) {
         StemVariable result = new StemVariable();
         int index = 0;
-        for (String key : arg2.keySet()) {
+        for (Object key : arg2.keySet()) {
             if (containsKey(key)) {
                 String currentIndex = Integer.toString(index++);
                 result.put(currentIndex, key);
@@ -400,47 +350,57 @@ public class StemVariable extends HashMap<String, Object> {
         return result;
     }
 
+    /*
+    In point of fact, renameKeys does not handle list values, only string keys
+     */
     public void renameKeys(StemVariable newKeys, boolean overWriteKeys) {
-        for (String oldKey : newKeys.keySet()) {
+        for (Object oldKey : newKeys.keySet()) {
             if (containsKey(oldKey)) {
-                String newKey = newKeys.getString(oldKey);
+                Object newKey = newKeys.get(oldKey);
                 if (containsKey(newKey)) {
                     if (overWriteKeys) {
-                        put(newKey, get(oldKey));
+                        putLongOrString(newKey, get(oldKey));
                         remove(oldKey);
                     } else {
-                        throw new IllegalArgumentException("'" + newKey + "' is already a key. You  must explicitly overwrite it with he flag");
+                        throw new IllegalArgumentException("'" + oldKey + "' is already a key. You  must explicitly overwrite it with the flag");
                     }
                 } else {
-                    put(newKey, get(oldKey));
+                    putLongOrString(newKey, get(oldKey));
                     remove(oldKey);
                 }
             }
         }
     }
 
+    @Override
+    public Object remove(Object key) {
+        if (key instanceof Long) {
+            return remove((Long) key);
+        }
+        return super.remove(key);
+    }
+
     /*  Quick example of rename.
-          b.OA2_foo := 'a';
-          b.OA2_woof := 'b';
-          b.OA2_arf := 'c';
-          b.fnord := 'd';
-          rename_keys(b., keys(b.)-'OA2_')
-     */
+              b.OA2_foo := 'a';
+              b.OA2_woof := 'b';
+              b.OA2_arf := 'c';
+              b.fnord := 'd';
+              rename_keys(b., keys(b.)-'OA2_')
+         */
     public StemVariable excludeKeys(StemVariable keyList) {
         return oldExcludeKeys(keyList);
     }
 
     protected StemVariable oldExcludeKeys(StemVariable keyList) {
         StemVariable result = new StemVariable();
-        for (String key : keySet()) {
-            if (isLongIndex(key)) {
-                Long longKey = Long.parseLong(key);
-                if (!keyList.containsValue(longKey)) {
-                    result.put(key, get(key));
+        for (Object key : keySet()) {
+            if (key instanceof Long) {
+                if (!keyList.containsValue((Long) key)) {
+                    result.put((Long) key, get(key));
                 }
             } else {
                 if (!keyList.containsValue(key)) {
-                    result.put(key, get(key));
+                    result.put((String) key, get(key));
                 }
             }
 
@@ -708,7 +668,21 @@ public class StemVariable extends HashMap<String, Object> {
 
 
     String int_regex = "[+-]?[1-9][0-9]*";
-
+    public void putLongOrString(Object key, Object value){
+        if(key instanceof Long){
+            put((Long)key, value);
+        }else{
+            put((String)key, value);
+        }
+    }
+    /**
+     * Does a regex on the index to see if it is really a long. Note that this
+     * still is needed since a user can set a.'2' := 3 and this should turn
+     * it into a list entry otherwise we get both string and list entries with
+     * "the same" key.
+     * @param key
+     * @return
+     */
     public boolean isLongIndex(String key) {
         // special case of index being zero!! Otherwise, no such index can start with zero,
         // so a key of "01" is a string, not the number 1. Sorry, best we can do.
@@ -943,14 +917,8 @@ public class StemVariable extends HashMap<String, Object> {
             }
             isFirst = false;
         }
-        Set<String> keys;
-        if (list == null) {
-            keys = keySet(); // process everything here.
-        } else {
-            keys = super.keySet(); // only process proper stem entries.
-            output = list + "~" + output;
-        }
-        for (String key : keys) {
+        StemKeys keys = keySet();
+        for (Object key : keys) {
             if (isFirst) {
                 isFirst = false;
             } else {
@@ -1001,7 +969,7 @@ public class StemVariable extends HashMap<String, Object> {
             keys = super.keySet(); // only process proper stem entries.
             output = list + "~" + output;
         }
-        for (String key : keys) {
+        for (Object key : keys) {
             if (isFirst) {
                 isFirst = false;
             } else {
@@ -1104,20 +1072,27 @@ public class StemVariable extends HashMap<String, Object> {
         }
     }
 
-    Set<String> orderedkeySet() {
-        if (super.keySet().isEmpty()) {
-            return getQDLList().getKeysAsStrings();
-        }
+    StemKeys orderedkeySet() {
 
+        if (super.keySet().isEmpty() && getQDLList().isEmpty()) {
+            return new StemKeys();
+        }
+        StemKeys stemKeys = getQDLList().orderedKeys();
+        TreeSet<String> stringTreeSet = new TreeSet<>();
+        stringTreeSet.addAll(super.keySet());
+        stemKeys.setStemKeys(stringTreeSet);
+        return stemKeys;
+/*
         LinkedHashSet<String> h;
         if (getQDLList().isEmpty()) {
             h = new LinkedHashSet<>();
             h.addAll(super.keySet());
             return h;
         }
-        h = getQDLList().getKeysAsStrings();
+        h = getQDLList().orderedKeys();
         h.addAll(super.keySet());
         return h;
+*/
         /*TreeSet<OrderedIndexEntry> stemKeys = new TreeSet<>();
 
         Set<String> currentKeys = new HashSet<>();
@@ -1180,7 +1155,7 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     @Override
-    public Set<String> keySet() {
+    public StemKeys keySet() {
         return orderedkeySet();
     }
 
@@ -1209,7 +1184,7 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public boolean containsKey(String key) {
-        if (isLongIndex(key)) {
+       if (isLongIndex(key)) {
             boolean rc = getQDLList().containsKey(key);
             return rc;
         }
@@ -1223,17 +1198,7 @@ public class StemVariable extends HashMap<String, Object> {
         if (getQDLList().isEmpty()) return false;
         // *sigh* have to look for it
         return getQDLList().contains(value);
-/*
-        for (SparseEntry s : getQDLList()) {
-            // Have to check that values like '007' are checked first.
-            if (s.entry.equals(value)) return true;
-            if (isIntVar(value.toString())) {
-                if (s.entry.equals(Long.parseLong(value.toString()))) return true;
 
-            }
-        }
-        return false;
-*/
     }
 
     @Override
@@ -1617,13 +1582,16 @@ public class StemVariable extends HashMap<String, Object> {
 
     protected KeyRankMap allKeys2() {
         KeyRankMap keyRankMap = new KeyRankMap();
-        for (String key : keySet()) {
+        for (Object key : keySet()) {
             List list = new ArrayList();
+            list.add(key);
+/*
             if (isLongIndex(key)) {
                 list.add(Long.parseLong(key));
             } else {
                 list.add(key);
             }
+*/
             Object v = get(key);
             if (v instanceof StemVariable) {
                 indices((StemVariable) v, list, keyRankMap);
@@ -1635,14 +1603,17 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     protected void indices(StemVariable v, List list, KeyRankMap keyRankMap) {
-        for (String key : v.keySet()) {
+        for (Object key : v.keySet()) {
             List list2 = new ArrayList();
             list2.addAll(list);
-            if (isLongIndex(key)) {
-                list2.add(Long.parseLong(key));
+            list2.add(key);
+/*
+            if (key instanceof Long) {
+                list2.add((Long)key);
             } else {
                 list2.add(key);
             }
+*/
             if (v.get(key) instanceof StemVariable) {
                 indices((StemVariable) v.get(key), list2, keyRankMap);
             } else {
@@ -1664,7 +1635,7 @@ public class StemVariable extends HashMap<String, Object> {
 
     public QDLSet valueSet() {
         QDLSet qdlSet = new QDLSet();
-        for (String key : keySet()) {
+        for (Object key : keySet()) {
             Object value = get(key);
             switch (Constant.getType(value)) {
                 case Constant.STEM_TYPE:
@@ -1687,7 +1658,7 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public boolean hasValue(Object x) {
-        for (String k : keySet()) {
+        for (Object k : keySet()) {
             Object v = get(k);
             if (v instanceof StemVariable) {
                 if (((StemVariable) v).hasValue(x)) {

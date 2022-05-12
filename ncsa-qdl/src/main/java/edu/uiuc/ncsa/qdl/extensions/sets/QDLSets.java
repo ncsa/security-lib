@@ -44,7 +44,7 @@ public class QDLSets implements QDLModuleMetaClass {
                 throw new IllegalArgumentException("argument to " + TO_SET_COMMAND + " must be list");
             }
             StemVariable result = new StemVariable();
-            for (String key : stemVariable.keySet()) {
+            for (Object key : stemVariable.keySet()) {
                 Object value = stemVariable.get(key);
                 int type = Constant.getType(value);
                 switch (type) {
@@ -115,8 +115,8 @@ public class QDLSets implements QDLModuleMetaClass {
             StemVariable stem0 = (StemVariable) objects[0];
 
             StemVariable result = new StemVariable();
-            for (String key : stem0.keySet()) {
-                result.put(key, stem1.containsKey(key));
+            for (Object key : stem0.keySet()) {
+                result.putLongOrString(key, stem1.containsKey(key));
             }
             return result;
         }
@@ -160,9 +160,9 @@ public class QDLSets implements QDLModuleMetaClass {
             }
             StemVariable stem1 = (StemVariable) objects[1];
             StemVariable result = new StemVariable();
-            for (String key : stem0.keySet()) {
+            for (Object key : stem0.keySet()) {
                 if (stem1.containsKey(key)) {
-                    result.put(key, key);
+                    result.putLongOrString(key, key);
                 }
             }
             return result;
@@ -212,7 +212,7 @@ public class QDLSets implements QDLModuleMetaClass {
             defaultCount = Math.min(defaultCount, arg.keySet().size());
             StemVariable result = new StemVariable();
             int i = 0;
-            for (String key : arg.keySet()) {
+            for (Object key : arg.keySet()) {
                 if (i == defaultCount) {
                     break;
                 }
@@ -299,7 +299,7 @@ public class QDLSets implements QDLModuleMetaClass {
             StemVariable arg = (StemVariable) objects[0];
             long i = 0L;
             StemVariable result = new StemVariable();
-            for (String key : arg.keySet()) {
+            for (Object key : arg.keySet()) {
                 result.put(i++, key);
             }
             return result;
@@ -344,9 +344,9 @@ public class QDLSets implements QDLModuleMetaClass {
             }
             StemVariable stem1 = (StemVariable) objects[1];
             StemVariable result = new StemVariable();
-            for (String key : stem0.keySet()) {
+            for (Object key : stem0.keySet()) {
                 if (stem0.containsKey(key) && !stem1.containsKey(key)) {
-                    result.put(key, key);
+                    result.putLongOrString(key, key);
                 }
             }
             return result;
@@ -392,7 +392,7 @@ public class QDLSets implements QDLModuleMetaClass {
             StemVariable stem1 = (StemVariable) objects[1];
             StemVariable stem0 = (StemVariable) objects[0];
 
-            for (String key : stem0.keySet()) {
+            for (Object key : stem0.keySet()) {
                 if (!stem1.containsKey(key)) {
                     return Boolean.FALSE;
                 }

@@ -37,7 +37,7 @@ public class StemUtility {
          * @param leftStem  - The left hand stem's argument at this axis
          * @param rightStem - the right hand stem's argument at this axis.
          */
-        void action(StemVariable out, String key, StemVariable leftStem, StemVariable rightStem);
+        void action(StemVariable out, Object key, StemVariable leftStem, StemVariable rightStem);
     }
 
     public static boolean isStem(Object o) {
@@ -75,7 +75,8 @@ public class StemUtility {
                                           boolean maxDepth,
                                           DyadAxisAction axisAction) {
         StemVariable commonKeys = left0.commonKeys(right0);
-        for (String key0 : commonKeys.keySet()) {
+        for (Object key0 : commonKeys.keySet()) {
+            boolean isKey0Long = key0 instanceof Long;
             Object leftObj = left0.get(key0);
             Object rightObj = right0.get(key0);
 
@@ -109,53 +110,23 @@ public class StemUtility {
                         throw new RankException("rank error");
                     }
                     StemVariable out1 = new StemVariable();
-                    out0.put(key0, out1);
+                    if(isKey0Long){
+                        out0.put((Long)key0, out1);
+                    }else{
+                        out0.put((String)key0, out1);
+                    }
                     axisDayadRecursion(out1, left1, right1, depth - 1, maxDepth, axisAction);
                 } else {
-                    out0.put(key0, left1.union(right1));
+                    if(isKey0Long){
+                        out0.put((Long)key0, left1.union(right1));
+                    }else {
+                        out0.put((String)key0, left1.union(right1));
+                    }
                 }
             }
         }
     }
 
-  /*  public static void axisMonadRecursion(StemVariable out0,
-                                          StemVariable arg,
-                                          int depth,
-                                          boolean maxDepth,
-                                          MonadAxisAction axisAction) {
-        System.out.println("starting depth=" + depth + ", maxDepth=" + maxDepth + ", arg=" + arg);
-        for (String key0 : arg.keySet()) {
-            Object argObj = arg.get(key0);
-
-            StemVariable arg1 = null;
-            if (isStem(argObj)) {
-                arg1 = (StemVariable) argObj;
-            } else {
-                arg1 = new StemVariable();
-                arg1.put(0L, argObj);
-            }
-
-            // bottomedout means that the axis was greater than the depth. If this is trying
-            // to work on an unknown last axis, that is ok.
-            boolean bottomedOut = !isStem(argObj) && maxDepth && 0 < depth;
-            //boolean bottomedOut =  0 < depth;
-            if (bottomedOut) {
-                axisAction.action(out0, key0, arg1);
-            } else {
-                if (0 < depth) {
-                    if (!isStem(argObj)) {
-                        throw new RankException("rank error");
-                    }
-                    StemVariable out1 = new StemVariable();
-                    out0.put(key0, out1);
-                    axisMonadRecursion(out1, arg1, depth - 1, maxDepth, axisAction);
-                } else {
-                    //out0.put(key0, arg1);
-                    axisAction.action(out0, key0, arg1);
-                }
-            }
-        }
-    }*/
 
 
     /**
@@ -180,12 +151,16 @@ public class StemUtility {
             return walker.action(inStem);
         }
         StemVariable outStem = new StemVariable();
-        for (String key1 : inStem.keySet()) {
+        for (Object key1 : inStem.keySet()) {
             Object obj = inStem.get(key1);
             if (!isStem(obj)) {
                 continue;
             }
-            outStem.put(key1, axisWalker((StemVariable) obj, depth - 1, walker));
+            if(key1 instanceof Long){
+                outStem.put((Long)key1, axisWalker((StemVariable) obj, depth - 1, walker));
+            }else{
+                outStem.put((String)key1, axisWalker((StemVariable) obj, depth - 1, walker));
+            }
         }
         return outStem;
     }
@@ -292,8 +267,7 @@ public class StemUtility {
         if(!stem.isList()){
              throw new IllegalArgumentException("cannot format general stem");
         }
-    //     if(stem.getRank() == 1L){
-             for(String key : stem.keySet()){
+             for(Object key : stem.keySet()){
                  Object obj = stem.get(key);
                  if(obj instanceof StemVariable){
                      StemVariable stemVariable = (StemVariable) obj;

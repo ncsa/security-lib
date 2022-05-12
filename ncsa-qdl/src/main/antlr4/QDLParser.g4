@@ -88,9 +88,18 @@ assertStatement2:
         f_arg : (stemValue | f_ref);
        f_args : f_arg (',' f_arg)* ;
         f_ref : F_REF;
-//        f_ref : FunctionMarker (AllOps | FUNCTION_NAME  | (FuncStart ')'));
-   //       f_ref : FunctionMarker (AllOps | FUNCTION_NAME | (FuncStart ')'));  // This allows for @f and @f() as equivalent.
-      //  me : variable? Hash expression;
+        // The next few lines are kept for reference to see what not to do.
+
+        // The intent was to
+        // promote # to being an operator in its own right, but that played hob with
+        // parsing. What we have works fine and this would require quite a substantial
+        // rewrite of the parser in places for not much payoff.
+        // me : variable? Hash expression;
+
+        // The next were to promote @ to be an operator in its own right. Also not much payoff
+        // for a big rewrite.
+        // f_ref : FunctionMarker (AllOps | FUNCTION_NAME  | (FuncStart ')'));
+        // f_ref : FunctionMarker (AllOps | FUNCTION_NAME | (FuncStart ')'));  // This allows for @f and @f() as equivalent.
 
 // Again, the order here has been tweaked and any changes to this list will require running all the tests
 // and checking for regression. Also Antlr 4 interprets the # tag in the right hand column and
@@ -147,6 +156,9 @@ expression
  | Bool                                                                        #logical
  | Null                                                                        #null
  | expression  op=ASSIGN  expression                                           #assignment
+ // removed the next expression (and keeping it for reference wit this comment) because empty expressions were
+ // being misinterpreted inside of slices in certain edge cases. It is better to just get errors if a
+ // user types in something like ;;;; rather than have wrong slices.
  //| ';'                                                                         #semi_for_empty_expressions
  ;
                    

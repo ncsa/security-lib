@@ -374,7 +374,7 @@ public class WhileLoop implements Statement {
             }
 
         } else {
-            for (String key : stemVariable.keySet()) {
+            for (Object key : stemVariable.keySet()) {
                 localState.getVStack().localPut(new VThing(new XKey(loopVar), key));
                 for (Statement statement : getStatements()) {
                     try {

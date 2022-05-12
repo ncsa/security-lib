@@ -23,7 +23,7 @@ import static edu.uiuc.ncsa.qdl.variables.StemUtility.axisWalker;
  * <p>Created by Jeff Gaynor<br>
  * on 9/30/21 at  5:07 PM
  */
-public class ListEvaluator extends AbstractFunctionEvaluator {
+public class ListEvaluator extends AbstractEvaluator {
     public static final String LIST_NAMESPACE = "list";
     public static final String LIST_FQ = LIST_NAMESPACE + NS_DELIMITER;
     public static final int LIST_BASE_VALUE = 10000;
@@ -546,22 +546,25 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
             StemVariable outStem = new StemVariable();
             StemVariable stemArg = (StemVariable) arg1;
             ArrayList<Object> rawArgs = new ArrayList<>();
-            for (String key : stemArg.keySet()) {
+            for (Object key : stemArg.keySet()) {
                 rawArgs.clear();
                 Object value = stemArg.get(key);
                 if(argCount == 2){
+                    rawArgs.add(key);
+/*
                     if(outStem.isLongIndex(key)){
                          rawArgs.add(Long.parseLong(key));
                     }else {
                         rawArgs.add(key);
                     }
+*/
                 }
                 rawArgs.add(stemArg.get(key));
                 f.setArguments(toConstants(rawArgs));
                 Object test = f.evaluate(state);
                 if (isBoolean(test)) {
                     if ((Boolean) test) {
-                        outStem.put(key, value);
+                        outStem.putLongOrString(key, value);
                     }
                 }
             }

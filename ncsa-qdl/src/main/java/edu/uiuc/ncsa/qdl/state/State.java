@@ -434,7 +434,7 @@ public class State extends FunctionState implements QDLConstants {
      * @return
      */
     public QDLScript getScriptFromVFS(String fqName) throws Throwable {
-        VFSEntry entry = getFileFromVFS(fqName, AbstractFunctionEvaluator.FILE_OP_TEXT_STRING);
+        VFSEntry entry = getFileFromVFS(fqName, AbstractEvaluator.FILE_OP_TEXT_STRING);
         if (entry == null) {
             return null;
         }

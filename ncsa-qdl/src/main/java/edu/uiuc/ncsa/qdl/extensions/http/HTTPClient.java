@@ -136,8 +136,8 @@ public class HTTPClient implements QDLModuleMetaClass {
         // make the parameters.
         String p = parameters.size() == 0 ? "" : "?";
         boolean isFirst = true;
-        for (String key : parameters.keySet()) {
-            String v = URLEncoder.encode(parameters.getString(key), "UTF-8");
+        for (Object key : parameters.keySet()) {
+            String v = URLEncoder.encode(String.valueOf(parameters.get(key)), "UTF-8");
             if (isFirst) {
                 p = p + key + "=" + v;
                 isFirst = false;
@@ -595,8 +595,8 @@ public class HTTPClient implements QDLModuleMetaClass {
                     break;
                 case CONTENT_FORM:
                     boolean isFirst = true;
-                    for (String key : payload.keySet()) {
-                        body = body + (isFirst ? "" : "&") + key + "=" + payload.getString(key);
+                    for (Object key : payload.keySet()) {
+                        body = body + (isFirst ? "" : "&") + key + "=" + payload.get(key);
                         if (isFirst) isFirst = false;
                     }
                     break;

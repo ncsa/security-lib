@@ -22,7 +22,7 @@ import static edu.uiuc.ncsa.qdl.variables.Constant.*;
  * <p>Created by Jeff Gaynor<br>
  * on 1/13/20 at  3:20 PM
  */
-public class OpEvaluator extends AbstractFunctionEvaluator {
+public class OpEvaluator extends AbstractEvaluator {
     // reference for unicode and other characters: https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
     public static final String AND = "&&";
     public static final String AND2 = "∧"; // unicode 2227
