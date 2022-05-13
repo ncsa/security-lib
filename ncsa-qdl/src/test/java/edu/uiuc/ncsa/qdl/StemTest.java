@@ -2092,7 +2092,7 @@ public class StemTest extends AbstractQDLTester {
     }
 
     // Managed to break subset doing a refactor, so these are the regression tests to detect that
-    // should something like it happen again.
+    // should something like it happen again.  These test a contiguous list
     public void testSubsetContract() throws Throwable {
             State state = testUtils.getNewState();
             StringBuffer script = new StringBuffer();
@@ -2104,13 +2104,46 @@ public class StemTest extends AbstractQDLTester {
             addLine(script, "ok5 := size(subset([;10],-3,0)) == 0;");
             QDLInterpreter interpreter = new QDLInterpreter(null, state);
             interpreter.execute(script.toString());
-            assert getBooleanValue("ok0", state) : " reqesting tale of list failed";
+            assert getBooleanValue("ok0", state) : " reqesting tail of list failed";
             assert getBooleanValue("ok1", state) : " requesting 4 elements from middle of list failed";
             assert getBooleanValue("ok2", state) : "negative count should return tail";
             assert getBooleanValue("ok3", state) : "negative start index failed";
             assert getBooleanValue("ok4", state) : "subset of scalar should return list with single value ";
             assert getBooleanValue("ok5", state) : "count of 0 should return empty list";
         }
+
+    public void testSubsetSparseContract() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "b. := [;15];remove(b.4);remove(b.7);remove(b.10);remove(b.11);"); // sparse list with gaps
+        addLine(script, "ok0 := reduce(@&&, subset(b., 10) == [12,13,14]);");
+        addLine(script, "ok1 := reduce(@&&, subset(b., 10, 10) == [12,13,14]);");
+        addLine(script, "ok2 := size(subset(b., 1000)) == 0;");
+        addLine(script, "ok3 := reduce(@&&, subset(b., 3, 6) == [3,5,6,8,9,12]);");
+        addLine(script, "ok4 := reduce(@&&, subset(b., -4, 2) == [12,13]);");
+        addLine(script, "ok5 := reduce(@&&, subset(b., -3) == [12,13,14]);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok0", state) : " reqesting tail of list failed";
+        assert getBooleanValue("ok1", state) : "requesting more than number of elements should just return rest of list";
+        assert getBooleanValue("ok2", state) : "request non-existent index returns empty list";
+        assert getBooleanValue("ok3", state) : "request of finite subset spanning gaps in list failed.";
+        assert getBooleanValue("ok4", state) : "request of finite subset from end, finite count  failed.";
+        assert getBooleanValue("ok5", state) : "request of subset from end spanning gaps in list failed.";
+
+    }
+    /*
+    b. := [;15];remove(b.4);remove(b.7);remove(b.10);remove(b.11);
+      subset(b., -4, 2)
+  [12,13]
+
+  subset(b., -3)
+    [12,13,14]
+
+
+
+     */
+
     /*
        subset((x,y)->2<x, [;10])
  {3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9}

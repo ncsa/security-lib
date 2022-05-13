@@ -2065,11 +2065,7 @@ public class StemEvaluator extends AbstractEvaluator {
                 Object kk = newKeyStem.get(key);
                 usedKeys.remove(kk);
                 Object vv = target.get(kk);
-                if(key instanceof Long){
-                    output.put((Long)key, vv);
-                }  else{
-                    output.put((String)key, vv);
-                }
+                output.putLongOrString((Long)key, vv);
             } else {
                 throw new BadArgException("'" + key + "' is not a key in the second argument.", polyad.getArgAt(1));
             }

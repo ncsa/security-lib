@@ -395,7 +395,7 @@ public class ListEvaluator extends AbstractEvaluator {
         QDLSet set = null;
 
         long startIndex = 0L;
-        Long count = 0L;
+        Long count = -1L; // return rest of list
 
         switch (Constant.getType(arg1)) {
             case Constant.STEM_TYPE:
@@ -405,20 +405,21 @@ public class ListEvaluator extends AbstractEvaluator {
                 }
                 startIndex = (Long) arg2;
 
-                if (startIndex < 0) {
-                    startIndex = startIndex + stem.size();
-                }
-                if (polyad.getArgCount() == 2) {
+
+              /*  if (polyad.getArgCount() == 2) {
                     count = (long) stem.size() - startIndex;
-                } else {
+                } else {*/
+                if(polyad.getArgCount() == 3){
                     // must be 3
                     count = (Long) arg3;
                     if (count < 0) {
                         throw new BadArgException(LIST_SUBSET + " requires that the number of elements be positive", polyad.getArgAt(2));
                     }
+/*
                     if(stem.size() < startIndex + count){
                         count = stem.size() - startIndex; // run to end of list
                     }
+*/
                 }
 
                 break;

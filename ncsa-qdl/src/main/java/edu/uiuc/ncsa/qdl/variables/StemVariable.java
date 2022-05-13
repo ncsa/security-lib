@@ -1260,9 +1260,8 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public StemVariable listSubset(long startIndex, long length) {
-
         StemVariable stemVariable = new StemVariable();
-        stemVariable.setQDLList(getQDLList().subset(startIndex, true, startIndex + length, false));
+        stemVariable.setQDLList(getQDLList().subset(startIndex, true, length, false));
         return stemVariable;
     }
 

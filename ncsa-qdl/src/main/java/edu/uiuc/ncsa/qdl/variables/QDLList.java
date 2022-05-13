@@ -53,37 +53,172 @@ public class QDLList implements List, Serializable {
     }
 
     public QDLList subset(long startIndex, boolean includeStartIndex, long endIndex, boolean includeEndIndex) {
-        if (!hasSparseEntries()) {
-            List subList = getArrayList().subList((int) startIndex, (int) endIndex);
-            if (!includeStartIndex) {
-                subList.remove(0);
-            }
-            if (includeEndIndex) {
-                if (getArrayList().size() + 1 < endIndex) {
-                    throw new IllegalArgumentException("index of " + endIndex + " not in this list");
-                }
-                subList.add(getArrayList().get((int) endIndex));
-            }
-            QDLList out = new QDLList();
-            if (subList instanceof ArrayList) {
-                out.setArrayList((ArrayList) subList);
-            } else {
-                out.getArrayList().addAll(subList);
-            }
-            return out;
-        }
-        // Case now is that there are sparse lists
-        if (!hasArrayList()) {
-            QDLList out = new QDLList();
-            SortedSet<SparseEntry> sortedSet = getSparseEntries().subSet(new SparseEntry(startIndex), true, new SparseEntry(endIndex), false);
-            TreeSet<SparseEntry> ts = out.getSparseEntries();
-            for (SparseEntry sparseEntry : sortedSet) {
-                ts.add(sparseEntry);
-            }
-            return out;
-        }
-        throw new NotImplementedException("need sublist support for sparse lists.");
+        return subsetNEW(startIndex, includeStartIndex, endIndex, includeEndIndex);
     }
+
+    /*
+b. := [;15]
+remove(b.4)
+remove(b.7)
+remove(b.10)
+remove(b.11)
+  subset(b., -4, 2)
+
+  subset(b., -3)
+
+
+subset(b., 10)
+subset(b., 10, 10)
+subset(b., 1000, 5)
+subset(b., 3, 6)
+
+     */
+
+    /**
+     * @param startIndex        - negative means start from end
+     * @param includeStartIndex
+     * @param count             - negative means rest of list from start index
+     * @param includeEndIndex
+     * @return
+     */
+    public QDLList subsetNEW(long startIndex, boolean includeStartIndex, long count, boolean includeEndIndex) {
+        if (isEmpty() || count == 0L) {
+            return new QDLList();
+        }
+        if (0 <= startIndex) {
+            if (0 < count) {
+                // start of list, finite count
+                return subsetBasicCase(startIndex, includeStartIndex, count, includeEndIndex);
+            } else {
+                //rest of list
+                return subsetEndOfList(startIndex, includeStartIndex, count, includeEndIndex);
+            }
+        } else {
+            if (0 < count) {
+                return subsetEndofListFinite(startIndex, includeStartIndex, count, includeEndIndex);
+                // end of list, finite count
+            } else {
+                return subsetEndOfListFromEnd(startIndex, includeStartIndex, count, includeEndIndex);
+                // end of list, rest of list
+            }
+        }
+    }
+
+    private QDLList subsetEndofListFinite(long startIndex, boolean includeStartIndex, long count, boolean includeEndIndex) {
+        if (!hasSparseEntries()) {
+            startIndex = startIndex + getArrayList().size(); // fixes this for very simple case
+            return subsetBasicCase(startIndex, includeStartIndex, count, includeEndIndex);
+        }
+        SparseEntry last = last();
+        startIndex = startIndex + last.index;
+        return subsetBasicCase(startIndex, includeStartIndex, count, includeEndIndex);
+    }
+
+    public QDLList subsetEndOfListFromEnd(long startIndex, boolean includeStartIndex, long count, boolean includeEndIndex) {
+        // Now the hard case....
+        long ss = -startIndex;
+        if (getSparseEntries().size() <= ss) {
+            // the requested start index spans the gap.
+            ArrayList sparse = new ArrayList(getSparseEntries().size());
+            // add them all
+            for (SparseEntry se : getSparseEntries()) {
+                sparse.add(se.entry);
+            }
+            // now get the stuff from the array list
+            ArrayList otherAL = new ArrayList();
+            otherAL.addAll(getArrayList().subList((int) (startIndex + getArrayList().size()), getArrayList().size()));
+            otherAL.addAll(sparse);
+            QDLList out = new QDLList();
+            out.setArrayList(otherAL);
+            return out;
+
+        } else {
+            long i = 0;
+            ArrayList arrayList = new ArrayList();
+            Iterator<SparseEntry> iterator = getSparseEntries().descendingIterator();
+            while (iterator.hasNext()) {
+                if (ss == i++) {
+                    break;
+                }
+                arrayList.add(iterator.next().entry);
+            }
+            Collections.reverse(arrayList);
+            QDLList out = new QDLList();
+            out.setArrayList(arrayList);
+            return out;
+        }
+
+    }
+
+    public QDLList subsetBasicCase(long startIndex, boolean includeStartIndex, long count, boolean includeEndIndex) {
+        // start is positive, count is positive
+        // return count elements of list.
+        ArrayList arrayList = new ArrayList((int) count);
+        SparseEntry currentSE = null;
+        for (long i = 0; i < count; i++) {
+            if (startIndex + i < getArrayList().size()) {
+                arrayList.add(getArrayList().get((int) (i + startIndex)));
+            } else {
+                if (!hasSparseEntries()) {
+                    break;
+                }
+                if (currentSE == null) {
+                    currentSE = new SparseEntry(startIndex);
+                    currentSE = getSparseEntries().ceiling(currentSE);
+                    if (currentSE == null) {
+                        // no such element -- they overshot the list
+                        QDLList out = new QDLList();
+                        return out;
+                    }
+
+                    arrayList.add(currentSE.entry);
+                    continue;
+                }
+                currentSE = new SparseEntry(currentSE.index + 1);
+                currentSE = getSparseEntries().ceiling(currentSE);
+
+                if (currentSE == null) {
+                    break; // ran out of elements
+                }
+                arrayList.add(currentSE.entry);
+            }
+
+        }
+        QDLList out = new QDLList();
+        out.setArrayList(arrayList);
+        return out;
+
+    }
+
+    public QDLList subsetEndOfList(long startIndex, boolean includeStartIndex, long count, boolean includeEndIndex) {
+        if (startIndex < getArrayList().size()) {
+            int ss = (int) startIndex;
+            ArrayList arrayList = new ArrayList(size() - ss); // crude at best
+            arrayList.addAll(getArrayList().subList(ss, getArrayList().size())); // rest of the list
+            if (hasSparseEntries()) {
+                for (SparseEntry se : getSparseEntries()) {
+                    arrayList.add(se.entry);
+                }
+            }
+            QDLList out = new QDLList();
+            out.setArrayList(arrayList);
+            return out;
+        }
+        ArrayList arrayList = new ArrayList();
+
+        SparseEntry seNext = new SparseEntry(startIndex);
+        SparseEntry se = getSparseEntries().ceiling(seNext);
+        while (se != null) {
+            arrayList.add(se.entry);
+            seNext = new SparseEntry(se.index + 1);
+            se = getSparseEntries().ceiling(seNext);
+        }
+        QDLList out = new QDLList();
+        out.setArrayList(arrayList);
+        return out;
+
+    }
+
 
 
     public QDLList() {
@@ -94,7 +229,7 @@ public class QDLList implements List, Serializable {
         if (Integer.MAX_VALUE < size) {
             throw new NotImplementedException("need to implement long lists");
         }
-        getArrayList().ensureCapacity((int)size);
+        getArrayList().ensureCapacity((int) size);
         for (long i = 0L; i < size; i++) {
             arrayList.add(i);
         }
@@ -105,7 +240,7 @@ public class QDLList implements List, Serializable {
         if (Integer.MAX_VALUE < size) {
             throw new NotImplementedException("need to implement long lists");
         }
-        getArrayList().ensureCapacity((int)size);
+        getArrayList().ensureCapacity((int) size);
         int fillSize = -1;
         if (fill != null && fill.length != 0) {
             fillSize = fill.length;
@@ -200,11 +335,6 @@ public class QDLList implements List, Serializable {
      * @param obj
      */
     public void append(Object obj) {
-        // Weirdly, Java does not seem to call the overloaded method  at times.
-   /*     if(obj instanceof QDLSet){
-            append((QDLSet) obj);
-            return;
-        }*/
         if (!hasSparseEntries()) {
             getArrayList().add(obj);
             return;
@@ -357,7 +487,6 @@ public class QDLList implements List, Serializable {
         return array;
     }
 
-    // to_json([random_string(5,5), random_string(4,4)])
     public String inputForm(int indent) {
         return inputForm(indent, "");
     }
@@ -494,23 +623,6 @@ public class QDLList implements List, Serializable {
         return getArrayList().size();
     }
 
-    /**
-     * get all of the keys in a list
-     *
-     * @return
-     */
-/*
-    public List<Long> getKeys() {
-        List<Long> keys = new ArrayList<>();
-        for (long i = 0; i < getArrayList().size(); i++) {
-            keys.add(i);
-        }
-        for (SparseEntry sparseEntry : getSparseEntries()) {
-            keys.add(sparseEntry.index);
-        }
-        return keys;
-    }
-*/
 
     /**
      * Get the keys in a linked hash set. This is specifically for cases where stems have to
@@ -529,16 +641,6 @@ public class QDLList implements List, Serializable {
         }
         stemKeys.setListkeys(treeSet);
         return stemKeys;
-/*
-        LinkedHashSet<String> keys = new LinkedHashSet<>();
-        for (int i = 0; i < getArrayList().size(); i++) {
-            keys.add(Integer.toString(i));
-        }
-        for (SparseEntry sparseEntry : getSparseEntries()) {
-            keys.add(Long.toString(sparseEntry.index));
-        }
-        return keys;
-*/
     }
 
     @Override
@@ -918,8 +1020,6 @@ public class QDLList implements List, Serializable {
     @Override
     public Object[] toArray(Object[] a) {
         throw new NotImplementedException("toArray(Object[])");
-
-//        return new Object[0];
     }
 
     @Override
@@ -933,26 +1033,6 @@ public class QDLList implements List, Serializable {
         return getArrayList().add(o);
     }
 
-    /**
-     * Removes by index of sparse entry
-     *
-     * @param sparseEntry
-     * @return
-     */
-    public boolean removeByIndex(SparseEntry sparseEntry) {
-        if (!hasSparseEntries()) {
-            return getArrayList().remove(sparseEntry.entry);
-        }
-        SparseEntry removeIt = null;
-        for (SparseEntry sparseEntry1 : getSparseEntries()) {
-            if (sparseEntry1.entry.equals(sparseEntry.entry)) {
-                removeIt = sparseEntry1;    // can't remove it in loop or get concurrent modification exception.
-                break;
-            }
-        }
-        getSparseEntries().remove(removeIt);
-        return true;
-    }
 
     /**
      * Remove by value
@@ -994,21 +1074,16 @@ public class QDLList implements List, Serializable {
     @Override
     public boolean addAll(int index, Collection c) {
         throw new NotImplementedException("addAll(int, Collection)");
-
-//        return false;
     }
 
     @Override
     public boolean removeAll(Collection c) {
         throw new NotImplementedException("removeAll(Collection)");
-
-        //return false;
     }
 
     @Override
     public boolean retainAll(Collection c) {
         throw new NotImplementedException("retainAll(Collection)");
-//        return false;
     }
 
     @Override
@@ -1037,37 +1112,27 @@ public class QDLList implements List, Serializable {
     @Override
     public Object remove(int index) {
         throw new NotImplementedException("remove(int)");
-
-//        return null;
     }
 
     @Override
     public int indexOf(Object o) {
         throw new NotImplementedException("indexOf(Object)");
-
-//        return 0;
     }
 
     @Override
 
     public int lastIndexOf(Object o) {
         throw new NotImplementedException("lastIndexOf(Object)");
-
-        //      return 0;
     }
 
     @Override
     public ListIterator listIterator() {
         throw new NotImplementedException("listIterator");
-
-//        return null;
     }
 
     @Override
     public ListIterator listIterator(int index) {
         throw new NotImplementedException("listIterator(index)");
-
-//        return null;
     }
 
     @Override
@@ -1133,6 +1198,7 @@ public class QDLList implements List, Serializable {
             }
             throw new NoSuchElementException();
         }
+
     }
 
     public static void main(String[] args) {
@@ -1144,7 +1210,8 @@ public class QDLList implements List, Serializable {
     }
 
     /**
-     * This is an internal method used by the IDE or debugging it is much harder
+     * Keep this! It is not used by QDL though and won't show up in any searches of methods used.
+     * This is an internal method used by the IDE for debugging. Supremely useful in that context.
      */
     protected String otherToString() {
         String x = getClass().getSimpleName() +

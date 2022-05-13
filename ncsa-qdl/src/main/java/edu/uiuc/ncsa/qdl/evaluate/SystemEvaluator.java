@@ -959,11 +959,7 @@ public class SystemEvaluator extends AbstractEvaluator {
                 argList.add(new ConstantNode(currentValue, Constant.getType(currentValue)));
                 operator.setArguments(argList);
                 operator.evaluate(state);
-                if(key instanceof Long){
-                    output.put((Long)key, operator.getResult());
-                }else{
-                    output.put((String)key, operator.getResult());
-                }
+                output.putLongOrString(key, operator.getResult());
                 lastValue = operator.getResult();
             }
             return output;
@@ -2025,11 +2021,7 @@ public class SystemEvaluator extends AbstractEvaluator {
                     newEntry = innerStem;
                 }
             }
-            if(key instanceof Long){
-                outStem.put((Long)key, newEntry);
-            }else{
-                outStem.put((String)key, newEntry);
-            }
+            outStem.putLongOrString(key, newEntry);
         }
         polyad.setEvaluated(true);
         if (outStem.size() == 1) {

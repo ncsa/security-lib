@@ -110,18 +110,10 @@ public class StemUtility {
                         throw new RankException("rank error");
                     }
                     StemVariable out1 = new StemVariable();
-                    if(isKey0Long){
-                        out0.put((Long)key0, out1);
-                    }else{
-                        out0.put((String)key0, out1);
-                    }
+                    out0.putLongOrString(key0, out1);
                     axisDayadRecursion(out1, left1, right1, depth - 1, maxDepth, axisAction);
                 } else {
-                    if(isKey0Long){
-                        out0.put((Long)key0, left1.union(right1));
-                    }else {
-                        out0.put((String)key0, left1.union(right1));
-                    }
+                    out0.putLongOrString(key0, left1.union(right1));
                 }
             }
         }
@@ -156,11 +148,7 @@ public class StemUtility {
             if (!isStem(obj)) {
                 continue;
             }
-            if(key1 instanceof Long){
-                outStem.put((Long)key1, axisWalker((StemVariable) obj, depth - 1, walker));
-            }else{
-                outStem.put((String)key1, axisWalker((StemVariable) obj, depth - 1, walker));
-            }
+            outStem.putLongOrString(key1, axisWalker((StemVariable) obj, depth - 1, walker));
         }
         return outStem;
     }

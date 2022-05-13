@@ -561,19 +561,11 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
                 StemVariable newOut = new StemVariable();
                 processStem2(newOut, toStem(objects[0]), toStem(objects[1]), pointer, polyad, optionalArgs);
                 if (!newOut.isEmpty()) {
-                    if(keyIsLong){
-                        outStem.put((Long)key, newOut);
-                    }else{
-                        outStem.put((String)key, newOut);
-                    }
+                    outStem.putLongOrString(key, newOut);
                 }
             } else {
                 r = pointer.process(objects);
-                if(keyIsLong){
-                    outStem.put((Long)key, r.result);
-                }else{
-                    outStem.put((String)key, r.result);
-                }
+                outStem.putLongOrString(key, r.result);
             }
         }
 
@@ -661,20 +653,12 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
                         toStem(objects[2]),
                         pointer, polyad, optionalArgs);
                 if (!newOut.isEmpty()) {
-                    if(keyIsLong){
-                        outStem.put((Long)key, newOut);
-                    }else{
-                        outStem.put((String)key, newOut);
-                    }
+                    outStem.putLongOrString(key, newOut);
                 }
                 //r = pointer.process(objects);
             } else {
                 r = pointer.process(objects);
-                if(keyIsLong){
-                    outStem.put((Long)key, r.result);
-                }else{
-                    outStem.put((String)key, r.result);
-                }
+                outStem.putLongOrString(key, r.result);
             }
         }
 

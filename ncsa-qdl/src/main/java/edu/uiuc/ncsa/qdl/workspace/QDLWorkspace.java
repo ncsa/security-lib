@@ -113,7 +113,7 @@ public class QDLWorkspace implements Serializable {
         // since the first symptom is this. Without this case, it falls through and the user just gets a random error
         // that whatever component failed, not that the component was actually missing.
         if (t instanceof NoClassDefFoundError) {
-            workspaceCommands.say("internal error: Missing classes. Did you try an upgrade that failed? (" + t.getMessage() + ")");
+            workspaceCommands.say("internal error: Missing classes. Did you try an upgrade while QDL is running? (" + t.getMessage() + ")");
             return;
         }
         // Final fall through case.
