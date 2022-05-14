@@ -915,7 +915,7 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
         throw new IllegalStateException("cannot create anonymous function");
 
     }
-
+          //  pick((k)->3<k<10, |>mod(random(20),11))
     /**
      * Checks if the argument is some form of a function reference. This lets you test for
      * overloading before invoking one of {@link #getFunctionReferenceNode(State, StatementWithResultInterface)}

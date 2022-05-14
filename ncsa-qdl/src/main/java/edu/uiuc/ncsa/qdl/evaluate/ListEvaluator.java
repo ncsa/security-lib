@@ -31,8 +31,7 @@ public class ListEvaluator extends AbstractEvaluator {
     public static final String LIST_INSERT_AT2 = "list_insert_at";
     public static final int LIST_INSERT_AT_TYPE = 1 + LIST_BASE_VALUE;
 
-    public static final String LIST_SUBSET = "subset";
-    public static final String LIST_SUBSET2 = "list_subset";
+    public static final String LIST_SUBSET = "sublist";
     public static final int LIST_SUBSET_TYPE = 2 + LIST_BASE_VALUE;
 
     public static final String LIST_COPY = "list_copy";
@@ -50,6 +49,9 @@ public class ListEvaluator extends AbstractEvaluator {
     public static final String LIST_SORT = "sort";
     public static final int LIST_SORT_TYPE = 8 + LIST_BASE_VALUE;
 
+    public static final String PICK = "pick";
+    public static final int PICK_TYPE = 9 + LIST_BASE_VALUE;
+
 
     @Override
     public String[] getFunctionNames() {
@@ -60,7 +62,8 @@ public class ListEvaluator extends AbstractEvaluator {
                     LIST_SUBSET,
                     LIST_COPY,
                     LIST_REVERSE,
-                    LIST_STARTS_WITH
+                    LIST_STARTS_WITH,
+                    PICK
             };
         }
         return fNames;
@@ -91,8 +94,9 @@ public class ListEvaluator extends AbstractEvaluator {
             case LIST_INSERT_AT2:
                 doListCopyOrInsert(polyad, state, true);
                 return true;
+            case PICK:
+                return doPickSubset(polyad, state);
             case LIST_SUBSET:
-            case LIST_SUBSET2:
                 return doListSubset(polyad, state);
             case LIST_REVERSE:
             case LIST_REVERSE2:
@@ -125,8 +129,9 @@ public class ListEvaluator extends AbstractEvaluator {
             case LIST_INSERT_AT2:
                 return LIST_INSERT_AT_TYPE;
             case LIST_SUBSET:
-            case LIST_SUBSET2:
                 return LIST_SUBSET_TYPE;
+            case PICK:
+                return PICK_TYPE;
         }
         return EvaluatorInterface.UNKNOWN_VALUE;
     }
@@ -359,11 +364,6 @@ public class ListEvaluator extends AbstractEvaluator {
             throw new ExtraArgException(LIST_SUBSET + " requires at most 3 arguments", polyad.getArgAt(3));
         }
 
-        // Another case if subset(@f, arg) will pick elements of arg and return them
-        // based on the first boolean-valued function
-        if (isFunctionRef(polyad.getArgAt(0))) {
-            return doPickSubset(polyad, state);
-        }
 
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0));
@@ -489,6 +489,7 @@ public class ListEvaluator extends AbstractEvaluator {
   subset(@my_f, [-2;5])
     subset((x,y)->mod(x,2)==0, [-4;5])
 {0:-4, 2:-2, 4:0, 6:2, 8:4}
+pick((v)-> 7<v<20,[|pi(); pi(3) ; 10|])
      */
     /**
      * Pick elements based on a function that is supplied.
@@ -498,6 +499,18 @@ public class ListEvaluator extends AbstractEvaluator {
      * @return
      */
     protected boolean doPickSubset(Polyad polyad, State state) {
+        if (polyad.isSizeQuery()) {
+             polyad.setResult(new int[]{2});
+             polyad.setEvaluated(true);
+             return true;
+         }
+         if (polyad.getArgCount() < 2) {
+             throw new MissingArgException(PICK + " requires 2 arguments", polyad);
+         }
+
+         if (2 < polyad.getArgCount()) {
+             throw new ExtraArgException(PICK + " requires 2 arguments", polyad.getArgAt(3));
+         }
         FunctionReferenceNode frn = getFunctionReferenceNode(state, polyad.getArgAt(0), true);
         Object arg1 = polyad.evalArg(1, state);
         ExpressionImpl f = null;
@@ -521,7 +534,7 @@ public class ListEvaluator extends AbstractEvaluator {
         // 3 cases
         if (isSet(arg1)) {
             if(argCount != 1){
-                throw new BadArgException(LIST_SUBSET + " pick function for sets can only have a single argument", polyad.getArgAt(0));
+                throw new BadArgException(PICK + " pick function for sets can only have a single argument", polyad.getArgAt(0));
             }
             QDLSet result = new QDLSet();
             QDLSet argSet = (QDLSet) arg1;
@@ -552,13 +565,6 @@ public class ListEvaluator extends AbstractEvaluator {
                 Object value = stemArg.get(key);
                 if(argCount == 2){
                     rawArgs.add(key);
-/*
-                    if(outStem.isLongIndex(key)){
-                         rawArgs.add(Long.parseLong(key));
-                    }else {
-                        rawArgs.add(key);
-                    }
-*/
                 }
                 rawArgs.add(stemArg.get(key));
                 f.setArguments(toConstants(rawArgs));

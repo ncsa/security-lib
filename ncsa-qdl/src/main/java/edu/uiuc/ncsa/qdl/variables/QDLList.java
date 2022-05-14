@@ -52,8 +52,8 @@ public class QDLList implements List, Serializable {
         return !sparseEntries.isEmpty();
     }
 
-    public QDLList subset(long startIndex, boolean includeStartIndex, long endIndex, boolean includeEndIndex) {
-        return subsetNEW(startIndex, includeStartIndex, endIndex, includeEndIndex);
+    public QDLList subList(long startIndex, boolean includeStartIndex, long endIndex, boolean includeEndIndex) {
+        return subListNEW(startIndex, includeStartIndex, endIndex, includeEndIndex);
     }
 
     /*
@@ -81,7 +81,7 @@ subset(b., 3, 6)
      * @param includeEndIndex
      * @return
      */
-    public QDLList subsetNEW(long startIndex, boolean includeStartIndex, long count, boolean includeEndIndex) {
+    public QDLList subListNEW(long startIndex, boolean includeStartIndex, long count, boolean includeEndIndex) {
         if (isEmpty() || count == 0L) {
             return new QDLList();
         }
@@ -1137,7 +1137,7 @@ subset(b., 3, 6)
 
     @Override
     public List subList(int fromIndex, int toIndex) {
-        return subset((long) fromIndex, true, (long) toIndex, false);
+        return subList((long) fromIndex, true, (long) toIndex, false);
     }
 
 

@@ -195,7 +195,7 @@ public class SetTest extends AbstractQDLTester {
     public void testSubset() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "ok := {0,-2} == subset((x)->x<3, {-2,0,4,5});");
+        addLine(script, "ok := {0,-2} == pick((x)->x<3, {-2,0,4,5});");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state);
@@ -204,12 +204,12 @@ public class SetTest extends AbstractQDLTester {
     public void testSubsetContract() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "ok0 := subset({1,2,3},7) == {1,2,3};");
-        addLine(script, "s := subset({1,2,3,4},3);");
+        addLine(script, "ok0 := sublist({1,2,3},7) == {1,2,3};");
+        addLine(script, "s := sublist({1,2,3,4},3);");
         addLine(script, "ok1 := s < {1,2,3,4} && size(s)==3;");
-        addLine(script, "r := subset({1,2,3,4},-3);");
+        addLine(script, "r := sublist({1,2,3,4},-3);");
         addLine(script, "ok2 := r < {1,2,3,4} && size(r)==3;");
-        addLine(script, "ok3 := subset({1,2,3,4},0) == {};");
+        addLine(script, "ok3 := sublist({1,2,3,4},0) == {};");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok0", state) : "requesting too many elements should return whole set";
@@ -374,8 +374,8 @@ public class SetTest extends AbstractQDLTester {
         addLine(script, "C :=" + C + ";"); // more or less total size
 
 
-        addLine(script, "A1 := subset(A, 7);");
-        addLine(script, "A0 := subset(A1, 3);");
+        addLine(script, "A1 := sublist(A, 7);");
+        addLine(script, "A0 := sublist(A1, 3);");
 
         //boatload of standard set identities.
         switch (testCase) {
@@ -537,7 +537,7 @@ public class SetTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "A := " + A + ";");
         addLine(script, "B := " + B + ";");
-        addLine(script, "X := subset(B," + n + ")\\/subset(A," + n + ");");
+        addLine(script, "X := sublist(B," + n + ")\\/sublist(A," + n + ");");
         addLine(script, "X := input_form(X);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());

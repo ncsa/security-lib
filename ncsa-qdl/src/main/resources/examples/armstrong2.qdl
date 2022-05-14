@@ -8,5 +8,5 @@
 // if a is the number with digits xyz then
 //           xyz ==   x^3    +           y^3     +      z^3
 armstrong(a)->a == (a%100)^3 + (a%10-a%100*10)^3 + (a-a%10*10)^3;
-a. := ~subset(@armstrong, [100;1000]);
+a. := ~pick(@armstrong, [100;1000]);
 say(a.);

@@ -2064,9 +2064,9 @@ public class StemTest extends AbstractQDLTester {
     public void testSubsetMonadicPick() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "ok := reduce(@&&, [-1,0,1] == subset((x)->x<2, [-1;5]));");
+        addLine(script, "ok := reduce(@&&, [-1,0,1] == pick((x)->x<2, [-1;5]));");
         addLine(script, "z. := {'a':'x_baz', 'b':3, 'c':'x_bar', 'd':'woof'};");
-        addLine(script, "q. := subset((x)->index_of(x, 'x_').0==0, z.);");
+        addLine(script, "q. := pick((x)->index_of(x, 'x_').0==0, z.);");
         addLine(script, "ok1 := reduce(@&&, {'a':'x_baz', 'c':'x_bar'}==q.);");
         addLine(script, "");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
@@ -2079,9 +2079,9 @@ public class StemTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         // Get elements with even indices
-        addLine(script, "ok := reduce(@&&, {0:-4, 2:-2, 4:0, 6:2, 8:4} == subset((x,y)->mod(x,2)==0, [-4;5]));");
+        addLine(script, "ok := reduce(@&&, {0:-4, 2:-2, 4:0, 6:2, 8:4} == pick((x,y)->mod(x,2)==0, [-4;5]));");
         // get elements whose key + value is divisible by 3, showing both are passed along and available
-        addLine(script, "q. := subset((key,value)->mod(key+value,3)==0, [-4;5]);");
+        addLine(script, "q. := pick((key,value)->mod(key+value,3)==0, [-4;5]);");
         addLine(script, "ok1 := reduce(@&&, {2:-2, 5:1, 8:4}==q.);");
         addLine(script, "my_f(x,y)->2<x;");
         addLine(script, "");
@@ -2096,12 +2096,12 @@ public class StemTest extends AbstractQDLTester {
     public void testSubsetContract() throws Throwable {
             State state = testUtils.getNewState();
             StringBuffer script = new StringBuffer();
-            addLine(script, "ok0 := reduce(@&&, subset([;10],7) == [7,8,9]);");
-            addLine(script, "ok1 := reduce(@&&, subset([;10],2,4) == [2,3,4,5]);");
-            addLine(script, "ok2 := reduce(@&&, subset([;10],-3) == [7,8,9]);");
-            addLine(script, "ok3 := reduce(@&&, subset([;10],-3,2) == [7,8]);");
-            addLine(script, "ok4 := reduce(@&&, subset('a',-3,2) == ['a']);"); // scalars are just returned
-            addLine(script, "ok5 := size(subset([;10],-3,0)) == 0;");
+            addLine(script, "ok0 := reduce(@&&, sublist([;10],7) == [7,8,9]);");
+            addLine(script, "ok1 := reduce(@&&, sublist([;10],2,4) == [2,3,4,5]);");
+            addLine(script, "ok2 := reduce(@&&, sublist([;10],-3) == [7,8,9]);");
+            addLine(script, "ok3 := reduce(@&&, sublist([;10],-3,2) == [7,8]);");
+            addLine(script, "ok4 := reduce(@&&, sublist('a',-3,2) == ['a']);"); // scalars are just returned
+            addLine(script, "ok5 := size(sublist([;10],-3,0)) == 0;");
             QDLInterpreter interpreter = new QDLInterpreter(null, state);
             interpreter.execute(script.toString());
             assert getBooleanValue("ok0", state) : " reqesting tail of list failed";
@@ -2116,12 +2116,12 @@ public class StemTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "b. := [;15];remove(b.4);remove(b.7);remove(b.10);remove(b.11);"); // sparse list with gaps
-        addLine(script, "ok0 := reduce(@&&, subset(b., 10) == [12,13,14]);");
-        addLine(script, "ok1 := reduce(@&&, subset(b., 10, 10) == [12,13,14]);");
-        addLine(script, "ok2 := size(subset(b., 1000)) == 0;");
-        addLine(script, "ok3 := reduce(@&&, subset(b., 3, 6) == [3,5,6,8,9,12]);");
-        addLine(script, "ok4 := reduce(@&&, subset(b., -4, 2) == [12,13]);");
-        addLine(script, "ok5 := reduce(@&&, subset(b., -3) == [12,13,14]);");
+        addLine(script, "ok0 := reduce(@&&, sublist(b., 10) == [12,13,14]);");
+        addLine(script, "ok1 := reduce(@&&, sublist(b., 10, 10) == [12,13,14]);");
+        addLine(script, "ok2 := size(sublist(b., 1000)) == 0;");
+        addLine(script, "ok3 := reduce(@&&, sublist(b., 3, 6) == [3,5,6,8,9,12]);");
+        addLine(script, "ok4 := reduce(@&&, sublist(b., -4, 2) == [12,13]);");
+        addLine(script, "ok5 := reduce(@&&, sublist(b., -3) == [12,13,14]);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok0", state) : " reqesting tail of list failed";
@@ -2134,10 +2134,10 @@ public class StemTest extends AbstractQDLTester {
     }
     /*
     b. := [;15];remove(b.4);remove(b.7);remove(b.10);remove(b.11);
-      subset(b., -4, 2)
+      sublist(b., -4, 2)
   [12,13]
 
-  subset(b., -3)
+  sublist(b., -3)
     [12,13,14]
 
 
@@ -2145,18 +2145,18 @@ public class StemTest extends AbstractQDLTester {
      */
 
     /*
-       subset((x,y)->2<x, [;10])
+       sublist((x,y)->2<x, [;10])
  {3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9}
-   subset((x)->x<0, [-2;3])
+   sublist((x)->x<0, [-2;3])
  [-2,-1]
-     subset((x)->x<0, [-2;3])
+     sublist((x)->x<0, [-2;3])
  [-2,-1]
    my_f(x,y)->2<x
-   subset(@my_f, [;10])
+   sublist(@my_f, [;10])
  {3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9}
    my_f(x)->x<0
-   subset(@my_f, [-2;5])
-     subset((x,y)->mod(x,2)==0, [-4;5])
+   sublist(@my_f, [-2;5])
+     sublist((x,y)->mod(x,2)==0, [-4;5])
  {0:-4, 2:-2, 4:0, 6:2, 8:4}
       */
 
