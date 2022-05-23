@@ -19,6 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator.*;
@@ -72,7 +73,7 @@ public class WhileLoop implements Statement {
         if (conditional instanceof Dyad) {
             Dyad d = (Dyad) conditional;
             if (d.getOperatorType() == OpEvaluator.EPSILON_VALUE) {
-                return forKeysLoop(localState);
+                return forKeysOrValuesLoop(localState, false);
             }
         }
         if (conditional instanceof Polyad) {
@@ -80,8 +81,9 @@ public class WhileLoop implements Statement {
             if (p.isBuiltIn()) {
                 switch (p.getName()) {
                     case FOR_KEYS:
+                        return forKeysOrValuesLoop(localState, true);
                     case StemEvaluator.HAS_VALUE:
-                        return forKeysLoop(localState);
+                        return forKeysOrValuesLoop(localState, false);
                     case FOR_NEXT:
                         return doForLoop(localState);
                     case CHECK_AFTER:
@@ -262,8 +264,6 @@ public class WhileLoop implements Statement {
             default:
                 throw new IllegalArgumentException("Error: incorrect number of arguments for " + FOR_NEXT + ".");
         }
-        // while[for_next(j,0,10,-1)]do[say(j);];  // test statememt
-        // SymbolTable localST = localState.getSymbolStack().getLocalST();
         if (doList) {
             for (Object key : list.keySet()) {
                 localState.setValue(loopArg, list.get(key));
@@ -320,12 +320,18 @@ public class WhileLoop implements Statement {
     }
 
     /**
+     * a ∈ X or jas_value(j, X) loop over the values
+     * @param localState
+     * @return
+     */
+
+    /**
      * for_keys(var, stem.) --  Loop over the keys in a given stem, assigning each to the var.
      *
      * @param localState
      * @return
      */
-    protected Object forKeysLoop(State localState) {
+    protected Object forKeysOrValuesLoop(State localState, boolean doKeys) {
         if (conditional.getArgCount() != 2) {
             throw new IllegalArgumentException("Error: You must supply two arguments for " + FOR_KEYS);
         }
@@ -354,9 +360,6 @@ public class WhileLoop implements Statement {
 
         }
 
-        //   SymbolTable localST = localState.getVStack().getLocalST();
-        // my.foo := 'bar'; my.a := 32; my.b := 'hi'; my.c := -0.432;
-        //while[for_keys(j,my.)]do[say('key=' + j + ', value=' + my.j);];
         if (isSet) {
             for (Object element : qdlSet) {
                 localState.getVStack().localPut(new VThing(new XKey(loopVar), element));
@@ -374,8 +377,15 @@ public class WhileLoop implements Statement {
             }
 
         } else {
-            for (Object key : stemVariable.keySet()) {
-                localState.getVStack().localPut(new VThing(new XKey(loopVar), key));
+            Iterator iterator;
+            if(doKeys){
+                iterator = stemVariable.keySet().iterator();
+            }else{
+                iterator = stemVariable.valuesIterator();
+            }
+
+            while (iterator.hasNext()) {
+                localState.getVStack().localPut(new VThing(new XKey(loopVar), iterator.next()));
                 for (Statement statement : getStatements()) {
                     try {
                         statement.evaluate(localState);

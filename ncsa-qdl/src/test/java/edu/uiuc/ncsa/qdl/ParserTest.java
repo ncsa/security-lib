@@ -2519,6 +2519,39 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("j", state).equals(5L); // make sure it did all the elements
 
     }
+
+    /**
+     * Tests looping with ∈ on a stem. This should access values, not keys
+     * @throws Throwable
+     */
+    public void testEpsilonLoop() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x. := abs([-5;0;1]);");// values are 5,4,3,2,1, indices are 0,1,2,3,4
+        addLine(script, "a := 6;");
+        addLine(script, "while[j ∈ x.][a:=a*j;];");// if it grabs the keys, this will be zero, not 6!
+        addLine(script, "ok := a== 720;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
+    /**
+     * Same conceptually as ∈ loop. Tests that using has_value works the same
+     * @throws Throwable
+     */
+    public void testHasValueLoop() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x. := abs([-5;0;1]);");// values are 5,4,3,2,1, indices are 0,1,2,3,4
+        addLine(script, "a := 6;");
+        addLine(script, "while[has_value(j, x.)][a:=a*j;];");// if it grabs the keys, this will be zero, not 6!
+        addLine(script, "ok := a== 720;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
     /* The following is an experiment with allowing lists of indices to be used for ste
        access. E.g.
                    a. := n(2,3,4,n(24))

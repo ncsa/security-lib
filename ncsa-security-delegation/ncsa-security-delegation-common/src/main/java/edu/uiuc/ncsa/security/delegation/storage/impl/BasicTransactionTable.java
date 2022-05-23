@@ -44,6 +44,7 @@ abstract public class BasicTransactionTable extends Table {
         return "SELECT * FROM " + getFQTablename() + " WHERE " + btk().accessToken() + "=?";
     }
 
+
     public String getByVerifierStatement() {
         return "SELECT * FROM " + getFQTablename() + " WHERE " + btk().verifier() + "=?";
     }

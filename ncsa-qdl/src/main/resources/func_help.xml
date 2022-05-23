@@ -569,22 +569,26 @@ pick(@f, arg) - picks elements from arg based on the boolean @f
           arg fails the test,a null will be returned.
           The number of allowed arguments for @f is 1 or 2.
 
-          If a single argument, the value supplied is the value itself.
-          If two arguments are supplied, the values are (key, value).
+          If f is monadic  the value supplied is the value itself.
+          If f is dyadic  the values are (key, value).
 
 Note that any indices are returned as well.
   ]]>
        </body>
        <example>
-   <![CDATA[  pick((x)->x<3, {-2,0,4,5}); // pick elements in a set whose value < 3
+   <![CDATA[  pick((v)->v<3, {-2,0,4,5}); // pick elements in a set whose value < 3
    {0,-2}
 
        pick((key,value)->mod(key,2)==0, [-4;5]); // get the elements with even indices
    {0:-4, 2:-2, 4:0, 6:2, 8:4}
 
-       // contrived example where key+value are divisible by 3:
+       // example where key+value are divisible by 3:
        pick((key,value)->mod(key+value,3)==0, [-4;5]);
-   {2:-2, 5:1, 8:4}]]>
+   {2:-2, 5:1, 8:4}
+       // How to select all the elements of a stem, x., that contain the substring 'my_string'
+       // Note that index_of always returns a list with at least one element. -1 means 'my_string'
+       // was not found.
+       pick((k,v)->-1 < index_of(v, 'my_string').0, x.)]]>
         </example>
     </entry>
 
@@ -3536,6 +3540,9 @@ x ∈ y - return a left conformable boolean mask of all
 
 This may always be replaced by has_value(x,y)
 
+You may use this in loops as well to return either the elements
+of a set, or the values of a stem.
+
 See also: ∉, intersection, has_value, subset(@pick arg).]]>
         </body>
         <example>
@@ -3543,12 +3550,23 @@ See also: ∉, intersection, has_value, subset(@pick arg).]]>
   b := {'p','q','b','a'};
   a. ∈ b
 [true,true,false]
-
+  // Another examples to emphasize that ∈ compares values, not indices.
+  [-2,3,4]∈[-3;3]
+[true,false,false]
     // This is useful with the mask function.
     mask(a., a. ∈ b)
 [a, b]
     // And is fine with loops, so this is a good statement:
-    while[α ∈ (A ∩ B) ∆ C][process(α);]]]>
+    while[α ∈ (A ∩ B) ∆ C][process(α);]
+    // In loops over stems (not sets) ∈ operates on the values of a stem
+  while[j∈[-3;3]][say(j);]
+-3
+-2
+-1
+0
+1
+2]]>
+
                 </example>
     </entry>
     <entry id="∉">
@@ -4004,7 +4022,7 @@ than a define statement.
    is_defined(y)
 false
 
-Lambdas are normally completely ambient, but
+Lambdas have the same state as an block statement, so
   zz(x)->y:=x^2;
   zz(4)
 16

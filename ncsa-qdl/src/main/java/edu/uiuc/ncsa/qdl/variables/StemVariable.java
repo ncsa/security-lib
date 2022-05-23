@@ -1651,9 +1651,49 @@ public class StemVariable extends HashMap<String, Object> {
         return qdlSet;
     }
 
+    /**
+     * Be aware that this creates an actual set so it reads every item. If you need to iterate
+     * over the elements (so single pass, not potentially multiple passes) consider using
+     * {@link #valuesIterator()} while gets the iterators and manages them.
+     * @return
+     */
     @Override
     public Collection<Object> values() {
         return valueSet();
+    }
+
+    /**
+     * Hook to get the iterator for the super. This is used to construct the {@link ValueIterator},
+     * naught else.
+     * @return
+     */
+    protected Iterator superIterator(){
+        return super.values().iterator();
+    }
+    public class ValueIterator implements  Iterator{
+        Iterator listIterator = getQDLList().iterator();
+        Iterator stemIterator = superIterator();
+        @Override
+        public boolean hasNext() {
+            return listIterator.hasNext() || stemIterator.hasNext();
+        }
+
+        @Override
+        public Object next() {
+            if(listIterator.hasNext()){
+                return listIterator.next();
+            }
+            return stemIterator.next();
+        }
+    }
+
+    /**
+     * A specific iterator for the values of this stem. This should be used when
+     * traversing all values, such as in {@link edu.uiuc.ncsa.qdl.statements.WhileLoop}s.
+     * @return
+     */
+    public Iterator valuesIterator(){
+        return new ValueIterator();
     }
 
     public boolean hasValue(Object x) {

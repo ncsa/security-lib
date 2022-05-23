@@ -19,6 +19,7 @@ public interface TransactionStore<V extends BasicTransaction> extends Store<V> {
 
     V get(AccessToken accessToken);
 
+
     V get(Verifier verifier);
 
     V getByProxyID(Identifier proxyID);
