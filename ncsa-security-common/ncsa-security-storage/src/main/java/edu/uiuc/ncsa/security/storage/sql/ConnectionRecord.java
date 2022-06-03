@@ -12,6 +12,16 @@ import java.sql.Connection;
  * on 5/11/21 at  10:25 AM
  */
 public class ConnectionRecord implements Identifiable {
+    @Override
+    public boolean isReadOnly() {
+        return false;  // Dummy value, for backwards compatibility.
+    }
+
+    @Override
+    public void setReadOnly(boolean readOnly) {
+
+    }
+
     public ConnectionRecord(Connection connection) {
         this.connection = connection;
         identifier = BasicIdentifier.randomID();

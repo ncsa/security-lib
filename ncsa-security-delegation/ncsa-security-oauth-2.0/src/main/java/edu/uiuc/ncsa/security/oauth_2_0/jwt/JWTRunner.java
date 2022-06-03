@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
-import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
+import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants2.*;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_OK;
 import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_OK_NO_SCRIPTS;
 
@@ -116,7 +116,7 @@ public class JWTRunner {
 
         getFromSources(transaction.getFlowStates(), SRE_PRE_AUTH, true);
 
-        doScript(ScriptingConstants.SRE_POST_AUTH);
+        doScript(SRE_POST_AUTH);
 
         for (PayloadHandler h : handlers) {
             h.saveState();
@@ -330,7 +330,6 @@ public class JWTRunner {
     }
 
     protected void doScript(String phase) throws Throwable {
-        //oldDoScript(phase);
         newDoScript(phase);
     }
 
@@ -383,24 +382,6 @@ public class JWTRunner {
                     }
                 }
                 // request makes copies of everything to turn in to QDL state, make it at the last second,  keep it is up to date.
-            }
-        }
-    }
-
-    // This next method did not clear the script set and reset it. It is kept for reference in case some
-    // legacy (e.g. functor) handlers do not react well to this
-    private void oldDoScript(String phase) throws Throwable {
-        if (getScriptRuntimeEngine() != null) {
-            ScriptRunRequest req = newSRR(transaction, phase);
-            for (PayloadHandler h : handlers) {
-                h.addRequestState(req);
-
-            }
-
-            ScriptRunResponse resp = getScriptRuntimeEngine().run(req);
-            handleSREResponse(transaction, resp);
-            for (PayloadHandler h : handlers) {
-                h.handleResponse(resp);
             }
         }
     }

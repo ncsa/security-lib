@@ -305,6 +305,9 @@ public class StemVariable extends HashMap<String, Object> {
     @Override
     public Object clone() {
         StemVariable output = new StemVariable();
+        if(hasDefaultValue()){
+            output.setDefaultValue(getDefaultValue());
+        }
         for (Object key : keySet()) {
             Object obj = get(key);
             boolean isLongKey = key instanceof Long;
@@ -762,6 +765,9 @@ public class StemVariable extends HashMap<String, Object> {
     public static String STEM_ENTRY_CONNECTOR = ":";
 
     public String toString(int indentFactor, String currentIndent) {
+        if(isEmpty()){
+            return "[]";
+        }
         String list = null;
         try {
             if (!getQDLList().isEmpty()) {
@@ -1681,7 +1687,12 @@ public class StemVariable extends HashMap<String, Object> {
         @Override
         public Object next() {
             if(listIterator.hasNext()){
-                return listIterator.next();
+                Object obj = listIterator.next();
+                if(obj instanceof SparseEntry){
+                    return ((SparseEntry)obj).entry;
+                }
+
+                return obj;
             }
             return stemIterator.next();
         }

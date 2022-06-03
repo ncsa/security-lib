@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.variables;
 
+import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import net.sf.json.JSONArray;
 
@@ -57,6 +58,12 @@ public class QDLSet extends HashSet {
 
     @Override
     public String toString() {
+        if(isEmpty()){
+            if(State.isPrintUnicode()){
+                return "∅";
+            }
+            return "{}";
+        }
         String out = "{";
         boolean isFirst = true;
         for (Object obj : this) {

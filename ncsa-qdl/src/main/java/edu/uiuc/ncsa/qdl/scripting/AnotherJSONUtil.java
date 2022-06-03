@@ -1,13 +1,14 @@
 package edu.uiuc.ncsa.qdl.scripting;
 
-import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
+import edu.uiuc.ncsa.security.util.scripting.ScriptingConstants;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -20,7 +21,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 6/1/20 at  3:52 PM
  */
-public class AnotherJSONUtil {
+public class AnotherJSONUtil implements ScriptingConstants {
     public static final String XMD_TAG = "xmd";
     public static final String ARGS_TAG = "args";
 
@@ -104,16 +105,16 @@ public class AnotherJSONUtil {
         if (jsonObject.containsKey(XMD_TAG)) {
             // options are to add single values or arrays.
             JSONObject xmd = jsonObject.getJSONObject(XMD_TAG);
-            for(Object key : xmd.keySet()){
+            for (Object key : xmd.keySet()) {
                 Object object = xmd.get(key);
-                if(object instanceof JSONArray){
+                if (object instanceof JSONArray) {
                     JSONArray array = (JSONArray) object;
                     String[] list = new String[array.size()];
-                    for(int i = 0; i < array.size(); i++){
+                    for (int i = 0; i < array.size(); i++) {
                         list[i] = array.getString(i);
                     }
                     xp.setList(key.toString(), list);
-                }else{
+                } else {
                     xp.put(key.toString(), object.toString());
                 }
             }
@@ -146,9 +147,9 @@ public class AnotherJSONUtil {
             if (!scriptName.endsWith("'")) {
                 scriptName = scriptName + "'";
             }
-            String rawArgs="";
+            String rawArgs = "";
             if (jsonObject.containsKey(ARGS_TAG)) {
-                rawArgs = buildArgList((JSON)jsonObject.get(ARGS_TAG));
+                rawArgs = buildArgList((JSON) jsonObject.get(ARGS_TAG));
             }
 
             String cmd;
@@ -164,48 +165,56 @@ public class AnotherJSONUtil {
             return qdlScript;
         }
         if (jsonObject.containsKey(Scripts.CODE)) {
+            QDLScript script = null;
             // contents are either a single line or a set of lines.
             Object object = jsonObject.get(Scripts.CODE);
+
             if (object instanceof String) {
                 lines.add(jsonObject.getString(Scripts.CODE));
-                return new QDLScript(lines, xp);
+                script = new QDLScript(lines, xp);
+                script.setFromCode(true);
+            }else{
+                if (object instanceof JSONArray) {
+                    lines.addAll(jsonObject.getJSONArray(Scripts.CODE));
+                    script = new QDLScript(lines, xp);
+                    script.setFromCode(true);
+                }else{
+                    throw new IllegalArgumentException("Error: Unknown code block type. Must be a string  or an array of strings");
+                }
             }
-            if (object instanceof JSONArray) {
-                lines.addAll(jsonObject.getJSONArray(Scripts.CODE));
-                return new QDLScript(lines, xp);
-            }
+            return script;
         }
         throw new IllegalArgumentException("Error: Unknown script type.");
     }
 
-    protected static String buildArgList(JSON json){
+    protected static String buildArgList(JSON json) {
         String out = "";
-        if(json.isArray()){
-            JSONArray array = (JSONArray)json;
-            for(int i = 0; i < array.size(); i++) {
+        if (json.isArray()) {
+            JSONArray array = (JSONArray) json;
+            for (int i = 0; i < array.size(); i++) {
                 Object obj = array.get(i);
-                if(obj instanceof String){
-                       out = out + "'" + obj.toString() + "'";
+                if (obj instanceof String) {
+                    out = out + "'" + obj.toString() + "'";
                 }
-                if(obj instanceof Boolean || obj instanceof Integer || obj instanceof Double){
-                   out = out + obj.toString();
+                if (obj instanceof Boolean || obj instanceof Integer || obj instanceof Double) {
+                    out = out + obj.toString();
                 }
-                if(obj instanceof JSON){
+                if (obj instanceof JSON) {
                     StemVariable stemVariable = new StemVariable();
-                    if(obj instanceof JSONArray) {
+                    if (obj instanceof JSONArray) {
                         stemVariable.fromJSON((JSONArray) obj);
-                    }else{
+                    } else {
                         stemVariable.fromJSON((JSONObject) obj);
                     }
                     out = out + StemEvaluator.FROM_JSON + "('" + stemVariable.toJSON() + "')";
                 }
 
-                if(i != array.size() - 1){
+                if (i != array.size() - 1) {
                     out = out + ",";
                 }
             }
-        }else{
-            out = StemEvaluator.FROM_JSON  + "('" + json.toString() + "')";
+        } else {
+            out = StemEvaluator.FROM_JSON + "('" + json.toString() + "')";
         }
         // Do not build it as a list, pass the arguments so we are consistent
         // with script arguments across the board.
@@ -214,11 +223,13 @@ public class AnotherJSONUtil {
         return out;
         // must be a stem list
     }
+
     public static void main(String[] args) {
         try {
-            JSONObject j = JSONObject.fromObject(test2);
+            JSONObject j = JSONObject.fromObject(test4);
             System.out.println(j.toString(1));
             ScriptSet<QDLScript> scripts = createScripts((JSON) j.get("qdl"));
+            scripts.get(SRE_EXEC_PHASE, SRE_POST_AT);
             System.out.println(scripts);
         } catch (Throwable t) {
             t.printStackTrace();
@@ -251,7 +262,7 @@ public class AnotherJSONUtil {
     static String test4 = "{\"qdl\":\n" +
             "   {\n" +
             "     \"code\":\"init(true, 9443);\",\n" +
-            "     \"xmd\":{\"phase\":\"pre_auth\",\"token_type\":\"refresh\"}\n" +
+            "     \"xmd\":{\"phase\":\"" + ScriptingConstants.SRE_POST_ALL + "\",\"token_type\":\"refresh\"}\n" +
             "   }\n" +
             "}\n";
 

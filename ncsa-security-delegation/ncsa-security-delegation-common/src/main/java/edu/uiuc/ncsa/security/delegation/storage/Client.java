@@ -54,11 +54,7 @@ public class Client extends BaseClient {
 
     String homeUri;
 
-
-
     String errorUri;
-
-
 
     public String getErrorUri() {
         return errorUri;
@@ -67,7 +63,6 @@ public class Client extends BaseClient {
     public void setErrorUri(String errorUri) {
         this.errorUri = errorUri;
     }
-
 
     @Override
     public boolean equals(Object obj) {

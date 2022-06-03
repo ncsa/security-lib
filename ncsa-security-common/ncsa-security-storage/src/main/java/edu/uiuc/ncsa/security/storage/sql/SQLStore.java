@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.cache.SimpleEntryImpl;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -181,6 +182,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     }
 
     public void register(V value) {
+        if(value.isReadOnly()){
+        throw  new IllegalAccessException(value.getIdentifierString() + " is read only");
+        }
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
 
@@ -727,7 +731,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         for (Field field : java.sql.Types.class.getFields()) {
             try {
                 jdbcMappings.put((Integer) field.get(null), field.getName());
-            } catch (IllegalAccessException e) {
+            } catch (java.lang.IllegalAccessException e) {
                 e.printStackTrace();
             }
         }

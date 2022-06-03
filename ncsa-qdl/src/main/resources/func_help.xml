@@ -2563,17 +2563,35 @@ See also: then, else, ?]]>
     </entry>
     <entry id="?">
         <body>
- <![CDATA[Used in the ternary operator
+<![CDATA[Used in the ternary operator
    boolean ? expression0 : expression1
-If boolean is true, then expression 0 is evaluated and returned. Otherwise
+   boolean. ? expression0 : expression1
+If boolean is true, then expression0 is evaluated and returned. Otherwise
 expression1 is used.
 
     user_name := script_args() == 2 ? script_args(1) : 'guest';
 
 These may be used like any other algebraic expression, where the if statement
 cannot be.
+
+If the left argument is a stem (list or simple stem) then a conformable
+result is returned.
+    a.0 := false; a.'foo' := true; a.3 := false;
+    a.?[-2;2]:'bar'
+
+{foo: [-2,-1,0,1], 0:bar, 3:bar}
+
+Note that expression0 and expression1 are not subject to subsetting, they
+are returned as is.
+
 See also: if, then, else]]>
         </body>
+        <example>
+<![CDATA[For a list of strings, add a trailing slash if one is missing.
+   p. := ['a:/x/y','a:/x/z/','b:/p/q']
+   p.+('.*/' =~ p.?'':'/');// regex to test if an element ends with a slash
+[a:/x/y/,a:/x/z/,b:/p/q/]]]>
+        </example>
     </entry>
     <entry id="then">
         <body>

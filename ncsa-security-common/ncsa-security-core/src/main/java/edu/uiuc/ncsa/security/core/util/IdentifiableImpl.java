@@ -51,6 +51,18 @@ public class IdentifiableImpl implements Identifiable, Cloneable {
         } else {
             rc = identifier.equals(x.getIdentifier());
         }
+        if(isReadOnly() != x.isReadOnly()) return false;
         return rc;
+    }
+
+    boolean readOnly = false; //default
+    @Override
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
     }
 }

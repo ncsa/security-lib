@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.cache.SimpleEntryImpl;
 import edu.uiuc.ncsa.security.core.exceptions.*;
+import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
@@ -311,6 +312,9 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
 
     @Override
     public void save(V t) {
+        if(t.isReadOnly()){
+           throw  new IllegalAccessException(t.getIdentifierString() + " is read only");
+           }
         realSave(false, t);
     }
 

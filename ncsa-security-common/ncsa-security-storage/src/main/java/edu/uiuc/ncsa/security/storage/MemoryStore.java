@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.storage;
 
 import edu.uiuc.ncsa.security.core.*;
+import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
@@ -102,6 +103,9 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
 
     @Override
     public void save(V value) {
+        if (value.isReadOnly()) {
+            throw new IllegalAccessException(value.getIdentifierString() + " is read only");
+        }
         realSave(value);
     }
 
@@ -122,23 +126,23 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
     @Override
     public List<V> search(String key, String condition, boolean isRegEx, List<String> attr, String dateField, Date before, Date after) {
         return GenericStoreUtils.search(this,
-                 key,
-                 condition,
-                 isRegEx,
-                 attr,
-                 dateField,
-                 before,
-                 after);
+                key,
+                condition,
+                isRegEx,
+                attr,
+                dateField,
+                before,
+                after);
     }
 
     @Override
     public List<V> search(String key, String condition, boolean isRegEx, List<String> attr) {
         return GenericStoreUtils.search(this,
-                 key,
-                 condition,
-                 isRegEx,
-                 attr,
-                 null,null,null);
+                key,
+                condition,
+                isRegEx,
+                attr,
+                null, null, null);
     }
 
     @Override
@@ -155,13 +159,13 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
         return count;
     }
 
-    public MapConverter getMapConverter(){
+    public MapConverter getMapConverter() {
         return null;
     }
 
     @Override
     public boolean remove(List<Identifiable> objects) {
-        for(Identifiable identifiable : objects){
+        for (Identifiable identifiable : objects) {
             remove(identifiable.getIdentifier());
         }
         return true;

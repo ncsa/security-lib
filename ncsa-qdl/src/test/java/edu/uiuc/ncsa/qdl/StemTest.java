@@ -2216,5 +2216,19 @@ public class StemTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state) : "failed to round trip JSON array with QDL nulls in it.";
     }
 
+    /**
+     * Makes sure that ~ handles default values in stems
+     * @throws Throwable
+     */
+    public void testTildeDefaultValues() throws Throwable {
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "qq. := {*:4}~[2];");
+         addLine(script, "ok := 4 ==  execute(input_form(qq.)).42;"); // round trip it, check default value
+         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+         interpreter.execute(script.toString());
+         assert getBooleanValue("ok", state) : "failed to round trip default value with a ~.";
+     }
+
 }
 

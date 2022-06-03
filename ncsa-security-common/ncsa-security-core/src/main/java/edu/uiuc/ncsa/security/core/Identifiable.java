@@ -9,23 +9,31 @@ import java.io.Serializable;
  */
 public interface Identifiable extends Serializable, Cloneable {
 
-            public Identifiable clone();
+    public Identifiable clone();
+
     /**
      * Get the identifer
+     *
      * @return
      */
     Identifier getIdentifier();
 
     /**
      * Convenience call to cast the identifier to a string.
+     *
      * @return
      */
     String getIdentifierString();
 
     /**
      * Set the identifier.
+     *
      * @param identifier
      */
     void setIdentifier(Identifier identifier);
+
+    boolean isReadOnly();
+
+    void setReadOnly(boolean readOnly);
 
 }

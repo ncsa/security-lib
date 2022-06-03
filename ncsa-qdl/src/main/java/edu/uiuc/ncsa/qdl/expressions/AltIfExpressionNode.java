@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.expressions;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
 import java.util.ArrayList;
 
@@ -49,6 +50,29 @@ public class AltIfExpressionNode extends ExpressionImpl {
     @Override
     public Object evaluate(State state) {
         Object arg0 = getIF().evaluate(state);
+        if(arg0 instanceof StemVariable){
+            StemVariable out = new StemVariable();
+            StemVariable inStem = (StemVariable) arg0;
+            for(Object key : inStem.keySet()){
+                   Object obj = inStem.get(key);
+                   if(!(obj instanceof Boolean)){
+                       throw new IllegalArgumentException("expression requires a boolean at index '" + key + "'");
+                   }
+                Boolean flag = (Boolean) obj;
+                Object arg1;
+                if (flag) {
+                    arg1 = getTHEN().evaluate(state);
+                } else {
+                    arg1 = getELSE().evaluate(state);
+                }
+                out.putLongOrString(key, arg1);
+            }
+            setResult(out);
+            setResultType(Constant.STEM_TYPE);
+            setEvaluated(true);
+            return out;
+
+        }
         if (!(arg0 instanceof Boolean)) {
             throw new IllegalArgumentException("error: expression requires a boolean as its first argument");
         }

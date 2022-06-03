@@ -664,22 +664,6 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
 
     }
 
-    /*
-     * This checks each stem for a default value and then if there is not one, it checks
-     * the key. Best we can do is jump out of the loop when we hit a dud.
-     *
-     * @param key
-     * @param stems
-     * @return
-     */
-/*    protected boolean allHaveKey(String key, StemVariable... stems) {
-        for (StemVariable stem : stems) {
-            if (!stem.isEmpty()) {
-                if (!stem.containsKey(key)) return false;
-            }
-        }
-        return true;
-    }*/
 
     public class CommonKeyIterator implements Iterator {
         ArrayList<StemKeys> stemKeys = new ArrayList<>();
@@ -701,6 +685,9 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
         @Override
         public boolean hasNext() {
             if (iterator == null) {
+                if(smallestKeys == null){
+                    return false;
+                }
                 iterator = smallestKeys.iterator();
             }
             while (iterator.hasNext()) {
@@ -738,38 +725,11 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
                 iterator.add(stem.keySet());
             }
         }
+        // edge case. E.g. all the stems are empty
+        if(iterator.smallestKeys == null){
+            iterator.smallestKeys = new StemKeys();
+        }
         return iterator;
-/*
-        StemKeys stemKeys = new StemKeys();
-        // First find one that has some keys.
-        for (StemVariable stem : stems) {
-            if (stem.hasDefaultValue()) {
-                continue;
-            }
-            if (!stem.isEmpty()) {
-                if (stemKeys.isEmpty()) {
-                    stemKeys.addAll(stem.keySet());
-                } else {
-                    stemKeys.intersection(stem.keySet());
-                }
-            }
-        }
-
-        return stemKeys;
-*/
-/*
-        Set<String> foundKeys = new HashSet<>();
-        // now look for common keys.
-        if (keys == null) {
-            // no common keys found
-            return foundKeys;
-        }
-        for (String key : keys) {
-            if (allHaveKey(key, stems)) {
-                foundKeys.add(key);
-            }
-        }
-        return foundKeys;*/
     }
 
     /**

@@ -31,6 +31,20 @@ public class QDLScript extends FileEntry implements ScriptInterface {
         super(lines, xp);
     }
 
+    /**
+     * Flag if this was loaded from a code block. Part of CIL-1302
+     * @return
+     */
+    public boolean isFromCode() {
+        return fromCode;
+    }
+
+    public void setFromCode(boolean fromCode) {
+        this.fromCode = fromCode;
+    }
+
+    boolean fromCode = false;
+
     StemVariable scriptArglist = null;
     boolean isRunScript = false;
 

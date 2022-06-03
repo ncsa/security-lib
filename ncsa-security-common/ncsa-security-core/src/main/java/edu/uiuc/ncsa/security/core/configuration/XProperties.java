@@ -684,7 +684,21 @@ public class XProperties extends Properties {
         return outS;
     }//end getList
 
-
+    /**
+     * return list as an {@link ArrayList}.
+     * @param key
+     * @param separator
+     * @return
+     */
+    public ArrayList<String> getArrayList(String key, String separator) {
+        String list = getString(key);
+        StringTokenizer st = new StringTokenizer(list, separator);
+        ArrayList<String> out = new ArrayList<>();
+        while (st.hasMoreTokens()) {
+            out.add(st.nextToken());
+        } /* end while*/
+        return out;
+    }//end getArrayList
     /**
      * Gets the value associated with the key and splits it into an array of strings
      * using the value from <code>getListSeparator</code>
@@ -697,7 +711,9 @@ public class XProperties extends Properties {
         return getList(key, getListSeparator());
     }
 
-
+    public ArrayList<String> getArrayList(String key) {
+        return getArrayList(key, getListSeparator());
+    }
     /**
      * Sets the name of the file that calling the default <code>store()</code> method
      * will write to. It may be changed at any time.

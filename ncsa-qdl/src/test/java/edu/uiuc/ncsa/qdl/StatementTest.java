@@ -309,4 +309,32 @@ public class StatementTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state);
     }
+
+    /**
+     * Tests that a ternary expression using a stem of booleans returns a conformable argument.
+     * @throws Throwable
+     */
+    public void testStemTernary() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "b. :=[true,false,true,true];");
+        addLine(script, "x. := b.?-1:1;");
+        addLine(script, "ok := reduce(@&&, x. == [-1,1,-1,-1]);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
+    /**
+     * Basic test of the ternary operator.
+     * @throws Throwable
+     */
+    public void testTernary() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok := 1 ==  (2<1?-1:1);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
 }
