@@ -5,17 +5,12 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.variables.Constant;
-import edu.uiuc.ncsa.qdl.variables.QDLCodec;
 import edu.uiuc.ncsa.qdl.variables.QDLSet;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
-import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.StringTokenizer;
 
 import static edu.uiuc.ncsa.qdl.state.QDLConstants.*;
@@ -69,11 +64,11 @@ public class StringEvaluator extends AbstractEvaluator {
     public static final String TOKENIZE = "tokenize";
     public static final int TOKENIZE_TYPE = 9 + STRING_FUNCTION_BASE_VALUE;
 
-    public static final String ENCODE = "vencode";
+/*    public static final String ENCODE = "vencode";
     public static final int ENCODE_TYPE = 10 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String DECODE = "vdecode";
-    public static final int DECODE_TYPE = 11 + STRING_FUNCTION_BASE_VALUE;
+    public static final int DECODE_TYPE = 11 + STRING_FUNCTION_BASE_VALUE;*/
 
     public static final String DETOKENIZE = "detokenize";
     public static final int DETOKENIZE_TYPE = 12 + STRING_FUNCTION_BASE_VALUE;
@@ -111,8 +106,8 @@ public class StringEvaluator extends AbstractEvaluator {
                     CAPUT,
                     TOKENIZE,
                     DETOKENIZE,
-                    ENCODE,
-                    DECODE,
+                //    ENCODE,
+                  //  DECODE,
                     TO_URI,
                     FROM_URI};
         }
@@ -146,10 +141,10 @@ public class StringEvaluator extends AbstractEvaluator {
                 return TOKENIZE_TYPE;
             case DETOKENIZE:
                 return DETOKENIZE_TYPE;
-            case ENCODE:
+/*            case ENCODE:
                 return ENCODE_TYPE;
             case DECODE:
-                return DECODE_TYPE;
+                return DECODE_TYPE;*/
             case TO_URI:
                 return TO_URI_TYPE;
             case FROM_URI:
@@ -210,12 +205,12 @@ public class StringEvaluator extends AbstractEvaluator {
             case SUBSTRING:
                 doSubstring(polyad, state);
                 return true;
-            case ENCODE:
+/*            case ENCODE:
                 doEncode(polyad, state);
                 return true;
             case DECODE:
                 doDecode(polyad, state);
-                return true;
+                return true;*/
             case TO_URI:
                 doToURI(polyad, state);
                 return true;
@@ -625,7 +620,7 @@ public class StringEvaluator extends AbstractEvaluator {
 
     }
 
-    protected void doDecode(Polyad polyad, State state) {
+  /*  protected void doDecode(Polyad polyad, State state) {
         if (polyad.isSizeQuery()) {
             polyad.setResult(new int[]{1, 2});
             polyad.setEvaluated(true);
@@ -694,7 +689,8 @@ public class StringEvaluator extends AbstractEvaluator {
         }
 
     }
-
+*/
+/*
     protected void doEncode(Polyad polyad, State state) {
         if (polyad.isSizeQuery()) {
             polyad.setResult(new int[]{1, 2});
@@ -764,6 +760,7 @@ public class StringEvaluator extends AbstractEvaluator {
         }
     }
 
+*/
 
     protected void doSubstring(Polyad polyad, State state) {
         if (polyad.isSizeQuery()) {

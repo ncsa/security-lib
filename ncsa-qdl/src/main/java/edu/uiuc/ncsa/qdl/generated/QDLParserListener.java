@@ -772,6 +772,18 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitRestriction(QDLParserParser.RestrictionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code is_a}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterIs_a(QDLParserParser.Is_aContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code is_a}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitIs_a(QDLParserParser.Is_aContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code stemVar}
 	 * labeled alternative in {@link QDLParserParser#expression}.
 	 * @param ctx the parse tree

@@ -7,8 +7,11 @@ import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
+
+import static ch.obermuhlner.math.big.BigDecimalMath.*;
 
 /**
  * Class for transcendental functions, like log, exponentiation etc.
@@ -85,12 +88,18 @@ public class TMathEvaluator extends AbstractEvaluator {
     public static final String CEILING = "ceiling";
     public static final int CEILING_TYPE = 20 + TMATH_FUNCTION_BASE_VALUE;
 
+    public static final String GCD = "gcd";
+    public static final int GCD_TYPE = 21 + TMATH_FUNCTION_BASE_VALUE;
+
+    public static final String LCM = "lcm";
+    public static final int LCM_TYPE = 22 + TMATH_FUNCTION_BASE_VALUE;
+
 
     @Override
     public String[] getFunctionNames() {
         if (fNames == null) {
             fNames = new String[]{
-                    COSINE, SINE, TANGENT, LOG_10, LOG_E, EXP, SINH, COSH, TANH,
+                    COSINE, SINE, TANGENT, LOG_10, LOG_E, EXP, SINH, COSH, TANH, GCD, LCM,
                     ARC_COSINE, ARC_SINE, ARC_TANGENT, ARC_COSH, ARC_SINH, ARC_TANH, PI, PI2,
                     N_ROOT, FLOOR, CEILING
             };
@@ -100,7 +109,7 @@ public class TMathEvaluator extends AbstractEvaluator {
 
     public static BigDecimal getPi(MathContext mathContext) {
         if (pi == null) {
-            pi = ch.obermuhlner.math.big.BigDecimalMath.pi(mathContext);
+            pi = pi(mathContext);
         }
         return pi;
     }
@@ -119,7 +128,7 @@ public class TMathEvaluator extends AbstractEvaluator {
 
     public static BigDecimal getNaturalLogBase(MathContext mathContext) {
         if (naturalLogBase == null) {
-            naturalLogBase = ch.obermuhlner.math.big.BigDecimalMath.exp(BigDecimal.ONE, mathContext);
+            naturalLogBase = exp(BigDecimal.ONE, mathContext);
         }
         return naturalLogBase;
     }
@@ -144,6 +153,12 @@ public class TMathEvaluator extends AbstractEvaluator {
 
     public boolean evaluate2(Polyad polyad, State state) {
         switch (polyad.getName()) {
+            case LCM:
+                doLCM(polyad, state);
+                return true;
+            case GCD:
+                doGCD(polyad, state);
+                return true;
             case SINE:
                 doTranscendentalMath(polyad, SINE, state);
                 return true;
@@ -206,6 +221,106 @@ public class TMathEvaluator extends AbstractEvaluator {
         return false;
     }
 
+    private void doLCM(Polyad polyad, State state) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{2});
+            polyad.setEvaluated(true);
+            return;
+        }
+
+        if (polyad.getArgCount() < 2) {
+            throw new MissingArgException(LCM + " requires an argument", polyad);
+        }
+
+        if (2 < polyad.getArgCount()) {
+            throw new ExtraArgException(LCM + " requires at most 1 argument", polyad.getArgAt(2));
+        }
+
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                BigInteger bi0 = gcdToBigInteger(polyad, objects[0]);
+                BigInteger bi1 = gcdToBigInteger(polyad, objects[1]);
+                // The LCM of two integers x,y is x*y/gcd(x,y)
+                BigInteger prod = bi0.multiply(bi1);
+                BigInteger rr = prod.divide(bi0.gcd(bi1));
+
+                try {
+                    Long ll = rr.longValueExact();
+                    r.result = ll;
+                    r.resultType = Constant.LONG_TYPE;
+                } catch (ArithmeticException ax) {
+                    // too big
+                    BigDecimal bigInteger = new BigDecimal(rr);
+                    r.result = bigInteger;
+                    r.resultType = Constant.DECIMAL_TYPE;
+                }
+                return r;
+            }
+        };
+        process2(polyad, pointer, LCM, state);
+    }
+
+    private void doGCD(Polyad polyad, State state) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{2});
+            polyad.setEvaluated(true);
+            return;
+        }
+
+        if (polyad.getArgCount() < 2) {
+            throw new MissingArgException(GCD + " requires an argument", polyad);
+        }
+
+        if (2 < polyad.getArgCount()) {
+            throw new ExtraArgException(GCD + " requires at most 1 argument", polyad.getArgAt(2));
+        }
+
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                BigInteger bi0 = gcdToBigInteger(polyad, objects[0]);
+                BigInteger bi1 = gcdToBigInteger(polyad, objects[1]);
+                BigInteger rr = bi0.gcd(bi1);
+                try {
+                    Long ll = rr.longValueExact();
+                    r.result = ll;
+                    r.resultType = Constant.LONG_TYPE;
+                } catch (ArithmeticException ax) {
+                    // too big
+                    BigDecimal bigInteger = new BigDecimal(rr);
+                    r.result = bigInteger;
+                    r.resultType = Constant.DECIMAL_TYPE;
+                }
+                return r;
+            }
+        };
+        process2(polyad, pointer, GCD, state);
+    }
+
+    private BigInteger gcdToBigInteger(Polyad polyad, Object arg0) {
+        BigInteger bi0 = null;
+        boolean arg0OK = false;
+        if (arg0 instanceof Long) {
+            bi0 = new BigInteger(Long.toString((Long) arg0));
+            arg0OK = true;
+        }
+        if (arg0 instanceof BigDecimal) {
+            try {
+                bi0 = ((BigDecimal) arg0).toBigIntegerExact();
+            } catch (ArithmeticException ex) {
+                throw new BadArgException("the first argument must be an integer.", polyad.getArgAt(0));
+            }
+            arg0OK = true;
+        }
+        if (!arg0OK) {
+            throw new BadArgException("the first argument must be an integer.", polyad.getArgAt(0));
+        }
+        return bi0;
+    }
+
     private void doCeiling(Polyad polyad, State state) {
         doFloorOrCeiling(polyad, state, false);
     }
@@ -266,7 +381,7 @@ public class TMathEvaluator extends AbstractEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(N_ROOT + " requires 2 arguments", polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
+            throw new MissingArgException(N_ROOT + " requires 2 arguments", polyad.getArgCount() == 1 ? polyad.getArgAt(0) : polyad);
         }
 
         if (2 < polyad.getArgCount()) {
@@ -322,7 +437,16 @@ public class TMathEvaluator extends AbstractEvaluator {
                     throw new BadArgException(N_ROOT + " requires a positive base if the exponent is even.", polyad.getArgAt(0));
                 }
                 MathContext mathContext = state.getOpEvaluator().getMathContext();
-                BigDecimal result = ch.obermuhlner.math.big.BigDecimalMath.root(base.abs(mathContext), exponent, state.getOpEvaluator().getMathContext());
+                BigDecimal abs = base.abs(mathContext);
+                BigDecimal result;
+                if (-1 == abs.compareTo(new BigDecimal("1000000"))) {
+                    result = root(base.abs(mathContext), exponent, state.getOpEvaluator().getMathContext());
+                } else {
+                    // Issue is that the BigMath root function has dismally slow  convergence
+                    // for larger values -- as in hours per value (!!)
+                    // so compute it in an alternate way: nroot(x, n) == exp(ln(|x|)/n)*sgn(x)
+                    result = exp(log(abs, mathContext).divide(exponent, mathContext), mathContext);
+                }
                 if (!isBaseNonNegative) {
                     result = result.negate(mathContext);
                 }
@@ -358,10 +482,10 @@ public class TMathEvaluator extends AbstractEvaluator {
             MathContext mathContext = OpEvaluator.getMathContext();
             BigDecimal rr = null;
             if (isLong(exponent)) {
-                rr = ch.obermuhlner.math.big.BigDecimalMath.pow(getPi(mathContext), (Long) exponent, mathContext);
+                rr = pow(getPi(mathContext), (Long) exponent, mathContext);
             }
             if (isBigDecimal(exponent)) {
-                rr = ch.obermuhlner.math.big.BigDecimalMath.pow(getPi(mathContext), (BigDecimal) exponent, mathContext);
+                rr = pow(getPi(mathContext), (BigDecimal) exponent, mathContext);
             }
             if (rr == null) {
                 throw new BadArgException("argument must be a number", polyad.getArgAt(0));
@@ -412,6 +536,8 @@ public class TMathEvaluator extends AbstractEvaluator {
                 return FLOOR_TYPE;
             case CEILING:
                 return CEILING_TYPE;
+            case GCD:
+                return GCD_TYPE;
         }
         return EvaluatorInterface.UNKNOWN_VALUE;
     }
@@ -425,57 +551,57 @@ public class TMathEvaluator extends AbstractEvaluator {
         BigDecimal bd = null;
         switch (op) {
             case COSINE:
-                bd = ch.obermuhlner.math.big.BigDecimalMath.cos(x, mathContext);
+                bd = cos(x, mathContext);
                 break;
             case ARC_COSINE:
-                bd = ch.obermuhlner.math.big.BigDecimalMath.acos(x, mathContext);
+                bd = acos(x, mathContext);
                 break;
             case SINE:
-                bd = ch.obermuhlner.math.big.BigDecimalMath.sin(x, mathContext);
+                bd = sin(x, mathContext);
                 break;
             case ARC_SINE:
-                bd = ch.obermuhlner.math.big.BigDecimalMath.asin(x, mathContext);
+                bd = asin(x, mathContext);
                 break;
             case TANGENT:
                 try {
-                    bd = ch.obermuhlner.math.big.BigDecimalMath.tan(x, mathContext);
+                    bd = tan(x, mathContext);
                 } catch (ArithmeticException ax) {
                     throw new IllegalArgumentException("you do not have enough precision to compute " + TANGENT + ". Please increase " + MathEvaluator.NUMERIC_DIGITS);
                 }
                 break;
             case ARC_TANGENT:
-                bd = ch.obermuhlner.math.big.BigDecimalMath.atan(x, mathContext);
+                bd = atan(x, mathContext);
                 break;
             case LOG_10:
-                bd = ch.obermuhlner.math.big.BigDecimalMath.log10(x, mathContext);
+                bd = log10(x, mathContext);
                 break;
             case LOG_E:
-                bd = ch.obermuhlner.math.big.BigDecimalMath.log(x, mathContext);
+                bd = log(x, mathContext);
                 break;
             case EXP:
-                bd = ch.obermuhlner.math.big.BigDecimalMath.exp(x, mathContext);
+                bd = exp(x, mathContext);
                 break;
             case SINH:
-                bd = ch.obermuhlner.math.big.BigDecimalMath.sinh(x, mathContext);
+                bd = sinh(x, mathContext);
                 break;
             case ARC_SINH:
-                bd = ch.obermuhlner.math.big.BigDecimalMath.asinh(x, mathContext);
+                bd = asinh(x, mathContext);
                 break;
             case COSH:
-                bd = ch.obermuhlner.math.big.BigDecimalMath.cosh(x, mathContext);
+                bd = cosh(x, mathContext);
                 break;
             case ARC_COSH:
-                bd = ch.obermuhlner.math.big.BigDecimalMath.acosh(x, mathContext);
+                bd = acosh(x, mathContext);
                 break;
             case TANH:
                 try {
-                    bd = ch.obermuhlner.math.big.BigDecimalMath.tanh(x, mathContext);
+                    bd = tanh(x, mathContext);
                 } catch (ArithmeticException ax) {
                     throw new IllegalArgumentException("you do not have enough precision to compute " + TANH + ". Please increase " + MathEvaluator.NUMERIC_DIGITS);
                 }
                 break;
             case ARC_TANH:
-                bd = ch.obermuhlner.math.big.BigDecimalMath.atanh(x, mathContext);
+                bd = atanh(x, mathContext);
                 break;
             default:
                 throw new UndefinedFunctionException("The function " + op + " is undefined", null);
@@ -542,7 +668,7 @@ public class TMathEvaluator extends AbstractEvaluator {
         };
         try {
             process1(polyad, pointer, op, state);
-        }catch (UndefinedFunctionException udx){
+        } catch (UndefinedFunctionException udx) {
             udx.setStatement(polyad);
             throw udx;
         }

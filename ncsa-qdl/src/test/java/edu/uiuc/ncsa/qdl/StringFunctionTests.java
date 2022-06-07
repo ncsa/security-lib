@@ -792,10 +792,10 @@ public class StringFunctionTests extends AbstractQDLTester {
         // π
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "ok1 ≔ vencode('foo &&*bar baz') == 'foo$20$26$26$2Abar$20baz';");
-        addLine(script, "ok2 ≔ vencode('foo &&*bar baz', true) == 'foo+%26%26*bar+baz';"); // URL encode
-        addLine(script, "ok3 ≔ vdecode('foo+%26%26*bar+baz', true) == 'foo &&*bar baz';");
-        addLine(script, "ok4 ≔ vdecode('foo$20$26$26$2Abar$20baz', false) == 'foo &&*bar baz';"); // redundant false, just to test
+        addLine(script, "ok1 ≔ encode('foo &&*bar baz',0) == 'foo$20$26$26$2Abar$20baz';");
+        addLine(script, "ok4 ≔ decode('foo$20$26$26$2Abar$20baz', 0) == 'foo &&*bar baz';");
+        addLine(script, "ok2 ≔ encode('foo &&*bar baz', 1) == 'foo+%26%26*bar+baz';"); // URL encode
+        addLine(script, "ok3 ≔ decode('foo+%26%26*bar+baz', 1) == 'foo &&*bar baz';");
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());

@@ -29,6 +29,19 @@ lexer grammar QDLLexer;
            THEN : 'then';
             TRY : 'try';
           WHILE : 'while';
+/*
+     Type_List : NULL2 | STRING2 | BOOLEAN2 | INTEGER2 | DECIMAL2 | NUMBER2 | LIST2 | SET2 | STEM2;
+
+     BOOLEAN2 : 'Boolean';
+     INTEGER2 : 'Integer';
+     DECIMAL2 : 'Decimal';
+      NUMBER2 : 'Number';
+      STRING2 : 'String';
+        NULL2 : 'Null';
+        LIST2 : 'List';
+        STEM2 : 'Stem';
+         SET2 : 'Set';*/
+
 
 // § 2 integers
       Integer : [0-9]+;
@@ -97,6 +110,7 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
             To_Set : '|>' | '⊢'; // unicode 22a2
         LessEquals : '<=' | '≤' ;  // unicode 2264
         MoreEquals : '>=' | '≥' ;  // unicode 2265
+               IsA : '<<';
             Equals : '==' | '≡';  // unicode 2261
          NotEquals : '!=' | '≠';  // unicode 2260
       RegexMatches : '=~' | '≈';  // unicode 2248
@@ -150,7 +164,7 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
 fragment AllOps :
      Times | Divide | Plus | Minus | LessThan | LessEquals | GreaterThan | Exponentiation |
      LessEquals | MoreEquals | Equals | NotEquals | And | Or | Percent | Tilde | TildeRight |
-     LogicalNot | RegexMatches | Floor | Ceiling | Membership | To_Set;
+     LogicalNot | RegexMatches | Floor | Ceiling | Membership | To_Set | IsA;
 
 fragment FUNCTION_NAME :
      [a-zA-Z_$\u03b1-\u03c9\u0391-\u03a9\u03d1\u03d6\u03f0\u03f1][a-zA-Z_$0-9\u03b1-\u03c9\u0391-\u03a9\u03d1]*;

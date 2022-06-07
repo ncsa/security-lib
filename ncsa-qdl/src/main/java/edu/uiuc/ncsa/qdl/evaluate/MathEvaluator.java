@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.QDLCodec;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.TokenUtil;
@@ -12,7 +13,10 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Locale;
@@ -42,6 +46,7 @@ public class MathEvaluator extends AbstractEvaluator {
     public static final String HASH = "hash";
     public static final int HASH_TYPE = 4 + MATH_FUNCTION_BASE_VALUE;
 
+/*
     public static final String ENCODE_B16 = "encode_b16";
     public static final int ENCODE_B16_TYPE = 5 + MATH_FUNCTION_BASE_VALUE;
 
@@ -53,17 +58,25 @@ public class MathEvaluator extends AbstractEvaluator {
 
     public static final String DECODE_B32 = "decode_b32";
     public static final int DECODE_B32_TYPE = 18 + MATH_FUNCTION_BASE_VALUE;
+*/
+
+    public static final String ENCODE = "encode";
+    public static final int ENCODE_TYPE = 19 + MATH_FUNCTION_BASE_VALUE;
+
+    public static final String DECODE = "decode";
+    public static final int DECODE_TYPE = 20 + MATH_FUNCTION_BASE_VALUE;
 
 
     public static final String DATE_MS = "date_ms";
     public static final int DATE_MS_TYPE = 7 + MATH_FUNCTION_BASE_VALUE;
 
-
+/*
     public static final String DECODE_B64 = "decode_b64";
     public static final int DECODE_B64_TYPE = 8 + MATH_FUNCTION_BASE_VALUE;
 
     public static final String ENCODE_B64 = "encode_b64";
     public static final int ENCODE_B64_TYPE = 9 + MATH_FUNCTION_BASE_VALUE;
+*/
 
     public static final String MOD = "mod";
     public static final int MOD_TYPE = 10 + MATH_FUNCTION_BASE_VALUE;
@@ -95,15 +108,21 @@ public class MathEvaluator extends AbstractEvaluator {
                     RANDOM,
                     RANDOM_STRING,
                     HASH,
+                    ENCODE,
+                    DECODE,
+/*
                     ENCODE_B16,
                     DECODE_B16,
+*/
                     DATE_MS,
                     DATE_ISO,
                     NUMERIC_DIGITS,
+/*
                     DECODE_B64,
                     ENCODE_B64,
                     DECODE_B32,
                     ENCODE_B32,
+*/
                     MOD,
                     MAX, MIN,
                     DATE_ISO};
@@ -125,10 +144,15 @@ public class MathEvaluator extends AbstractEvaluator {
                 return RANDOM_STRING_TYPE;
             case HASH:
                 return HASH_TYPE;
-            case ENCODE_B16:
-                return ENCODE_B16_TYPE;
             case NUMERIC_DIGITS:
                 return NUMERIC_DIGITS_TYPE;
+            case ENCODE:
+                return ENCODE_TYPE;
+            case DECODE:
+                return DECODE_TYPE;
+/*
+            case ENCODE_B16:
+                return ENCODE_B16_TYPE;
             case DECODE_B16:
                 return DECODE_B16_TYPE;
             case ENCODE_B64:
@@ -139,6 +163,7 @@ public class MathEvaluator extends AbstractEvaluator {
                 return ENCODE_B32_TYPE;
             case DECODE_B32:
                 return DECODE_B32_TYPE;
+*/
             case DATE_MS:
                 return DATE_MS_TYPE;
             case DATE_ISO:
@@ -185,15 +210,25 @@ public class MathEvaluator extends AbstractEvaluator {
             case HASH:
                 doHash(polyad, state);
                 return true;
+            case ENCODE:
+                doCodec(polyad, state, true);
+                return true;
+            case DECODE:
+                doCodec(polyad, state, false);
+                return true;
+
+/*
             case ENCODE_B16:
                 toFromhex(polyad, state, true);
                 return true;
             case DECODE_B16:
                 toFromhex(polyad, state, false);
                 return true;
+*/
             case NUMERIC_DIGITS:
                 doNumericDigits(polyad, state);
                 return true;
+/*
             case ENCODE_B64:
                 doB64(polyad, state, true);
                 return true;
@@ -206,6 +241,7 @@ public class MathEvaluator extends AbstractEvaluator {
             case DECODE_B32:
                 doB32(polyad, state, false);
                 return true;
+*/
             case DATE_MS:
                 doDates(polyad, state, true);
                 return true;
@@ -225,6 +261,102 @@ public class MathEvaluator extends AbstractEvaluator {
         return false;
     }
 
+    private void doCodec(Polyad polyad, State state, final boolean isEncode) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{1, 2});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (polyad.getArgCount() < 1) {
+            throw new MissingArgException((isEncode ? ENCODE : DECODE) + " requires at least 1 argument", polyad);
+        }
+
+        if (2 < polyad.getArgCount()) {
+            throw new ExtraArgException((isEncode ? ENCODE : DECODE) + " requires at most 2 arguments", polyad.getArgAt(2));
+        }
+        final int type; // default for base 64.
+        if (polyad.getArgCount() == 2) {
+            Object obj = polyad.evalArg(1, state);
+            if (!(obj instanceof Long)) {
+                throw new BadArgException("the second argument must be an integer", polyad.getArgAt(1));
+            }
+            long lll = (Long)obj;
+            type = (int)lll;
+        } else {
+            type = 64;
+        }
+        AbstractEvaluator.fPointer pointer = new AbstractEvaluator.fPointer() {
+            @Override
+            public AbstractEvaluator.fpResult process(Object... objects) {
+                AbstractEvaluator.fpResult r = new AbstractEvaluator.fpResult();
+                if (!(objects[0] instanceof String)) {
+                    r.result = objects[0];
+                    r.resultType = polyad.getArguments().get(0).getResultType();
+                    return r;
+                }
+                switch (type) {
+                    case 0:// vencode
+                        QDLCodec codec = new QDLCodec();
+                        if (isEncode) {
+                            r.result = codec.encode(objects[0].toString());
+                        } else {
+                            r.result = codec.decode(objects[0].toString());
+                        }
+                        break;
+                    case 1:// url encode
+                        try {
+                            if (isEncode) {
+                                r.result = URLEncoder.encode(objects[0].toString(), "UTF-8");
+                            } else {
+                                r.result = URLDecoder.decode(objects[0].toString(), "UTF-8");
+                            }
+                        }catch(UnsupportedEncodingException unsupportedEncodingException){
+                            throw new QDLException("internal error doing URL code:" + unsupportedEncodingException.getMessage());
+                        }
+                        break;
+                    case 16:
+                        if (isEncode) {
+                            r.result = Hex.encodeHexString(objects[0].toString().getBytes());
+                        } else {
+                            try {
+                                byte[] decoded = Hex.decodeHex(objects[0].toString().toCharArray());
+                                r.result = new String(decoded);
+                            } catch (Throwable t) {
+                                r.result = "(error)";
+                            }
+                        }
+                        break;
+                    case 32:
+                        if (isEncode) {
+                            r.result = TokenUtil.b32EncodeToken(objects[0].toString());
+                        } else {
+                            r.result = TokenUtil.b32DecodeToken(objects[0].toString().toUpperCase(Locale.ROOT));
+                        }
+                        break;
+                    case 64:
+                        if (isEncode) {
+                            r.result = Base64.encodeBase64URLSafeString(objects[0].toString().getBytes());
+                        } else {
+                            r.result = new String(Base64.decodeBase64(objects[0].toString()));
+                        }
+                        break;
+                    default:
+                        throw new IllegalArgumentException("unknown conversion type " + type);
+                }
+                r.resultType = Constant.STRING_TYPE;
+                return r;
+            }
+        };
+        if(polyad.getArgCount() == 1){
+            process1(polyad, pointer, isEncode ? ENCODE : DECODE, state);
+        }else{
+            process2(polyad, pointer, isEncode ? ENCODE : DECODE, state);
+        }
+
+
+    }
+
+/*
     protected void doB32(Polyad polyad, State state, boolean isEncode) {
         if (polyad.isSizeQuery()) {
             polyad.setResult(new int[]{1});
@@ -260,6 +392,7 @@ public class MathEvaluator extends AbstractEvaluator {
         process1(polyad, pointer, isEncode ? ENCODE_B64 : DECODE_B64, state);
 
     }
+*/
 
 
     /**
@@ -376,7 +509,7 @@ public class MathEvaluator extends AbstractEvaluator {
 
     protected void doNumericDigits(Polyad polyad, State state) {
         if (polyad.isSizeQuery()) {
-            polyad.setResult(new int[]{0,1});
+            polyad.setResult(new int[]{0, 1});
             polyad.setEvaluated(true);
             return;
         }
@@ -407,7 +540,7 @@ public class MathEvaluator extends AbstractEvaluator {
 
     protected void doRandomString(Polyad polyad, State state) {
         if (polyad.isSizeQuery()) {
-            polyad.setResult(new int[]{0,1, 2});
+            polyad.setResult(new int[]{0, 1, 2});
             polyad.setEvaluated(true);
             return;
         }
@@ -504,6 +637,7 @@ public class MathEvaluator extends AbstractEvaluator {
         process1(polyad, pointer, HASH, state);
     }
 
+/*
     protected void doB64(Polyad polyad, State state, boolean isEncode) {
         if (polyad.isSizeQuery()) {
             polyad.setResult(new int[]{1});
@@ -580,6 +714,7 @@ public class MathEvaluator extends AbstractEvaluator {
         };
         process1(polyad, pointer, toHex ? ENCODE_B16 : DECODE_B16, state);
     }
+*/
 
     /**
      * Compute the modulus of two numbers, i.e. the remainder after division
@@ -593,7 +728,7 @@ public class MathEvaluator extends AbstractEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(MOD + " requires 2 arguments", polyad.getArgCount()==1?polyad.getArgAt(0): polyad);
+            throw new MissingArgException(MOD + " requires 2 arguments", polyad.getArgCount() == 1 ? polyad.getArgAt(0) : polyad);
         }
 
         if (2 < polyad.getArgCount()) {
@@ -734,7 +869,7 @@ public class MathEvaluator extends AbstractEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException((isMax ? MAX : MIN) + " requires 2 arguments", polyad.getArgCount()==1?polyad.getArgAt(0): polyad);
+            throw new MissingArgException((isMax ? MAX : MIN) + " requires 2 arguments", polyad.getArgCount() == 1 ? polyad.getArgAt(0) : polyad);
         }
 
         if (2 < polyad.getArgCount()) {
@@ -747,9 +882,9 @@ public class MathEvaluator extends AbstractEvaluator {
                 AbstractEvaluator.fpResult r = new AbstractEvaluator.fpResult();
                 if (!areAllNumbers(objects)) {
                     Statement s = null;
-                    if(!isNumber(objects[0])){
+                    if (!isNumber(objects[0])) {
                         s = polyad.getArgAt(0);
-                    }else{
+                    } else {
                         s = polyad.getArgAt(1);
                     }
                     // Contract is that if there are not numbers, just return the

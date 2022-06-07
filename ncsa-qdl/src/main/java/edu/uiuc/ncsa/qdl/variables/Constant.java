@@ -35,6 +35,7 @@ public class Constant {
     Object value;
     int type = UNKNOWN_TYPE;
 
+
     public int getType() {
         return type;
     }

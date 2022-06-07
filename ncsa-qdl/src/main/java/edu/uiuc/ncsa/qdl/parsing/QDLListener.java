@@ -2094,6 +2094,18 @@ illegal argument:no module named "b" was  imported at (1, 67)
         finish(monad, ctx);
     }
 
+    @Override
+    public void enterIs_a(QDLParserParser.Is_aContext ctx) {
+
+    }
+
+    @Override
+    public void exitIs_a(QDLParserParser.Is_aContext ctx) {
+        Dyad dyad = new Dyad(OpEvaluator.IS_A_VALUE);
+        dyad.setTokenPosition(tp(ctx));
+        stash(ctx, dyad);
+        finish(dyad, ctx);
+    }
 }
 
 

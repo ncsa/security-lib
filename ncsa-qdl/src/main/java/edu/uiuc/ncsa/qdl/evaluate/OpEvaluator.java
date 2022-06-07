@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
 
+import edu.uiuc.ncsa.qdl.exceptions.BadArgException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.qdl.expressions.*;
@@ -13,6 +14,7 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.TreeSet;
 
 import static edu.uiuc.ncsa.qdl.variables.Constant.*;
@@ -72,6 +74,7 @@ public class OpEvaluator extends AbstractEvaluator {
     public static final String TO_SET2 = "|>";
     public static final String EPSILON = "∈";
     public static final String EPSILON_NOT = "∉";
+    public static final String IS_A = "<<";
 
 
     public static final int ASSIGNMENT_VALUE = 10;
@@ -103,12 +106,13 @@ public class OpEvaluator extends AbstractEvaluator {
     public static final int TO_SET_VALUE = 221;
     public static final int EPSILON_VALUE = 222;
     public static final int EPSILON_NOT_VALUE = 223;
+    public static final int IS_A_VALUE = 224;
 
     /**
      * All Math operators. These are used in function references.
      */
     public static String[] ALL_MATH_OPS = new String[]{
-            EPSILON, EPSILON_NOT,
+            EPSILON, EPSILON_NOT, IS_A,
             TO_SET, TO_SET2,
             FLOOR, CEILING,
             UNION, UNION_2, INTERSECTION, INTERSECTION_2,
@@ -226,6 +230,8 @@ public class OpEvaluator extends AbstractEvaluator {
      */
     public int getType(String oo) {
         switch (oo) {
+            case IS_A:
+                return IS_A_VALUE;
             case EPSILON:
                 return EPSILON_VALUE;
             case EPSILON_NOT:
@@ -319,6 +325,9 @@ public class OpEvaluator extends AbstractEvaluator {
 
     public void evaluate2(Dyad dyad, State state) {
         switch (dyad.getOperatorType()) {
+            case IS_A_VALUE:
+                doIsA(dyad, state);
+                return;
             case EPSILON_VALUE:
                 doMembership(dyad, state, true);
                 return;
@@ -373,6 +382,65 @@ public class OpEvaluator extends AbstractEvaluator {
             default:
                 throw new NotImplementedException("Unknown dyadic operator " + dyad.getOperatorType());
         }
+    }
+
+    private void doIsA(Dyad dyad, State state) {
+      doIsA1(dyad, state);
+    }
+    private void doIsA1(Dyad dyad, State state) {
+         Object lhs = dyad.evalArg(0, state);
+
+        if (!(dyad.getRightArgument() instanceof VariableNode)) {
+            List<String> source =dyad.getRightArgument().getSourceCode();
+            String text;
+            if(source.size()==1){
+                text = source.get(0);
+            }else{
+                text = source.toString();
+            }
+            throw new BadArgException("unknown type '" + text + "'", dyad.getRightArgument());
+        }
+        Object obj2 = dyad.evalArg(1,state); // If the variable resolves to something, blow up
+        if(obj2 != null){
+            throw new BadArgException("you must supply a type, not a value ", dyad.getRightArgument());
+        }
+        String typeName = ((VariableNode)dyad.getRightArgument()).getVariableReference();
+        boolean x = false;
+        switch (typeName) {
+            case "Null":
+                x = lhs instanceof QDLNull;
+                break;
+            case "Boolean":
+                x = lhs instanceof Boolean;
+                break;
+            case "String":
+                x = lhs instanceof String;
+                break;
+            case "Number":
+                x = (lhs instanceof Long) || (lhs instanceof BigDecimal);
+                break;
+            case "Integer":
+                x = lhs instanceof Long;
+                break;
+            case "Decimal":
+                x = lhs instanceof BigDecimal;
+                break;
+            case "Stem":
+                x = lhs instanceof StemVariable;
+                break;
+            case "List":
+                x = (lhs instanceof StemVariable) && ((StemVariable) lhs).isList();
+                break;
+            case "Set":
+                x = lhs instanceof QDLSet;
+                break;
+            default:
+                throw new BadArgException("unkown type", dyad.getRightArgument());
+        }
+        dyad.setResult( x ? Boolean.TRUE : Boolean.FALSE);
+        dyad.setResultType(BOOLEAN_TYPE);
+        dyad.setEvaluated(true);
+
     }
 
     private void doMembership(Dyad dyad, State state, boolean isMember) {

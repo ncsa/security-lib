@@ -335,8 +335,10 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
         Object arg2 = null;
         UnknownSymbolException usx = null;
         try {
-            arg2 = polyad.evalArg(1, state);
-            checkNull(arg2, polyad.getArgAt(1), state);
+            if(!name.equals(OpEvaluator.IS_A)){ // special case is_a operator
+                arg2 = polyad.evalArg(1, state);
+                checkNull(arg2, polyad.getArgAt(1), state);
+            }
         } catch (UnknownSymbolException unknownSymbolException) {
             usx = unknownSymbolException;
         }

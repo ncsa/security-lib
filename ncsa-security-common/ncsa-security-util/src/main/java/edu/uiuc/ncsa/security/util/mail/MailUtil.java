@@ -174,7 +174,7 @@ public class MailUtil implements Logable {
                                             String messageTemplate,
                                             Map replacements,
                                             String newRecipients) {
-       // CIL-1225
+       // CIL-1225 (Both tomcat and the servlet have the mail jar), CIL-1308 (nobody has the mail jar)
         if (!isEnabled()) {
             return true;
         }

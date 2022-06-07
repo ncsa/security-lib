@@ -1038,8 +1038,10 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a :='Trăm năm trong cõi người ta, Chữ tài chữ mệnh khéo là ghét nhau.';");
         // Some Ahmaric text...
         addLine(script, "p :='በሰማይ ፡ የምትኖር ፡ ኣባታችን ፡ ሆይ ፡';");
-        addLine(script, "b := (a == vdecode(vencode(a)));");
-        addLine(script, "q := (p == vdecode(vencode(p)));");
+        //addLine(script, "b := (a == vdecode(vencode(a)));");
+        //addLine(script, "q := (p == vdecode(vencode(p)));");
+        addLine(script, "b := (a == decode(encode(a,0),0));");
+        addLine(script, "q := (p == decode(encode(p,0),0));");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("b", state);

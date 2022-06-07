@@ -34,7 +34,7 @@ import static edu.uiuc.ncsa.qdl.xml.XMLConstants.*;
 public class BufferManager implements Serializable {
 
 
-    public static class BufferRecord {
+    public static class BufferRecord implements Serializable{
         String src;
         String link;
         boolean edited = false;

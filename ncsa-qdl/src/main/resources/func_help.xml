@@ -27,86 +27,54 @@ See also: date_ms]]>
         </body>
     </entry>
 
-    <entry id="decode_b64">
+    <entry id="decode">
         <body>
- <![CDATA[decode_b64(arg) - decode a base 64 encoded string or stem of strings to string(s).
+ <![CDATA[decode(arg{,type}) - decode an encoded string or stem of strings to string(s).
                   Note that if the arg is encoded binary, you will get
                   gibberish back.
 
-See also: encode_b64]]>
+See also: encode]]>
         </body>
     </entry>
 
-    <entry id="encode_b64">
+    <entry id="encode">
         <body>
-<![CDATA[encode_b64(arg) - encode a string or stem of string into base 64.
-We follow RFC 4648, meaning that the result is not padded with
-things like ='s, and the character set is a-zA-Z0-9-_.
-This makes the result always URL safe.
-Full technical description: https://datatracker.ietf.org/doc/html/rfc4648
+<![CDATA[encode(arg{,type}) - encode a string or stem of strings. There are
+ various types of encoding allowed.
+type  name   notes
+ 0     v     Variable encode/decode that is QDL safe. Used in boxing, some JSON
+ 1     url   RFC 3986,  percent encode/decode
+ 16    hex   RFC 4648, character set is a-e0-9
+ 32    b32   RFC 4648, character set is A-Z2-7
+ 64    b64   RFC 4648, character set is  A-Za-z0-9-_
 
-See also: decode_b64]]>
+RFC 4648:
+   https://datatracker.ietf.org/doc/html/rfc4648
+
+RFC 3986:
+  https://datatracker.ietf.org/doc/html/rfc3986
+
+There is never any padding at the end of strings.
+
+See also: decode]]>
         </body>
 <example>
-<![CDATA[  encode_b64('foobar')
-Zm9vYmFy]]>
-</example>
-    </entry>
-
-
-    <entry id="decode_b32">
-        <body>
- <![CDATA[decode_b32(arg) - decode a base 32 encoded string or stem of strings to string(s).
-                  Note that if the arg is encoded binary, you will get
-                  gibberish back.
-See also: encode_b32]]>
-        </body>
-    </entry>
-
-    <entry id="encode_b32">
-        <body>
- <![CDATA[encode_b32(arg) - encode a string or stem of string into base 32.
-We follow RFC 4648, meaning that the result is not padded with
-things like ='s, and the character set is A-Z2-7
-This makes the result always URL safe.
-Full technical description: https://datatracker.ietf.org/doc/html/rfc4648
-E.g.
-  encode_b32('foobar')
+<![CDATA[  encode('foobar'); // base 64 default
+Zm9vYmFy
+  encode('foobar', 32); // base 32
 MZXW6YTBOI
-
-See also: decode_b32]]>
-        </body>
-<example>
-    <![CDATA[   encode_b32('foobar')
-    MZXW6YTBOI]]>
+   encode('foobar', 16); // base 16 or hex encoding
+666f6f626172
+   decode('Tr%C4%83m+n%C4%83m', 1); // URL
+Trăm năm
+   encode('你浣',0); // QDL's encoding
+$E4$BD$A0$E6$B5$A3
+   decode('$E4$BD$A0$E6$B5$A3',0)
+你浣
+Note that the last two characters are preserved. This is a famous case that these two are not always encoded
+correctly, hence included to show functionality.]]>
 </example>
     </entry>
-
-    <entry id="decode_b16">
-        <body>
- <![CDATA[decode_b16(arg) - decode a base 16 encoded string or stem of strings to string(s).
-                  Note that if the arg is encoded binary, you will get
-                  gibberish back.
-See also: encode_b16]]>
-        </body>
-    </entry>
-
-    <entry id="encode_b16">
-        <body>
-<![CDATA[encode_b16(arg) - encode a string or stem of string into base 16.
-We follow RFC 4648, meaning that the result is not padded with
-things like ='s, and the character set is a-f0-9
-This makes the result always URL safe.
-Full technical description: https://datatracker.ietf.org/doc/html/rfc4648
-
-See also: decode_b16]]>
-        </body>
-<example>
-<![CDATA[   encode_b16('foobar')
-666f6f626172]]>
-</example>
-    </entry>
-
 
     <entry id="head">
         <body>
@@ -219,7 +187,7 @@ random(n) - return n (an integer) random numbers as a stem list.]]>
    random_string(n) - return a random string of n bytes, base 64 encoded
 random_string(n, m) - return a list containing m entries with n bytes each,
                       base 64 encoded
-See also: encode_b64, decode_b64]]>
+See also: encode, decode]]>
         </body>
     </entry>
 
@@ -997,7 +965,7 @@ file_write(file_name, contents, is_base_64) = same, but if is_base_64 is true,
                                   before writing. The default is that this
                                   flag is false.
 
-See also: file_read, decode_b64, encode_b64]]>
+See also: file_read, decode, encode]]>
         </body>
     </entry>
     <entry id="starts_with">
@@ -1572,39 +1540,6 @@ omits the trailing |.]]>
 Remember that the "-" operator will remove characters in the middle as well
 while trim() just removes from the ends.]]>
         </body>
-    </entry>
-    <entry id="vencode">
-        <body>
- <![CDATA[vencode(arg{, url_encode}) -  encode a string or stem of them.
-Note: This is supremely useful for non-western character sets that must be
-      preserved.
-      url_encode - (optional, default is false) if true the arg will be URL encoded
-      instead.
-
-See also: vdecode]]>
-        </body>
-        <example>
-<![CDATA[   vencode('你浣')
-$E4$BD$A0$E6$B5$A3
-  vencode('你浣', true)
-%E4%BD%A0%E6%B5%A3]]>
-                </example>
-
-    </entry>
-    <entry id="vdecode">
-        <body>
- <![CDATA[vdecode(arg{,url_decode}) -  decode an encoded string or stem.
-         url_decode - (optional, default false) if true will
-         try to URL decode the argument.
-
-See also: vencode]]>
-        </body>
-        <example>
-<![CDATA[   // Decode a tamil proverb:heaven helps the helpless.
-  vdecode('%E0%AE%85%E0%AE%95%E0%AE%A4%E0%AE%BF%E0%AE%95%E0%AF%8D%E0%AE%95%E0%AF%81+%E0%AE%86%E0%AE%95%E0%AE%BE%E0%AE%9A%E0%AE%AE%E0%AF%87+%E0%AE%A4%E0%AF%81%E0%AE%A3%E0%AF%88',true)
-அகதிக்கு ஆகாசமே துணை]]>
-                </example>
-
     </entry>
 
     <!--
@@ -4051,6 +3986,81 @@ false]]>
    <![CDATA[   f(x,y,z) -> block[q:=x; q:=q+y ; q:= q+z ; return(q);];
    f(3,2,1)
 6]]>
+        </example>
+    </entry>
+    <entry id="is_null">
+       <body>
+  <![CDATA[is_null(arg) - returns true if the argument is null, false otherwise.
+
+  A common construction is to set a variable null, e.g.
+     a. := null;
+Testing  a. == null later works unless a. has had a value assigned, in which case each
+element is tested for equality.
+
+     a. == null
+true;
+    is_null(a.)
+true;
+   a.0 :=1;
+   a. == null;
+[false]
+   is_null(a.)
+false
+
+Note that in the last case, is_null returns true if the entire argument is null.]]>
+       </body>
+       <example>
+   <![CDATA[
+   ]]>
+        </example>
+    </entry>
+    <entry id="gcd">
+       <body>
+  <![CDATA[gcd(x,y) - returns the greatest common divisor of x and y
+
+  gcd(720, 1800)
+360
+
+See also: lcm]]>
+       </body>
+    </entry>
+    <entry id="lcm">
+       <body>
+  <![CDATA[lcm(x,y) - the least common multiple of x and y
+  lcm(720, 1800)
+3600
+
+Note that lcm(α,β)=α×β÷gcd(α,β)
+
+See also: gcd]]>
+       </body>
+    </entry>
+    <entry id="&lt;&lt;">
+       <body>
+  <![CDATA[A << B - check if A is of type B.
+Read 'A is a B'
+Supported types built in to QDL:
+Null
+Boolean
+String
+Integer
+Decimal
+Number
+Stem
+Set
+List
+
+The result is always a boolean.
+Note that this is applied to the left hand side, so [1,2,3] << List would not check each element.
+This means that the << operator is something of an exception to the usual operator.]]>
+       </body>
+       <example>
+   <![CDATA[  4 << Number
+true
+  4 << Decimal
+false;
+  [;5] << List
+true]]>
         </example>
     </entry>
 

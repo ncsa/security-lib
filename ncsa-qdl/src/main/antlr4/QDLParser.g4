@@ -72,7 +72,7 @@ assertStatement2:
 
    iInterval : LeftBracket expression? ';' expression (';' | (';' expression))? RightBracket;
    rInterval : LDoubleBracket expression? ';' expression (';' | (';' expression))? RDoubleBracket;
-
+//   typeList : Type_List;
 
           set : '{' expression (',' expression)* '}'  | '{' '}';
  stemVariable : '{' stemEntry (',' stemEntry)* '}';
@@ -140,6 +140,8 @@ expression
  | expression And expression                                                   #andExpression
  | expression Or expression                                                    #orExpression
  | LogicalNot expression                                                       #notExpression
+// | expression '<<' typeList                                                    #is_a
+ | expression '<<' expression                                                  #is_a
  | '(' expression ')'                                                          #association
  | expression '?' expression ':' expression                                    #altIFExpression
  | expression Backslash + expression                                           #restriction

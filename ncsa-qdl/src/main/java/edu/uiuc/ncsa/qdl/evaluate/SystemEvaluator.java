@@ -111,6 +111,9 @@ public class SystemEvaluator extends AbstractEvaluator {
     public static final String TO_STRING = "to_string";
     public static final int TO_STRING_TYPE = 16 + SYSTEM_BASE_VALUE;
 
+    public static final String IS_NULL = "is_null";
+    public static final int IS_NULL_TYPE = 17 + SYSTEM_BASE_VALUE;
+
     public static final String TO_NUMBER = "to_number";
     public static final int TO_NUMBER_TYPE = 20 + SYSTEM_BASE_VALUE;
 
@@ -199,6 +202,7 @@ public class SystemEvaluator extends AbstractEvaluator {
                     CLIPBOARD_PASTE,
                     WS_MACRO,
                     IS_DEFINED,
+                    IS_NULL,
                     VAR_TYPE,
                     TO_NUMBER,
                     TO_STRING,
@@ -239,6 +243,8 @@ public class SystemEvaluator extends AbstractEvaluator {
     @Override
     public int getType(String name) {
         switch (name) {
+            case IS_NULL:
+                return IS_NULL_TYPE;
             case HAS_CLIPBOARD:
                 return HAS_CLIPBOARD_COMMAND_TYPE;
             case CLIPBOARD_COPY:
@@ -339,6 +345,9 @@ public class SystemEvaluator extends AbstractEvaluator {
         boolean printIt = false;
 
         switch (polyad.getName()) {
+            case IS_NULL:
+                doIsNull(polyad,state);
+                return true;
             case FOR_LINES:
                 doForLines(polyad, state);
                 return true;
@@ -473,6 +482,27 @@ public class SystemEvaluator extends AbstractEvaluator {
                 return true;
         }
         return false;
+    }
+
+    private void doIsNull(Polyad polyad, State state) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{1});
+            polyad.setEvaluated(true);
+            return;
+        }
+
+        if (polyad.getArgCount() < 1) {
+            throw new MissingArgException(IS_NULL + " requires an argument", polyad);
+        }
+
+        if (1 < polyad.getArgCount()) {
+            throw new ExtraArgException(IS_NULL + " requires at most 1 argument", polyad.getArgAt(1));
+        }
+
+        Object result = polyad.evalArg(0, state);
+        polyad.setEvaluated(true);
+        polyad.setResult(result instanceof QDLNull?Boolean.TRUE:Boolean.FALSE);
+        polyad.setResultType(Constant.BOOLEAN_TYPE);
     }
 
     private void doForLines(Polyad polyad, State state) {
