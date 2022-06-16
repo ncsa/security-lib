@@ -424,6 +424,7 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
 
     public abstract XStack getStateStack(State state);
 
+
     public void fromJSON(JSONArray array, XMLSerializationState xmlSerializationState) {
         // To recreate the various states, we still need to use the parser and essentially
         // create local state repeatedly. The aim is to be as faithful as possible to
@@ -444,7 +445,9 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
             JSONArray jsonArray = array.getJSONArray(i);
             for (int k = 0; k < jsonArray.size(); k++) {
                 try {
-                    qi.execute(currentST.fromJSONEntry(jsonArray.getString(k), xmlSerializationState));
+                    String xx = jsonArray.getString(k);
+
+                    qi.execute(currentST.fromJSONEntry(xx, xmlSerializationState));
                 } catch (Throwable e) {
                     // For now
                     e.printStackTrace();
@@ -484,22 +487,6 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
 
     protected JSONArray getJSON(XMLEventReader xer) throws XMLStreamException {
         return JSONArray.fromObject(XMLUtilsV2.getText(xer, getXMLStackTag()));
-/*
-        JSONArray jsonArray = null;
-        XMLEvent xe = xer.nextEvent();
-        while (xer.hasNext()) {
-            switch (xe.getEventType()) {
-                case XMLEvent.CHARACTERS:
-                    if (xe.asCharacters().isWhiteSpace()) {
-                        break;
-                    }
-                    jsonArray = JSONArray.fromObject(xe.asCharacters().getData());
-                    return jsonArray;
-            }
-            xe = xer.nextEvent();
-        }
-        throw new XMLMissingCloseTagException(VARIABLE_STACK);
-*/
     }
 
     protected void toXMLNEW(XMLStreamWriter xsw, XMLSerializationState xmlSerializationState) throws XMLStreamException {

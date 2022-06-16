@@ -1,31 +1,31 @@
 module[
    'qdl:/extensions','ext'
 ]body[
-   >> This module defines several additional functions for mathematics
-   >> These include sec(), sech() etc.
-   >>    clone(arg.) - make a complete copy of a stem
-   >>    for_each(@monad, arg.) -- apply the monad to each individual element of arg.
-   >>    fork(@monad0, @dyad, @monad1, arg) - evaluate dyad(monad0(arg),monad1(arg))
-   >>    n_copy(s,n) - make a stem with n copies of the argument s
-   >>    to_csv(arg.)- export a stem to comma separated format.
-   >>    
-   >> Mostly this is for very useful functions (like ravel) that are way easier
-   >> to write in QDL than anything else.
+   » This module defines several additional functions for mathematics
+   » These include sec(), sech() etc.
+   »    clone(arg.) - make a complete copy of a stem
+   »    for_each(@monad, arg.) -- apply the monad to each individual element of arg.
+   »    fork(@monad0, @dyad, @monad1, arg) - evaluate dyad(monad0(arg),monad1(arg))
+   »    n_copy(s,n) - make a stem with n copies of the argument s
+   »    to_csv(arg.)- export a stem to comma separated format.
+   »    
+   » Mostly this is for very useful functions (like ravel) that are way easier
+   » to write in QDL than anything else.
 
     define[clone(arg)][
-        >> clone(arg.) - Returns a completely new copy of the stem.
-        >> Since generally stems are by reference, not value,  something like
-        >> a. := b.
-        >> a.0 := 42
-        >> sets element 42 in b. as well. To have them independent, use this
-        >> If arg is not a stem, it is simply returned since all other references
-        >> are by value.
+        » clone(arg.) - Returns a completely new copy of the stem.
+        » Since generally stems are by reference, not value,  something like
+        » a. := b.
+        » a.0 := 42
+        » sets element 42 in b. as well. To have them independent, use this
+        » If arg is not a stem, it is simply returned since all other references
+        » are by value.
         if[var_type(arg) != constants('var_type').'stem'][return(arg);];
         return(from_json(to_json(arg)));
    ];
 
    define[n_copy(s, n)][
-     >> n_copy(s,n) - Create a stem with 0 < n copies of the single argument s.
+     » n_copy(s,n) - Create a stem with 0 < n copies of the single argument s.
      out. := null;
      if[n <= 0][return([]);];
      while[for_next(__j, [;n])][out.__j := s;];
@@ -34,34 +34,34 @@ module[
 
 
    define[ fork(⊗monad1,⊗dyad,⊗monad2,x.)][
-     >> fork(⊗monad1,⊗dyad,⊗monad2,x.) - apply a fork to a stem.
-     >> A fork is defined as a taking a dyad and two monads and applying them to an argument
-     >>    dyad(monad1(x.), monad2(x.)
-     >> A surprisingly large number of problems are addressed by this: transform the argument
-     >> then use both results for something else. For instance
-     >> to compute the average of a set of numbers, define
-     >>    sum(x.)->reduce(@+, x.);
-     >> then the average of the first 10 odd numbers is
-     >>    fork(@sum(), @/, @size(), 1+2*n(10));
-     >> So "sum divided by size" is how to read this.
-     >> Note the dyad (any algebraic operation like addition is a dyad) is put
-     >> in the middle of the argument list so it looks any other operator.
+     » fork(⊗monad1,⊗dyad,⊗monad2,x.) - apply a fork to a stem.
+     » A fork is defined as a taking a dyad and two monads and applying them to an argument
+     »    dyad(monad1(x.), monad2(x.)
+     » A surprisingly large number of problems are addressed by this: transform the argument
+     » then use both results for something else. For instance
+     » to compute the average of a set of numbers, define
+     »    sum(x.)->reduce(@+, x.);
+     » then the average of the first 10 odd numbers is
+     »    fork(@sum(), @/, @size(), 1+2*n(10));
+     » So "sum divided by size" is how to read this.
+     » Note the dyad (any algebraic operation like addition is a dyad) is put
+     » in the middle of the argument list so it looks any other operator.
      return(dyad(monad1(x.),monad2(x.)));
    ];
 
    define[
       to_csv(arg.)
     ][
-      >> to_csv(arg.) - Convert a stem., arg., to csv (comma separated values) format.
-      >> arg. is the stem to be converted. Each element is a list and will be a line
-      >> in the output. The zero-th element of arg. should be the headers you want.
-      >> A typical use is
-      >>     file_write(my_file, to_csv(data.));
-      >> E.g. here is the start of one.
-      >>
-      >>     arg.0 := ['t', 'x', 'y']; // header
-      >>     arg.1 := [12.3, -0.3, 2.2]; // first line of data, etc.
-      >> tip:  [['t', 'x','y']]~arg. would add the headers to arg..
+      » to_csv(arg.) - Convert a stem., arg., to csv (comma separated values) format.
+      » arg. is the stem to be converted. Each element is a list and will be a line
+      » in the output. The zero-th element of arg. should be the headers you want.
+      » A typical use is
+      »     file_write(my_file, to_csv(data.));
+      » E.g. here is the start of one.
+      »
+      »     arg.0 := ['t', 'x', 'y']; // header
+      »     arg.1 := [12.3, -0.3, 2.2]; // first line of data, etc.
+      » tip:  [['t', 'x','y']]~arg. would add the headers to arg..
       // convert each entry and remove the [] so its just numbers
       z. := for_each(@to_string(), a.) - ']' - '[';
       return(z.);
@@ -70,23 +70,23 @@ module[
    define[
        ravel(q)
    ][
-      >> ravel(q) - turn any stem (of any dimension) into a list of values.
-      >> This always returns a simple list. If you supply a scalar, that will be
-      >> returned in a list too.
-      >> One use is 'pouring' one set of values into another shape
-      >> E.g.
-      >>     q. := n(2,6,[;12]);
-      >>     n(3,2,2, ravel(q.))
-      >> [
-      >>    [[0,1],[2,3]],
-      >>    [[4,5],[6,7]],
-      >>    [[8,9],[10,11]]
-      >>  ]
-      >>
-      >> E.g.
-      >>     ravel(n(2,3,2,3,[;2*3*2*3]))
-      >>    [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
-      >>        21,22,23,24,25,26,27,28,29,30,31,32,33,34,35]
+      » ravel(q) - turn any stem (of any dimension) into a list of values.
+      » This always returns a simple list. If you supply a scalar, that will be
+      » returned in a list too.
+      » One use is 'pouring' one set of values into another shape
+      » E.g.
+      »     q. := n(2,6,[;12]);
+      »     n(3,2,2, ravel(q.))
+      » [
+      »    [[0,1],[2,3]],
+      »    [[4,5],[6,7]],
+      »    [[8,9],[10,11]]
+      »  ]
+      »
+      » E.g.
+      »     ravel(n(2,3,2,3,[;2*3*2*3]))
+      »    [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
+      »        21,22,23,24,25,26,27,28,29,30,31,32,33,34,35]
       if[var_type(q) != constants().var_type.stem][return([q]);];
       if[rank(q)==1][return(q);];
       return(remap(q, indices(q)));
@@ -95,7 +95,7 @@ module[
   define[
       laminate(x, y)
    ][
-     >> laminate(x, y) - Laminate along zero-th axis. See help for laminate(x,y,axis).
+     » laminate(x, y) - Laminate along zero-th axis. See help for laminate(x,y,axis).
       return(laminate(x,y,0));
    ];
     //  laminate(n(2,3,[;6]),n(2,3,[10;16]),0)
@@ -107,8 +107,8 @@ module[
   define[
       laminate(x, y, axis)
    ][
-     >> laminate(x, y, axis) - paste two stems together along an axis
-     >> At least one of x and y is a stem.
+     » laminate(x, y, axis) - paste two stems together along an axis
+     » At least one of x and y is a stem.
       types ≔ (var_type(x) ≡ 4?1:0) + (var_type(y) ≡ 4?2:0);
       // 0 - both scalars, 1 - x only stem, 2 - y only stem 3 - both stems
       if[types ≡ 0][return([x,y]);]; // trivial case
@@ -140,33 +140,33 @@ module[
    define[
       inner_product(⊗f, x., ⊗g, y.)
    ][
-     >> inner_product(⊗f, x., ⊗g, y.) - compute the inner product of x. and y.
-     >> using the given functions. f and g are dyadic. This applies g along
-     >> the first axis of x. and the last axis of y.,
-     >> then reduces along the last axis. It is a common idiom.
-     >> The result is conformable to x.
-     >> In the simple case of two matrices and f is addtion, g is multiplication
-     >> this is exactly the matrix product.
-     >>
-     >> E.g.
-     >> Given a long list of elements probably in random order, find which are included.
-     >>      ϱ. := unique(['a','b',0,3,true]~'c'~[['a','b',-2,'q',true]]~[[['aa','b',4,17,2/3]]])
-     >>      inner_product(⊗∨, ['a','b','s','c',0,3,true], @≡,  ϱ.)
-     >> [true,true,false,true,true,true,true]
+     » inner_product(⊗f, x., ⊗g, y.) - compute the inner product of x. and y.
+     » using the given functions. f and g are dyadic. This applies g along
+     » the first axis of x. and the last axis of y.,
+     » then reduces along the last axis. It is a common idiom.
+     » The result is conformable to x.
+     » In the simple case of two matrices and f is addtion, g is multiplication
+     » this is exactly the matrix product.
+     »
+     » E.g.
+     » Given a long list of elements probably in random order, find which are included.
+     »      ϱ. := unique(['a','b',0,3,true]~'c'~[['a','b',-2,'q',true]]~[[['aa','b',4,17,2/3]]])
+     »      inner_product(⊗∨, ['a','b','s','c',0,3,true], @≡,  ϱ.)
+     » [true,true,false,true,true,true,true]
           return(reduce(⊗f, τ(for_each(⊗g, x., τ(y.,-1)) ,-1)));
    ];
 
     define[
        reduce_all(⊗f, arg.)
     ][
-    >> reduce_all(⊗f, arg.) - apply reduce to the arguments until a scalar result.
-    >> This lets you check across large stems.
-    >>
-    >>     a. := n(3,4,5,6,[;3*4*5*6])
-    >>     reduce_all(⊗∧, a. < 1000)
-    >> true
-    >>
-    >> So every elements of a. is less than 1000.
+    » reduce_all(⊗f, arg.) - apply reduce to the arguments until a scalar result.
+    » This lets you check across large stems.
+    »
+    »     a. := n(3,4,5,6,[;3*4*5*6])
+    »     reduce_all(⊗∧, a. < 1000)
+    » true
+    »
+    » So every elements of a. is less than 1000.
        rank := rank(arg.);
        foo. := arg.;
        while[1 < rank--][
@@ -177,35 +177,35 @@ module[
     define[
       mload(path)
     ][
-      >> Convenience to import a module and load an instance of it all at
-      >> once. This returns the name of the imported module.
+      » Convenience to import a module and load an instance of it all at
+      » once. This returns the name of the imported module.
        return(module_import(module_load(path)));
     ];
 
     define[
       m_indices(x,y)
       ][
-       >> m_indices(x,y) creates a multi-index.
-       >> x - a scalar or simple list of indices
-       >> y - a scalar or simple list of indices
-       >> output is the list of indices consisting of all pairs
-       >> from x and y.
-       >> E.g.
-       >>     m_indices([2;5],'id')
-       >> [[2,id],[3,id],[4,id]]
-       >> This is immensely useful with functions like remap.
-       >> E.g. Extract a 2x2 array from a. with elements
-       >> [
-       >>    [a.2.3, a.2.5],
-       >>    [a.4.3, a.4.5]
-       >> ]
-       >> using remap and m_indices.
-       >>     a. := n(5,7,[;35]); //populate a.
-       >>     remap(a.,m_indices([2,4],[3,5]),m_indices([;2],[;2]));
-       >> [
-       >>   [17,19],
-       >>   [31,33]
-       >>  ]
+       » m_indices(x,y) creates a multi-index.
+       » x - a scalar or simple list of indices
+       » y - a scalar or simple list of indices
+       » output is the list of indices consisting of all pairs
+       » from x and y.
+       » E.g.
+       »     m_indices([2;5],'id')
+       » [[2,id],[3,id],[4,id]]
+       » This is immensely useful with functions like remap.
+       » E.g. Extract a 2x2 array from a. with elements
+       » [
+       »    [a.2.3, a.2.5],
+       »    [a.4.3, a.4.5]
+       » ]
+       » using remap and m_indices.
+       »     a. := n(5,7,[;35]); //populate a.
+       »     remap(a.,m_indices([2,4],[3,5]),m_indices([;2],[;2]));
+       » [
+       »   [17,19],
+       »   [31,33]
+       »  ]
        xx. := var_type(x)==4?x:[x];
        yy. := (var_type(y)==4)?y:[y];
        return(reduce(@~, for_each(@~,xx.,yy.)));
@@ -214,23 +214,23 @@ module[
    define[
       m_indices(x.)
       ][
-       >> m_indices(x.) create a multi-index using each element in x.
-       >> x. - a stem of either simple lists or scalars
-       >> output is the multi-index. Note size(x.) determines the rank
-       >> of the resulting multi-index.
-       >> This is equivalent to
-       >> m_indices(x.n,m_indices(x.(n-1),...,m_indices(x.0,x.1)))
-       >> E.g.
-       >>     m_indices([[;3],'foo',[4,7]])
-       >> [
-       >>    [0,foo,4],
-       >>    [0,foo,7],
-       >>    [1,foo,4],
-       >>    [1,foo,7],
-       >>    [2,foo,4],
-       >>    [2,foo,7]
-       >>  ]
-       >> Since x. had size 3, these are 3-indices.
+       » m_indices(x.) create a multi-index using each element in x.
+       » x. - a stem of either simple lists or scalars
+       » output is the multi-index. Note size(x.) determines the rank
+       » of the resulting multi-index.
+       » This is equivalent to
+       » m_indices(x.n,m_indices(x.(n-1),...,m_indices(x.0,x.1)))
+       » E.g.
+       »     m_indices([[;3],'foo',[4,7]])
+       » [
+       »    [0,foo,4],
+       »    [0,foo,7],
+       »    [1,foo,4],
+       »    [1,foo,7],
+       »    [2,foo,4],
+       »    [2,foo,7]
+       »  ]
+       » Since x. had size 3, these are 3-indices.
        ⊨ 1<size(x.) : 'm_indices requires its argument to have at least 2 elements.';
        r. :=m_indices(x.0,x.1);
        while[
@@ -249,8 +249,8 @@ module[
 /*   define[
       ε(x., y.)
    ][
-   >> ε(x., y.) - the is member of function for two lists. This will return a boolean list
-   >> conformable to x. with true for elements that are in y. and false otherwise.
+   » ε(x., y.) - the is member of function for two lists. This will return a boolean list
+   » conformable to x. with true for elements that are in y. and false otherwise.
    return(inner_product(@||, x., @==, y.));
    ];*/
 /*

@@ -5,10 +5,10 @@
 module[
    'qdl:/math/complex','complex'
 ]body[
-    >> Complex number operations on simple numbers as lists.
-    >> These do not work iteratively since the plan is to introduce
-    >> actual complex number support at some point into QDL. These are
-    >> examples and also allow for some quick calculations
+    » Complex number operations on simple numbers as lists.
+    » These do not work iteratively since the plan is to introduce
+    » actual complex number support at some point into QDL. These are
+    » examples and also allow for some quick calculations
      c_plus(a.,b.)→a.+b.;
     c_minus(a.,b.)→a.-b.;
     c_times(a.,b.)→(a.0×b.0 - a.1×b.1)~(a.0×b.1+b.0×a.1);
@@ -27,13 +27,13 @@ module[
          c_tan(z.)→c_div(c_sin(z.), c_cos(z.));
         c_tanh(z.)→c_div(c_sinh(z.), c_cosh(z.));
     define[c_root(a,b)][
-    >> c_root(a,b) will return the positive square root of a+i*b.
-    >> See also: c_root(z.) to do this for complex numbers directly.
-    >>    w. := c_root(-2,5)
-    >>    w.
-    >> [1.30099285300391,1.9216093264676]
-    >>    c_times(w., w.)
-    >> [-2.00000000000001,5.00000000000001]
+    » c_root(a,b) will return the positive square root of a+i*b.
+    » See also: c_root(z.) to do this for complex numbers directly.
+    »    w. := c_root(-2,5)
+    »    w.
+    » [1.30099285300391,1.9216093264676]
+    »    c_times(w., w.)
+    » [-2.00000000000001,5.00000000000001]
     if[b==0][
       if[a<0][return([0,sqrt(abs(a))]);];
       return([sqrt(a),0]);

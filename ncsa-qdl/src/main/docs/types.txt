@@ -1,0 +1,99 @@
+QDL and Types
+2022-06-13
+
+Rather than have classes, QDL should have user defined types. This allows for
+
+* multiple inheritance - based on order, so no diamond problem
+* interfaces - promise of certain functions/variables
+* overrides
+* Constructors of all super types are called in order and instances of them maintained(?)
+* Access supertypes How? super(A)::f() calls the function f from stored instance of A.
+* Casting needed???
+* Static method and member access. C++ does this with :: vs. .
+
+type[
+  uri, name
+  ]extends[
+    //list of super types
+  ]implements[
+    // list of interfaces
+  ]exposes[
+     f(x,y), z // list of functions or variables that are publically accessible.
+
+  ][
+  // body
+  ];
+
+All types support the following functions
+  * new - constructor
+  * to_string - convert this type to s string representation
+  * clone - create a copy of this type
+
+There will also be a Java interface to implement:
+  public interface QDLType extends Serializable{
+    String to_string(); // to_string
+    QDLType make_copy_of(); //clone
+    void create(Object[] args); // new
+    QDLType self_ref; // constant for this
+  }
+
+methods will be accessed with a ::.
+  x := X::new(3, 'a'); // create a new object of type X with the given arguments
+  x::add(y); // invoke the function add on x for argument y.
+
+E.g.
+  type[
+   Complex
+   ]exposes[
+      One, Zero, I, add, minus, mod, times, conj, over, power, e, re, im
+   ][
+     __re; __im;
+     re()->__re;
+     im()->__im;
+     // Constants
+     One  := Complex::new(1,0);
+     Zero := Complex::new(0,0);
+        I := Complex::new(0,1);
+     define[new(x,y)][__re := x, __ im :=y;];
+     add(y)->Complex::new(re()+y::re(), im() + y::im());
+     minus(y)->Complex::new(re()-y::re(), im() - y::im());
+     mod()->nroot(__re^2 + __im^2);
+     times(y)-> Complex::new(re()*y::re() - im()*y::im(), im()*y::re() + re()*y::im());
+     conj()->Complex::new(__re, -__im);
+     over(y)->times(y::conj)/mod(y)^2;
+     define[
+       power(n)
+       ][
+       //de Moivre's theorem.
+        if[n==2][return(Complex::new(times(this));
+         rho := mod();
+         theta = atan(_im/_re);
+         return(Complex::(rho^n*cos(n*theta), rho^m*sin(n*theta)));
+       ];
+     e()->Complex::new(exp(__re)*cos(__im), exp(__re)*sin(__im));
+   ];
+
+Another example
+z. := Complex::new(x., y.); //creates conformable stem z.
+
+E.g.
+  (z^2 - w^2)/(1+z*w)
+
+z::power(2)::minus(w::power(2))::over(Complex::One::plus(z::times(w)));
+
+?? Allow for overloading operators like + and ÷?
+
+type[T]extends[A,B,C][
+  f(x)->super(A)::f(x)*super(B)::g(x^2+1);
+  new(x,y);
+];
+
+z := <qdl:math/util>Complex::new(2.3, -1)
+or allow for full uri as a type
+uri := URI::new('qdl:/math/extension/Complex');
+
+or allow for some uris directly, so
+z := qdl:/math/extension/Complex::new(2,-1);
+import(qdl:/math/extension/Complex)
+z := Complex::new(2,-1);
+uri := qdl:/math/extension;

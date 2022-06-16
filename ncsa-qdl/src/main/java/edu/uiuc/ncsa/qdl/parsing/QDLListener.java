@@ -739,8 +739,9 @@ public class QDLListener implements QDLParserListener {
         for (QDLParserParser.FdocContext fd : docStatementBlockContext.fdoc()) {
             String doc = fd.getText();
             // strip off function comment marker
-            if (doc.startsWith(">>")) {
-                doc = doc.substring(2).trim();
+            //if (doc.startsWith(">>")) {
+            if (doc.startsWith(FDOC_MARKER)) {
+                doc = doc.substring(FDOC_MARKER.length()).trim();
             }
             functionRecord.documentation.add(doc);
         }
@@ -1019,8 +1020,10 @@ illegal argument:no module named "b" was  imported at (1, 67)
         for (QDLParserParser.FdocContext fd : docStatementBlockContext.fdoc()) {
             String doc = fd.getText();
             // strip off function comment marker
-            if (doc.startsWith(">>")) {
-                doc = doc.substring(2).trim();
+
+            //if (doc.startsWith(">>")) {
+            if (doc.startsWith(FDOC_MARKER)) {
+                doc = doc.substring(FDOC_MARKER.length()).trim();
             }
             moduleStatement.getDocumentation().add(doc);
         }
@@ -1028,6 +1031,7 @@ illegal argument:no module named "b" was  imported at (1, 67)
         moduleStatement.setSourceCode(getSource(moduleContext));
     }
 
+    static String FDOC_MARKER = "»";
     /*
     module['a:a','A'][module['b:b','B'][u:=2;f(x)->x+1;];];module_import('b:b');say(B#u);];
      */

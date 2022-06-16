@@ -2262,6 +2262,7 @@ an ASCII version (usually a digraph).
 Here is a table of supported unicode characters in QDL:
 
 Standard    Unicode   ALT   escape code    What is it
+               »       '    \u00bb         FDoc start of line
 !              ¬       !    \u00ac         logical not
 -              ¯       -    \u00af         unary minus
 `              ·       .    \u00b7         raised dot
@@ -2597,7 +2598,7 @@ See also: while]]>
 This is for the QDLs modules which are self-contained units of code:
 module[uri, alias
   ][
-  >> General comments
+  » General comments
   (statement;)*
 ];
 
@@ -2831,7 +2832,7 @@ of boolean?x:y in a lambda definition. Full syntax is
 define[
    function_signature
    ][
-   >> Comments
+   » Comments
    body
  ]
 
@@ -4063,7 +4064,28 @@ false;
 true]]>
         </example>
     </entry>
-
+    <entry id="»">
+       <body>
+  <![CDATA[unicode \u00bb.
+  This is the marker for module or function documentation. The general format is
+define[
+  signature
+  ][
+  » first line
+  » second line...
+  body
+  ];
+When listing the function (or module) the first line will be spit out as a
+short form, so make sure it says something useful. The rest of the lines are printed.
+Note that only the initial block of these is parsed, so any documemntation lines
+outside of this are ignored.
+  ]]>
+       </body>
+       <example>
+   <![CDATA[
+   ]]>
+        </example>
+    </entry>
     <!--
         entry template
     -->

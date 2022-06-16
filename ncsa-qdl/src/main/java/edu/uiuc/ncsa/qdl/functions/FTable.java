@@ -25,23 +25,24 @@ import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTION_TAG;
  * <p>Created by Jeff Gaynor<br>
  * on 11/19/21 at  7:48 AM
  */
-public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,V>  implements Documentable {
+public class FTable<K extends FKey, V extends FunctionRecord> extends XTable<K, V> implements Documentable {
 
     /**
      * If argCount === -1, remove all named functions, otherwise only remove the one with the
      * exact argCount.
+     *
      * @param key
      * @return
      */
     @Override
     public V remove(Object key) {
-        if(!(key instanceof FKey)){
+        if (!(key instanceof FKey)) {
             throw new IllegalArgumentException(key + " is not an FKey");
         }
         FKey fKey = (FKey) key;
         if (fKey.getArgCount() == -1) {
             for (XKey key1 : keySet()) {
-                if (((FKey)key1).hasName(fKey.getfName())) {
+                if (((FKey) key1).hasName(fKey.getfName())) {
                     remove(key1);
                 }
             }
@@ -54,7 +55,7 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
     public List<V> getByAllName(String name) {
         List<V> fList = new ArrayList<>();
         for (XKey key : keySet()) {
-            if (((FKey)key).hasName(name)) {
+            if (((FKey) key).hasName(name)) {
                 fList.add(get(key));
             }
         }
@@ -73,13 +74,13 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
 
     @Override
     public boolean containsKey(Object key) {
-        if(!(key instanceof FKey)){
+        if (!(key instanceof FKey)) {
             throw new IllegalArgumentException(key + " is not an FKey");
         }
         FKey fkey = (FKey) key;
-        if(fkey.getArgCount() == -1){
+        if (fkey.getArgCount() == -1) {
             for (XKey key0 : keySet()) {
-                if (((FKey)key0).hasName(fkey.getfName())) {
+                if (((FKey) key0).hasName(fkey.getfName())) {
                     return true;
                 }
             }
@@ -95,18 +96,18 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
         HashMap<String, Set<Integer>> fAndArgs = new HashMap<>();
 
         for (XKey key : keySet()) {
-            String name = ((FKey)key).getfName(); // de-munge
+            String name = ((FKey) key).getfName(); // de-munge
             FunctionRecord fr = get(key);
             if (regex != null && !regex.isEmpty()) {
                 if (name.matches(regex)) {
-                    if(!fAndArgs.containsKey(name)){
+                    if (!fAndArgs.containsKey(name)) {
                         Set<Integer> list = new TreeSet<>();
                         fAndArgs.put(name, list);
                     }
                     fAndArgs.get(name).add(fr.getArgCount());
                 }
             } else {
-                if(!fAndArgs.containsKey(name)){
+                if (!fAndArgs.containsKey(name)) {
                     Set<Integer> list = new TreeSet<>();
                     fAndArgs.put(name, list);
                 }
@@ -114,7 +115,7 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
             }
         }
         TreeSet<String> names = new TreeSet<>();
-        for(String key : fAndArgs.keySet()){
+        for (String key : fAndArgs.keySet()) {
             String args = fAndArgs.get(key).toString();
             args = args.replace(" ", ""); // no blanks in arg list. Makes regexes easier
             names.add(key + "(" + args + ")");
@@ -131,7 +132,7 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
     public List<String> listAllDocs() {
         ArrayList<String> docs = new ArrayList<>();
         for (XKey key : keySet()) {
-            String name = ((FKey)key).getfName(); // de-munge
+            String name = ((FKey) key).getfName(); // de-munge
             FunctionRecord fr = get(key);
             name = name + "(" + fr.getArgCount() + ")";
             if (0 < fr.documentation.size()) {
@@ -154,7 +155,7 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
     public List<String> listAllDocs(String fname) {
         ArrayList<String> docs = new ArrayList<>();
         for (XKey key : keySet()) {
-            if (((FKey)key).hasName(fname)) {
+            if (((FKey) key).hasName(fname)) {
                 FunctionRecord fr = get(key);
                 String name = fname + "(" + fr.getArgCount() + ")";
                 if (0 < fr.documentation.size()) {
@@ -192,10 +193,11 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
             return get(key).documentation;
         }
     }
-   /**
-    *  Writes every function in no particular order by its source code. Look at
-    * {@link FStack#toXML(XMLStreamWriter, XMLSerializationState)} for top level of functions
-   */
+
+    /**
+     * Writes every function in no particular order by its source code. Look at
+     * {@link FStack#toXML(XMLStreamWriter, XMLSerializationState)} for top level of functions
+     */
     @Override
     public void toXML(XMLStreamWriter xsw, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         for (XKey key : keySet()) {
@@ -204,7 +206,7 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
                 // and we cannot recreate it.
                 continue;
             }
-            String name = ((FKey)key).getfName(); // de-munge
+            String name = ((FKey) key).getfName(); // de-munge
 
             xsw.writeStartElement(XMLConstants.FUNCTION_TAG);
             xsw.writeAttribute(XMLConstants.FUNCTION_NAME_TAG, name);
@@ -237,11 +239,13 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
                     }
                 case XMLEvent.CHARACTERS:
                     if (!xe.asCharacters().isIgnorableWhiteSpace()) {
+                        String x = xe.asCharacters().getData();
+                        x = FDOC_CONVERT ? convertFDOC(x) : x;
                         try {
-                            qi.execute(xe.asCharacters().getData());
+                            qi.execute(x);
                         } catch (Throwable t) {
                             // should do something else??
-                            System.err.println("Error deserializing function:" + t.getMessage());
+                            System.err.println("Error deserializing function '" + x + "': " + t.getMessage());
                         }
                     }
             }
@@ -264,11 +268,13 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
                     break;
                 case XMLEvent.CHARACTERS:
                     if (!xe.asCharacters().isIgnorableWhiteSpace()) {
+                        String x = xe.asCharacters().getData();
+                        x = FDOC_CONVERT ? convertFDOC(x) : x;
                         try {
-                            qi.execute(xe.asCharacters().getData());
+                            qi.execute(x);
                         } catch (Throwable t) {
                             // should do something else??
-                            System.err.println("Error deserializing function:" + t.getMessage());
+                            System.err.println("Error deserializing function '" + x + "': " + t.getMessage());
                         }
                     }
                     break;
@@ -276,10 +282,10 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
                     if (xe.asEndElement().getName().getLocalPart().equals(getXMLElementTag())) {
                         Set<XKey> newKeys = qi.getState().getFTStack().keySet();
                         newKeys.removeAll(oldKeys);
-                        if(newKeys.isEmpty()){
+                        if (newKeys.isEmpty()) {
                             throw new IllegalStateException("no function found to deserialize");
                         }
-                        if(newKeys.size() !=1){
+                        if (newKeys.size() != 1) {
                             throw new IllegalStateException(newKeys.size() + " functions deserialized. A single one was expected");
                         }
                         return (V) qi.getState().getFTStack().get(newKeys.iterator().next());
@@ -322,6 +328,7 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
     public String getXMLElementTag() {
         return FUNCTION_TAG;
     }
+
     /*
      Big note on serializing functions. All that are serialized here are QDL native functions.
      The source is stored and on deserialization they are run through the interpreter again to
@@ -332,16 +339,18 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
      */
     @Override
     public String toJSONEntry(V xThing, XMLSerializationState xmlSerializationState) {
-        String src =  StringUtils.listToString(xThing.sourceCode);
+        String src = StringUtils.listToString(xThing.sourceCode);
         return Base64.encodeBase64URLSafeString(src.getBytes(StandardCharsets.UTF_8));
     }
 
 
     @Override
     public String fromJSONEntry(String x, XMLSerializationState xmlSerializationState) {
-
-        return new String(Base64.decodeBase64(x));
-
+        // Conversion away from >> in function documentation. This allows for converting older
+        // workspaces
+        x = new String(Base64.decodeBase64(x));
+        x = FDOC_CONVERT ? convertFDOC(x) : x;
+        return x;
     }
 }
 

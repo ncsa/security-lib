@@ -22,7 +22,7 @@ halt('Stop #4. Check your variables');
 define[
   q(x,y)
 ][
->>> A function to concatenate a couple of arguments.
+»> A function to concatenate a couple of arguments.
   return(x + y);
 ];
 halt('Stop #5. Check your functions. Set the pid to this and execute the function.');

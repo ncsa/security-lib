@@ -172,7 +172,7 @@ fragment FUNCTION_NAME :
 /*
    § 9 Comments and white space
 */
-           FDOC :  '>>' ~[\r\n]*;
+           FDOC :  '»' ~[\r\n]*;
              WS : [ \t\r\n\u000C]+ -> skip;
         COMMENT : '/*' .*? '*/' -> skip;
    LINE_COMMENT : '//' ~[\r\n]* -> skip;

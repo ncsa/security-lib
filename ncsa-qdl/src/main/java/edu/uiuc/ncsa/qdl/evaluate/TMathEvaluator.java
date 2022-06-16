@@ -252,8 +252,8 @@ public class TMathEvaluator extends AbstractEvaluator {
                     r.resultType = Constant.LONG_TYPE;
                 } catch (ArithmeticException ax) {
                     // too big
-                    BigDecimal bigInteger = new BigDecimal(rr);
-                    r.result = bigInteger;
+                    BigDecimal bigDecimal = new BigDecimal(rr);
+                    r.result = bigDecimal;
                     r.resultType = Constant.DECIMAL_TYPE;
                 }
                 return r;
@@ -538,6 +538,8 @@ public class TMathEvaluator extends AbstractEvaluator {
                 return CEILING_TYPE;
             case GCD:
                 return GCD_TYPE;
+            case LCM:
+                return LCM_TYPE;
         }
         return EvaluatorInterface.UNKNOWN_VALUE;
     }

@@ -579,7 +579,9 @@ public class WSXMLSerializer {
         workspaceCommands.setUseExternalEditor(json.getBoolean(USE_EXTERNAL_EDITOR));
         workspaceCommands.setAssertionsOn(json.getBoolean(ASSERTIONS_ON));
         workspaceCommands.setPrettyPrint(json.getBoolean(PRETTY_PRINT));
-        workspaceCommands.getState().setAllowBaseFunctionOverrides(json.getBoolean(OVERWRITE_BASE_FUNCTIONS));
+        if(json.containsKey(OVERWRITE_BASE_FUNCTIONS)) {
+            workspaceCommands.getState().setAllowBaseFunctionOverrides(json.getBoolean(OVERWRITE_BASE_FUNCTIONS));
+        }
         // numbers
         workspaceCommands.setAutosaveInterval(json.getLong(AUTOSAVE_INTERVAL));
         workspaceCommands.currentPID = json.getInt(CURRENT_PID);

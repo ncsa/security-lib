@@ -48,6 +48,7 @@ lambdaStatement:
 
 moduleStatement:
      MODULE LeftBracket STRING (',' STRING)? RightBracket BODY? docStatementBlock;
+   //  MODULE LeftBracket (url|STRING) (',' STRING)? RightBracket BODY? docStatementBlock;
 
 tryCatchStatement:
      TRY statementBlock CATCH statementBlock;
@@ -88,6 +89,8 @@ assertStatement2:
         f_arg : (stemValue | f_ref);
        f_args : f_arg (',' f_arg)* ;
         f_ref : F_REF;
+
+ //    url : (variable ':')+ '/' (variable|Integer)? ('/' (variable | Integer))*;
         // The next few lines are kept for reference to see what not to do.
 
         // The intent was to
@@ -110,6 +113,7 @@ assertStatement2:
 expression
  :
    function                                                                    #functions
+ // | url     #url2
   | expression StemDot+ expression                                             #dotOp
   | expression postfix=StemDot                                                 #dotOp2
  // | me                                                                         #moduleExpression
@@ -137,11 +141,11 @@ expression
  | expression op=(LessThan | GreaterThan | LessEquals | MoreEquals) expression #compExpression
  | expression op=(Equals | NotEquals) expression                               #eqExpression
  | expression op=RegexMatches expression                                       #regexMatches
+ | expression '<<' expression                                                  #is_a
  | expression And expression                                                   #andExpression
  | expression Or expression                                                    #orExpression
  | LogicalNot expression                                                       #notExpression
 // | expression '<<' typeList                                                    #is_a
- | expression '<<' expression                                                  #is_a
  | '(' expression ')'                                                          #association
  | expression '?' expression ':' expression                                    #altIFExpression
  | expression Backslash + expression                                           #restriction

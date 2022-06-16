@@ -346,7 +346,7 @@ public class SystemEvaluator extends AbstractEvaluator {
 
         switch (polyad.getName()) {
             case IS_NULL:
-                doIsNull(polyad,state);
+                doIsNull(polyad, state);
                 return true;
             case FOR_LINES:
                 doForLines(polyad, state);
@@ -501,7 +501,7 @@ public class SystemEvaluator extends AbstractEvaluator {
 
         Object result = polyad.evalArg(0, state);
         polyad.setEvaluated(true);
-        polyad.setResult(result instanceof QDLNull?Boolean.TRUE:Boolean.FALSE);
+        polyad.setResult(result instanceof QDLNull ? Boolean.TRUE : Boolean.FALSE);
         polyad.setResultType(Constant.BOOLEAN_TYPE);
     }
 
@@ -1803,7 +1803,7 @@ public class SystemEvaluator extends AbstractEvaluator {
             File testFile = new File(name);
             if (testFile.isAbsolute()) {
                 if (state.isServerMode()) {
-                    throw new IllegalArgumentException("File access forbidden in server mode.");
+                    throw new QDLServerModeException("File access forbidden in server mode.");
                 } else {
                     return new QDLScript(QDLFileUtil.readFileAsLines(name), null);
                 }
@@ -1998,10 +1998,8 @@ public class SystemEvaluator extends AbstractEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        if (state.isServerMode()) {
-            throw new QDLServerModeException("reading files is not supported in server mode");
-        }
-
+        // CIL-1313 NEVER check for server mode here. That is handled later since the modules are
+        // simply loaded as scripts. Checking here can make it impossible to load any modules.
         if (polyad.getArgCount() < 1) {
             throw new MissingArgException(MODULE_LOAD + " requires at least 1 argument", polyad);
         }
@@ -2037,7 +2035,6 @@ public class SystemEvaluator extends AbstractEvaluator {
                 loadedQNames = doJavaModuleLoad(state, resourceName);
             } else {
                 loadedQNames = doQDLModuleLoad(state, resourceName);
-
             }
             Object newEntry = null;
             if (loadedQNames == null || loadedQNames.isEmpty()) {

@@ -10,11 +10,11 @@ if[
 x := to_number(script_args(0));
 
  define[my_sqrt(x)]body[
-   >> A function to compute the sqrt of a positive number x
-   >> Usage sqrt(x);
-   >> where 0 < x is a number.
-   >> The default is 10 iterations, which should give pretty good precision for most purposes.
-   >> This uses the Newton-Raphson method.
+   » A function to compute the sqrt of a positive number x
+   » Usage sqrt(x);
+   » where 0 < x is a number.
+   » The default is 10 iterations, which should give pretty good precision for most purposes.
+   » This uses the Newton-Raphson method.
        x0 := 1;
       m := 10;
       while[

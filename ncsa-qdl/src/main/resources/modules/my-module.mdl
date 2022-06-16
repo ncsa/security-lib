@@ -1,7 +1,7 @@
 module[
    'a:a','A'
 ]body[
-    >> Sample module from the reference manual.
+    » Sample module from the reference manual.
     foo := 'abar';
     define[f(n)]body[return(n+1);];
 ]; // end

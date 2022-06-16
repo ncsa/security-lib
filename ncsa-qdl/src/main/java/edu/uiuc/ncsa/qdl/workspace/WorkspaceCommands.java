@@ -4656,7 +4656,8 @@ public class WorkspaceCommands implements Logable, Serializable {
         MetaDebugUtil du = new MetaDebugUtil();
         du.setDebugLevel(qe.getDebugLevel());
         state.setDebugUtil(du);
-
+         state.setServerMode(qe.isServerModeOn());
+         state.setRestrictedIO(qe.isRestrictedIO());
         // Next is for logging, which is not the same as debug.
         if (qe.isDebugOn()) {
             setDebugOn(true);

@@ -93,4 +93,7 @@ public class BasicIdentifier implements Identifier {
         }
         return toString().compareTo(o.toString());
     }
+    public static void main(String[] args){
+       System.out.println( BasicIdentifier.newID("*"));
+    }
 }

@@ -9,13 +9,13 @@
 module[
    'a:a','a'
 ]body[
-   >> Tests modules and how they work at a basic level. This
-   >> module defines a function, f.
+   » Tests modules and how they work at a basic level. This
+   » module defines a function, f.
     foo := 'abar';
     define[
       f(n)
      ]body[
-     >> f(n) returns n+1.
+     » f(n) returns n+1.
       return(n+1);
      ];
 ]; // end
@@ -23,13 +23,13 @@ module[
 module[
    'b:b','b'
 ]body[
-   >> This module defines another function, also named f, to
-   >> show that these can be kept separate.
+   » This module defines another function, also named f, to
+   » show that these can be kept separate.
     foo := 'bbar';
     define[
     f(n)
     ]body[
-    >> f(n) returns n - 1;
+    » f(n) returns n - 1;
     return(n-1);
     ];
 ]; // end

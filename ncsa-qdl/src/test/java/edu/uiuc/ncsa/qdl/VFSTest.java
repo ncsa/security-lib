@@ -639,6 +639,8 @@ public class VFSTest extends AbstractQDLTester {
         script = new StringBuffer();
         // should work.
         addLine(script, "readme := file_read('vfs#/vfs-test/readme.txt');");
+        // NOTE that server mode for java modules should allow loading.
+        addLine(script, "q := module_load('edu.uiuc.ncsa.qdl.extensions.http.QDLHTTPLoader','java');");
         interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
     }
@@ -727,9 +729,11 @@ public class VFSTest extends AbstractQDLTester {
         addLine(script, SystemEvaluator.OS_ENV + "();");
         assert testServerCall(script, state) : " was able to call " + SystemEvaluator.OS_ENV + " in server mode";
 
+        // module loading needs to be checked.
+
         script = new StringBuffer();
-        addLine(script, SystemEvaluator.MODULE_LOAD + "();");
-        assert testServerCall(script, state) : " was able to call " + SystemEvaluator.MODULE_LOAD + " in server mode";
+        addLine(script, SystemEvaluator.MODULE_LOAD + "('" + rootDir + "/vfs-test/readme.txt');");
+        assert testServerCall(script, state) : " was able to call " + SystemEvaluator.MODULE_LOAD + " on a non VFS file in server mode";
     }
 
 }

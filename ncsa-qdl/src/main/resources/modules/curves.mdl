@@ -1,17 +1,17 @@
 module[
    'qdl:/math/curves','curves'
 ]body[
-   >> This module defines several additional functions for mathematics
-   >> that allow for plotting planar curves in various coordinate systems.
-   >> It also defines several coordinate systems for plotting, so you can just
-   >> pass your favorite equation in to get plotted.
-   >> E.g. rho(t.)->t. passed to polar_plot would plot a spiral.
+   » This module defines several additional functions for mathematics
+   » that allow for plotting planar curves in various coordinate systems.
+   » It also defines several coordinate systems for plotting, so you can just
+   » pass your favorite equation in to get plotted.
+   » E.g. rho(t.)->t. passed to polar_plot would plot a spiral.
 
    define[
        polar_plot(@rho(), interval.)
       ][
-       >> Plot a function rho(theta) over the interval using polar coordinates.
-       >> The coordinate system is made of lines and concentric circles.
+       » Plot a function rho(theta) over the interval using polar coordinates.
+       » The coordinate system is made of lines and concentric circles.
        x(t.)->rho(t.)*cos(t.);
        y(t.)->rho(t.)*sin(t.);
        return(pplot(@x(),@y(), interval.));
@@ -20,9 +20,9 @@ module[
      define[
         elliptic_plot(@mu(), interval.)
       ][
-        >> Plots a function 0 < mu(nu) in elliptic coordinates.
-        >> The coordinate curves are ellipses. Try plotting a
-        >> constant function. 
+        » Plots a function 0 < mu(nu) in elliptic coordinates.
+        » The coordinate curves are ellipses. Try plotting a
+        » constant function.
         x(t.)->cosh(mu(t.))*cos(t.);
         y(t.)->sinh(mu(t.))*sin(t.);
         return(pplot(@x(),@y(), interval.));
@@ -31,8 +31,8 @@ module[
       define[
          parabolic_plot(@sigma(), interval.)
        ][
-         >> Plots a function sigma(tau) in parabolic coordinates.
-         >> The coordinate lines are confocal parabolas.
+         » Plots a function sigma(tau) in parabolic coordinates.
+         » The coordinate lines are confocal parabolas.
          x(t.)->sigma(t.)*t.;
          y(t.)->(t.^2 - sigma(t.)^2)/2;
          return(pplot(@x(),@y(), interval.));
@@ -41,8 +41,8 @@ module[
      define[
         rose(a,n, interval.)
       ][
-        >> Plot a rose of width 0 < a and n petals.
-        >> If n is rational it will be closed.
+        » Plot a rose of width 0 < a and n petals.
+        » If n is rational it will be closed.
         rho(t.)->a*sin(n*t.);
         return(polar_plot(@rho(), interval.));
       ];
@@ -50,10 +50,10 @@ module[
       define[
          hypocycloid(a, b, interval.)
        ][
-       >> The hypocycloid is formed when a circle of radius b rolls inside a circle of radius a.
-       >> b < a is common. If k:=a/b is an integer, then the curve will have k cusps. If k is
-       >> irrational, the curve will be space-filling.
-       >> An interval of [0,2*pi()] gives the complete curve in the rational k case.
+       » The hypocycloid is formed when a circle of radius b rolls inside a circle of radius a.
+       » b < a is common. If k:=a/b is an integer, then the curve will have k cusps. If k is
+       » irrational, the curve will be space-filling.
+       » An interval of [0,2*pi()] gives the complete curve in the rational k case.
        x(t.)->(a-b)*cos(t.) + b*cos((a-b)/b*t.);
        y(t.)->(a-b)*sin(t.) - b*sin((a-b)/b*t.);
        return(pplot(@x(),@y(),interval.));
@@ -62,11 +62,11 @@ module[
       define[
          epicycloid(a, b, interval.)
        ][
-       >> The epicycloid is formed when a circle of radius b rolls outside a circle of radius a.
-       >> b <= a is common. If k:=a/b is an integer, then the curve will have k cusps. If k is
-       >> irrational, the curve will be space-filling.
-       >> An interval of [0,2*pi()] gives the complete curve in the rational k case.
-       >> A special case is a == b, which is the cardiod.
+       » The epicycloid is formed when a circle of radius b rolls outside a circle of radius a.
+       » b <= a is common. If k:=a/b is an integer, then the curve will have k cusps. If k is
+       » irrational, the curve will be space-filling.
+       » An interval of [0,2*pi()] gives the complete curve in the rational k case.
+       » A special case is a == b, which is the cardiod.
        x(t.)->(a+b)*cos(t.) - b*cos((a+b)/b*t.);
        y(t.)->(a+b)*sin(t.) - b*sin((a+b)/b*t.);
        return(pplot(@x(),@y(),interval.));
@@ -75,12 +75,12 @@ module[
      define[
         tractrix(a, interval.)
      ][
-       >> The tractrix (or "Hundekurve" in German) is formed by pulling a point
-       >> at the end of a segment.
-       >> The parameter a is simply a scale factor and can usually be set to 1.
-       >> The interval is (-pi()/2, pi()/2) (no endpoints, since it is infinite there).
-       >> The German name means "dog curve" and refers to the path an unwilling
-       >> dog at the end of a leash makes as you drag him for a walk.
+       » The tractrix (or "Hundekurve" in German) is formed by pulling a point
+       » at the end of a segment.
+       » The parameter a is simply a scale factor and can usually be set to 1.
+       » The interval is (-pi()/2, pi()/2) (no endpoints, since it is infinite there).
+       » The German name means "dog curve" and refers to the path an unwilling
+       » dog at the end of a leash makes as you drag him for a walk.
        x(t.)->a*(t. -tanh(t.));
        y(t.)->a*sech(t.);
        return(pplot(@x(),@y(),interval.));
@@ -89,9 +89,9 @@ module[
      define[
        cissoid(a, interval.)
      ][
-       >> This is the Cissoid of Diocles.
-       >> The interval is (-pi()/2, pi()/2) ( so no endpoints, since the curve is infinite there).
-       >> The parameter a is a scaling factor and can usually be set to 1.
+       » This is the Cissoid of Diocles.
+       » The interval is (-pi()/2, pi()/2) ( so no endpoints, since the curve is infinite there).
+       » The parameter a is a scaling factor and can usually be set to 1.
        r(t.)->2*a*(sec(t.)-cos(t.));
        return(polar_plot(@r(), interval.));
      ];

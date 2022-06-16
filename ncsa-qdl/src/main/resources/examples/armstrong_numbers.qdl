@@ -10,9 +10,9 @@
 define[
   armstrong(m)
   ][
-     >> An Armstrong number is a 3 digit number that is equal to the sum of its cubed   digits.
-      >>  This computes them for 100 < n < 1000.
-     >> So for example 407 is an Armstrong number since 407 = 4^3 + 0^3 + 7^3
+     » An Armstrong number is a 3 digit number that is equal to the sum of its cubed   digits.
+      »  This computes them for 100 < n < 1000.
+     » So for example 407 is an Armstrong number since 407 = 4^3 + 0^3 + 7^3
      if[ m < 100]then[say('sorry, m must be 100 or larger'); return();];
      if[1000 < m]then[say('sorry, m must be less than 1000'); return();];
      sum := 0;

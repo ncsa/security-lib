@@ -73,7 +73,7 @@ public class MetaDebugUtil implements DebugConstants, Serializable {
         debugLevel = newDebugLevel;
     }
 
-    protected  int debugLevel;
+    protected  int debugLevel = DEBUG_LEVEL_OFF; // default or everything gets printed on startup
 
     public  boolean isEnabled() {
         return getDebugLevel() != DEBUG_LEVEL_OFF;
@@ -81,7 +81,7 @@ public class MetaDebugUtil implements DebugConstants, Serializable {
 
     public  void setIsEnabled(boolean isEnabled) {
         if (isEnabled) {
-            setDebugLevel(DEBUG_LEVEL_WARN); //default
+            setDebugLevel(DEBUG_LEVEL_WARN); 
         } else {
             setDebugLevel(DEBUG_LEVEL_OFF);
         }

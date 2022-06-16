@@ -220,6 +220,7 @@ public abstract class Module implements XThing, Serializable {
     public void writeExtraXMLElements(XMLStreamWriter xsw) throws XMLStreamException {
     }
 
+    public boolean FDOC_CONVERT = true;
     /**
      * Used in version 2,0 serialization
      *
@@ -252,7 +253,9 @@ public abstract class Module implements XThing, Serializable {
                             State state = new State();
                             QDLInterpreter qdlInterpreter = new QDLInterpreter(state);
                             try {
-                                qdlInterpreter.execute(StringUtils.listToString(source));
+                                String x = StringUtils.listToString(source);
+                                x = FDOC_CONVERT?x.replace(">>","»"):x;
+                                qdlInterpreter.execute(x);
                                 if(state.getMTemplates().isEmpty()) {
                                     // fall through case -- nothing resulted.
                                     throw new IllegalStateException("no module found");

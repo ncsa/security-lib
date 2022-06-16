@@ -1,7 +1,7 @@
 module[
    'a:/b','X'
    ][
-   >> Test module with public variables and three functions.
+   » Test module with public variables and three functions.
    u := 2;
    v := 3;
    __private := is_defined(zz)?zz:4;

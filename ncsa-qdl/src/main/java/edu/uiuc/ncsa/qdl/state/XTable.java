@@ -19,6 +19,11 @@ import java.util.UUID;
  * on 11/7/21 at  5:14 AM
  */
 public abstract class XTable<K extends XKey, V extends XThing> extends HashMap<K, V> implements Cloneable, Serializable {
+    protected boolean FDOC_CONVERT = true; // allows for older workspaces to be read. Remove this later
+    protected String convertFDOC(String x){
+        return x.replace(">>", "»");
+    }
+
     /**
      * Should add the {@link XThing} based on its {@link XThing#getName()} as the key.
      *

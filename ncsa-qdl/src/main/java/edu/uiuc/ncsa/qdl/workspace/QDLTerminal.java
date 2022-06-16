@@ -25,6 +25,7 @@ public class QDLTerminal extends ISO6429Terminal {
         if (charMap == null) {
             charMap = new char[256];
             Arrays.fill(charMap, (char) 0);
+            charMap['\''] = '»';
             charMap['{'] = '⟦';
             charMap['}'] = '⟧';
             charMap['<'] = '≤';
