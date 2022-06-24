@@ -4,6 +4,7 @@ module[
    » This module defines several additional functions for mathematics
    » These include sec(), sech() etc.
    » There is also the variable primes. which is a list of all primes < 10,000
+   » 2 == primes.0 is the zero-th prime, 2, etc.
 
         sec(x)->1/cos(x);
         csc(x)->1/sin(x);
@@ -158,14 +159,7 @@ module[
           // to add z. to it.
           return(join(x.~|y., z., 1));
        ];
-       /*
-         x(t,s)->sin(t)*cosh(s)
-         y(t,s)->cos(t)*sinh(s)
-         z(t,s)->sin(2*t)*cos(3*s)
-         t. :=⟦-1,1,10⟧
-         s. :=⟦0,1,10⟧
-         splot(@x, @y, @z, t., s.)
-       */
+
        define[
          mm(x., y.)
        ][
@@ -187,72 +181,6 @@ module[
        return(reduce(@+, τ(for_each(@*, x., τ(y.,-1)) ,-1)));
        ];
 
-/*      Promoted to language feature. Keep for reference.
-        define[
-          transpose(x.)
-         ][
-         » Reverse the axes of a stem. In the case of a 2 dimensional
-         » stem with dimension n×m this is the matrix transpose, resulting in
-         » an m×n stem.  In higher
-         » dimensions, this flips the whole stem around the axis list.
-         » E.g.
-         » a. := n(2,3,4,n(24))
-         » [
-         »   [
-         »     [0,1,2,3],
-         »     [4,5,6,7], . .
-         » transpose(a.)
-         »  [
-         »    [
-         »      [0,12],
-         »      [4,16],
-         »      [8,20] . . .
-         »     dim(transpose(a.))
-         » [4,3,2]
-         » Final note is that this works on the last axis of the stem, so
-         » if the stem is ragged, this may not return some elements.
-         » It is best to restict this (it being a generalization of
-         » a math concept) stems whose entries all have the same rank
-         » and dimension.
-          old. := indices(x., -1);
-          rank := size(old.0);
-          new. := for_each(@shuffle, old., [reverse([;rank])]);
-          return(subset(x., new., old.));
-         ];
-
-         define[
-            transpose(x., p)
-           ][
-           » Reverse the axes of a stem. In the case of a 2 dimensional
-           » stem with dimension n×m this is the matrix transpose, resulting in
-           » an m×n stem.  In higher
-           » dimensions, this flips the whole stem around the axis list.
-           » E.g.
-           » a. := n(2,3,4,n(24))
-           » [
-           »   [
-           »     [0,1,2,3],
-           »     [4,5,6,7], . .
-           » transpose(a.)
-           »  [
-           »    [
-           »      [0,12],
-           »      [4,16],
-           »      [8,20] . . .
-           »     dim(transpose(a.))
-           » [4,3,2]
-           » Final note is that this works on the last axis of the stem, so
-           » if the stem is ragged, this may not return some elements.
-           » It is best to restict this (it being a generalization of
-           » a math concept) stems whose entries all have the same rank
-           » and dimension.
-          //  p. := is_number(p)?[p]:p.;
-            old. := indices(x., -1);
-            rank := size(old.0);
-            perm. := p~~exclude_keys([;rank], p);
-            new. := for_each(@shuffle, old., [perm.]);
-            return(remap(x., new., old.));
-           ];*/
    /*
       A list of primes less than 10,000.      
    */

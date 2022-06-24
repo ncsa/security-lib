@@ -538,7 +538,7 @@ public class VFSTest extends AbstractQDLTester {
                     3306,
                     "com.mysql.cj.jdbc.Driver",
                     false,
-                    "useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=America/Chicago"
+                    "useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=America/Chicago"
             );
             tableName = getXp().getString(MYSQL + TABLE).trim();
         } else {

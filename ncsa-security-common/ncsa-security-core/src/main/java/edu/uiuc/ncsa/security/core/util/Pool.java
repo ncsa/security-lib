@@ -24,6 +24,10 @@ public abstract class Pool<T> {
     protected boolean DEEP_DEBUG = false;
 
     protected void trace(String x) {
+        if (DEEP_DEBUG) {
+            DebugUtil.setEnabled(DEEP_DEBUG);
+            DebugUtil.setDebugLevel(DebugConstants.DEBUG_LEVEL_TRACE);
+        }
         DebugUtil.trace(DEEP_DEBUG, this, x);
     }
 

@@ -548,7 +548,7 @@ public class StemEvaluator extends AbstractEvaluator {
                 rawArgs.add(obj);
                 f.setArguments(toConstants(rawArgs));
                 f.evaluate(state);
-                output.putLongOrString( key0, f.getResult());
+                output.putLongOrString(key0, f.getResult());
             }
         } else {
             forEachRecursion(output, f, state, stems);
@@ -566,7 +566,7 @@ public class StemEvaluator extends AbstractEvaluator {
             rawArgs.add(stems[0].get(key));
             StemVariable output1 = new StemVariable();
             forEachRecursion(output1, f, state, stems, rawArgs, argCount - 1);
-            output.putLongOrString( key, output1);
+            output.putLongOrString(key, output1);
         }
     }
 
@@ -595,7 +595,7 @@ public class StemEvaluator extends AbstractEvaluator {
                 rawArgs.set(currentIndex, stems[currentIndex].get(key));
                 StemVariable output1 = new StemVariable();
                 forEachRecursion(output1, f, state, stems, rawArgs, depth - 1);
-                output.putLongOrString( key, output1);
+                output.putLongOrString(key, output1);
             }
         }
     }
@@ -831,7 +831,7 @@ public class StemEvaluator extends AbstractEvaluator {
             if (isStem(rightArg)) {
                 StemVariable rStem = (StemVariable) rightArg;
                 for (Object lkey : lStem.keySet()) {
-                    result.putLongOrString( lkey, rStem.hasValue(lStem.get(lkey)));
+                    result.putLongOrString(lkey, rStem.hasValue(lStem.get(lkey)));
                 }
             } else {
                 if (isSet(rightArg)) {
@@ -873,7 +873,7 @@ public class StemEvaluator extends AbstractEvaluator {
                 } else {
                     // check if each element in the left stem matches the value of the right arg.
                     for (Object lKey : lStem.keySet()) {
-                        result.putLongOrString( lKey, lStem.get(lKey).equals(rightArg) ? Boolean.TRUE : Boolean.FALSE); // got to finagle these are right Java objects
+                        result.putLongOrString(lKey, lStem.get(lKey).equals(rightArg) ? Boolean.TRUE : Boolean.FALSE); // got to finagle these are right Java objects
                     }
                 }
             }
@@ -930,10 +930,6 @@ public class StemEvaluator extends AbstractEvaluator {
         }
         Object arg = polyad.evalArg(0, state);
         checkNull(arg, polyad.getArgAt(0));
-
-        if (!isString(arg)) {
-            throw new BadArgException(FROM_JSON + " requires a string as its first argument", polyad.getArgAt(0));
-        }
         boolean convertKeys = false;
 
         if (polyad.getArgCount() == 2) {
@@ -946,18 +942,53 @@ public class StemEvaluator extends AbstractEvaluator {
         }
         JSONObject jsonObject = null;
         StemVariable output = new StemVariable();
-        try {
-            jsonObject = JSONObject.fromObject((String) arg);
-            output.fromJSON(jsonObject, convertKeys);
-        } catch (Throwable t) {
-            try {
-                JSONArray array = JSONArray.fromObject((String) arg);
-                output.fromJSON(array);
-            } catch (Throwable tt) {
-                // ok, so this is not valid JSON.
-                throw new BadArgException(FROM_JSON + " could not parse the argument as valid JSON", polyad.getArgAt(0));
+        boolean gotOne = false;
+        if (isStem(arg)) {
+            gotOne = true;
+            StemVariable stem = (StemVariable) arg;
+            for (Object key : stem.keySet()) {
+                Object value = stem.get(key);
+                if (!isString(value)) {
+                    continue;
+//                    throw new BadArgException(FROM_JSON + " requires a string or stem of strings as its first argument", polyad.getArgAt(0));
+                }
+                try {
+                    StemVariable nextStem = new StemVariable();
+                    jsonObject = JSONObject.fromObject(value);
+                    nextStem.fromJSON(jsonObject, convertKeys);
+                    if (key instanceof Long) {
+                        output.put((Long) key, nextStem);
+                    } else {
+                        output.put((String) key, nextStem);
+                    }
+                } catch (Throwable tt) {
+                    // ok, so this is not valid JSON, rock on
+                    //throw new BadArgException(FROM_JSON + " could not parse the argument as valid JSON", polyad.getArgAt(0));
+                }
+
             }
         }
+
+        if (isString(arg)) {
+            gotOne = true;
+            try {
+                jsonObject = JSONObject.fromObject((String) arg);
+                output.fromJSON(jsonObject, convertKeys);
+            } catch (Throwable t) {
+                try {
+                    JSONArray array = JSONArray.fromObject((String) arg);
+                    output.fromJSON(array);
+                } catch (Throwable tt) {
+                    // ok, so this is not valid JSON.
+                    throw new BadArgException(FROM_JSON + " could not parse the argument as valid JSON", polyad.getArgAt(0));
+                }
+            }
+        }
+        if (!gotOne) {
+            throw new BadArgException(FROM_JSON + " requires a string or stem of strings as its first argument", polyad.getArgAt(0));
+        }
+
+
         polyad.setResult(output);
         polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
@@ -1287,13 +1318,6 @@ public class StemEvaluator extends AbstractEvaluator {
             for (Object key : stemVariable.keySet()) {
                 if (returnType == Constant.getType(stemVariable.get(key))) {
                     out.put(i++, key);
-/*
-                    if (key instanceof Long) {
-                        out.put(i++, Long.parseLong(key));
-                    } else {
-                        out.put(i++, key);
-                    }
-*/
                 }
             }
         } else {
@@ -1303,36 +1327,15 @@ public class StemEvaluator extends AbstractEvaluator {
                 switch (returnScope) {
                     case all_keys:
                         out.put(i++, key);
-/*
-                        if (out.isLongIndex(key)) {
-                            out.put(i++, Long.parseLong(key));
-                        } else {
-                            out.put(i++, key);
-                        }
-*/
                         break;
                     case only_scalars:
                         if (Constant.getType(stemVariable.get(key)) != STEM_TYPE) {
                             out.put(i++, key);
-/*
-                            if (out.isLongIndex(key)) {
-                                out.put(i++, Long.parseLong(key));
-                            } else {
-                                out.put(i++, key);
-                            }
-*/
                         }
                         break;
                     case only_stems:
                         if (Constant.getType(stemVariable.get(key)) == STEM_TYPE) {
                             out.put(i++, key);
-/*
-                            if (out.isLongIndex(key)) {
-                                out.put(i++, Long.parseLong(key));
-                            } else {
-                                out.put(i++, key);
-                            }
-*/
                         }
                         break;
                 }
@@ -1444,7 +1447,7 @@ public class StemEvaluator extends AbstractEvaluator {
      */
     protected void putLongOrStringKey(StemVariable out, Object key) {
         if (key instanceof Long) {
-            Long k =  (Long) key;
+            Long k = (Long) key;
             out.put(k, k);
         } else {
             String k = (String) key;
@@ -1737,7 +1740,7 @@ public class StemEvaluator extends AbstractEvaluator {
                 gotValue = arg0.get(v);
             }
             if (gotValue != null) {
-                output.putLongOrString( key, gotValue);
+                output.putLongOrString(key, gotValue);
             }
         }
 
@@ -2065,7 +2068,7 @@ public class StemEvaluator extends AbstractEvaluator {
                 Object kk = newKeyStem.get(key);
                 usedKeys.remove(kk);
                 Object vv = target.get(kk);
-                output.putLongOrString((Long)key, vv);
+                output.putLongOrString((Long) key, vv);
             } else {
                 throw new BadArgException("'" + key + "' is not a key in the second argument.", polyad.getArgAt(1));
             }

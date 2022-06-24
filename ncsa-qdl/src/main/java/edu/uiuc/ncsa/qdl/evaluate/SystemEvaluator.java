@@ -140,6 +140,9 @@ public class SystemEvaluator extends AbstractEvaluator {
     public static final String MODULE_REMOVE = "module_remove";
     public static final int MODULE_REMOVE_TYPE = 212 + SYSTEM_BASE_VALUE;
 
+/*    public static final String MODULE_CREATE = "module";
+    public static final int MODULE_CREATE_TYPE = 214 + SYSTEM_BASE_VALUE;*/
+
 
     // For system constants
     public static final String CONSTANTS = "constants";

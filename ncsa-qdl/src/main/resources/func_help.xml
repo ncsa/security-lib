@@ -174,6 +174,17 @@ Note: Precision refers to the total number of digits that are considered
       value, since up to precision, they are the same.
       See the reference manual for a more information.]]>
         </body>
+<example>
+<![CDATA[In this example. precision is set high and a large number has its
+square root approximated, then squared. The result is the original number
+plus an extended artifact of the approximation. The size of the result is
+50 digits (lead integer then 49 places to the right of the decimal point.)
+
+  numeric_digits(50)
+15
+  sqrt(945602795792794567)^2
+9.4560279579279456700000000000000000000000000000087E17]]>
+</example>
     </entry>
     <entry id="random">
         <body>
@@ -217,13 +228,52 @@ Note: The result will be a subset of target. that contains none of the keys
     </entry>
     <entry id="from_json">
         <body>
- <![CDATA[from_json(arg) - takes the argument with is a string representation of
-                          JSON and turns it into a stem.
-from_json(arg, convert) - as per single argument case, but allows a flag (true
+ <![CDATA[from_json(arg | arg.) - takes the argument which is a string  or stem of string
+                          representation(s) of JSON and turns it into a stem or stem of stems.
+from_json(arg | arg., convert) - as per single argument case, but allows a flag (true
                           or false) if vencode is to be applied to each key.
                           The default is false.
+
+Note that i the case of stems,  this will only convert strings, so non-strings will be skipped
+and not returned.
 See also: vencode, to_json]]>
         </body>
+<example>
+    <![CDATA[Here is an example to read an encoded JWT (JSON Web Token)
+from the  clipboard, decode it and turn it into a stem. A JWT is of the
+form X.Y.Z where X, Y and Z are base 64 encoded. Z (if present) is a
+binary signature, so cannot be read.
+
+    jwt()->from_json(decode(tokenize(cb_read(), '.')));
+/* Typical JWT. Copy it to the clipboard:
+
+eyJraWQiOiJCRUZGRjU4NzZEMTAiLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.
+eyJ3bGNnLnZlciI6IjEuMCIsImF1ZCI6Imh0dHBzOi8vd2xjZy5jZXJuLmNoL
+2p3dC92MS9hbnkiLCJzdWIiOiJqZ2F5bm9yIiwibmJmIjoxNjU2MDIwMjMxLCJz
+Y29wZSI6Ii9ob21lL2plZmYifQ.
+bYPQkk7VDPVF4EYM4KpPRtzdIEyaPraEc7Tg
+-xr6FBXzg5gDUdEWyscAvBbGm77Pj0Hn0OJrKZ1lux8SgB_DkBo
+
+Do note that base 64 decode ignores any embedded blanks and linefeeds,
+as per the spec.
+*/
+  jwt()
+[
+  {
+  kid:BEFFF5876D10,
+  typ:JWT,
+  alg:RS256
+ },
+  {
+  wlcg.ver:1.0,
+  aud:https://wlcg.cern.ch/jwt/v1/any,
+  sub:jgaynor,
+  nbf:1656020231,
+  scope:/home/jeff
+ }
+Note that the last field of Z here is not converted since it binary is not
+valid JSON and therefore and cannot be turned into a stem.]]]>
+</example>
     </entry>
     <entry id="list_keys">
         <body>
@@ -3650,7 +3700,7 @@ can be recursive structures, highly nested etc.) can
 be slow and very difficult. On the other hand, sets may
 be entries in stems with no issues.
 
-See also: \/, /\, /, %, <, >, ==, ∈, ∉, ~, |>,  subset(@pick, arg)]]>
+See also: \/, /\, /, %, <, >, ==, ∈, ∉, ~, |>,  pick(@f, arg)]]>
         </body>
     </entry>
     <entry id="local">
@@ -4078,12 +4128,29 @@ define[
 When listing the function (or module) the first line will be spit out as a
 short form, so make sure it says something useful. The rest of the lines are printed.
 Note that only the initial block of these is parsed, so any documemntation lines
-outside of this are ignored.
-  ]]>
+outside of this are ignored.]]>
        </body>
        <example>
-   <![CDATA[
-   ]]>
+   <![CDATA[E.g. of how the help system works, This has to be in a file or buffer.
+since it has to span several lines:
+
+  define[
+    f(x)
+  ][
+    » f(x) returns the square of x
+    » x can be a stem too.
+    return(x^2);
+  ];
+
+//If you issue
+   )help *
+f(x) returns the square of x
+
+(along with possibly a ton of other first lines from module functions)
+
+  )help f 1
+f(x) returns the square of x
+x can be a stem too.]]>
         </example>
     </entry>
     <!--

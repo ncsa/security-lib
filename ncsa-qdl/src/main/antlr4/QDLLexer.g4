@@ -150,8 +150,8 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
       This include standard upper and lower case Greek letters as well as
       ϑ - var theta, \u03d1,
       ϖ - var pi, \u03d6
-      ϰ script kappa, \u03f0
-      ϱ var rho, \u03f1
+      ϰ - script kappa, \u03f0
+      ϱ - var rho, \u03f1
    */
    Identifier :  ('&')?[a-zA-Z_$\u03b1-\u03c9\u0391-\u03a9\u03d1\u03d6\u03f0\u03f1][a-zA-Z_$0-9\u03b1-\u03c9\u0391-\u03a9\u03d1]*;   // no .!
 
@@ -168,6 +168,8 @@ fragment AllOps :
 
 fragment FUNCTION_NAME :
      [a-zA-Z_$\u03b1-\u03c9\u0391-\u03a9\u03d1\u03d6\u03f0\u03f1][a-zA-Z_$0-9\u03b1-\u03c9\u0391-\u03a9\u03d1]*;
+
+   //                       URL  : (Identifier Colon)  ((Identifier) Divide)* (Identifier)?;
 
 /*
    § 9 Comments and white space

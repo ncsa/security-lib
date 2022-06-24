@@ -227,6 +227,47 @@ public class ExpressionTest extends AbstractQDLTester {
         assert getBooleanValue("q_ok", state);
     }
 
+    public void testMultipleAssignments() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        addLine(script, "[a, b., c] := [3, [;5], 6];");
+        addLine(script, "oka := a == 3;");
+        addLine(script, "okb := reduce(@&&, b. == [;5]);");
+        addLine(script, "okc := c == 6;");
+        interpreter.execute(script.toString());
+        assert getBooleanValue("oka", state);
+        assert getBooleanValue("okb", state);
+        assert getBooleanValue("okc", state);
+    }
+
+    public void testRMultipleAssignments() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        addLine(script, "[3, [;5], 6] =: [a, b., c];");
+        addLine(script, "oka := a == 3;");
+        addLine(script, "okb := reduce(@&&, b. == [;5]);");
+        addLine(script, "okc := c == 6;");
+        interpreter.execute(script.toString());
+        assert getBooleanValue("oka", state);
+        assert getBooleanValue("okb", state);
+        assert getBooleanValue("okc", state);
+    }
+    public void testOverloadedMultipleAssignments() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        addLine(script, "[a, b., c] := [3, [;5], 6];");
+        addLine(script, "[a, b., c] += [3, [;5], 6];");
+        addLine(script, "oka := a == 6;");
+        addLine(script, "okb := reduce(@&&, b. == 2*[;5]);");
+        addLine(script, "okc := c == 12;");
+        interpreter.execute(script.toString());
+        assert getBooleanValue("oka", state);
+        assert getBooleanValue("okb", state);
+        assert getBooleanValue("okc", state);
+    }
     /**
      * Tests input_form for basic expressions and types. 
      * @throws Throwable

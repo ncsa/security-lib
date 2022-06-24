@@ -3,6 +3,8 @@ package edu.uiuc.ncsa.qdl.state;
 import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.qdl.evaluate.*;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
+import edu.uiuc.ncsa.qdl.extensions.database.QDLDBLoader;
+import edu.uiuc.ncsa.qdl.extensions.http.QDLHTTPLoader;
 import edu.uiuc.ncsa.qdl.functions.FKey;
 import edu.uiuc.ncsa.qdl.functions.FStack;
 import edu.uiuc.ncsa.qdl.functions.FTable;
@@ -203,6 +205,12 @@ public class State extends FunctionState implements QDLConstants {
                 systemInfo.put(SYS_QDL_VERSION, versionInfo);
             }
         }
+        // get modules
+        StemVariable libStem = new StemVariable();
+        libStem.put("http", QDLHTTPLoader.class.getCanonicalName());
+        libStem.put("db", QDLDBLoader.class.getCanonicalName());
+        systemInfo.put("lib",libStem);
+
 
     }
 

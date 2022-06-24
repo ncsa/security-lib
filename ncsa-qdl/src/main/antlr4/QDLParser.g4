@@ -47,8 +47,8 @@ lambdaStatement:
     function LambdaConnector  (statement) | statementBlock;
 
 moduleStatement:
-     MODULE LeftBracket STRING (',' STRING)? RightBracket BODY? docStatementBlock;
-   //  MODULE LeftBracket (url|STRING) (',' STRING)? RightBracket BODY? docStatementBlock;
+   MODULE LeftBracket STRING (',' STRING)? RightBracket BODY? docStatementBlock;
+  //   MODULE LeftBracket (URL|STRING) (',' STRING)? RightBracket BODY? docStatementBlock;
 
 tryCatchStatement:
      TRY statementBlock CATCH statementBlock;
@@ -64,7 +64,7 @@ tryCatchStatement:
 
 assertStatement2:
   ASSERT2 expression (':' expression)?;
-
+                  
     statementBlock : LeftBracket (statement ';')* RightBracket;
  docStatementBlock : LeftBracket fdoc* (statement ';')+ RightBracket;
    expressionBlock : LeftBracket expression ';' ( expression ';')+ RightBracket;
@@ -88,9 +88,9 @@ assertStatement2:
      function : FuncStart f_args* ')';
         f_arg : (stemValue | f_ref);
        f_args : f_arg (',' f_arg)* ;
-        f_ref : F_REF;
-
- //    url : (variable ':')+ '/' (variable|Integer)? ('/' (variable | Integer))*;
+        f_ref : F_REF;                                                 
+//         url : (Identifier Colon)  ((Identifier) Divide)* (Identifier)?;
+   //      url : URL;
         // The next few lines are kept for reference to see what not to do.
 
         // The intent was to
@@ -113,7 +113,6 @@ assertStatement2:
 expression
  :
    function                                                                    #functions
- // | url     #url2
   | expression StemDot+ expression                                             #dotOp
   | expression postfix=StemDot                                                 #dotOp2
  // | me                                                                         #moduleExpression
@@ -161,13 +160,15 @@ expression
  | keyword                                                                     #keywords
  | Bool                                                                        #logical
  | Null                                                                        #null
+ //| url                                                                         #url2
  | expression  op=ASSIGN  expression                                           #assignment
  // removed the next expression (and keeping it for reference wit this comment) because empty expressions were
  // being misinterpreted inside of slices in certain edge cases. It is better to just get errors if a
  // user types in something like ;;;; rather than have wrong slices.
  //| ';'                                                                         #semi_for_empty_expressions
  ;
-                   
+
+
        variable : Identifier ;
   //complex_number: (Decimal |  SCIENTIFIC_NUMBER) 'J' (Decimal |  SCIENTIFIC_NUMBER);
          number : Decimal |  SCIENTIFIC_NUMBER;

@@ -5,8 +5,12 @@ import edu.uiuc.ncsa.security.core.util.Pool;
 import edu.uiuc.ncsa.security.core.util.PoolException;
 
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -32,20 +36,68 @@ public class ConnectionPool<T extends ConnectionRecord> extends Pool<T> {
         this.connectionParameters = connectionParameters;
         stack = new StackMap<>();
         type = connectionType;
+        setupDriverManager();
     }
-    public StackMap getStackMap(){
+
+    protected void setupDriverManager() {
+        //CIL-1318 fix
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            // BUG in MariaDB driver.  The way the driver manager works is that the JDBC URL
+            // is presented to the driver. If the driver accepts it, then it returns a connection and
+            // if not, it should return a null. The MariaDB returns itself for both protocols mariadb
+            // and mysql. This meant that, depending upon load order for the drivers, the MariaDB
+            // driver might be returned. Up until MySQL version 8.0.29 or so, there were no differences really,
+            // but now there SQL Connection errors, so we must explicitly intercept the attempt if it
+            // fails and do it manually. Fortunately, I remember how to do this in Java 1.2. :(
+            Enumeration<Driver> drivers = DriverManager.getDrivers();
+            ArrayList<Driver> reorderedDrivers = new ArrayList<>();
+
+            while (drivers.hasMoreElements()) {
+                Driver driver = drivers.nextElement();
+                if (driver.getClass().getCanonicalName().toLowerCase(Locale.ROOT).indexOf("mysql") != -1) {
+                    reorderedDrivers.add(0, driver); // prepend MMySQL driver, so it gets called first.
+                } else {
+                    reorderedDrivers.add(driver);
+                }
+                DriverManager.deregisterDriver(driver);
+            }
+            for (Driver driver : reorderedDrivers) {
+                DriverManager.registerDriver(driver);// this appends them.
+            }
+        } catch (Throwable t) {
+            if (DEEP_DEBUG) {
+                t.printStackTrace();
+            }
+            throw new PoolException("could not register MySQL driver:" + t.getMessage(), t);
+        }
+
+    }
+
+    public StackMap getStackMap() {
         return (StackMap) stack;
     }
 
-    public void setStackMap(StackMap stackMap){
+    public void setStackMap(StackMap stackMap) {
         stack = stackMap;
     }
-    
+
     public T create() throws PoolException {
         trace("create pool id:" + getUuid() + ", connections: " + getStackMap().map.keySet());
         try {
+            String jdbcURL = getConnectionParameters().getJdbcUrl();
             Connection con = DriverManager.getConnection(getConnectionParameters().getJdbcUrl());
+            if (con == null) {
+                throw new IllegalStateException("Could not find any suitable JDBC driver. ");
+            }
             T connectionRecord = (T) new ConnectionRecord(con);
+            if (!con.isValid(0)) {
+                trace("invalid connection: " + con);
+                destroy(connectionRecord);
+                con = DriverManager.getConnection(getConnectionParameters().getJdbcUrl());
+                connectionRecord = (T) new ConnectionRecord(con); // one retry.
+            }
+            trace("create pool id:" + getUuid() + ", connection: " + con);
             totalCreated++;
             return connectionRecord;
         } catch (Exception x) {
@@ -73,18 +125,19 @@ public class ConnectionPool<T extends ConnectionRecord> extends Pool<T> {
     public synchronized void push(T object) throws PoolException {
         trace("push id:" + getUuid() + ", connections: " + getStackMap().map.keySet() + ", total created:" + totalCreated);
         super.push(object);
-        if(!object.isClosed){
+        if (!object.isClosed) {
             object.lastAccessed = System.currentTimeMillis();
         }
     }
+
     public synchronized T pop(long timeout) throws PoolException, InterruptedException {
-          return (T) getStackMap().poll(timeout, TimeUnit.MILLISECONDS);
+        return (T) getStackMap().poll(timeout, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public synchronized T pop() throws PoolException {
         trace("pop pool id:" + getUuid() + ", connections: " + getStackMap().map.keySet());
-        T cr= super.pop();
+        T cr = super.pop();
         cr.lastAccessed = -1L;
         return cr;
     }
@@ -155,10 +208,10 @@ public class ConnectionPool<T extends ConnectionRecord> extends Pool<T> {
 
     int type = CONNECTION_TYPE_UNKNOWN;
 
-    public static final int CONNECTION_TYPE_UNKNOWN =-1;
-    public static final int CONNECTION_TYPE_MYSQL =1;
-    public static final int CONNECTION_TYPE_MARIADB =2;
-    public static final int CONNECTION_TYPE_POSTGRES =3;
-    public static final int CONNECTION_TYPE_DEBRY =4;
-    public static final int CONNECTION_TYPE_H2 =5;
+    public static final int CONNECTION_TYPE_UNKNOWN = -1;
+    public static final int CONNECTION_TYPE_MYSQL = 1;
+    public static final int CONNECTION_TYPE_MARIADB = 2;
+    public static final int CONNECTION_TYPE_POSTGRES = 3;
+    public static final int CONNECTION_TYPE_DEBRY = 4;
+    public static final int CONNECTION_TYPE_H2 = 5;
 }

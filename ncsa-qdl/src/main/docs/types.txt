@@ -3,31 +3,35 @@ QDL and Types
 
 Rather than have classes, QDL should have user defined types. This allows for
 
-* multiple inheritance - based on order, so no diamond problem
+* add URI type
+* this keyword for current type.
+* no multiple inheritance, but multiple prototypes - based on order, so no diamond problem
 * interfaces - promise of certain functions/variables
 * overrides
-* Constructors of all super types are called in order and instances of them maintained(?)
-* Access supertypes How? super(A)::f() calls the function f from stored instance of A.
-* Casting needed???
+* Constructors of all prototypes are called in order and instances of them maintained(?)
+* Constructors have same name as type. Can also call ::new.
+* Access prototypes How? prototype(A)::f() calls the function f from internally managed instance of A.
+* Casting never needed
 * Static method and member access. C++ does this with :: vs. .
+* private are denoted with lead __, make static with lead $$ and static private _$ or $_.
+* Namespace resolution comes from module. Types typically live inside a module though they
+  do not have to. Type names therefore are simple.
 
 type[
   uri, name
-  ]extends[
-    //list of super types
+  ]prototypes[
+    //list of prototypes
   ]implements[
     // list of interfaces
-  ]exposes[
-     f(x,y), z // list of functions or variables that are publically accessible.
-
   ][
   // body
   ];
 
 All types support the following functions
-  * new - constructor
+  * constructor, same names as type
   * to_string - convert this type to s string representation
   * clone - create a copy of this type
+  * ?input_form - spit out constructor
 
 There will also be a Java interface to implement:
   public interface QDLType extends Serializable{
@@ -37,63 +41,91 @@ There will also be a Java interface to implement:
     QDLType self_ref; // constant for this
   }
 
-methods will be accessed with a ::.
+Type resolution operator is ::
   x := X::new(3, 'a'); // create a new object of type X with the given arguments
   x::add(y); // invoke the function add on x for argument y.
 
-E.g.
-  type[
-   Complex
-   ]exposes[
-      One, Zero, I, add, minus, mod, times, conj, over, power, e, re, im
-   ][
-     __re; __im;
-     re()->__re;
-     im()->__im;
-     // Constants
-     One  := Complex::new(1,0);
-     Zero := Complex::new(0,0);
-        I := Complex::new(0,1);
-     define[new(x,y)][__re := x, __ im :=y;];
-     add(y)->Complex::new(re()+y::re(), im() + y::im());
-     minus(y)->Complex::new(re()-y::re(), im() - y::im());
-     mod()->nroot(__re^2 + __im^2);
-     times(y)-> Complex::new(re()*y::re() - im()*y::im(), im()*y::re() + re()*y::im());
-     conj()->Complex::new(__re, -__im);
-     over(y)->times(y::conj)/mod(y)^2;
-     define[
-       power(n)
-       ][
-       //de Moivre's theorem.
-        if[n==2][return(Complex::new(times(this));
-         rho := mod();
-         theta = atan(_im/_re);
-         return(Complex::(rho^n*cos(n*theta), rho^m*sin(n*theta)));
-       ];
-     e()->Complex::new(exp(__re)*cos(__im), exp(__re)*sin(__im));
+-----------------
+uri := URI('qdl:/math/ext');
+module[
+  uri
+  ][
+
+   interface[My_Number][
+     plus(x);
+     times(x);
+     over(x);
+     power(n);
+     eq();
+   ]; //end My_Number
+
+
+   type[
+     Complex
+    ]implements[
+      My_Number
+    ][
+      $$Zero := Complex(0,0);
+      $$One := Complex(1,0);
+      $$I := Complex(0,1);
+      [__re, __im] := [0,0];
+      re()->__re();
+      im()->__im();
+      Complex(x,y)->[__re,__im]:=[x,y];
+      Complex(z.)->[__re,__im]:=z.;// assumes z. is a 2-list
+      Complex(x., y.)->...; // make a list of complex numbers [[x.0,y.0],[x.1,y.1],...]
+      plus(w)->Complex(re()+w::re(), im()+w::im());
+      mod()->(re^2+im()^2)^0.5; // read-valued
+      times(w)->Complex(re()*w::re()-im()*w::im(), re*w::im() + im*w::re());
+      conj()->Complex(re(), -im());
+      over(w)->Complex(times(w::conj())/mod(w)^2;
+      power(n)->local[
+        //de Moivre's theorem.
+          if[n==2][return(this::times(this))];
+          rho := mod();
+          theta = atan(_im/_re);
+          return(Complex(rho^n*cos(n*theta), rho^n*sin(n*theta)));
+      ]; // end power
+      eq(w)->re()==w::re() && im()==w::im();
+      to_string()->to_string(re()) + (im()<0?' - ':' + ') + to_string(abs(im())) + 'i';
    ];
 
+  type[
+     Fraction
+    ]implements[
+       My_Number
+     ][
+       [__a,__b,__c]:=[1,0,1];
+       Fraction(a,b,c)-> [__a,__b,__c]:=[a,b,c]; // probably reduce to lowest terms, check c != 0, etc.
+      plus(f)->...Fraction(
+      eval()->(__a<0||__b<0?-1:1)*(abs(__a)+__b/__c);
+
+  ]; // end Fraction type
+  ]; //end module
+
+Use
+  c := module(uri); // create module instance
+  z := c#Complex(-1,1); // create complex number -1+i
+  z
+-1 + 1i
+  w := c#Complex(2,3);
+  z::plus(w)
+1 + 4i
+  [z,w]::over(c#Complex(0,1))
+[1 - 1i, 3 + 2i]
+
 Another example
-z. := Complex::new(x., y.); //creates conformable stem z.
+z. := c#Complex(x., y.); //creates conformable stem z., if constructor allows it
 
 E.g.
   (z^2 - w^2)/(1+z*w)
 
-z::power(2)::minus(w::power(2))::over(Complex::One::plus(z::times(w)));
+z::power(2)::minus(w::power(2))::over(Complex::$$One::plus(z::times(w)));
 
-?? Allow for overloading operators like + and ÷?
-
-type[T]extends[A,B,C][
-  f(x)->super(A)::f(x)*super(B)::g(x^2+1);
-  new(x,y);
-];
-
-z := <qdl:math/util>Complex::new(2.3, -1)
-or allow for full uri as a type
-uri := URI::new('qdl:/math/extension/Complex');
-
-or allow for some uris directly, so
-z := qdl:/math/extension/Complex::new(2,-1);
-import(qdl:/math/extension/Complex)
-z := Complex::new(2,-1);
-uri := qdl:/math/extension;
+alternate notation possibilities
+z**power(w)
+z!power(w)
+z?power(w)
+z|power(w)
+z#power(w)
+z\power(w)

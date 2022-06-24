@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.types.Types;
 import edu.uiuc.ncsa.qdl.variables.*;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TreeSet;
 
+import static edu.uiuc.ncsa.qdl.types.Types.NULL;
 import static edu.uiuc.ncsa.qdl.variables.Constant.*;
 
 /**
@@ -407,31 +409,31 @@ public class OpEvaluator extends AbstractEvaluator {
         String typeName = ((VariableNode)dyad.getRightArgument()).getVariableReference();
         boolean x = false;
         switch (typeName) {
-            case "Null":
+            case NULL:
                 x = lhs instanceof QDLNull;
                 break;
-            case "Boolean":
+            case Types.BOOLEAN:
                 x = lhs instanceof Boolean;
                 break;
-            case "String":
+            case Types.STRING:
                 x = lhs instanceof String;
                 break;
-            case "Number":
+            case Types.NUMBER:
                 x = (lhs instanceof Long) || (lhs instanceof BigDecimal);
                 break;
-            case "Integer":
+            case Types.INTEGER:
                 x = lhs instanceof Long;
                 break;
-            case "Decimal":
+            case Types.DECIMAL:
                 x = lhs instanceof BigDecimal;
                 break;
-            case "Stem":
+            case Types.STEM:
                 x = lhs instanceof StemVariable;
                 break;
-            case "List":
+            case Types.LIST:
                 x = (lhs instanceof StemVariable) && ((StemVariable) lhs).isList();
                 break;
-            case "Set":
+            case Types.SET:
                 x = lhs instanceof QDLSet;
                 break;
             default:

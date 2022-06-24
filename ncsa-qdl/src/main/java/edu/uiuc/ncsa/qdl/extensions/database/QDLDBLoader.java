@@ -17,12 +17,5 @@ public class QDLDBLoader implements QDLLoader {
         modules.add(new QDLDBModule().newInstance(null));
         return modules;
     }
-    /*
-      @Override
-    public List<Module> load() {
-        List<Module> modules = new ArrayList<>();
-        modules.add(new QDLSetsModule().newInstance(null));
-        return modules;
-    }
-     */
+
 }

@@ -361,12 +361,19 @@ public class TMathEvaluator extends AbstractEvaluator {
                 } else {
                     throw new BadArgException((isFloor ? FLOOR : CEILING) + " is only defined for numbers", polyad.getArgAt(0));
                 }
+                BigDecimal rr = null;
                 if (isFloor) {
-                    r.result = bd.setScale(0, RoundingMode.FLOOR);
+                    rr = bd.setScale(0, RoundingMode.FLOOR);
                 } else {
-                    r.result = bd.setScale(0, RoundingMode.CEILING);
+                    rr = bd.setScale(0, RoundingMode.CEILING);
                 }
-                r.resultType = Constant.DECIMAL_TYPE;
+                try {
+                    r.result = rr.longValueExact();
+                    r.resultType = Constant.LONG_TYPE;
+                } catch (ArithmeticException ax) {
+                    r.result = rr;
+                    r.resultType = Constant.DECIMAL_TYPE;
+                }
                 return r;
             }
         };

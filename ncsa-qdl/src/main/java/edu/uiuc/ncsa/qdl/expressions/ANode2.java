@@ -1,10 +1,13 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
+import edu.uiuc.ncsa.qdl.variables.StemListNode;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
 import static edu.uiuc.ncsa.qdl.variables.Constant.*;
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
@@ -16,14 +19,21 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
  */
 public class ANode2 extends ExpressionImpl {
     TokenPosition tokenPosition = null;
-    @Override
-    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
 
     @Override
-    public TokenPosition getTokenPosition() {return tokenPosition;}
+    public void setTokenPosition(TokenPosition tokenPosition) {
+        this.tokenPosition = tokenPosition;
+    }
 
     @Override
-    public boolean hasTokenPosition() {return tokenPosition!=null;}
+    public TokenPosition getTokenPosition() {
+        return tokenPosition;
+    }
+
+    @Override
+    public boolean hasTokenPosition() {
+        return tokenPosition != null;
+    }
 
     public ANode2(TokenPosition tokenPosition) {
         this.tokenPosition = tokenPosition;
@@ -111,7 +121,7 @@ public class ANode2 extends ExpressionImpl {
         StatementWithResultInterface realLeftArg = getLeftArg();
         boolean chained = false;
         while (realLeftArg instanceof ANode2) {
-            ANode2 rla = (ANode2)realLeftArg;
+            ANode2 rla = (ANode2) realLeftArg;
             ANode2 xNode = new ANode2(rla.getTokenPosition());
             xNode.setLeftArg(rla.getRightArg());
             xNode.setRightArg(lastAnode.getRightArg());
@@ -121,7 +131,7 @@ public class ANode2 extends ExpressionImpl {
             realLeftArg = rla.getLeftArg();
             chained = true;
         }
-        if(chained){
+        if (chained) {
             // Since this was chained, there is every reason to suspect that the
             // value from earlier has been altered. Update it.
             lastAnode.evaluate(state);
@@ -129,11 +139,34 @@ public class ANode2 extends ExpressionImpl {
             setResultType(lastAnode.getResultType());
             setEvaluated(true);
         }
-        if(realLeftArg instanceof ParenthesizedExpression){
-            realLeftArg = ((ParenthesizedExpression)realLeftArg).getExpression();
+        while (realLeftArg instanceof ParenthesizedExpression) {
+            realLeftArg = ((ParenthesizedExpression) realLeftArg).getExpression();
+        }
+        if (realLeftArg instanceof StemListNode) {
+            StemListNode stemListNode = (StemListNode) realLeftArg;
+            StemVariable rStem;
+            if (getResult() instanceof StemVariable) {
+                rStem = (StemVariable) getResult();
+                if (!rStem.isList()) {
+                    throw new QDLExceptionWithTrace("unknown rh node type", getRightArg());
+                }
+            } else {
+                rStem = new StemVariable();
+                rStem.setDefaultValue(getResult());
+            }
+
+            for (int i = 0; i < stemListNode.getStatements().size(); i++) {
+                StatementWithResultInterface swri = stemListNode.getStatements().get(i);
+                if (!(swri instanceof VariableNode)) {
+                    throw new QDLExceptionWithTrace("unknown left assignment statement ", getLeftArg());
+                }
+                Object value = rStem.get(i);
+                state.setValue(((VariableNode) swri).getVariableReference(), value);
+            }
+            return getResult();
         }
         if (realLeftArg instanceof VariableNode) {
-            state.setValue(((VariableNode)realLeftArg).getVariableReference(), getResult());
+            state.setValue(((VariableNode) realLeftArg).getVariableReference(), getResult());
             return getResult();
         }
         if (realLeftArg instanceof ConstantNode) {
@@ -144,14 +177,12 @@ public class ANode2 extends ExpressionImpl {
             ((ESN2) realLeftArg).set(state, getResult());
             return getResult();
         }
-        if(realLeftArg instanceof ModuleExpression){
-            ((ModuleExpression)realLeftArg).set(state, getResult());
+        if (realLeftArg instanceof ModuleExpression) {
+            ((ModuleExpression) realLeftArg).set(state, getResult());
             return getResult();
         }
-        throw new IllegalArgumentException("unknown node type");
+        throw new QDLExceptionWithTrace("unknown type for left hand side", getLeftArg());
     }
-
-
 
 
     @Override
