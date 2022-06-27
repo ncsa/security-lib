@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
+import static edu.uiuc.ncsa.qdl.variables.QDLStem.STEM_INDEX_MARKER;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -1936,7 +1936,7 @@ illegal argument:no module named "b" was  imported at (1, 67)
         dyad.setUnary(true);
         dyad.setTokenPosition(tp(ctx));
         stash(ctx, dyad);
-        dyad.setLeftArgument(new ConstantNode(new StemVariable(), Constant.STEM_TYPE));
+        dyad.setLeftArgument(new ConstantNode(new QDLStem(), Constant.STEM_TYPE));
         dyad.setRightArgument((StatementWithResultInterface) resolveChild(ctx.expression()));
         List<String> source = new ArrayList<>();
         source.add(ctx.getText());

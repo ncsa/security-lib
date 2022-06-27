@@ -4,9 +4,9 @@ import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.Statement;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLSet;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 
 import java.net.URI;
@@ -414,7 +414,7 @@ public class StringEvaluator extends AbstractEvaluator {
             throw new BadArgException(FROM_URI + " requires a stem as its argument", polyad.getArgAt(0));
         }
 
-        StemVariable s = (StemVariable) object;
+        QDLStem s = (QDLStem) object;
         try {
             Long port = s.getLong("port");
 
@@ -458,7 +458,7 @@ public class StringEvaluator extends AbstractEvaluator {
         }
         try {
             URI uri = URI.create(object.toString());
-            StemVariable output = new StemVariable();
+            QDLStem output = new QDLStem();
             putURIAttrib(output, URI_AUTHORITY, uri.getAuthority());
             putURIAttrib(output, URI_FRAGMENT, uri.getFragment());
             putURIAttrib(output, URI_HOST, uri.getHost());
@@ -479,7 +479,7 @@ public class StringEvaluator extends AbstractEvaluator {
     }
 
 
-    void putURIAttrib(StemVariable s, String key, String value) {
+    void putURIAttrib(QDLStem s, String key, String value) {
         if (StringUtils.isTrivial(value)) {
             return;
         }
@@ -546,12 +546,12 @@ public class StringEvaluator extends AbstractEvaluator {
             leftArg = ((QDLSet) leftArg).toStem();
         }
         if (isStem(leftArg)) {
-            StemVariable leftStem = (StemVariable) leftArg;
+            QDLStem leftStem = (QDLStem) leftArg;
             int lsize = leftStem.size();
             int currentCount = 0;
 
             if (isStem(rightArg)) {
-                StemVariable rightStem = (StemVariable) rightArg;
+                QDLStem rightStem = (QDLStem) rightArg;
                 for (Object key : leftStem.keySet()) {
                     if (rightStem.containsKey(key)) {
                         String delim = "";
@@ -883,7 +883,7 @@ public class StringEvaluator extends AbstractEvaluator {
                     }
                     caseSensitive = (Boolean) objects[2];
                 }
-                    StemVariable outStem = new StemVariable();
+                    QDLStem outStem = new QDLStem();
                 if (areAllStrings(objects[0], objects[1])) {
                     String haystack = (String) objects[0];
                     String needle = (String) objects[1];
@@ -1122,7 +1122,7 @@ public class StringEvaluator extends AbstractEvaluator {
                             doRegex = (Boolean) objects[2];
                         }
                     }
-                    StemVariable outStem = new StemVariable();
+                    QDLStem outStem = new QDLStem();
                     if (doRegex) {
                         String[] tokens = objects[0].toString().split(objects[1].toString());
                         for (int i = 0; i < tokens.length; i++) {

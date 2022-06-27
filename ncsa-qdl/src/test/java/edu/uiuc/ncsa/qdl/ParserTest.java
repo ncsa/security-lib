@@ -4,8 +4,8 @@ import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import net.sf.json.JSONObject;
 
 import java.math.BigDecimal;
@@ -421,8 +421,8 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "out2. := x. - y.;"); // do separately, subtract results
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        StemVariable out1 = getStemValue("out1.", state);
-        StemVariable out2 = getStemValue("out2.", state);
+        QDLStem out1 = getStemValue("out1.", state);
+        QDLStem out2 = getStemValue("out2.", state);
         assert out1.size() == 5;
         assert out2.size() == 5;
         for (long i = 0L; i < 5; i++) {
@@ -593,7 +593,7 @@ public class ParserTest extends AbstractQDLTester {
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        StemVariable stemVariable = getStemValue("a.", state);
+        QDLStem stemVariable = getStemValue("a.", state);
         assert stemVariable.size() == 10; // Fingers and toes test.
         assert stemVariable.containsKey("1"); // odds are stems
         assert stemVariable.containsKey("0"); // evens are scalars
@@ -621,7 +621,7 @@ public class ParserTest extends AbstractQDLTester {
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        StemVariable stemVariable = getStemValue("a.", state);
+        QDLStem stemVariable = getStemValue("a.", state);
         assert stemVariable.size() == 10; // Fingers and toes test.
         assert stemVariable.containsKey("1"); // odds are stems
         assert stemVariable.containsKey("0"); // evens are scalars
@@ -784,23 +784,23 @@ public class ParserTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
-        StemVariable a = getStemValue("a.", state);
+        QDLStem a = getStemValue("a.", state);
         assert a.size() == 3;
         assert a.get(0L).equals(5L);
         assert a.get(1L).equals(3L);
         assert a.get(2L).equals(1L);
 
-        StemVariable b = getStemValue("b.", state);
+        QDLStem b = getStemValue("b.", state);
         assert b.size() == 2;
         assert b.containsKey("p");
         assert b.get("p").equals("q");
         assert b.containsKey("3.4");
         assert b.get("3.4").equals(4L);
 
-        StemVariable c = getStemValue("c.", state);
+        QDLStem c = getStemValue("c.", state);
         assert c.size() == 1;
         assert c.containsKey("z");
-        StemVariable innnerStem = (StemVariable) c.get("z");
+        QDLStem innnerStem = (QDLStem) c.get("z");
         assert innnerStem.size() == 1;
         assert innnerStem.containsKey("t");
         assert innnerStem.getLong("t").equals(42L);
@@ -1333,7 +1333,7 @@ public class ParserTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
 
         assert getLongValue("a", state) == 5L;
-        StemVariable a = getStemValue("a.", state);
+        QDLStem a = getStemValue("a.", state);
         assert a.getLong("0") == 0L;
         assert a.getLong("1") == 1L;
     }
@@ -1589,7 +1589,7 @@ public class ParserTest extends AbstractQDLTester {
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        StemVariable stem = getStemValue("stem.", state);
+        QDLStem stem = getStemValue("stem.", state);
         assert stem.getLong("0") == 5L;
         assert stem.getLong("1") == 6L;
         assert !getBooleanValue("boolean", state);
@@ -1690,7 +1690,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "f().j(2) := 100;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        StemVariable stemVariable = getStemValue("a.", state);
+        QDLStem stemVariable = getStemValue("a.", state);
         // check that exactly the value was updated
         assert stemVariable.getLong(0L) == 0L;
         assert stemVariable.getLong(1L) == 1L;
@@ -1724,7 +1724,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "f().j(2) := p := q += 1;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        StemVariable stemVariable = getStemValue("a.", state);
+        QDLStem stemVariable = getStemValue("a.", state);
         // check that exactly the value was updated
         assert getLongValue("p", state) == 100L;
         assert getLongValue("q", state) == 100L;
@@ -1769,7 +1769,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "f().2 := p := q += 1;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        StemVariable stemVariable = getStemValue("a.", state);
+        QDLStem stemVariable = getStemValue("a.", state);
         // check that exactly the value was updated
         assert getLongValue("p", state) == 100L;
         assert getLongValue("q", state) == 100L;
@@ -1787,7 +1787,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "q =: f().j(2);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        StemVariable stemVariable = getStemValue("a.", state);
+        QDLStem stemVariable = getStemValue("a.", state);
         // check that exactly the value was updated
         assert getLongValue("q", state) == 99L;
         assert stemVariable.getLong(0L) == 0L;
@@ -2101,7 +2101,7 @@ public class ParserTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // returns true if any elements are true
-        StemVariable stem = getStemValue("x.", state);
+        QDLStem stem = getStemValue("x.", state);
         assert stem.getBoolean(0L);
         assert !stem.getBoolean(1L);
         assert stem.getBoolean(2L);
@@ -2122,7 +2122,7 @@ public class ParserTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // returns true if any elements are true
-        StemVariable stem = getStemValue("x.", state);
+        QDLStem stem = getStemValue("x.", state);
         assert stem.getBoolean(0L);
         assert !stem.getBoolean(1L);
         assert stem.getBoolean(2L);
@@ -2226,8 +2226,6 @@ public class ParserTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getStringValue("out", state).indexOf("false") < 0;
-        // returns true if any elements are true
-        StemVariable stem = getStemValue("x.", state);
     }
 
     /**

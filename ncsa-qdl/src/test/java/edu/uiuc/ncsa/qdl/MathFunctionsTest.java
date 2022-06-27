@@ -7,8 +7,8 @@ import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.variables.Constant;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.VStack;
 import edu.uiuc.ncsa.qdl.variables.VThing;
 
@@ -41,7 +41,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
 
         VStack symbolTable = state.getVStack();
-        StemVariable arg = new StemVariable();
+        QDLStem arg = new QDLStem();
         arg.put("0", new Long(-12345L));
         arg.put("1", new Long(2468L));
         arg.put("2", new Long(-1000000L));
@@ -52,10 +52,10 @@ public class MathFunctionsTest extends AbstractQDLTester {
         Polyad polyad = new Polyad(MathEvaluator.ABS_VALUE);
         polyad.addArgument(argNode);
         polyad.evaluate(state);
-        StemVariable r = (StemVariable) polyad.getResult();
+        QDLStem r = (QDLStem) polyad.getResult();
         assert r.size() == 4;
-        assert r.getLong("0").equals(12345L);
-        assert r.getLong("1").equals(2468L);
+        assert r.getLong(0L).equals(12345L);
+        assert r.getLong(1L).equals(2468L);
         assert r.getLong("2").equals(1000000L);
         assert r.getLong("3").equals(987654321L);
     }
@@ -78,7 +78,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         ConstantNode left = new ConstantNode(new Long(count), Constant.LONG_TYPE);
         polyad.addArgument(left);
         polyad.evaluate(state);
-        StemVariable r = (StemVariable) polyad.getResult();
+        QDLStem r = (QDLStem) polyad.getResult();
         assert r.size() == count;
     }
 
@@ -121,13 +121,13 @@ public class MathFunctionsTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("0", "One Ring to rule them all");
         sourceStem.put("1", "One Ring to find them");
         sourceStem.put("2", "One Ring to bring them all");
         sourceStem.put("3", "and in the darkness bind them");
 
-        StemVariable expected = new StemVariable();
+        QDLStem expected = new QDLStem();
         expected.put("0", "40d006b6b2e8bea7bf3e9aad679e13b5246f87a2");
         expected.put("1", "15ac553ccb88f34f3c2a4f9ac0460d0fde29c8a8");
         expected.put("2", "5fd8b1f8f66de0848eca4dfc468fc15e147e4670");
@@ -137,7 +137,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         Polyad polyad = new Polyad(MathEvaluator.HASH);
         polyad.addArgument(arg);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         assert result.size() == 4;
         for (Object key : result.keySet()) {
             assert result.get(key).equals(expected.get(key));
@@ -273,7 +273,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert areEqual(getStemValue("d.", state), arrayToStem(new int[]{-9, -4, -1, 0, -1, -4}));
         assert areEqual(getStemValue("e.", state), arrayToStem(new int[]{27, 8, 1, 0, -1, -8}));
         assert areEqual(getStemValue("f.", state), arrayToStem(new int[]{9, 6, 3, 0, -3, -6}));
-        StemVariable gStem = new StemVariable();
+        QDLStem gStem = new QDLStem();
         // Caveat: Bigdecimal from double always induces rounding, so use string constructor for exact tests.
         gStem.listAppend(new BigDecimal(".9"));
         gStem.listAppend(new BigDecimal(".6"));

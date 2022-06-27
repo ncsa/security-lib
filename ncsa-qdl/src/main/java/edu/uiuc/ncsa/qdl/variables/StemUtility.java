@@ -18,13 +18,6 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 public class StemUtility {
     public static final Long LAST_AXIS_ARGUMENT_VALUE = new Long(-0xcafed00d);
 
-/*
-
-    public interface MonadAxisAction {
-        void action(StemVariable out, String key, StemVariable arg);
-    }
-*/
-
     /**
      * Action to be applied at a given axis.
      */
@@ -37,11 +30,11 @@ public class StemUtility {
          * @param leftStem  - The left hand stem's argument at this axis
          * @param rightStem - the right hand stem's argument at this axis.
          */
-        void action(StemVariable out, Object key, StemVariable leftStem, StemVariable rightStem);
+        void action(QDLStem out, Object key, QDLStem leftStem, QDLStem rightStem);
     }
 
     public static boolean isStem(Object o) {
-        return o instanceof StemVariable;
+        return o instanceof QDLStem;
     }
 
     public static boolean areNoneStems(Object... objects) {
@@ -68,37 +61,37 @@ public class StemUtility {
      * @param maxDepth
      * @param axisAction
      */
-    public static void axisDayadRecursion(StemVariable out0,
-                                          StemVariable left0,
-                                          StemVariable right0,
+    public static void axisDayadRecursion(QDLStem out0,
+                                          QDLStem left0,
+                                          QDLStem right0,
                                           int depth,
                                           boolean maxDepth,
                                           DyadAxisAction axisAction) {
-        StemVariable commonKeys = left0.commonKeys(right0);
+        QDLStem commonKeys = left0.commonKeys(right0);
         for (Object key0 : commonKeys.keySet()) {
             boolean isKey0Long = key0 instanceof Long;
             Object leftObj = left0.get(key0);
             Object rightObj = right0.get(key0);
 
-            StemVariable left1 = null;
+            QDLStem left1 = null;
             if (isStem(leftObj)) {
-                left1 = (StemVariable) leftObj;
+                left1 = (QDLStem) leftObj;
             } else {
                 if (rightObj == null) {
                     throw new RankException("There are no more elements in the left argument.");
                 }
 
-                left1 = new StemVariable();
+                left1 = new QDLStem();
                 left1.put(0L, leftObj);
             }
-            StemVariable right1 = null;
+            QDLStem right1 = null;
             if (isStem(rightObj)) {
-                right1 = (StemVariable) right0.get(key0);
+                right1 = (QDLStem) right0.get(key0);
             } else {
                 if (rightObj == null) {
                     throw new RankException("There are no more elements in the right argument.");
                 }
-                right1 = new StemVariable();
+                right1 = new QDLStem();
                 right1.put(0L, rightObj);
             }
             boolean bottomedOut = areNoneStems(leftObj, rightObj) && maxDepth && 0 < depth;
@@ -109,7 +102,7 @@ public class StemUtility {
                     if (areNoneStems(leftObj, rightObj)) {
                         throw new RankException("rank error");
                     }
-                    StemVariable out1 = new StemVariable();
+                    QDLStem out1 = new QDLStem();
                     out0.putLongOrString(key0, out1);
                     axisDayadRecursion(out1, left1, right1, depth - 1, maxDepth, axisAction);
                 } else {
@@ -125,7 +118,7 @@ public class StemUtility {
      * For operations that return a stem.
      */
     public interface StemAxisWalkerAction1 {
-        Object action(StemVariable inStem);
+        Object action(QDLStem inStem);
     }
 
     /**
@@ -135,7 +128,7 @@ public class StemUtility {
      * @param walker
      * @return
      */
-    public static Object axisWalker(StemVariable inStem, int depth, StemAxisWalkerAction1 walker) {
+    public static Object axisWalker(QDLStem inStem, int depth, StemAxisWalkerAction1 walker) {
         if (inStem.getRank() < depth+1) {
             throw new RankException("error: axis " + depth + " requested on stem of rank " + inStem.getRank() );
         }
@@ -297,7 +290,7 @@ public class StemUtility {
      * @param forceToString
      * @return
      */
-    public static String stemListToString(StemVariable contents, boolean forceToString){
+    public static String stemListToString(QDLStem contents, boolean forceToString){
         if(contents.isEmpty()){
             return "";
         }

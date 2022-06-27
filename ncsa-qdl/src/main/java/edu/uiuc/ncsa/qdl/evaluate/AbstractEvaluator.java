@@ -94,7 +94,7 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
     }
 
     protected boolean isStemList(Object obj) {
-        return isStem(obj) && ((StemVariable) obj).containsKey("0");
+        return isStem(obj) && ((QDLStem) obj).containsKey("0");
     }
 
     protected boolean isLong(Object obj) {
@@ -196,9 +196,9 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
         throw new IllegalArgumentException("'" + obj + "' is not a number");
     }
 
-    protected StemVariable toStem(Object object) {
-        if (isStem(object)) return (StemVariable) object;
-        StemVariable out = new StemVariable();
+    protected QDLStem toStem(Object object) {
+        if (isStem(object)) return (QDLStem) object;
+        QDLStem out = new QDLStem();
         out.setDefaultValue(object);
         return out;
     }
@@ -253,8 +253,8 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
             finishExpr(polyad, r);
             return;
         }
-        StemVariable stemVariable = (StemVariable) arg1;
-        StemVariable outStem = new StemVariable();
+        QDLStem stemVariable = (QDLStem) arg1;
+        QDLStem outStem = new QDLStem();
         processStem1(outStem, stemVariable, pointer);
         polyad.setResult(outStem);
         polyad.setResultType(Constant.STEM_TYPE);
@@ -268,13 +268,13 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
      * @param stemVariable
      * @param pointer
      */
-    protected void processStem1(StemVariable outStem, StemVariable stemVariable, fPointer pointer) {
+    protected void processStem1(QDLStem outStem, QDLStem stemVariable, fPointer pointer) {
         for (Object key : stemVariable.keySet()) {
             Object object = stemVariable.get(key);
             boolean isLongKey = key instanceof Long;
-            if (object instanceof StemVariable) {
-                StemVariable newOut = new StemVariable();
-                processStem1(newOut, (StemVariable) object, pointer);
+            if (object instanceof QDLStem) {
+                QDLStem newOut = new QDLStem();
+                processStem1(newOut, (QDLStem) object, pointer);
                 if (!newOut.isEmpty()) {
                     if (isLongKey) {
                         outStem.put((Long) key, newOut);
@@ -295,7 +295,7 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
 
     protected void processSet1(QDLSet outSet, QDLSet arg, fPointer pointer) {
         for (Object key : arg) {
-            if (key instanceof StemVariable) {
+            if (key instanceof QDLStem) {
                 // Do something here???
             } else {
                 outSet.add(pointer.process(key).result);
@@ -386,14 +386,14 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
         boolean scalarRHS = false;
         QDLSet leftSet = null;
         QDLSet rightSet = null;
-        if ((arg1 instanceof QDLSet) && (arg2 instanceof StemVariable)) {
-            if (((StemVariable) arg2).isEmpty()) {
+        if ((arg1 instanceof QDLSet) && (arg2 instanceof QDLStem)) {
+            if (((QDLStem) arg2).isEmpty()) {
                 arg2 = new QDLSet();// make the empty set
             }
         }
 
-        if ((arg2 instanceof QDLSet) && (arg1 instanceof StemVariable)) {
-            if (((StemVariable) arg1).isEmpty()) {
+        if ((arg2 instanceof QDLSet) && (arg1 instanceof QDLStem)) {
+            if (((QDLStem) arg1).isEmpty()) {
                 arg1 = new QDLSet();// make the empty set
             }
         }
@@ -404,7 +404,7 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
                 rightSet = (QDLSet) arg2;
                 isTwoSets = true;
             } else {
-                if (arg2 instanceof StemVariable) {
+                if (arg2 instanceof QDLStem) {
                     throw new IllegalArgumentException("can only apply scalar operations on sets.");
                 }
                 isOneSet = true;
@@ -412,7 +412,7 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
             }
         }
         if ((leftSet == null) && arg2 instanceof QDLSet) {
-            if (arg1 instanceof StemVariable) {
+            if (arg1 instanceof QDLStem) {
                 throw new IllegalArgumentException("can only apply scalar operations on sets.");
             }
             isOneSet = true;
@@ -442,9 +442,9 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
             finishExpr(polyad, result);
             return;
         }
-        StemVariable stem1 = toStem(arg1);
-        StemVariable stem2 = toStem(arg2);
-        StemVariable outStem = new StemVariable();
+        QDLStem stem1 = toStem(arg1);
+        QDLStem stem2 = toStem(arg2);
+        QDLStem outStem = new QDLStem();
         processStem2(outStem, stem1, stem2, pointer, polyad, optionalArgs);
         polyad.setResult(outStem);
         polyad.setResultType(Constant.STEM_TYPE);
@@ -533,9 +533,9 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
       c.0.0 := 2; c.0.1 := 1; c.1.0:= -7;  c.1.1 := 5;
       c. + d.
      */
-    protected void processStem2(StemVariable outStem,
-                                StemVariable stem1,
-                                StemVariable stem2,
+    protected void processStem2(QDLStem outStem,
+                                QDLStem stem1,
+                                QDLStem stem2,
                                 fPointer pointer,
                                 ExpressionImpl polyad, boolean optionalArgs) {
         CommonKeyIterator iterator = getCommonKeys(stem1, stem2);
@@ -560,7 +560,7 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
                 }
             }
             if (isStem(objects[0]) || isStem(objects[1])) {
-                StemVariable newOut = new StemVariable();
+                QDLStem newOut = new QDLStem();
                 processStem2(newOut, toStem(objects[0]), toStem(objects[1]), pointer, polyad, optionalArgs);
                 if (!newOut.isEmpty()) {
                     outStem.putLongOrString(key, newOut);
@@ -607,10 +607,10 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
             finishExpr(polyad, result);
             return;
         }
-        StemVariable stem1 = toStem(arg1);
-        StemVariable stem2 = toStem(arg2);
-        StemVariable stem3 = toStem(arg3);
-        StemVariable outStem = new StemVariable();
+        QDLStem stem1 = toStem(arg1);
+        QDLStem stem2 = toStem(arg2);
+        QDLStem stem3 = toStem(arg3);
+        QDLStem outStem = new QDLStem();
         processStem3(outStem, stem1, stem2, stem3, pointer, polyad, true);
         polyad.setResult(outStem);
         polyad.setResultType(Constant.STEM_TYPE);
@@ -618,10 +618,10 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
     }
 
 
-    protected void processStem3(StemVariable outStem,
-                                StemVariable stem1,
-                                StemVariable stem2,
-                                StemVariable stem3,
+    protected void processStem3(QDLStem outStem,
+                                QDLStem stem1,
+                                QDLStem stem2,
+                                QDLStem stem3,
                                 fPointer pointer,
                                 ExpressionImpl polyad, boolean optionalArgs) {
         CommonKeyIterator iterator = getCommonKeys(stem1, stem2, stem3);
@@ -647,8 +647,8 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
                 }
             }
 
-            if (objects[0] instanceof StemVariable) {
-                StemVariable newOut = new StemVariable();
+            if (objects[0] instanceof QDLStem) {
+                QDLStem newOut = new QDLStem();
                 processStem3(newOut,
                         toStem(objects[0]),
                         toStem(objects[1]),
@@ -717,9 +717,9 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
         }
     }
 
-    protected CommonKeyIterator getCommonKeys(StemVariable... stems) {
+    protected CommonKeyIterator getCommonKeys(QDLStem... stems) {
         CommonKeyIterator iterator = new CommonKeyIterator();
-        for (StemVariable stem : stems) {
+        for (QDLStem stem : stems) {
             if (stem.hasDefaultValue()) {
                 continue;
             }
@@ -757,23 +757,23 @@ public abstract class AbstractEvaluator implements EvaluatorInterface {
      * @param informativeMessage
      * @return
      */
-    protected StemVariable getOrCreateStem(StatementWithResultInterface node, State state, String informativeMessage) {
-        StemVariable stem1 = null;
+    protected QDLStem getOrCreateStem(StatementWithResultInterface node, State state, String informativeMessage) {
+        QDLStem stem1 = null;
         if (node instanceof VariableNode) {
             VariableNode vn = (VariableNode) node;
             String varName = vn.getVariableReference();
             if (!state.isDefined(varName)) {
-                if (!varName.endsWith(StemVariable.STEM_INDEX_MARKER)) {
+                if (!varName.endsWith(QDLStem.STEM_INDEX_MARKER)) {
                     throw new IllegalArgumentException(informativeMessage);
                 }
-                stem1 = new StemVariable();
+                stem1 = new QDLStem();
                 state.setValue(varName, stem1);
             } else {
                 Object arg1 = node.evaluate(state);
                 if (!isStem(arg1)) {
                     throw new IllegalArgumentException(informativeMessage);
                 }
-                stem1 = (StemVariable) arg1;
+                stem1 = (QDLStem) arg1;
             }
         }
         if (stem1 == null) {

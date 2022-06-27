@@ -16,7 +16,7 @@ public class Constant {
         if(object instanceof String) return STRING_TYPE;
         if(object instanceof Long) return LONG_TYPE;
         if(object instanceof Boolean) return BOOLEAN_TYPE;
-        if(object instanceof StemVariable) return STEM_TYPE;
+        if(object instanceof QDLStem) return STEM_TYPE;
         if(object instanceof BigDecimal) return DECIMAL_TYPE;
         if(object instanceof QDLSet) return SET_TYPE;
         if(object instanceof FunctionReferenceNode) return FUNCTION_TYPE;

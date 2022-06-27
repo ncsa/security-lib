@@ -4,9 +4,9 @@ import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.Statement;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLCodec;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.TokenUtil;
 import org.apache.commons.codec.binary.Base64;
@@ -491,7 +491,7 @@ public class MathEvaluator extends AbstractEvaluator {
         checkNull(arg, polyad.getArgAt(0));
         if (arg instanceof Long) {
             int size = ((Long) arg).intValue();
-            StemVariable stemVariable = new StemVariable();
+            QDLStem stemVariable = new QDLStem();
             for (int i = 0; i < size; i++) {
                 stemVariable.put(Integer.toString(i), secureRandom.nextLong());
             }
@@ -594,7 +594,7 @@ public class MathEvaluator extends AbstractEvaluator {
         }
         // so more than one string needs to be returned.
 
-        StemVariable stem = new StemVariable();
+        QDLStem stem = new QDLStem();
         for (int i = 0; i < returnCount; i++) {
             secureRandom.nextBytes(ba);
             String rc = Base64.encodeBase64URLSafeString(ba);

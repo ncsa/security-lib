@@ -265,7 +265,7 @@ subset(b., 3, 6)
         HashSet set = new HashSet();
         for (Object obj : this) {
             if (obj instanceof StemVariable) {
-                StemVariable ss = ((StemVariable) obj).almostUnique();
+                QDLStem ss = ((QDLStem) obj).almostUnique();
                 set.addAll(ss.getQDLList().unique());
             } else {
                 set.add(obj);
@@ -404,7 +404,7 @@ subset(b., 3, 6)
                 } else {
                     output = output + ",\n";
                 }
-                output = output + newIndent + ((StemVariable) obj).toString(indentFactor, newIndent);
+                output = output + newIndent + ((QDLStem) obj).toString(indentFactor, newIndent);
             } else {
                 needsCRWithClosingBrace = false;
                 if (isFirst) {
@@ -466,8 +466,8 @@ subset(b., 3, 6)
     public JSONArray toJSON(boolean escapeNames) {
         JSONArray array = new JSONArray();
         for (Object element : getArrayList()) {
-            if (element instanceof StemVariable) {
-                array.add(((StemVariable) element).toJSON(escapeNames));
+            if (element instanceof QDLStem) {
+                array.add(((QDLStem) element).toJSON(escapeNames));
             } else {
                 if (element instanceof QDLNull) {
                     array.add(QDLConstants.JSON_QDL_NULL);
@@ -478,8 +478,8 @@ subset(b., 3, 6)
         }
         for (SparseEntry s : getSparseEntries()) {
             Object v = s.entry;
-            if (v instanceof StemVariable) {
-                array.add(((StemVariable) v).toJSON(escapeNames));
+            if (v instanceof QDLStem) {
+                array.add(((QDLStem) v).toJSON(escapeNames));
             } else {
                 array.add(v);
             }
@@ -548,7 +548,7 @@ subset(b., 3, 6)
             Object[] r = new Object[getArrayList().size()];
             int ii = 0;
             for (Object ooo : getArrayList()) {
-                if (!allowStems && (ooo instanceof StemVariable)) {
+                if (!allowStems && (ooo instanceof QDLStem)) {
                     throw new IllegalArgumentException("error: a stem is not allowed in this list");
                 }
                 r[ii++] = ooo;
@@ -563,7 +563,7 @@ subset(b., 3, 6)
         }
         // now handle sparse entries. All that is left is to fill in
         for (SparseEntry sparseEntry : getSparseEntries()) {
-            if (!allowStems && (sparseEntry.entry instanceof StemVariable)) {
+            if (!allowStems && (sparseEntry.entry instanceof QDLStem)) {
                 throw new IllegalArgumentException("error: a stem is not allowed in this list");
             }
             r[ii++] = sparseEntry.entry;
@@ -587,8 +587,8 @@ subset(b., 3, 6)
         s.add(new Long(size()));
         Object currentEntry = obj;
         while (currentEntry != null) {
-            if (currentEntry instanceof StemVariable) {
-                StemVariable s1 = (StemVariable) currentEntry;
+            if (currentEntry instanceof QDLStem) {
+                QDLStem s1 = (QDLStem) currentEntry;
                 if (s1.getQDLList().size() == 0) {
                     break;
                 }

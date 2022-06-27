@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLRuntimeException;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
@@ -156,7 +156,7 @@ public class WSXMLSerializer {
             if (xmlSerializationState.isVersion2_0()) {
                 toCDataB64(xsw, s);
             } else {
-                StemVariable stemVariable = new StemVariable();
+                QDLStem stemVariable = new QDLStem();
                 stemVariable.addList(s);
                 XMLUtils.write(xsw, stemVariable);
             }
@@ -536,7 +536,7 @@ public class WSXMLSerializer {
     }
 
     protected List<String> getStemAsListFromXML(String tag, XMLEventReader xer) throws XMLStreamException {
-        StemVariable stem = null;
+        QDLStem stem = null;
         XMLEvent xe = xer.nextEvent();
         while (xer.hasNext()) {
             xe = xer.peek();
@@ -545,8 +545,8 @@ public class WSXMLSerializer {
                     if (xe.asStartElement().getName().getLocalPart().equals(STEM_TAG)) {
                         Object obj = XMLUtils.resolveConstant(xer);
                         // it is possible that the XML does not have a serialized stem, in which case, ignore it.
-                        if (obj instanceof StemVariable) {
-                            stem = (StemVariable) obj;
+                        if (obj instanceof QDLStem) {
+                            stem = (QDLStem) obj;
                         }
                     }
                     break;

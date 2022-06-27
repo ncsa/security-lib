@@ -7,10 +7,7 @@ import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
-import edu.uiuc.ncsa.qdl.variables.Constant;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
-import edu.uiuc.ncsa.qdl.variables.VStack;
-import edu.uiuc.ncsa.qdl.variables.VThing;
+import edu.uiuc.ncsa.qdl.variables.*;
 
 import java.math.BigDecimal;
 
@@ -82,7 +79,7 @@ public class TestDyadicOperations extends AbstractQDLTester {
         Dyad dyad = new Dyad(OpEvaluator.PLUS_VALUE, left, right);
         dyad.evaluate(state);
         assert dyad.getResultType() == Constant.STEM_TYPE;
-        StemVariable result = (StemVariable) dyad.getResult();
+        QDLStem result = (QDLStem) dyad.getResult();
         assert result.get("foo").equals(4L);
         assert result.get("baz").equals(-31L);
         assert testNumberEquals(result.get("bar"), new BigDecimal("348.432"));

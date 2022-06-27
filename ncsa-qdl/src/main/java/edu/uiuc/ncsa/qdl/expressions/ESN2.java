@@ -4,9 +4,9 @@ import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
 import java.util.ArrayList;
@@ -68,10 +68,10 @@ public class ESN2 extends ExpressionImpl {
         if (indexList.size() == 0) {
             // just wants whole stem, no indices
             Object r0 = leftArgs.get(leftArgs.size() - 1).evaluate(state);
-            if (!(r0 instanceof StemVariable)) {
+            if (!(r0 instanceof QDLStem)) {
                 throw new IllegalStateException("error: left argument must evaluate to be a stem ");
             }
-            StemVariable stemVariable = (StemVariable) r0;
+            QDLStem stemVariable = (QDLStem) r0;
             setResult(stemVariable);
             setResultType(Constant.STEM_TYPE);
             setEvaluated(true);
@@ -94,10 +94,10 @@ public class ESN2 extends ExpressionImpl {
             }
             throw new IndexError("left argument is undefined", lll);
         }
-        if (!(r0 instanceof StemVariable)) {
+        if (!(r0 instanceof QDLStem)) {
             throw new IllegalStateException("error: left argument must evaluate to be a stem ");
         }
-        StemVariable stemVariable = (StemVariable) r0;
+        QDLStem stemVariable = (QDLStem) r0;
         IndexList r;
         try {
             r = stemVariable.get(indexList, true);
@@ -140,18 +140,18 @@ public class ESN2 extends ExpressionImpl {
         IndexList r;
 
         for (int i = indexList.size() - 1; 0 <= i; i--) {
-            if (indexList.get(i) instanceof StemVariable) {
+            if (indexList.get(i) instanceof QDLStem) {
                 if (i == indexList.size() - 1) {
                     continue;
                 }
-                r = ((StemVariable) indexList.get(i)).get(indexList.tail(i + 1), false);
+                r = ((QDLStem) indexList.get(i)).get(indexList.tail(i + 1), false);
                 indexList.truncate(i);
                 indexList.addAll(i, r);
             } else {
                 // Case that left most argument is not a stem, but that the rhs is
                 // which implies the user made a boo-boo
                 if (i < indexList.size() - 1) {
-                    if (indexList.get(i + 1) instanceof StemVariable) {
+                    if (indexList.get(i + 1) instanceof QDLStem) {
                         throw new IndexError("error: lhs is not a stem.", null);
                     }
                 }
@@ -176,7 +176,7 @@ public class ESN2 extends ExpressionImpl {
                         obj = vNode.evaluate(state);
 
                     } else {
-                        VariableNode vNode1 = new VariableNode(vNode.getVariableReference() + StemVariable.STEM_INDEX_MARKER);
+                        VariableNode vNode1 = new VariableNode(vNode.getVariableReference() + QDLStem.STEM_INDEX_MARKER);
                         obj = vNode1.evaluate(state);
                         if (obj == null) {
                             // try it as a simple scalar
@@ -245,12 +245,12 @@ public class ESN2 extends ExpressionImpl {
         // Made it this far. Now we need to do this again, but handing off indices
         // to the stem as needed.
         whittleIndices(indexList);
-        StemVariable stemVariable = null;
+        QDLStem stemVariable = null;
         boolean gotOne = false;
         StatementWithResultInterface realLeftArg = leftArgs.get(leftArgs.size() - 1);
         Object arg0 = realLeftArg.evaluate(state);
-        if (arg0 instanceof StemVariable) {
-            StemVariable arg = (StemVariable) arg0;
+        if (arg0 instanceof QDLStem) {
+            QDLStem arg = (QDLStem) arg0;
             try {
                 return arg.remove(indexList);
             } catch (IndexError indexError) {
@@ -271,7 +271,7 @@ public class ESN2 extends ExpressionImpl {
         // Made it this far. Now we need to do this again, but handing off indices
         // to the stem as needed.
         whittleIndices(indexList);
-        StemVariable stemVariable = null;
+        QDLStem stemVariable = null;
         boolean gotOne = false;
         StatementWithResultInterface realLeftArg = leftArgs.get(leftArgs.size() - 1);
         realLeftArg.evaluate(state);
@@ -280,8 +280,8 @@ public class ESN2 extends ExpressionImpl {
             realLeftArg = ((ParenthesizedExpression) realLeftArg).getExpression();
         }
         //leftArgs.get(leftArgs.size() - 1).evaluate(state);
-        if (realLeftArg.getResult() instanceof StemVariable) {
-            stemVariable = (StemVariable) realLeftArg.getResult();
+        if (realLeftArg.getResult() instanceof QDLStem) {
+            stemVariable = (QDLStem) realLeftArg.getResult();
             gotOne = true;
         }
         if (realLeftArg instanceof VariableNode) {
@@ -289,7 +289,7 @@ public class ESN2 extends ExpressionImpl {
             // Either it is not set or set to QDLNull
             if (vNode.getResult() == null || (vNode.getResult() instanceof QDLNull)) {
                 // then this variable does not exist in the symbol table. Add it
-                stemVariable = new StemVariable();
+                stemVariable = new QDLStem();
                 state.setValue(vNode.getVariableReference(), stemVariable);
             }
             gotOne = true;
@@ -300,7 +300,7 @@ public class ESN2 extends ExpressionImpl {
         // it is possible that the left most expression is a stem node, so make sure there is
         // something to return
         if (stemVariable == null) {
-            stemVariable = new StemVariable();
+            stemVariable = new QDLStem();
         }
         try {
             stemVariable.set(indexList, newValue); // let the stem set its value internally

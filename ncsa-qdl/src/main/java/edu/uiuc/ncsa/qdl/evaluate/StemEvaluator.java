@@ -380,14 +380,14 @@ public class StemEvaluator extends AbstractEvaluator {
         if (!isStem(arg1)) {
             throw new BadArgException(REMAP + " requires stem as its first argument", polyad.getArgAt(0));
         }
-        StemVariable stem = (StemVariable) arg1;
+        QDLStem stem = (QDLStem) arg1;
         Object arg2 = polyad.evalArg(1, state);
         checkNull(arg2, polyad.getArgAt(1));
 
         if (!isStem(arg2)) {
             throw new BadArgException(REMAP + " requires an stem or integer as its second argument", polyad.getArgAt(1));
         }
-        StemVariable newIndices = null;
+        QDLStem newIndices = null;
         if (polyad.getArgCount() == 3) {
             Object arg3 = polyad.evalArg(2, state);
             checkNull(arg3, polyad.getArgAt(2), state);
@@ -395,12 +395,12 @@ public class StemEvaluator extends AbstractEvaluator {
                 throw new BadArgException(REMAP + " requires an stem or integer as its third argument", polyad.getArgAt(2));
             }
 
-            newIndices = (StemVariable) arg3;
-            threeArgRemap(polyad, stem, (StemVariable) arg2, newIndices);
+            newIndices = (QDLStem) arg3;
+            threeArgRemap(polyad, stem, (QDLStem) arg2, newIndices);
             return;
         }
         try {
-            twoArgRemap(polyad, stem, (StemVariable) arg2);
+            twoArgRemap(polyad, stem, (QDLStem) arg2);
         } catch (IndexError indexError) {
             indexError.setStatement(polyad.getArgAt(1));
             throw indexError;
@@ -428,7 +428,7 @@ public class StemEvaluator extends AbstractEvaluator {
         if (!isStem(arg0)) {
             throw new BadArgException(ALL_KEYS + " requires a stem as its first argument", polyad.getArgAt(0));
         }
-        StemVariable stem = (StemVariable) arg0;
+        QDLStem stem = (QDLStem) arg0;
         boolean returnAll = true;
         long axis = 0L;
         if (polyad.getArgCount() == 2) {
@@ -440,7 +440,7 @@ public class StemEvaluator extends AbstractEvaluator {
             }
             axis = (Long) arg1;
         }
-        StemVariable rc = returnAll ? stem.indices() : stem.indices(axis);
+        QDLStem rc = returnAll ? stem.indices() : stem.indices(axis);
         polyad.setResult(rc);
         polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(Boolean.TRUE);
@@ -456,23 +456,13 @@ public class StemEvaluator extends AbstractEvaluator {
             throw new MissingArgException(VALUES + " requires an argument", polyad);
         }
         // create a list of values for a stem.
-        StemVariable out = new StemVariable();
+        QDLStem out = new QDLStem();
         Object object0 = polyad.evalArg(0, state);
         checkNull(object0, polyad.getArgAt(0));
         QDLSet outSet;
         if (isStem(object0)) {
-            StemVariable inStem = (StemVariable) object0;
+            QDLStem inStem = (QDLStem) object0;
             outSet = inStem.valueSet();
-/*
-            ArrayList values = new ArrayList();
-            for (Object key : inStem.keySet()) {
-                Object obj = inStem.get(key);
-                if (!values.contains(obj)) {
-                    values.add(inStem.get(key));
-                }
-            }
-            out.addList(values);
-*/
 
         } else {
             //out.put(0L, object0);
@@ -506,7 +496,7 @@ public class StemEvaluator extends AbstractEvaluator {
             throw new MissingArgException(FOR_EACH + " requires at least 2 arguments", polyad.getArgAt(0));
         }
 
-        StemVariable[] stems = new StemVariable[polyad.getArgCount() - 1];
+        QDLStem[] stems = new QDLStem[polyad.getArgCount() - 1];
         for (int i = 1; i < polyad.getArgCount(); i++) {
 
             Object arg = polyad.evalArg(i, state);
@@ -528,7 +518,7 @@ public class StemEvaluator extends AbstractEvaluator {
             if (!isStem(arg)) {
                 throw new BadArgException("All arguments to except the first must be stem. Argument " + i + " is not a stem.", polyad.getArgAt(i));
             }
-            stems[i - 1] = (StemVariable) arg;
+            stems[i - 1] = (QDLStem) arg;
         }
         ExpressionImpl f;
         try {
@@ -538,7 +528,7 @@ public class StemEvaluator extends AbstractEvaluator {
             throw ufx;
         }
 
-        StemVariable output = new StemVariable();
+        QDLStem output = new QDLStem();
         // special case single args. Otherwise have to special case a bunch of stuff in forEachRecursion
 
         if (stems.length == 1) {
@@ -559,21 +549,21 @@ public class StemEvaluator extends AbstractEvaluator {
 
     }
 
-    protected void forEachRecursion(StemVariable output, ExpressionImpl f, State state, StemVariable[] stems) {
+    protected void forEachRecursion(QDLStem output, ExpressionImpl f, State state, QDLStem[] stems) {
         int argCount = stems.length - 1;
         for (Object key : stems[0].keySet()) {
             ArrayList<Object> rawArgs = new ArrayList<>();
             rawArgs.add(stems[0].get(key));
-            StemVariable output1 = new StemVariable();
+            QDLStem output1 = new QDLStem();
             forEachRecursion(output1, f, state, stems, rawArgs, argCount - 1);
             output.putLongOrString(key, output1);
         }
     }
 
-    protected void forEachRecursion(StemVariable output,
+    protected void forEachRecursion(QDLStem output,
                                     ExpressionImpl f,
                                     State state,
-                                    StemVariable[] stems,
+                                    QDLStem[] stems,
                                     ArrayList<Object> rawArgs,
                                     int depth) {
         ArrayList<StatementWithResultInterface> args = null;
@@ -593,7 +583,7 @@ public class StemEvaluator extends AbstractEvaluator {
                 output.putLongOrString(key, f.getResult());
             } else {
                 rawArgs.set(currentIndex, stems[currentIndex].get(key));
-                StemVariable output1 = new StemVariable();
+                QDLStem output1 = new QDLStem();
                 forEachRecursion(output1, f, state, stems, rawArgs, depth - 1);
                 output.putLongOrString(key, output1);
             }
@@ -619,7 +609,7 @@ public class StemEvaluator extends AbstractEvaluator {
         if (!isStem(arg0)) {
             throw new BadArgException(JSON_PATH_QUERY + " requires a stem as its first argument", polyad.getArgAt(0));
         }
-        StemVariable stemVariable = (StemVariable) arg0;
+        QDLStem stemVariable = (QDLStem) arg0;
         Object arg1 = polyad.evalArg(1, state);
         checkNull(arg1, polyad.getArgAt(1));
 
@@ -642,7 +632,7 @@ public class StemEvaluator extends AbstractEvaluator {
                     .options(Option.AS_PATH_LIST).build();
         }
         String output;
-        StemVariable outStem;
+        QDLStem outStem;
 
         if (returnAsPaths) {
             try {
@@ -653,7 +643,7 @@ public class StemEvaluator extends AbstractEvaluator {
                     // A "feature" of this API is to return an empty list if there are no values
                     // but throw a path exception if you want the results as paths.
                     // Only way to check is to look at the message. 
-                    outStem = new StemVariable();
+                    outStem = new QDLStem();
                 } else {
                     throw new BadArgException("error processing query:" + jpe.getMessage(), polyad);
                 }
@@ -667,7 +657,7 @@ public class StemEvaluator extends AbstractEvaluator {
                 // of a JSON array vs object. The JsonPath generally tends to return arrays so we
                 // test for that first.
                 output = JsonPath.using(conf).parse(stemVariable.toJSON(false).toString()).read(query).toString();
-                outStem = new StemVariable();
+                outStem = new QDLStem();
                 try {
                     JSONArray array = JSONArray.fromObject(output);
                     outStem.fromJSON(array);
@@ -693,14 +683,14 @@ public class StemEvaluator extends AbstractEvaluator {
      * @param indexList
      * @return
      */
-    protected StemVariable stemPathConverter(String indexList) {
+    protected QDLStem stemPathConverter(String indexList) {
         JSONArray arrayIn = JSONArray.fromObject(indexList);
-        StemVariable arrayOut = new StemVariable();
+        QDLStem arrayOut = new QDLStem();
         for (int i = 0; i < arrayIn.size(); i++) {
             String x = arrayIn.getString(i);
             x = x.substring(2); // All JSON paths start with a $.
             StringTokenizer tokenizer = new StringTokenizer(x, "[");
-            StemVariable r = new StemVariable();
+            QDLStem r = new QDLStem();
             while (tokenizer.hasMoreTokens()) {
                 String nextOne = tokenizer.nextToken();
                 if (nextOne.startsWith("'")) {
@@ -739,7 +729,7 @@ public class StemEvaluator extends AbstractEvaluator {
             return;
         }
         polyad.setEvaluated(true);
-        StemVariable s = (StemVariable) polyad.getArgAt(0).getResult();
+        QDLStem s = (QDLStem) polyad.getArgAt(0).getResult();
         polyad.setResult(s.getRank());
         polyad.setResultType(LONG_TYPE);
 
@@ -765,7 +755,7 @@ public class StemEvaluator extends AbstractEvaluator {
         }
         // so its a stem
         polyad.setEvaluated(true);
-        StemVariable s = (StemVariable) polyad.getArgAt(0).getResult();
+        QDLStem s = (QDLStem) polyad.getArgAt(0).getResult();
         polyad.setResult(s.dim());
         polyad.setResultType(STEM_TYPE);
 
@@ -789,13 +779,13 @@ public class StemEvaluator extends AbstractEvaluator {
         checkNull(arg, polyad.getArgAt(0));
 
         if (!isStem(arg)) {
-            polyad.setResult(new StemVariable()); // just an empty stem
+            polyad.setResult(new QDLStem()); // just an empty stem
             polyad.setResultType(STEM_TYPE);
             polyad.setEvaluated(true);
             return;
         }
-        StemVariable stemVariable = (StemVariable) arg;
-        StemVariable out = stemVariable.almostUnique().almostUnique();
+        QDLStem stemVariable = (QDLStem) arg;
+        QDLStem out = stemVariable.almostUnique().almostUnique();
 
         polyad.setResult(out);
         polyad.setResultType(STEM_TYPE);
@@ -825,11 +815,11 @@ public class StemEvaluator extends AbstractEvaluator {
         checkNull(rightArg, polyad.getArgAt(1));
         // breaks  down tidily in to 4 cases.
         if (isStem(leftArg)) {
-            StemVariable lStem = (StemVariable) leftArg;
-            StemVariable result = new StemVariable(); // result is always conformable to left arg
+            QDLStem lStem = (QDLStem) leftArg;
+            QDLStem result = new QDLStem(); // result is always conformable to left arg
 
             if (isStem(rightArg)) {
-                StemVariable rStem = (StemVariable) rightArg;
+                QDLStem rStem = (QDLStem) rightArg;
                 for (Object lkey : lStem.keySet()) {
                     result.putLongOrString(lkey, rStem.hasValue(lStem.get(lkey)));
                 }
@@ -884,7 +874,7 @@ public class StemEvaluator extends AbstractEvaluator {
             // left arg is not a stem.
             Boolean result = Boolean.FALSE;
             if (isStem(rightArg)) {
-                StemVariable rStem = (StemVariable) rightArg;
+                QDLStem rStem = (QDLStem) rightArg;
                 result = rStem.hasValue(leftArg);
             } else {
                 if (isSet(rightArg)) {
@@ -941,11 +931,11 @@ public class StemEvaluator extends AbstractEvaluator {
             convertKeys = (Boolean) arg2;
         }
         JSONObject jsonObject = null;
-        StemVariable output = new StemVariable();
+        QDLStem output = new QDLStem();
         boolean gotOne = false;
         if (isStem(arg)) {
             gotOne = true;
-            StemVariable stem = (StemVariable) arg;
+            QDLStem stem = (QDLStem) arg;
             for (Object key : stem.keySet()) {
                 Object value = stem.get(key);
                 if (!isString(value)) {
@@ -953,7 +943,7 @@ public class StemEvaluator extends AbstractEvaluator {
 //                    throw new BadArgException(FROM_JSON + " requires a string or stem of strings as its first argument", polyad.getArgAt(0));
                 }
                 try {
-                    StemVariable nextStem = new StemVariable();
+                    QDLStem nextStem = new QDLStem();
                     jsonObject = JSONObject.fromObject(value);
                     nextStem.fromJSON(jsonObject, convertKeys);
                     if (key instanceof Long) {
@@ -1058,7 +1048,7 @@ public class StemEvaluator extends AbstractEvaluator {
             indent = argL.intValue(); // best we can do
         }
 
-        JSON j = ((StemVariable) arg1).toJSON(convertNames);
+        JSON j = ((QDLStem) arg1).toJSON(convertNames);
         if (0 < indent) {
             polyad.setResult(j.toString(indent));
         } else {
@@ -1084,7 +1074,7 @@ public class StemEvaluator extends AbstractEvaluator {
         if (0 == polyad.getArgCount()) {
             throw new MissingArgException("the " + UNION + " function requires at least 1 argument", polyad);
         }
-        StemVariable outStem = new StemVariable();
+        QDLStem outStem = new QDLStem();
 
         for (int i = 0; i < polyad.getArgCount(); i++) {
             Object arg = polyad.evalArg(i, state);
@@ -1092,7 +1082,7 @@ public class StemEvaluator extends AbstractEvaluator {
             if (!isStem(arg)) {
                 throw new BadArgException(UNION + " only works on stems.", polyad.getArgAt(i));
             }
-            outStem = outStem.union((StemVariable) arg);
+            outStem = outStem.union((QDLStem) arg);
         }
         polyad.setResult(outStem);
         polyad.setEvaluated(true);
@@ -1116,7 +1106,7 @@ public class StemEvaluator extends AbstractEvaluator {
         checkNull(arg0, polyad.getArgAt(0));
 
         // should take either a stem or a variable reference to it.
-        StemVariable stem = null;
+        QDLStem stem = null;
         Boolean safeMode = Boolean.TRUE;
         if (polyad.getArgCount() == 2) {
             Object o = polyad.evalArg(1, state);
@@ -1131,17 +1121,17 @@ public class StemEvaluator extends AbstractEvaluator {
         if (polyad.getArgAt(0) instanceof VariableNode) {
             VariableNode vn = (VariableNode) polyad.getArgAt(0);
             varName = vn.getVariableReference();
-            if (!(vn.getResult() instanceof StemVariable)) {
+            if (!(vn.getResult() instanceof QDLStem)) {
                 throw new BadArgException("You can only apply " + UNBOX + " to a stem.", polyad.getArgAt(0));
             }
-            stem = (StemVariable) vn.getResult();
+            stem = (QDLStem) vn.getResult();
         }
         if (polyad.getArgAt(0) instanceof StemVariableNode) {
-            stem = (StemVariable) polyad.evalArg(0, state);
+            stem = (QDLStem) polyad.evalArg(0, state);
         }
 
-        if ((polyad.getArgAt(0) instanceof StemVariable)) {
-            stem = (StemVariable) polyad.getArgAt(0);
+        if ((polyad.getArgAt(0) instanceof QDLStem)) {
+            stem = (QDLStem) polyad.getArgAt(0);
         }
         if (stem == null) {
             throw new BadArgException("You can only apply " + UNBOX + " to a stem.", polyad.getArgAt(0));
@@ -1206,7 +1196,7 @@ public class StemEvaluator extends AbstractEvaluator {
             throw new MissingArgException("the " + BOX + " function requires at least 1 argument", polyad);
         }
         ArrayList<String> varNames = new ArrayList<>();
-        StemVariable stem = new StemVariable();
+        QDLStem stem = new QDLStem();
 
         for (int i = 0; i < polyad.getArgCount(); i++) {
             polyad.evalArg(i, state);
@@ -1245,7 +1235,7 @@ public class StemEvaluator extends AbstractEvaluator {
             size = new Long(((QDLSet) arg).size());
         }
         if (isStem(arg)) {
-            size = new Long(((StemVariable) arg).size());
+            size = new Long(((QDLStem) arg).size());
         }
         if (arg instanceof String) {
             size = new Long(arg.toString().length());
@@ -1306,13 +1296,13 @@ public class StemEvaluator extends AbstractEvaluator {
         }
         long size = 0;
         if (!isStem(arg)) {
-            polyad.setResult(new StemVariable()); // just an empty stem
+            polyad.setResult(new QDLStem()); // just an empty stem
             polyad.setResultType(STEM_TYPE);
             polyad.setEvaluated(true);
             return;
         }
-        StemVariable stemVariable = (StemVariable) arg;
-        StemVariable out = new StemVariable();
+        QDLStem stemVariable = (QDLStem) arg;
+        QDLStem out = new QDLStem();
         if (returnByType) {
             long i = 0L;
             for (Object key : stemVariable.keySet()) {
@@ -1374,7 +1364,7 @@ public class StemEvaluator extends AbstractEvaluator {
         Object arg = polyad.evalArg(0, state);
         checkNull(arg, polyad.getArgAt(0));
         if (!isStem(arg)) {
-            polyad.setResult(new StemVariable()); // just an empty stem
+            polyad.setResult(new QDLStem()); // just an empty stem
             polyad.setResultType(STEM_TYPE);
             polyad.setEvaluated(true);
             return;
@@ -1402,9 +1392,9 @@ public class StemEvaluator extends AbstractEvaluator {
                 throw new BadArgException(LIST_KEYS + " second argument must be a boolean or integer if present.", polyad.getArgAt(1));
             }
         }
-        StemVariable stemVariable = (StemVariable) arg;
+        QDLStem stemVariable = (QDLStem) arg;
 
-        StemVariable out = new StemVariable();
+        QDLStem out = new QDLStem();
 
         if (returnByType) {
             for (Object key : stemVariable.keySet()) {
@@ -1445,7 +1435,7 @@ public class StemEvaluator extends AbstractEvaluator {
      * @param out
      * @param key
      */
-    protected void putLongOrStringKey(StemVariable out, Object key) {
+    protected void putLongOrStringKey(QDLStem out, Object key) {
         if (key instanceof Long) {
             Long k = (Long) key;
             out.put(k, k);
@@ -1479,7 +1469,7 @@ public class StemEvaluator extends AbstractEvaluator {
         if (!isStem(arg)) {
             throw new BadArgException(HAS_KEYS + " command requires a stem as its first argument.", polyad.getArgAt(0));
         }
-        StemVariable target = (StemVariable) arg;
+        QDLStem target = (QDLStem) arg;
         polyad.evalArg(1, state);
         Object arg2 = polyad.getArgAt(1).getResult();
         checkNull(arg2, polyad.getArgAt(1));
@@ -1490,7 +1480,7 @@ public class StemEvaluator extends AbstractEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        StemVariable result = target.hasKeys((StemVariable) arg2);
+        QDLStem result = target.hasKeys((QDLStem) arg2);
         polyad.setResult(result);
         polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
@@ -1511,7 +1501,7 @@ public class StemEvaluator extends AbstractEvaluator {
         boolean gotOne = false;
         // First argument always has to be an integer.
         boolean isLongArg = arg instanceof Long;
-        boolean isStemArg = arg instanceof StemVariable;
+        boolean isStemArg = arg instanceof QDLStem;
 
         if (!(isLongArg || isStemArg)) {
             throw new BadArgException(SHORT_MAKE_INDICES + " requires a non-negative integer argument or a stem as its first argument", polyad.getArgAt(0));
@@ -1520,7 +1510,7 @@ public class StemEvaluator extends AbstractEvaluator {
         int[] lengths = null;
 
         if (isStemArg) {
-            StemVariable argStem = (StemVariable) arg;
+            QDLStem argStem = (QDLStem) arg;
             JSON json = argStem.toJSON();
             if (!json.isArray()) {
                 throw new BadArgException("first argument must be a stem list in " + SHORT_MAKE_INDICES, polyad.getArgAt(0));
@@ -1544,7 +1534,7 @@ public class StemEvaluator extends AbstractEvaluator {
                 // fine, no fill.
                 hasFill = false;
             } else {
-                StemVariable fillStem = (StemVariable) lastArg;
+                QDLStem fillStem = (QDLStem) lastArg;
                 if (!fillStem.isList()) {
                     throw new BadArgException("fill argument must be a list of scalars", polyad.getArgAt(polyad.getArgCount() - 1)); // last arg is fill list
                 }
@@ -1560,7 +1550,7 @@ public class StemEvaluator extends AbstractEvaluator {
         // array (recursion automatically boxes it into at least a 2 rank array).
         if (isLongArg && (polyad.getArgCount() == 1 || (polyad.getArgCount() == 2 && hasFill))) {
             long size = (Long) arg;
-            StemVariable out = createSimpleStemVariable(polyad, cyclicArgList, hasFill, size);
+            QDLStem out = createSimpleStemVariable(polyad, cyclicArgList, hasFill, size);
             if (out == null) return; // special case where zero length requested
 
 
@@ -1571,10 +1561,10 @@ public class StemEvaluator extends AbstractEvaluator {
         }
         // so the left arg is a stem Check simple case
         if (isStemArg) {
-            StemVariable argStem = (StemVariable) arg;
+            QDLStem argStem = (QDLStem) arg;
             if (argStem.size() == 1) {
                 long size = (Long) argStem.get(0L);
-                StemVariable out = createSimpleStemVariable(polyad, cyclicArgList, hasFill, size);
+                QDLStem out = createSimpleStemVariable(polyad, cyclicArgList, hasFill, size);
                 if (out == null) return; // special case where zero length requested
 
 
@@ -1601,7 +1591,7 @@ public class StemEvaluator extends AbstractEvaluator {
                 lengths[i] = ((Long) obj).intValue();
                 // Any dimension of 0 returns an empty list
                 if (lengths[i] == 0) {
-                    polyad.setResult(new StemVariable());
+                    polyad.setResult(new QDLStem());
                     polyad.setResultType(STEM_TYPE);
                     polyad.setEvaluated(true);
                     return;
@@ -1612,7 +1602,7 @@ public class StemEvaluator extends AbstractEvaluator {
             }
 
         }
-        StemVariable out = new StemVariable();
+        QDLStem out = new QDLStem();
         indexRecursion(out, lengths, 0, cyclicArgList);
         polyad.setResult(out);
         polyad.setResultType(STEM_TYPE);
@@ -1620,9 +1610,9 @@ public class StemEvaluator extends AbstractEvaluator {
         return;
     }
 
-    private StemVariable createSimpleStemVariable(Polyad polyad, CyclicArgList cyclicArgList, boolean hasFill, long size) {
+    private QDLStem createSimpleStemVariable(Polyad polyad, CyclicArgList cyclicArgList, boolean hasFill, long size) {
         if (size == 0) {
-            polyad.setResult(new StemVariable());
+            polyad.setResult(new QDLStem());
             polyad.setResultType(STEM_TYPE);
             polyad.setEvaluated(true);
             return null;
@@ -1636,7 +1626,7 @@ public class StemEvaluator extends AbstractEvaluator {
         } else {
             qdlList = new QDLList(size);
         }
-        StemVariable out = new StemVariable();
+        QDLStem out = new QDLStem();
         out.setQDLList(qdlList);
         return out;
     }
@@ -1686,21 +1676,21 @@ public class StemEvaluator extends AbstractEvaluator {
      * @param index
      * @param cyclicArgList
      */
-    protected void indexRecursion(StemVariable out, int[] lengths, int index, CyclicArgList cyclicArgList) {
+    protected void indexRecursion(QDLStem out, int[] lengths, int index, CyclicArgList cyclicArgList) {
         for (int i = 0; i < lengths[index]; i++) {
             if (lengths.length == index + 2) {
                 // end of recursion
-                StemVariable out1;
+                QDLStem out1;
                 if (cyclicArgList == null) {
-                    out1 = new StemVariable((long) lengths[lengths.length - 1], null);
+                    out1 = new QDLStem((long) lengths[lengths.length - 1], null);
                 } else {
 
-                    out1 = new StemVariable((long) lengths[lengths.length - 1], cyclicArgList.next(lengths[lengths.length - 1]));
+                    out1 = new QDLStem((long) lengths[lengths.length - 1], cyclicArgList.next(lengths[lengths.length - 1]));
                 }
                 out.put((long) i, out1);
 
             } else {
-                StemVariable out1 = new StemVariable();
+                QDLStem out1 = new QDLStem();
                 indexRecursion(out1, lengths, index + 1, cyclicArgList);
                 out.put((long) i, out1);
             }
@@ -1718,14 +1708,14 @@ public class StemEvaluator extends AbstractEvaluator {
      * @param arg0
      * @param arg1
      */
-    private void twoArgRemap(Polyad polyad, StemVariable arg0, StemVariable arg1) {
-        StemVariable indices1 = arg1;
-        StemVariable output = new StemVariable();
+    private void twoArgRemap(Polyad polyad, QDLStem arg0, QDLStem arg1) {
+        QDLStem indices1 = arg1;
+        QDLStem output = new QDLStem();
         for (Object key : indices1.keySet()) {
             Object v = indices1.get(key);
             Object gotValue = null;
-            if (v instanceof StemVariable) {
-                StemVariable ii = (StemVariable) v;
+            if (v instanceof QDLStem) {
+                QDLStem ii = (QDLStem) v;
                 if (!ii.isList()) {
                     throw new BadArgException("stem index " + ii + " must be a list.", polyad.getArgAt(1));
                 }
@@ -1767,25 +1757,25 @@ public class StemEvaluator extends AbstractEvaluator {
      * @param newIndices
      * @param oldIndices
      */
-    private void threeArgRemap(Polyad polyad, StemVariable stem,
-                               StemVariable oldIndices,
-                               StemVariable newIndices
+    private void threeArgRemap(Polyad polyad, QDLStem stem,
+                               QDLStem oldIndices,
+                               QDLStem newIndices
     ) {
-        StemVariable output = new StemVariable();
+        QDLStem output = new QDLStem();
         for (long i = 0L; i < newIndices.size(); i++) {
 
             Object newI = newIndices.get(i);
             Object oldI = oldIndices.get(i);
             IndexList newIndex;
             if (isStem(newI)) {
-                newIndex = new IndexList((StemVariable) newI);
+                newIndex = new IndexList((QDLStem) newI);
             } else {
                 newIndex = new IndexList();
                 newIndex.add(newI);
             }
             IndexList oldIndex;
             if (isStem(oldI)) {
-                oldIndex = new IndexList((StemVariable) oldI);
+                oldIndex = new IndexList((QDLStem) oldI);
             } else {
                 oldIndex = new IndexList();
                 oldIndex.add(oldI);
@@ -1823,7 +1813,7 @@ public class StemEvaluator extends AbstractEvaluator {
         if (!isStem(arg1)) {
             throw new BadArgException(IS_LIST + " requires stem as its first argument", polyad.getArgAt(0));
         }
-        StemVariable stemVariable = (StemVariable) arg1;
+        QDLStem stemVariable = (QDLStem) arg1;
         Boolean isList = stemVariable.isList();
         polyad.setResult(isList);
         polyad.setResultType(BOOLEAN_TYPE);
@@ -1911,12 +1901,12 @@ public class StemEvaluator extends AbstractEvaluator {
         if (!isStem(arg)) {
             throw new BadArgException("The " + INCLUDE_KEYS + " command requires a stem as its first argument.", polyad.getArgAt(0));
         }
-        StemVariable target = (StemVariable) arg;
+        QDLStem target = (QDLStem) arg;
         polyad.evalArg(1, state);
         Object arg2 = polyad.getArgAt(1).getResult();
         checkNull(arg2, polyad.getArgAt(1));
         if (!isStem(arg2)) {
-            StemVariable result = new StemVariable();
+            QDLStem result = new QDLStem();
             if (target.containsKey(arg2.toString())) {
                 result.put(arg2.toString(), target.get(arg2.toString()));
             }
@@ -1925,7 +1915,7 @@ public class StemEvaluator extends AbstractEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        StemVariable result = target.includeKeys((StemVariable) arg2);
+        QDLStem result = target.includeKeys((QDLStem) arg2);
         polyad.setResult(result);
         polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
@@ -1956,13 +1946,13 @@ public class StemEvaluator extends AbstractEvaluator {
         if (!isStem(arg)) {
             throw new BadArgException("The " + EXCLUDE_KEYS + " command requires a stem as its first argument.", polyad.getArgAt(0));
         }
-        StemVariable target = (StemVariable) arg;
+        QDLStem target = (QDLStem) arg;
         polyad.evalArg(1, state);
         Object arg2 = polyad.getArgAt(1).getResult();
         checkNull(arg2, polyad.getArgAt(1));
 
         if (!isStem(arg2)) {
-            StemVariable result = new StemVariable();
+            QDLStem result = new QDLStem();
             String excluded = arg2.toString();
             for (Object ndx : target.keySet()) {
                 if (ndx instanceof Long) {
@@ -1977,7 +1967,7 @@ public class StemEvaluator extends AbstractEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        StemVariable result = target.excludeKeys((StemVariable) arg2);
+        QDLStem result = target.excludeKeys((QDLStem) arg2);
         polyad.setResult(result);
         polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
@@ -2032,7 +2022,7 @@ public class StemEvaluator extends AbstractEvaluator {
             }
             List<Long> longList = Arrays.asList(array);
             Collections.shuffle(longList);
-            StemVariable stem = new StemVariable();
+            QDLStem stem = new QDLStem();
             stem.addList(longList);
             polyad.setResult(stem);
             polyad.setResultType(STEM_TYPE);
@@ -2050,12 +2040,12 @@ public class StemEvaluator extends AbstractEvaluator {
         if (!isStem(arg2)) {
             throw new BadArgException(SHUFFLE + " requires a stem as its second argument.", polyad.getArgAt(1));
         }
-        StemVariable target = (StemVariable) arg;
-        StemVariable newKeyStem = (StemVariable) arg2;
+        QDLStem target = (QDLStem) arg;
+        QDLStem newKeyStem = (QDLStem) arg2;
         StemKeys newKeys = newKeyStem.keySet();
         StemKeys usedKeys = target.keySet();
 
-        StemVariable output = new StemVariable();
+        QDLStem output = new QDLStem();
 
         StemKeys keys = target.keySet();
         // easy check is to count. If this fails, then we throw and exception.
@@ -2149,8 +2139,8 @@ public class StemEvaluator extends AbstractEvaluator {
             }
 
         }
-        StemVariable target = (StemVariable) arg;
-        target.renameKeys((StemVariable) arg2, overwriteKeys);
+        QDLStem target = (QDLStem) arg;
+        target.renameKeys((QDLStem) arg2, overwriteKeys);
 
         polyad.setResult(target);
         polyad.setResultType(STEM_TYPE);
@@ -2192,8 +2182,8 @@ public class StemEvaluator extends AbstractEvaluator {
             throw new BadArgException(COMMON_KEYS + " requires a stem as its second argument.", polyad.getArgAt(1));
         }
 
-        StemVariable target = (StemVariable) arg;
-        StemVariable result = target.commonKeys((StemVariable) arg2);
+        QDLStem target = (QDLStem) arg;
+        QDLStem result = target.commonKeys((QDLStem) arg2);
 
         polyad.setResult(result);
         polyad.setResultType(STEM_TYPE);
@@ -2218,7 +2208,7 @@ public class StemEvaluator extends AbstractEvaluator {
         if (2 < polyad.getArgCount()) {
             throw new ExtraArgException(SET_DEFAULT + " requires 2 arguments", polyad.getArgAt(2));
         }
-        StemVariable stemVariable = getOrCreateStem(polyad.getArgAt(0),
+        QDLStem stemVariable = getOrCreateStem(polyad.getArgAt(0),
                 state,
                 "the " + SET_DEFAULT + " command accepts   only a stem variable as its first argument.");
 
@@ -2265,9 +2255,9 @@ public class StemEvaluator extends AbstractEvaluator {
             Statement s = isStem(obj1) ? polyad.getArgAt(0) : polyad.getArgAt(1);
             throw new BadArgException("the " + MASK + " requires both arguments be stem variables", s);
         }
-        StemVariable stem1 = (StemVariable) obj1;
-        StemVariable stem2 = (StemVariable) obj2;
-        StemVariable result = stem1.mask(stem2);
+        QDLStem stem1 = (QDLStem) obj1;
+        QDLStem stem2 = (QDLStem) obj2;
+        QDLStem result = stem1.mask(stem2);
         polyad.setResultType(STEM_TYPE);
         polyad.setResult(result);
         polyad.setEvaluated(true);
@@ -2375,18 +2365,18 @@ z. :=  join3(q.,w.)
         if (args.length == 3) {
             axis = ((Long) args[2]).intValue();
         }
-        StemVariable leftStem;
+        QDLStem leftStem;
         if (isStem(args[0])) {
-            leftStem = (StemVariable) args[0];
+            leftStem = (QDLStem) args[0];
         } else {
-            leftStem = new StemVariable();
+            leftStem = new QDLStem();
             leftStem.put(0L, args[0]);
         }
-        StemVariable rightStem;
+        QDLStem rightStem;
         if (isStem(args[1])) {
-            rightStem = (StemVariable) args[1];
+            rightStem = (QDLStem) args[1];
         } else {
-            rightStem = new StemVariable();
+            rightStem = new QDLStem();
             rightStem.put(0L, args[1]);
         }
         boolean doJoinOnLastAxis = false;
@@ -2394,7 +2384,7 @@ z. :=  join3(q.,w.)
             doJoinOnLastAxis = true;
         }
         if (axis == 0) {
-            StemVariable outStem = leftStem.union(rightStem);
+            QDLStem outStem = leftStem.union(rightStem);
             polyad.setEvaluated(true);
             polyad.setResultType(STEM_TYPE);
             polyad.setResult(outStem);
@@ -2402,7 +2392,7 @@ z. :=  join3(q.,w.)
         }
         if (leftStem.dim().size() == 1) {
             if (axis == -1) {
-                StemVariable outStem = leftStem.union(rightStem);
+                QDLStem outStem = leftStem.union(rightStem);
                 polyad.setEvaluated(true);
                 polyad.setResultType(STEM_TYPE);
                 polyad.setResult(outStem);
@@ -2410,7 +2400,7 @@ z. :=  join3(q.,w.)
             }
             throw new RankException("axis of " + axis + " exceeds rank");
         }
-        StemVariable outStem = new StemVariable();
+        QDLStem outStem = new QDLStem();
 
         if (leftStem.isEmpty() || rightStem.isEmpty()) {
             // edge case -- they sent an empty argument, so don't blow up, just return nothing
@@ -2421,7 +2411,7 @@ z. :=  join3(q.,w.)
         }
         StemUtility.DyadAxisAction joinAction = new StemUtility.DyadAxisAction() {
             @Override
-            public void action(StemVariable out, Object key, StemVariable leftStem, StemVariable rightStem) {
+            public void action(QDLStem out, Object key, QDLStem leftStem, QDLStem rightStem) {
                 if (key instanceof Long) {
                     out.put((Long) key, leftStem.union(rightStem));
                 } else {
@@ -2439,7 +2429,7 @@ z. :=  join3(q.,w.)
     }
 
     public interface AxisAction {
-        void action(StemVariable out, String key, StemVariable leftStem, StemVariable rightStem);
+        void action(QDLStem out, String key, QDLStem leftStem, QDLStem rightStem);
     }
 
 
@@ -2480,11 +2470,11 @@ z. :=  join3(q.,w.)
         if (!isStem(arg0)) {
             throw new BadArgException(TRANSPOSE + " requires a stem as its first argument", polyad.getArgAt(0));
         }
-        StemVariable stem = (StemVariable) arg0;
+        QDLStem stem = (QDLStem) arg0;
 
-        StemVariable oldIndices = stem.indices(-1L);
+        QDLStem oldIndices = stem.indices(-1L);
         // kludge, assume that the rank of all at the last axis is the same.
-        int rank = ((StemVariable) oldIndices.get(0L)).size();
+        int rank = ((QDLStem) oldIndices.get(0L)).size();
 
         if (rank == 1) {
             // nothing to do. This is just a list
@@ -2494,7 +2484,7 @@ z. :=  join3(q.,w.)
             return;
         }
 
-        StemVariable pStem0;
+        QDLStem pStem0;
         // Start QDL. sliceNode is [;rank]
         OpenSliceNode sliceNode = new OpenSliceNode(polyad.getTokenPosition());
         sliceNode.getArguments().add(new ConstantNode(0L, LONG_TYPE));
@@ -2503,7 +2493,7 @@ z. :=  join3(q.,w.)
         if (polyad.getArgCount() == 2) {
             Object arg1 = polyad.evalArg(1, state);
             checkNull(arg1, polyad.getArgAt(1), state);
-            StemVariable stem1 = null;
+            QDLStem stem1 = null;
             boolean arg2ok = false;
             if (isLong(arg1)) {
                 Long longArg = (Long) arg1;
@@ -2514,7 +2504,7 @@ z. :=  join3(q.,w.)
                     polyad.setEvaluated(Boolean.TRUE);
                     return;
                 }
-                stem1 = new StemVariable();
+                stem1 = new QDLStem();
                 if (longArg < 0) {
                     long newArg = rank + longArg;
                     if (newArg < 0) {
@@ -2530,7 +2520,7 @@ z. :=  join3(q.,w.)
                 arg2ok = true;
             }
             if (isStem(arg1)) {
-                stem1 = (StemVariable) arg1;
+                stem1 = (QDLStem) arg1;
                 arg2ok = true;
             }
             if (!arg2ok) {
@@ -2542,24 +2532,24 @@ z. :=  join3(q.,w.)
             excludeKeys.addArgument(sliceNode);
             excludeKeys.addArgument(new ConstantNode(stem1, STEM_TYPE));
             Dyad monadicTilde = new Dyad(OpEvaluator.TILDE_VALUE); // mondic tilde does not exist. It is done as []~arg.
-            monadicTilde.setLeftArgument(new ConstantNode(new StemVariable(), STEM_TYPE));
+            monadicTilde.setLeftArgument(new ConstantNode(new QDLStem(), STEM_TYPE));
             monadicTilde.setRightArgument(excludeKeys);
             Dyad dyadicTilde = new Dyad(OpEvaluator.TILDE_VALUE);
             dyadicTilde.setLeftArgument(new ConstantNode(stem1, STEM_TYPE));
             dyadicTilde.setRightArgument(monadicTilde);
             dyadicTilde.evaluate(state);
-            pStem0 = (StemVariable) dyadicTilde.getResult();
+            pStem0 = (QDLStem) dyadicTilde.getResult();
         } else {
             // default is to use reverse([;rank]) as the second argument
             Polyad reverse = new Polyad(ListEvaluator.LIST_REVERSE);
             reverse.addArgument(sliceNode);
             reverse.evaluate(state);
-            pStem0 = (StemVariable) reverse.getResult();
+            pStem0 = (QDLStem) reverse.getResult();
         }
 
         // Now we need to create QDL for
         // newIndices. := shuffle(oldIndices., pStem0.)
-        StemVariable pStem = new StemVariable();
+        QDLStem pStem = new QDLStem();
         pStem.put(0L, pStem0); // makes [pstem.]
         Polyad makeNew = new Polyad(FOR_EACH);
         FunctionReferenceNode frn = new FunctionReferenceNode();
@@ -2567,7 +2557,7 @@ z. :=  join3(q.,w.)
         makeNew.addArgument(frn);
         makeNew.addArgument(new ConstantNode(oldIndices, STEM_TYPE));
         makeNew.addArgument(new ConstantNode(pStem, STEM_TYPE));
-        StemVariable newIndices = (StemVariable) makeNew.evaluate(state);
+        QDLStem newIndices = (QDLStem) makeNew.evaluate(state);
 
         // QDL to remap everything.
         Polyad subset = new Polyad(REMAP);

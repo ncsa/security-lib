@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.util;
 
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.variables.StemUtility;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.FileUtil;
@@ -40,18 +41,8 @@ public class QDLFileUtil extends FileUtil {
      *
      * @param filename
      */
-    public static void writeStemToFile(String filename, StemVariable contents) throws Throwable {
+    public static void writeStemToFile(String filename, QDLStem contents) throws Throwable {
         FileWriter fileWriter = new FileWriter(new File(filename));
-/*
-        StringBuilder stringBuilder = new StringBuilder();
-        if (!contents.containsKey("0") && !contents.isEmpty()) {
-            throw new IllegalArgumentException("Error: The given stem is not a list. It must be a list to use this function.");
-        }
-        for (int i = 0; i < contents.size(); i++) {
-            stringBuilder.append(contents.get(Integer.toString(i)) + "\n");
-        }
-        fileWriter.write(stringBuilder.toString());
-*/
         fileWriter.write(StemUtility.stemListToString(contents, true));
         fileWriter.flush();
         fileWriter.close();

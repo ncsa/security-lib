@@ -11,10 +11,7 @@ import edu.uiuc.ncsa.qdl.module.MTStack;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.state.legacy.SymbolStack;
 import edu.uiuc.ncsa.qdl.state.legacy.SymbolTable;
-import edu.uiuc.ncsa.qdl.variables.QDLNull;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
-import edu.uiuc.ncsa.qdl.variables.VStack;
-import edu.uiuc.ncsa.qdl.variables.VThing;
+import edu.uiuc.ncsa.qdl.variables.*;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
@@ -98,18 +95,18 @@ public abstract class VariableState extends NamespaceAwareState {
             StemMultiIndex w = new StemMultiIndex(variableName);
             // Don't allow assignments of wrong type, but do let them set a stem to null.
             if (w.isStem()) {
-                if (!(value instanceof StemVariable) && !(value instanceof QDLNull)) {
+                if (!(value instanceof QDLStem) && !(value instanceof QDLNull)) {
                     throw new IndexError("Error: You cannot set a scalar value to a stem variable", null);
                 }
             } else {
-                if (value instanceof StemVariable) {
+                if (value instanceof QDLStem) {
                     throw new IndexError("Error: You cannot set a scalar variable to a stem value", null);
                 }
             }
             gsrNSStemOp(w, OP_SET, value, new HashSet<>());
             return;
         }
-        if (value instanceof StemVariable) {
+        if (value instanceof QDLStem) {
             throw new IndexError("Error: You cannot set a scalar variable to a stem value",null);
         }
 
@@ -188,7 +185,7 @@ public abstract class VariableState extends NamespaceAwareState {
                                  Object value, Set<XKey> checkInstances) {
         w = resolveStemIndices(w);
         String variableName;
-        StemVariable stem = null;
+        QDLStem stem = null;
         boolean isQDLNull = false;
         VStack vStack = null;
         variableName = w.name;
@@ -254,8 +251,8 @@ public abstract class VariableState extends NamespaceAwareState {
 
                             Object obj = m.getState().getValue(variableName, checkInstances);
                             checkInstances.add(xKey);
-                            if (obj != null && (obj instanceof StemVariable)) {
-                                stem = (StemVariable) obj;
+                            if (obj != null && (obj instanceof QDLStem)) {
+                                stem = (QDLStem) obj;
                                 break;
                             }
 
@@ -286,7 +283,7 @@ public abstract class VariableState extends NamespaceAwareState {
                     setValueImportAware(variableName, value);
                 } else {
                     if (stem == null || isQDLNull) {
-                        stem = new StemVariable();
+                        stem = new QDLStem();
                         setValueImportAware(variableName, stem);
                     }
                     stem.set(w, value);

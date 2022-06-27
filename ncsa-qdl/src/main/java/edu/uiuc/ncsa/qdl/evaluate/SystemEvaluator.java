@@ -698,8 +698,8 @@ public class SystemEvaluator extends AbstractEvaluator {
                 commands.add(line);
             }
         }
-        if (obj instanceof StemVariable) {
-            StemVariable stemVariable = (StemVariable) obj;
+        if (obj instanceof QDLStem) {
+            QDLStem stemVariable = (QDLStem) obj;
             if (!stemVariable.isList()) {
                 throw new BadArgException(WS_MACRO + " requires a list", polyad.getArgAt(0));
             }
@@ -742,13 +742,13 @@ public class SystemEvaluator extends AbstractEvaluator {
         }
 
         Object result = polyad.evalArg(0, state);
-        StemVariable aliases = null;
+        QDLStem aliases = null;
         // normalize argument
-        if (result instanceof StemVariable) {
-            aliases = (StemVariable) result;
+        if (result instanceof QDLStem) {
+            aliases = (QDLStem) result;
         }
         if (result instanceof String) {
-            aliases = new StemVariable();
+            aliases = new QDLStem();
             aliases.put(0L, (String) result);
         }
         if (aliases == null) {
@@ -835,7 +835,7 @@ public class SystemEvaluator extends AbstractEvaluator {
         if (!doReduce && !isStem(arg1)) {
             throw new BadArgException(EXPAND + " requires a list as its argument", polyad.getArgAt(1));
         }
-        StemVariable stemVariable = (StemVariable) arg1;
+        QDLStem stemVariable = (QDLStem) arg1;
 
         if (!doReduce && !stemVariable.isList()) {
             throw new BadArgException(EXPAND + " requires a list as its argument", polyad.getArgAt(1));
@@ -890,7 +890,7 @@ public class SystemEvaluator extends AbstractEvaluator {
                 polyad.setResult(QDLNull.getInstance());
                 polyad.setResultType(Constant.NULL_TYPE);
             } else {
-                polyad.setResult(new StemVariable());
+                polyad.setResult(new QDLStem());
                 polyad.setResultType(Constant.STEM_TYPE);
             }
             // result is an empty stem
@@ -906,7 +906,7 @@ public class SystemEvaluator extends AbstractEvaluator {
                 polyad.setResultType(Constant.getType(sparseEntry.entry));
 
             } else {
-                StemVariable output = new StemVariable();
+                QDLStem output = new QDLStem();
                 output.listAppend(sparseEntry.entry);
                 polyad.setResult(output);
                 polyad.setResultType(Constant.STEM_TYPE);
@@ -945,7 +945,7 @@ public class SystemEvaluator extends AbstractEvaluator {
         }
 
         @Override
-        public Object action(StemVariable inStem) {
+        public Object action(QDLStem inStem) {
             Object reduceOuput = null;
             // contract is that a single list is returned unaltered.
             // At this point, we know there are at least 2 entries.
@@ -976,8 +976,8 @@ public class SystemEvaluator extends AbstractEvaluator {
         }
 
         @Override
-        public Object action(StemVariable inStem) {
-            StemVariable output = new StemVariable();
+        public Object action(QDLStem inStem) {
+            QDLStem output = new QDLStem();
             //Set<String> keySet = inStem.keySet();
             Iterator iterator = inStem.keySet().iterator();
 
@@ -1446,7 +1446,7 @@ public class SystemEvaluator extends AbstractEvaluator {
         if (polyad.getArgCount() == 0) {
             polyad.setEvaluated(true);
             polyad.setResultType(Constant.STEM_TYPE);
-            StemVariable stemVariable = new StemVariable();
+            QDLStem stemVariable = new QDLStem();
             if (state.getModulePaths().isEmpty()) {
                 polyad.setResult(stemVariable);
                 return;
@@ -1470,7 +1470,7 @@ public class SystemEvaluator extends AbstractEvaluator {
             if (!isStem(obj)) {
                 throw new BadArgException(MODULE_PATH + " requires a stem as its argument.", polyad.getArgAt(0));
             }
-            StemVariable stemVariable = (StemVariable) obj;
+            QDLStem stemVariable = (QDLStem) obj;
             // now we have to turn it in to list, tending to the semantics.
             QDLList qdlList = stemVariable.getQDLList();
             List<String> sp = new ArrayList<>();
@@ -1513,7 +1513,7 @@ public class SystemEvaluator extends AbstractEvaluator {
         if (polyad.getArgCount() == 0) {
             polyad.setEvaluated(true);
             polyad.setResultType(Constant.STEM_TYPE);
-            StemVariable stemVariable = new StemVariable();
+            QDLStem stemVariable = new QDLStem();
             if (state.getScriptPaths().isEmpty()) {
                 polyad.setResult(stemVariable);
                 return;
@@ -1537,7 +1537,7 @@ public class SystemEvaluator extends AbstractEvaluator {
             if (!isStem(obj)) {
                 throw new BadArgException(SCRIPT_PATH_COMMAND + " requires a stem as its argument.", polyad.getArgAt(0));
             }
-            StemVariable stemVariable = (StemVariable) obj;
+            QDLStem stemVariable = (QDLStem) obj;
             // now we have to turn it in to list, tending to the semantics.
             QDLList qdlList = stemVariable.getQDLList();
             List<String> sp = new ArrayList<>();
@@ -1589,7 +1589,7 @@ public class SystemEvaluator extends AbstractEvaluator {
         }
         int index = ((Long) obj).intValue();
         if (index == -1L) {
-            StemVariable args = new StemVariable();
+            QDLStem args = new QDLStem();
             for (Object object : state.getScriptArgs()) {
                 args.listAppend(object);
             }
@@ -1627,7 +1627,7 @@ public class SystemEvaluator extends AbstractEvaluator {
         }
 
 
-        StemVariable env = new StemVariable();
+        QDLStem env = new QDLStem();
         QDLCodec codec = new QDLCodec();
 
         int argCount = polyad.getArgCount();
@@ -1692,7 +1692,7 @@ public class SystemEvaluator extends AbstractEvaluator {
         getConst(polyad, state, state.getSystemConstants());
     }
 
-    protected void getConst(Polyad polyad, State state, StemVariable values) {
+    protected void getConst(Polyad polyad, State state, QDLStem values) {
         if (polyad.getArgCount() == 0) {
             polyad.setEvaluated(true);
             polyad.setResult(values);
@@ -2019,8 +2019,8 @@ public class SystemEvaluator extends AbstractEvaluator {
             return;
         }
 
-        StemVariable argStem = convertArgsToStem(polyad, arg, state, MODULE_LOAD);
-        StemVariable outStem = new StemVariable();
+        QDLStem argStem = convertArgsToStem(polyad, arg, state, MODULE_LOAD);
+        QDLStem outStem = new QDLStem();
         for (Object key : argStem.keySet()) {
             Object value = argStem.get(key);
             int loadTarget = LOAD_FILE;
@@ -2028,7 +2028,7 @@ public class SystemEvaluator extends AbstractEvaluator {
             if (isString(value)) {
                 resourceName = (String) value;
             } else {
-                StemVariable q = (StemVariable) value;
+                QDLStem q = (QDLStem) value;
                 resourceName = q.get(0L).toString();
                 loadTarget = q.get(1L).toString().equals(MODULE_TYPE_JAVA) ? LOAD_JAVA : LOAD_FILE;
 
@@ -2046,7 +2046,7 @@ public class SystemEvaluator extends AbstractEvaluator {
                 if (loadedQNames.size() == 1) {
                     newEntry = loadedQNames.get(0);
                 } else {
-                    StemVariable innerStem = new StemVariable();
+                    QDLStem innerStem = new QDLStem();
                     innerStem.addList(loadedQNames);
                     newEntry = innerStem;
                 }
@@ -2215,7 +2215,7 @@ public class SystemEvaluator extends AbstractEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        StemVariable argStem = convertArgsToStem(polyad, arg, state, MODULE_IMPORT);
+        QDLStem argStem = convertArgsToStem(polyad, arg, state, MODULE_IMPORT);
         boolean gotOne;
         // The arguments has been regularized so it is a stem of lists of the form
         // [[fq0{,alias0}],[fq1{,alias1}],...,[fqn{,aliasn}]]
@@ -2225,7 +2225,7 @@ public class SystemEvaluator extends AbstractEvaluator {
         // [['fq:0','alias0'],'fq:1',['fq:2'],['fq:3','alias3']]
         // should work
         gotOne = false;
-        StemVariable outputStem = new StemVariable();
+        QDLStem outputStem = new QDLStem();
         for (Object key : argStem.keySet()) {
             Object value = argStem.get(key);
             URI moduleNS = null;
@@ -2235,7 +2235,7 @@ public class SystemEvaluator extends AbstractEvaluator {
                 gotOne = true;
             }
             if (isStem(value)) {
-                StemVariable innerStem = (StemVariable) value;
+                QDLStem innerStem = (QDLStem) value;
                 Object q = innerStem.get(0L);
 
                 if (!isString(q)) {
@@ -2315,8 +2315,8 @@ public class SystemEvaluator extends AbstractEvaluator {
      * @param component
      * @return
      */
-    private StemVariable convertArgsToStem(Polyad polyad, Object arg, State state, String component) {
-        StemVariable argStem = null;
+    private QDLStem convertArgsToStem(Polyad polyad, Object arg, State state, String component) {
+        QDLStem argStem = null;
 
         boolean gotOne = false;
 
@@ -2326,12 +2326,12 @@ public class SystemEvaluator extends AbstractEvaluator {
             case 1:
                 // single string arguments
                 if (isString(arg)) {
-                    argStem = new StemVariable();
+                    argStem = new QDLStem();
                     argStem.listAppend(arg);
                     gotOne = true;
                 }
                 if (isStem(arg)) {
-                    argStem = (StemVariable) arg;
+                    argStem = (QDLStem) arg;
                     gotOne = true;
                 }
                 break;
@@ -2345,8 +2345,8 @@ public class SystemEvaluator extends AbstractEvaluator {
                     throw new BadArgException("Dyadic " + component + " requires string arguments only", polyad.getArgAt(1));
                 }
 
-                argStem = new StemVariable();
-                StemVariable innerStem = new StemVariable();
+                argStem = new QDLStem();
+                QDLStem innerStem = new QDLStem();
                 innerStem.listAppend(arg);
                 innerStem.listAppend(arg2);
                 argStem.put(0L, innerStem);
@@ -2394,7 +2394,7 @@ public class SystemEvaluator extends AbstractEvaluator {
             stringReader = new StringReader(string);
         }
         if (isStemList(result)) {
-            stringReader = new StringReader(StemUtility.stemListToString((StemVariable) result, false));
+            stringReader = new StringReader(StemUtility.stemListToString((QDLStem) result, false));
         }
         if (stringReader == null) {
             throw new BadArgException("No executable argument found.", polyad.getArgAt(0));
@@ -2602,11 +2602,11 @@ public class SystemEvaluator extends AbstractEvaluator {
                 result = "null";
 
             } else {
-                if (temp instanceof StemVariable) {
-                    StemVariable s = ((StemVariable) temp);
+                if (temp instanceof QDLStem) {
+                    QDLStem s = ((QDLStem) temp);
                     if (prettyPrintForStems) {
 
-                        result = ((StemVariable) temp).toString(1);
+                        result = ((QDLStem) temp).toString(1);
                     } else {
                         result = String.valueOf(temp);
                     }
@@ -2670,7 +2670,7 @@ public class SystemEvaluator extends AbstractEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        StemVariable output = new StemVariable();
+        QDLStem output = new QDLStem();
         output.put(0L, new Long(Constant.getType(polyad.getArgAt(0).getResult())));
         for (int i = 1; i < polyad.getArgCount(); i++) {
             Object r = polyad.evalArg(i, state);

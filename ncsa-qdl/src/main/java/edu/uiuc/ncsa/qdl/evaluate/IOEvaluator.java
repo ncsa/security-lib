@@ -6,9 +6,9 @@ import edu.uiuc.ncsa.qdl.parsing.IniParserDriver;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.*;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -440,7 +440,7 @@ public class IOEvaluator extends AbstractEvaluator {
             polyad.setResultType(Constant.NULL_TYPE);
             return;
         }
-        StemVariable dir = new StemVariable();
+        QDLStem dir = new QDLStem();
         for (String x : entries) {
             dir.getQDLList().append(x);
         }
@@ -508,7 +508,7 @@ public class IOEvaluator extends AbstractEvaluator {
         if (!isStem(arg1)) {
             throw new BadArgException("The argument must be a stem", polyad.getArgAt(0));
         }
-        StemVariable cfg = (StemVariable) arg1;
+        QDLStem cfg = (QDLStem) arg1;
         if (!cfg.containsKey(VFS_ATTR_TYPE)) {
             // create a memory store
             cfg.put(VFS_ATTR_TYPE, VFS_TYPE_MEMORY);
@@ -624,7 +624,7 @@ public class IOEvaluator extends AbstractEvaluator {
                             throw new BadArgException(WRITE_FILE + " requires a stem for ini output", polyad.getArgAt(1));
                         }
                         xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.TEXT_TYPE);
-                        lines.add(convertToIni((StemVariable) obj2));
+                        lines.add(convertToIni((QDLStem) obj2));
                         break;
                     case FILE_OP_BINARY:
                         xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.BINARY_TYPE);
@@ -633,7 +633,7 @@ public class IOEvaluator extends AbstractEvaluator {
                     case FILE_OP_TEXT_STRING:
                     case FILE_OP_TEXT_STEM:
                         if (isStem(obj2)) {
-                            StemVariable contents = (StemVariable) obj2;
+                            QDLStem contents = (QDLStem) obj2;
 
                             xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.TEXT_TYPE);
                             // allow for writing empty files. Edge case but happens.
@@ -671,12 +671,12 @@ public class IOEvaluator extends AbstractEvaluator {
                         if (!isStem(obj2)) {
                             throw new BadArgException(WRITE_FILE + " requires a stem for ini output", polyad.getArgAt(1));
                         }
-                        QDLFileUtil.writeStringToFile(fileName, convertToIni((StemVariable) obj2));
+                        QDLFileUtil.writeStringToFile(fileName, convertToIni((QDLStem) obj2));
                         break;
                     case FILE_OP_TEXT_STEM:
                     case FILE_OP_TEXT_STRING:
                         if (isStem(obj2)) {
-                            QDLFileUtil.writeStemToFile(fileName, (StemVariable) obj2);
+                            QDLFileUtil.writeStemToFile(fileName, (QDLStem) obj2);
                         }
                         if (isString(obj2)) {
                             QDLFileUtil.writeStringToFile(fileName, (String) obj2);
@@ -699,21 +699,21 @@ public class IOEvaluator extends AbstractEvaluator {
 
     }
 
-    private String convertToIni(StemVariable obj2) {
+    private String convertToIni(QDLStem obj2) {
         StringBuilder stringBuilder = new StringBuilder();
         for (Object key0 : obj2.keySet()) {
             stringBuilder.append("[" + key0 + "]\n");
             Object obj = obj2.get(key0);
-            if (!(obj instanceof StemVariable)) {
+            if (!(obj instanceof QDLStem)) {
                 throw new IllegalArgumentException("ini files must have stems as entries.");
             }
-            StemVariable innerStem = (StemVariable) obj;
+            QDLStem innerStem = (QDLStem) obj;
             for (Object key1 : innerStem.keySet()) {
                 Object innerObject = innerStem.get(key1);
                 if (!isStem(innerObject)) {
                     stringBuilder.append(key1 + " := " + InputFormUtil.inputForm(innerObject) + "\n");
                 } else {
-                    StemVariable innerInnerObject = (StemVariable) innerObject;
+                    QDLStem innerInnerObject = (QDLStem) innerObject;
                     String out = "";
                     boolean isFirst = true;
                     for (Object key2 : innerInnerObject.keySet()) {
@@ -812,14 +812,14 @@ public class IOEvaluator extends AbstractEvaluator {
                         content = QDLFileUtil.readFileAsString(fileName);
                     }
                     if (StringUtils.isTrivial(content)) {
-                        polyad.setResult(new StemVariable());
+                        polyad.setResult(new QDLStem());
                         polyad.setResultType(Constant.STEM_TYPE);
                         polyad.setEvaluated(true);
                         return;
                     }
                     IniParserDriver iniParserDriver = new IniParserDriver();
                     StringReader stringReader = new StringReader(content);
-                    StemVariable out = iniParserDriver.parse(stringReader);
+                    QDLStem out = iniParserDriver.parse(stringReader);
 
                     polyad.setResult(out);
                     polyad.setResultType(Constant.STEM_TYPE);

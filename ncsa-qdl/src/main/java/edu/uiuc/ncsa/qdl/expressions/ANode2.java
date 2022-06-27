@@ -5,9 +5,9 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.statements.TokenPosition;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemListNode;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
 import static edu.uiuc.ncsa.qdl.variables.Constant.*;
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
@@ -144,14 +144,14 @@ public class ANode2 extends ExpressionImpl {
         }
         if (realLeftArg instanceof StemListNode) {
             StemListNode stemListNode = (StemListNode) realLeftArg;
-            StemVariable rStem;
-            if (getResult() instanceof StemVariable) {
-                rStem = (StemVariable) getResult();
+            QDLStem rStem;
+            if (getResult() instanceof QDLStem) {
+                rStem = (QDLStem) getResult();
                 if (!rStem.isList()) {
                     throw new QDLExceptionWithTrace("unknown rh node type", getRightArg());
                 }
             } else {
-                rStem = new StemVariable();
+                rStem = new QDLStem();
                 rStem.setDefaultValue(getResult());
             }
 

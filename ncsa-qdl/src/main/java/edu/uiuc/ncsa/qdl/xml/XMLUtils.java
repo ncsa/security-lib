@@ -9,10 +9,10 @@ import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.SparseEntry;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import net.sf.json.JSONObject;
@@ -46,8 +46,8 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 public class XMLUtils implements XMLConstants {
 
 
-    protected static StemVariable makeStem(XMLStreamReader xsr) throws XMLStreamException {
-        StemVariable stem = new StemVariable();
+    protected static QDLStem makeStem(XMLStreamReader xsr) throws XMLStreamException {
+        QDLStem stem = new QDLStem();
         // what SHOULD happen is that there is sequence of entry tags
         // This processes entries, in other words.
         while (xsr.hasNext()) {
@@ -111,7 +111,7 @@ public class XMLUtils implements XMLConstants {
      */
     public static void write(XMLStreamWriter xsw, List list) throws XMLStreamException {
         if (list != null && !list.isEmpty()) {
-            StemVariable s = new StemVariable();
+            QDLStem s = new QDLStem();
             for (Object obj : list) {
                 if (obj != null) {
                     s.listAppend(obj.toString());
@@ -122,7 +122,7 @@ public class XMLUtils implements XMLConstants {
 
     }
 
-    public static void write(XMLStreamWriter xsw, StemVariable stem) throws XMLStreamException {
+    public static void write(XMLStreamWriter xsw, QDLStem stem) throws XMLStreamException {
         xsw.writeStartElement(STEM_TAG);
         if (0 < stem.size()) {
             for (Object key : stem.keySet()) {
@@ -172,10 +172,10 @@ public class XMLUtils implements XMLConstants {
         if (obj == null) {
             return new ArrayList<>();
         }
-        if (!(obj instanceof StemVariable)) {
+        if (!(obj instanceof QDLStem)) {
             throw new IllegalArgumentException("Error: expected a stem and got a " + obj.getClass().getSimpleName());
         }
-        return ((StemVariable) obj).getQDLList().toJSON();
+        return ((QDLStem) obj).getQDLList().toJSON();
     }
 
     /**
@@ -269,8 +269,8 @@ public class XMLUtils implements XMLConstants {
 
     }
 
-    protected static StemVariable resolveStem(XMLEventReader xer) throws XMLStreamException {
-        StemVariable stem = new StemVariable();
+    protected static QDLStem resolveStem(XMLEventReader xer) throws XMLStreamException {
+        QDLStem stem = new QDLStem();
         XMLEvent xe = xer.nextEvent();
         if (xe.isEndElement() && xe.asEndElement().getName().getLocalPart().equals(STEM_TAG)) {
             return stem; // this covers the edge case that the entry is exactly <stem/>
@@ -344,7 +344,7 @@ public class XMLUtils implements XMLConstants {
                 write(xsw, (BigDecimal) obj);
                 break;
             case Constant.STEM_TYPE:
-                write(xsw, (StemVariable) obj);
+                write(xsw, (QDLStem) obj);
                 break;
             case Constant.NULL_TYPE:
                 write(xsw, (QDLNull) obj);

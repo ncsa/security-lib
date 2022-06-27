@@ -170,7 +170,7 @@ public class ListEvaluator extends AbstractEvaluator {
                 list.addAll((QDLSet) arg0);
                 break;
             case Constant.STEM_TYPE:
-                StemVariable inStem = (StemVariable) arg0;
+                QDLStem inStem = (QDLStem) arg0;
                 if (inStem.isList()) {
                     list = inStem.getQDLList().values(); // fast
                 } else {
@@ -179,7 +179,7 @@ public class ListEvaluator extends AbstractEvaluator {
                 }
                 break;
             default:
-                StemVariable stemVariable = new StemVariable();
+                QDLStem stemVariable = new QDLStem();
                 stemVariable.put(0, arg0);
                 polyad.setEvaluated(true);
                 polyad.setResult(stemVariable);
@@ -197,7 +197,7 @@ public class ListEvaluator extends AbstractEvaluator {
         }
         try {
             doSorting(list, sortUp);
-            StemVariable output = new StemVariable((long) list.size(), list.toArray());
+            QDLStem output = new QDLStem((long) list.size(), list.toArray());
             polyad.setEvaluated(true);
             polyad.setResult(output);
             polyad.setResultType(Constant.STEM_TYPE);
@@ -253,7 +253,7 @@ public class ListEvaluator extends AbstractEvaluator {
             list.addAll(nulls);
 
         }
-        StemVariable output = new StemVariable((long) list.size(), list.toArray());
+        QDLStem output = new QDLStem((long) list.size(), list.toArray());
         polyad.setEvaluated(true);
         polyad.setResult(output);
         polyad.setResultType(Constant.STEM_TYPE);
@@ -288,7 +288,7 @@ public class ListEvaluator extends AbstractEvaluator {
         if (!isStem(arg1)) {
             throw new BadArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires a stem as its first argument", polyad.getArgAt(0));
         }
-        StemVariable souorceStem = (StemVariable) arg1;
+        QDLStem souorceStem = (QDLStem) arg1;
 
         Object arg2 = polyad.evalArg(1, state);
         checkNull(arg2, polyad.getArgAt(1));
@@ -306,7 +306,7 @@ public class ListEvaluator extends AbstractEvaluator {
         Long length = (Long) arg3;
 
         // need to handle case that the target does not exist.
-        StemVariable targetStem;
+        QDLStem targetStem;
         if (polyad.getArgAt(3) instanceof VariableNode) {
             targetStem = getOrCreateStem(polyad.getArgAt(3),
                     state, (doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires a stem as its fourth argument"
@@ -318,7 +318,7 @@ public class ListEvaluator extends AbstractEvaluator {
             if (!isStem(obj)) {
                 throw new BadArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires an integer as its fourth argument", polyad.getArgAt(3));
             }
-            targetStem = (StemVariable) obj;
+            targetStem = (QDLStem) obj;
         }
 
         Object arg5 = polyad.evalArg(4, state);
@@ -370,7 +370,7 @@ public class ListEvaluator extends AbstractEvaluator {
         if (isScalar(arg1)) {
             QDLList qdlList = new QDLList();
             qdlList.add(arg1);
-            StemVariable stemVariable = new StemVariable();
+            QDLStem stemVariable = new QDLStem();
             stemVariable.setQDLList(qdlList);
             polyad.setResult(stemVariable);
             polyad.setResultType(Constant.STEM_TYPE);
@@ -391,7 +391,7 @@ public class ListEvaluator extends AbstractEvaluator {
                 throw new BadArgException(LIST_SUBSET + " requires an integer as its third argument", polyad.getArgAt(2));
             }
         }
-        StemVariable stem = null;
+        QDLStem stem = null;
         QDLSet set = null;
 
         long startIndex = 0L;
@@ -399,7 +399,7 @@ public class ListEvaluator extends AbstractEvaluator {
 
         switch (Constant.getType(arg1)) {
             case Constant.STEM_TYPE:
-                stem = (StemVariable) arg1;
+                stem = (QDLStem) arg1;
                 if (!stem.isList()) {
                     throw new BadArgException(LIST_SUBSET + " requires a list", polyad.getArgAt(0));
                 }
@@ -439,7 +439,7 @@ public class ListEvaluator extends AbstractEvaluator {
             default:
                 QDLList qdlList = new QDLList();
                 qdlList.add(arg1);
-                StemVariable stemVariable = new StemVariable();
+                QDLStem stemVariable = new QDLStem();
                 stemVariable.setQDLList(qdlList);
                 polyad.setResult(stemVariable);
                 polyad.setResultType(Constant.STEM_TYPE);
@@ -462,9 +462,9 @@ public class ListEvaluator extends AbstractEvaluator {
             return true;
         }
 
-        StemVariable outStem;
+        QDLStem outStem;
         if (count == 0) {
-            outStem = new StemVariable();
+            outStem = new QDLStem();
         } else {
             outStem = stem.listSubset(startIndex, count);
         }
@@ -557,8 +557,8 @@ pick((v)-> 7<v<20,[|pi(); pi(3) ; 10|])
         }
         // For stems it's quite similar, but not enough to have a single piece of code.
         if (isStem(arg1)) {
-            StemVariable outStem = new StemVariable();
-            StemVariable stemArg = (StemVariable) arg1;
+            QDLStem outStem = new QDLStem();
+            QDLStem stemArg = (QDLStem) arg1;
             ArrayList<Object> rawArgs = new ArrayList<>();
             for (Object key : stemArg.keySet()) {
                 rawArgs.clear();
@@ -623,14 +623,14 @@ pick((v)-> 7<v<20,[|pi(); pi(3) ; 10|])
         Object leftArg = polyad.evalArg(0, state);
         checkNull(leftArg, polyad.getArgAt(0));
 
-        StemVariable leftStem = null;
+        QDLStem leftStem = null;
         if (isString(leftArg)) {
-            leftStem = new StemVariable();
+            leftStem = new QDLStem();
             leftStem.put(0L, leftArg);
         }
         if (leftStem == null) {
             if (isStem(leftArg)) {
-                leftStem = (StemVariable) leftArg;
+                leftStem = (QDLStem) leftArg;
             } else {
                 throw new BadArgException(LIST_STARTS_WITH + " requires a stem for the left argument.", polyad.getArgAt(0));
             }
@@ -639,20 +639,20 @@ pick((v)-> 7<v<20,[|pi(); pi(3) ; 10|])
         Object rightArg = polyad.evalArg(1, state);
         checkNull(rightArg, polyad.getArgAt(1));
 
-        StemVariable rightStem = null;
+        QDLStem rightStem = null;
         if (isString(rightArg)) {
-            rightStem = new StemVariable();
+            rightStem = new QDLStem();
             rightStem.put(0L, rightArg);
         }
         if (rightStem == null) {
             if (isStem(rightArg)) {
-                rightStem = (StemVariable) rightArg;
+                rightStem = (QDLStem) rightArg;
 
             } else {
                 throw new BadArgException(LIST_STARTS_WITH + " requires a stem for the right argument.", polyad.getArgAt(1));
             }
         }
-        StemVariable output = new StemVariable();
+        QDLStem output = new QDLStem();
         for (long i = 0; i < leftStem.size(); i++) {
             boolean gotOne = false;
             for (long j = 0; j < rightStem.size(); j++) {
@@ -702,7 +702,7 @@ pick((v)-> 7<v<20,[|pi(); pi(3) ; 10|])
             axis = ((Long) arg2).intValue();
         }
 
-        StemVariable input = (StemVariable) arg1;
+        QDLStem input = (QDLStem) arg1;
 
         DoReverse reverse = this.new DoReverse();
 
@@ -715,8 +715,8 @@ pick((v)-> 7<v<20,[|pi(); pi(3) ; 10|])
 
     protected class DoReverse implements StemUtility.StemAxisWalkerAction1 {
         @Override
-        public Object action(StemVariable inStem) {
-            StemVariable output = new StemVariable();
+        public Object action(QDLStem inStem) {
+            QDLStem output = new QDLStem();
             Iterator iterator = inStem.getQDLList().descendingIterator(true);
             while (iterator.hasNext()) {
                 output.listAppend(iterator.next());

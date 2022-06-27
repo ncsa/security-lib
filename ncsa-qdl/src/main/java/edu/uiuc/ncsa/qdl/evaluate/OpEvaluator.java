@@ -428,10 +428,10 @@ public class OpEvaluator extends AbstractEvaluator {
                 x = lhs instanceof BigDecimal;
                 break;
             case Types.STEM:
-                x = lhs instanceof StemVariable;
+                x = lhs instanceof QDLStem;
                 break;
             case Types.LIST:
-                x = (lhs instanceof StemVariable) && ((StemVariable) lhs).isList();
+                x = (lhs instanceof QDLStem) && ((QDLStem) lhs).isList();
                 break;
             case Types.SET:
                 x = lhs instanceof QDLSet;
@@ -514,7 +514,7 @@ public class OpEvaluator extends AbstractEvaluator {
         Object obj1 = dyad.evalArg(1, state);
         if (isSet(obj1)) {
             QDLSet set = (QDLSet) obj1;
-            StemVariable outStem = new StemVariable();
+            QDLStem outStem = new QDLStem();
             // special case. If this is a unary ~, then the first argument is
             // ignored.
             if (dyad.isUnary()) {
@@ -534,11 +534,11 @@ public class OpEvaluator extends AbstractEvaluator {
             if ((obj1 instanceof QDLNull)) {
                 throw new QDLExceptionWithTrace("cannot do a union a null", dyad.getRightArgument());
             }
-            StemVariable stem0;
-            if (obj0 instanceof StemVariable) {
-                stem0 = (StemVariable) obj0;
+            QDLStem stem0;
+            if (obj0 instanceof QDLStem) {
+                stem0 = (QDLStem) obj0;
             } else {
-                stem0 = new StemVariable();
+                stem0 = new QDLStem();
                 stem0.put(0L, obj0);
             }
             outStem = outStem.union(stem0); // copy over elements
@@ -565,28 +565,28 @@ public class OpEvaluator extends AbstractEvaluator {
             throw new QDLExceptionWithTrace("cannot do union on a null", dyad.getRightArgument());
         }
 
-        StemVariable stem0 = null;
-        StemVariable stem1 = null;
+        QDLStem stem0 = null;
+        QDLStem stem1 = null;
 
-        if (obj0 instanceof StemVariable) {
-            stem0 = (StemVariable) obj0;
+        if (obj0 instanceof QDLStem) {
+            stem0 = (QDLStem) obj0;
         } else {
-            stem0 = new StemVariable();
+            stem0 = new QDLStem();
             stem0.put(0L, obj0);
         }
 
 
-        if (obj1 instanceof StemVariable) {
-            stem1 = (StemVariable) obj1;
+        if (obj1 instanceof QDLStem) {
+            stem1 = (QDLStem) obj1;
         } else {
-            stem1 = new StemVariable();
+            stem1 = new QDLStem();
             stem1.put(0L, obj1);
         }
         // NOTE this is done so we don't end up shlepping around references to things and modifying them
         // without warning.
         //       stem0 = (StemVariable) stem0.clone();
         //       stem1 = (StemVariable)stem1.clone();
-        StemVariable newStem = stem0.union(stem1);
+        QDLStem newStem = stem0.union(stem1);
         dyad.setResult(newStem);
         dyad.setResultType(STEM_TYPE);
         dyad.setEvaluated(true);
@@ -1236,7 +1236,7 @@ public class OpEvaluator extends AbstractEvaluator {
                 Polyad p = new Polyad(StemEvaluator.UNIQUE_VALUES);
                 p.setArguments(monad.getArguments());
                 p.evaluate(state);
-                StemVariable stemVariable = (StemVariable) p.getResult(); // as per contract
+                QDLStem stemVariable = (QDLStem) p.getResult(); // as per contract
                 set = new QDLSet();
                 set.addAll(stemVariable.getQDLList().values());
 

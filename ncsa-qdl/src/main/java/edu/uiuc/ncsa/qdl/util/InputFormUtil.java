@@ -12,9 +12,9 @@ import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.QDLSet;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -35,7 +35,7 @@ public class InputFormUtil {
         if (obj instanceof Long) return inputForm((Long) obj);
         if (obj instanceof BigDecimal) return inputForm((BigDecimal) obj);
         if (obj instanceof String) return inputForm((String) obj);
-        if (obj instanceof StemVariable) return inputForm((StemVariable) obj);
+        if (obj instanceof QDLStem) return inputForm((QDLStem) obj);
         if (obj instanceof QDLNull) return inputForm((QDLNull) obj);
         if(obj instanceof QDLSet) return inputForm((QDLSet)obj);
         return "";
@@ -183,11 +183,11 @@ public class InputFormUtil {
         return "null";
     }
 
-    public static String inputForm(StemVariable stemVariable) {
+    public static String inputForm(QDLStem stemVariable) {
         return stemVariable.inputForm();
     }
 
-    public static String inputForm(StemVariable stemVariable, int indentFactor) {
+    public static String inputForm(QDLStem stemVariable, int indentFactor) {
         return stemVariable.inputForm(indentFactor);
     }
 
@@ -243,8 +243,8 @@ public class InputFormUtil {
     public static String inputFormVar(String varName, int indentFactor, State state) {
         Object object = state.getValue(varName);
         if (object == null) return null;
-        if (object instanceof StemVariable && 0 <= indentFactor) {
-            return inputForm((StemVariable) object, indentFactor);
+        if (object instanceof QDLStem && 0 <= indentFactor) {
+            return inputForm((QDLStem) object, indentFactor);
         }
         return inputForm(object);
     }
@@ -254,7 +254,7 @@ public class InputFormUtil {
     }
 
     public static void main(String[] args) {
-        StemVariable stemVariable = new StemVariable();
+        QDLStem stemVariable = new QDLStem();
         stemVariable.put(0L, "foo0");
         stemVariable.put(1L, "foo1");
         stemVariable.put(2L, "foo2");

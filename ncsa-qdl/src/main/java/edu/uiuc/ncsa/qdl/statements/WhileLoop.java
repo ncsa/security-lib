@@ -9,8 +9,8 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.variables.QDLSet;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.VThing;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 
@@ -214,7 +214,7 @@ public class WhileLoop implements Statement {
         String loopArg = null;
         Object arg = null;
         boolean doList = false;
-        StemVariable list = null;
+        QDLStem list = null;
         switch (conditional.getArgCount()) {
             case 4:
                 arg = conditional.getArguments().get(3).evaluate(localState);
@@ -239,8 +239,8 @@ public class WhileLoop implements Statement {
                     endValue = xxx.intValue();
                     gotArg2 = true;
                 }
-                if (arg instanceof StemVariable) {
-                    list = (StemVariable) arg;
+                if (arg instanceof QDLStem) {
+                    list = (QDLStem) arg;
                     doList = true;
                     gotArg2 = true;
                     hasEndvalue = true;
@@ -336,12 +336,12 @@ public class WhileLoop implements Statement {
             throw new IllegalArgumentException("Error: You must supply two arguments for " + FOR_KEYS);
         }
         String loopVar = null;
-        StemVariable stemVariable = null;
+        QDLStem stemVariable = null;
         QDLSet qdlSet = null;
         Object arg = conditional.getArguments().get(1).evaluate(localState);
         boolean isSet = false;
-        if (arg instanceof StemVariable) {
-            stemVariable = (StemVariable) arg;
+        if (arg instanceof QDLStem) {
+            stemVariable = (QDLStem) arg;
         } else {
             if (arg instanceof QDLSet) {
                 qdlSet = (QDLSet) arg;

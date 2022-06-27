@@ -47,11 +47,11 @@ public class VThing implements XThing {
     }
      public boolean isStem(){
         if(value == null) return false;
-        return value instanceof StemVariable;
+        return value instanceof QDLStem;
      }
 
-     public StemVariable getStemValue(){
-        return (StemVariable) value;
+     public QDLStem getStemValue(){
+        return (QDLStem) value;
      }
      public Long getLongValue(){
         return (Long) value;

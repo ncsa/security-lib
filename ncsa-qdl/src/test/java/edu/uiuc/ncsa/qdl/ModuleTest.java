@@ -3,7 +3,6 @@ package edu.uiuc.ncsa.qdl;
 import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
 import java.math.BigDecimal;
 
@@ -478,7 +477,6 @@ public class ModuleTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // returns true if any elements are true
-        StemVariable stem = getStemValue("x.", state);
         assert getBooleanValue("ok1", state);
         assert getBooleanValue("ok", state);
     }
@@ -497,7 +495,6 @@ public class ModuleTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // returns true if any elements are true
-        StemVariable stem = getStemValue("x.", state);
         assert getLongValue("y", state).equals(4L);
     }
 

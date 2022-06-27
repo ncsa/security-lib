@@ -7,8 +7,8 @@ import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.variables.Constant;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.VStack;
 import edu.uiuc.ncsa.qdl.variables.VThing;
 
@@ -41,7 +41,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
 
-        StemVariable snippets = new StemVariable();
+        QDLStem snippets = new QDLStem();
         snippets.put("score", "score");
         snippets.put("Four", "Four");
         snippets.put("ago", "woof");
@@ -56,7 +56,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         polyad.addArgument(left);
         polyad.addArgument(right);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         // A left scalar is propagate to all the elements of the right argument if it is compound.
         assert result.containsKey("score");
         assert (Boolean) result.get("score");
@@ -81,7 +81,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("rule", "One Ring to rule them all");
         sourceStem.put("find", "One Ring to find them");
         sourceStem.put("bring", "One Ring to bring them all");
@@ -98,7 +98,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         polyad.addArgument(left);
         polyad.addArgument(right);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         assert result.containsKey("rule");
         assert result.getBoolean("rule");
         assert result.containsKey("find");
@@ -114,7 +114,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("rule", "oNe Ring to rule them all");
         sourceStem.put("find", "OnE Ring to find them");
         sourceStem.put("bring", "one Ring to bring them all");
@@ -133,7 +133,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         polyad.addArgument(right);
         polyad.addArgument(ignoreCase);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         assert result.containsKey("rule");
         assert result.getBoolean("rule");
         assert result.containsKey("find");
@@ -149,12 +149,12 @@ public class StringFunctionTests extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("rule", "One Ring to rule them all");
         sourceStem.put("find", "One Ring to find them");
         sourceStem.put("bring", "One Ring to bring them all");
         sourceStem.put("bind", "and in the darkness bind them");
-        StemVariable targetStem = new StemVariable();
+        QDLStem targetStem = new QDLStem();
         targetStem.put("all", "all");
         targetStem.put("One", "One");
         targetStem.put("bind", "woof");
@@ -170,7 +170,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         polyad.addArgument(left);
         polyad.addArgument(right);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         // The contract is that the answer is conformable to the left argument, so only keys from the left
         // argument appear in the result.
         assert result.size() == 1;
@@ -216,7 +216,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack symbolTable = state.getVStack();
 
-        StemVariable stem = new StemVariable();
+        QDLStem stem = new QDLStem();
         stem.put("1", "  foo");
         stem.put("woof", "      ");
         stem.put("warp", "foo           ");
@@ -227,7 +227,7 @@ public class StringFunctionTests extends AbstractQDLTester {
 
         polyad.addArgument(left);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         assert result.get("1").equals("foo");
         assert result.get("woof").equals("");
         assert result.get("warp").equals("foo");
@@ -245,8 +245,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         polyad.addArgument(left);
         polyad.addArgument(right);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
-        //assert result == 3L;
+        QDLStem result = (QDLStem) polyad.getResult();
         assert result.getLong(0L) == 3L;
     }
 
@@ -257,7 +256,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         String source = "Four score and seven years ago...";
         VStack vStack = state.getVStack();
 
-        StemVariable snippets = new StemVariable();
+        QDLStem snippets = new QDLStem();
         snippets.put("score", "score");
         snippets.put("Four", "Four");
         snippets.put("ago", "woof");
@@ -272,7 +271,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         polyad.addArgument(left);
         polyad.addArgument(right);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         assert testOldIndexOf(result, "score", 5L);
         assert testOldIndexOf(result, "Four", 0L);
         assert testOldIndexOf(result, "7", 15L);
@@ -284,7 +283,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         State state = testUtils.getTestState();
         VStack vStack = state.getVStack();
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("rule", "One Ring to rule them all");
         sourceStem.put("find", "One Ring to find them");
         sourceStem.put("bring", "One Ring to bring them all");
@@ -302,7 +301,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         polyad.addArgument(left);
         polyad.addArgument(right);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         assert result.size() == 4;
         assert testOldIndexOf(result, "rule", 0L);
         assert testOldIndexOf(result, "find", 0L);
@@ -310,9 +309,9 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert testOldIndexOf(result, "bring", 0L);
     }
 
-    private boolean testOldIndexOf(StemVariable result, String key, Long index) {
+    private boolean testOldIndexOf(QDLStem result, String key, Long index) {
         // Really awkward not to do it in QDL
-        StemVariable stemVariable = (StemVariable) result.get(key);
+        QDLStem stemVariable = (QDLStem) result.get(key);
         Object obj1 = stemVariable.get(0L);
         return index.equals(obj1);
     }
@@ -335,7 +334,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         State state = testUtils.getTestState();
         VStack vStack = state.getVStack();
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("rule", "one Ring to rule them all");
         sourceStem.put("find", "onE Ring to find them");
         sourceStem.put("bring", "oNE Ring to bring them all");
@@ -354,7 +353,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         polyad.addArgument(right);
         polyad.addArgument(ignoreCase);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         assert result.size() == 4;
         assert testOldIndexOf(result, "rule", 0L);
         assert testOldIndexOf(result, "find", 0L);
@@ -367,12 +366,12 @@ public class StringFunctionTests extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("rule", "One Ring to rule them all");
         sourceStem.put("find", "One Ring to find them");
         sourceStem.put("bring", "One Ring to bring them all");
         sourceStem.put("bind", "and in the darkness bind them");
-        StemVariable targetStem = new StemVariable();
+        QDLStem targetStem = new QDLStem();
         targetStem.put("all", "all");
         targetStem.put("One", "One");
         targetStem.put("bind", "darkness");
@@ -388,7 +387,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         polyad.addArgument(left);
         polyad.addArgument(right);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         // The contract is that the answer is conformable to the left argument, so only keys from the left
         // argument appear in the result.
         assert result.size() == 1;
@@ -443,7 +442,7 @@ public class StringFunctionTests extends AbstractQDLTester {
     public void testStemToLower() throws Exception {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
-        StemVariable stem = new StemVariable();
+        QDLStem stem = new QDLStem();
         String arg1 = "HAlt WHO";
         String arg2 = "GoeS";
         String arg3 = "THeRe";
@@ -458,7 +457,7 @@ public class StringFunctionTests extends AbstractQDLTester {
 
         polyad.addArgument(left);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         assert result.get("1").equals(arg1.toLowerCase());
         assert result.get("woof").equals(arg2.toLowerCase());
         assert result.get("warp").equals(arg3.toLowerCase());
@@ -470,7 +469,7 @@ public class StringFunctionTests extends AbstractQDLTester {
     public void testStemToUpper() throws Exception {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
-        StemVariable stem = new StemVariable();
+        QDLStem stem = new QDLStem();
         String arg1 = "HAlt WHO";
         String arg2 = "GoeS";
         String arg3 = "THeRe";
@@ -485,7 +484,7 @@ public class StringFunctionTests extends AbstractQDLTester {
 
         polyad.addArgument(left);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         assert result.get("1").equals(arg1.toUpperCase());
         assert result.get("woof").equals(arg2.toUpperCase());
         assert result.get("warp").equals(arg3.toUpperCase());
@@ -515,12 +514,12 @@ public class StringFunctionTests extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("rule", "One Ring to rule them all");
         sourceStem.put("find", "One Ring to find them");
         sourceStem.put("bring", "One Ring to bring them all");
         sourceStem.put("bind", "and in the darkness bind them");
-        StemVariable targetStem = new StemVariable();
+        QDLStem targetStem = new QDLStem();
         targetStem.put("all", "all");
         targetStem.put("One", "One");
         targetStem.put("bind", "darkness");
@@ -539,7 +538,7 @@ public class StringFunctionTests extends AbstractQDLTester {
 
         polyad.evaluate(state);
         String expectedValue = "and in the two bind them";
-        StemVariable outStem = (StemVariable) polyad.getResult();
+        QDLStem outStem = (QDLStem) polyad.getResult();
         assert outStem.getString("bind").equals(expectedValue);
     }
 
@@ -570,7 +569,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("rule", "One Ring to rule them all");
         sourceStem.put("find", "One Ring to find them");
         sourceStem.put("bring", "One Ring to bring them all");
@@ -589,7 +588,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         polyad.addArgument(index);
 
         polyad.evaluate(state);
-        StemVariable stem = (StemVariable) polyad.getResult();
+        QDLStem stem = (QDLStem) polyad.getResult();
         assert stem.get("rule").toString().startsWith("One" + newS);
         assert stem.get("find").toString().startsWith("One" + newS);
         assert stem.get("bring").toString().startsWith("One" + newS);
@@ -607,17 +606,17 @@ public class StringFunctionTests extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("rule", "One Ring to rule them all");
         sourceStem.put("find", "One Ring to find them");
         sourceStem.put("bring", "One Ring to bring them all");
         sourceStem.put("bind", "and in the darkness bind them");
-        StemVariable snippets = new StemVariable();
+        QDLStem snippets = new QDLStem();
         snippets.put("all", "all");
         snippets.put("One", "One");
         snippets.put("bind", "darkness");
         snippets.put("7", "seven");
-        StemVariable indices = new StemVariable();
+        QDLStem indices = new QDLStem();
         indices.setDefaultValue(new Long(4L));
         // This sticks the work "darkness" in the string associated with the key bind
         String expectedResult = "and darknessin the darkness bind them";
@@ -634,7 +633,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         polyad.addArgument(snippetVar);
         polyad.addArgument(indexVar);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         // The contract is that the answer is conformable to the left argument, so only keys from the left
         // argument appear in the result.
 

@@ -32,7 +32,7 @@ public class StemTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("rule", "One Ring to rule them all");
         sourceStem.put("find", "One Ring to find them");
         sourceStem.put("bring", "One Ring to bring them all");
@@ -53,7 +53,7 @@ public class StemTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("rule", "One Ring to rule them all");
         sourceStem.put("find", "One Ring to find them");
         sourceStem.put("bring", "One Ring to bring them all");
@@ -66,8 +66,8 @@ public class StemTest extends AbstractQDLTester {
 
         polyad.addArgument(arg);
         polyad.evaluate(state);
-        assert polyad.getResult() instanceof StemVariable;
-        StemVariable result = (StemVariable) polyad.getResult();
+        assert polyad.getResult() instanceof QDLStem;
+        QDLStem result = (QDLStem) polyad.getResult();
         for (int i = 0; i < 4; i++) {
             String key = Integer.toString(i);
             assert sourceStem.containsKey(result.get(key));
@@ -79,7 +79,7 @@ public class StemTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("rule", "One Ring to rule them all");
         sourceStem.put("find", "One Ring to find them");
         sourceStem.put("bring", "One Ring to bring them all");
@@ -92,9 +92,9 @@ public class StemTest extends AbstractQDLTester {
 
         polyad.addArgument(arg);
         polyad.evaluate(state);
-        assert polyad.getResult() instanceof StemVariable;
+        assert polyad.getResult() instanceof QDLStem;
 
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         assert result.size() == sourceStem.size();
         for (Object key : sourceStem.keySet()) {
             assert result.containsKey(result.get(key));
@@ -131,7 +131,7 @@ public class StemTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("rule", "One Ring to rule them all");
         sourceStem.put("find", "One Ring to find them");
         sourceStem.put("bring", "One Ring to bring them all");
@@ -142,7 +142,7 @@ public class StemTest extends AbstractQDLTester {
         VariableNode arg = new VariableNode("sourceStem.");
         polyad.addArgument(arg);
         polyad.evaluate(state);
-        StemVariable keys = (StemVariable) polyad.getResult();
+        QDLStem keys = (QDLStem) polyad.getResult();
         assert keys.size() == 4;
         assert keys.containsKey("0");
         assert keys.containsKey("1");
@@ -159,13 +159,13 @@ public class StemTest extends AbstractQDLTester {
         VStack vStack = state.getVStack();
 
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("rule", "One Ring to rule them all");
         sourceStem.put("find", "One Ring to find them");
         sourceStem.put("bring", "One Ring to bring them all");
         sourceStem.put("bind", "and in the darkness bind them");
 
-        StemVariable sourceStem2 = new StemVariable();
+        QDLStem sourceStem2 = new QDLStem();
         sourceStem2.put("rule", "mairzy doats");
         sourceStem2.put("find", "and dozey");
         sourceStem2.put("bring", "doats");
@@ -181,7 +181,7 @@ public class StemTest extends AbstractQDLTester {
         polyad.addArgument(arg);
         polyad.addArgument(arg2);
         polyad.evaluate(state);
-        StemVariable keys = (StemVariable) polyad.getResult();
+        QDLStem keys = (QDLStem) polyad.getResult();
         assert keys.size() == 3;
         assert keys.containsValue("rule");
         assert keys.containsValue("find");
@@ -196,8 +196,8 @@ public class StemTest extends AbstractQDLTester {
         VStack vStack = state.getVStack();
 
 
-        StemVariable sourceStem = new StemVariable();
-        StemVariable keys = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
+        QDLStem keys = new QDLStem();
         int count = 5;
         int j = 0;
         QDLCodec codec = new QDLCodec();
@@ -218,7 +218,7 @@ public class StemTest extends AbstractQDLTester {
         polyad.addArgument(arg);
         polyad.addArgument(arg2);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         assert result.size() == count;
         for (int i = 0; i < count; i++) {
             assert result.containsKey(keys.getString(Integer.toString(i)));
@@ -431,8 +431,8 @@ public class StemTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
 
-        StemVariable sourceStem = new StemVariable();
-        StemVariable keys = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
+        QDLStem keys = new QDLStem();
         int count = 5;
         int j = 0;
         for (int i = 0; i < 2 * count; i++) {
@@ -452,7 +452,7 @@ public class StemTest extends AbstractQDLTester {
         polyad.addArgument(arg);
         polyad.addArgument(arg2);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         assert result.size() == count;
         for (int i = 0; i < count; i++) {
             assert !result.containsKey(keys.getString(Integer.toString(i)));
@@ -465,8 +465,8 @@ public class StemTest extends AbstractQDLTester {
         VStack vStack = state.getVStack();
 
 
-        StemVariable sourceStem = new StemVariable();
-        StemVariable keys = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
+        QDLStem keys = new QDLStem();
         String targetKey = geter();
 
         sourceStem.put(targetKey, geter());
@@ -484,7 +484,7 @@ public class StemTest extends AbstractQDLTester {
         polyad.addArgument(arg);
         polyad.addArgument(arg2);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         assert result.size() == count; // we added one, then removed it.
         assert !result.containsKey(targetKey);
     }
@@ -495,8 +495,8 @@ public class StemTest extends AbstractQDLTester {
      * @param count
      * @return
      */
-    protected StemVariable randomStem(int count) {
-        StemVariable s = new StemVariable();
+    protected QDLStem randomStem(int count) {
+        QDLStem s = new QDLStem();
         randomStem(s, count);
         return s;
     }
@@ -508,7 +508,7 @@ public class StemTest extends AbstractQDLTester {
      * @param count
      * @return
      */
-    protected StemVariable randomStem(StemVariable s, int count) {
+    protected QDLStem randomStem(QDLStem s, int count) {
         for (int i = 0; i < count; i++) {
             s.put(geter(), geter());
         }
@@ -521,7 +521,7 @@ public class StemTest extends AbstractQDLTester {
         VStack vStack = state.getVStack();
 
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
 
         String targetKey = geter();
 
@@ -537,7 +537,7 @@ public class StemTest extends AbstractQDLTester {
         polyad.addArgument(arg);
         polyad.addArgument(arg2);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         assert result.size() == 1;
         assert result.containsKey(targetKey);
     }
@@ -547,9 +547,9 @@ public class StemTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         int count = 5;
-        StemVariable keys = new StemVariable();
+        QDLStem keys = new QDLStem();
         int j = 0;
         for (int i = 0; i < 2 * count; i++) {
             String key = geter();
@@ -570,7 +570,7 @@ public class StemTest extends AbstractQDLTester {
         polyad.addArgument(arg);
         polyad.addArgument(arg2);
         polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
+        QDLStem result = (QDLStem) polyad.getResult();
         assert result.size() == count * 2;
         j = 0;
         for (int i = 0; i < count; i++) {
@@ -587,8 +587,8 @@ public class StemTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
 
-        StemVariable sourceStem = new StemVariable();
-        StemVariable keys = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
+        QDLStem keys = new QDLStem();
         int count = 5;
         String targetKey = geter();
         sourceStem.put(targetKey, geter());
@@ -622,7 +622,7 @@ public class StemTest extends AbstractQDLTester {
         ConstantNode arg = new ConstantNode(new Long(4L), Constant.LONG_TYPE);
         polyad.addArgument(arg);
         polyad.evaluate(state);
-        StemVariable indices = (StemVariable) polyad.getResult();
+        QDLStem indices = (QDLStem) polyad.getResult();
         assert indices.containsKey("0");
         assert indices.containsKey("1");
         assert indices.containsKey("2");
@@ -637,7 +637,7 @@ public class StemTest extends AbstractQDLTester {
     public void testRemoveStem() throws Exception {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("rule", "One Ring to rule them all");
         sourceStem.put("find", "One Ring to find them");
         sourceStem.put("bring", "One Ring to bring them all");
@@ -659,7 +659,7 @@ public class StemTest extends AbstractQDLTester {
         VStack vStack = state.getVStack();
 
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("rule", "One Ring to rule them all");
         sourceStem.put("find", "One Ring to find them");
         sourceStem.put("bring", "One Ring to bring them all");
@@ -685,7 +685,7 @@ public class StemTest extends AbstractQDLTester {
         VStack vStack = state.getVStack();
 
 
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.put("rule", "One Ring to rule them all");
         sourceStem.put("find", "One Ring to find them");
         sourceStem.put("bring", "One Ring to bring them all");
@@ -712,7 +712,7 @@ public class StemTest extends AbstractQDLTester {
         polyad.addArgument(arg);
         polyad.addArgument(arg2);
         polyad.evaluate(state);
-        StemVariable sourceStem = ((VThing) state.getVStack().get(new XKey("sourceStem."))).getStemValue();
+        QDLStem sourceStem = ((VThing) state.getVStack().get(new XKey("sourceStem."))).getStemValue();
         assert polyad.getResult() == QDLNull.getInstance();
         assert sourceStem.getDefaultValue().equals(expectedResult);
         assert sourceStem.get("foo").equals(expectedResult);
@@ -776,11 +776,11 @@ public class StemTest extends AbstractQDLTester {
                 "    }\n" +
                 "  ]\n" +
                 "}";
-        StemVariable stemVariable = new StemVariable();
+        QDLStem stemVariable = new QDLStem();
         stemVariable.fromJSON(JSONObject.fromObject(rawJSON));
 
         JSON j = stemVariable.toJSON();
-        StemVariable x = (StemVariable) stemVariable.get("isMemberOf.");
+        QDLStem x = (QDLStem) stemVariable.get("isMemberOf.");
         assert x.size() == 3;
         assert x.containsKey("0") : "Spurious element added to stem on serialization to JSON.";
         assert x.containsKey("1") : "Spurious element added to stem on serialization to JSON.";
@@ -799,7 +799,7 @@ public class StemTest extends AbstractQDLTester {
      */
 
     public void testMixedJSON() throws Exception {
-        StemVariable s = new StemVariable();
+        QDLStem s = new QDLStem();
         String name = "bob";
         String issuer = "https://localhost:9443/oauth2";
         String tokenID = "https://localhost:9443/oauth2/idToken/7e3318d9e03b19a2a38ba88542abab0a/1591271860588";
@@ -839,7 +839,7 @@ public class StemTest extends AbstractQDLTester {
 
     protected void verifyJSONArrayRoundtrip(JSONArray array) {
         // options are this has single strings as elements or JSON Arrays of strings
-        StemVariable stemVariable = new StemVariable();
+        QDLStem stemVariable = new QDLStem();
         stemVariable.fromJSON(array);
         JSON json = stemVariable.toJSON();
         assert json instanceof JSONArray : "Did not get back a JSON array";
@@ -887,7 +887,7 @@ public class StemTest extends AbstractQDLTester {
 
 
     public void testAddList() throws Throwable {
-        StemVariable s = new StemVariable();
+        QDLStem s = new QDLStem();
         ArrayList<Object> list = new ArrayList<>();
         int max = 6;
         for (int i = 0; i < max; i++) {
@@ -916,8 +916,8 @@ public class StemTest extends AbstractQDLTester {
             //qdlList2.add(new SparseEntry(i, i * i));
             qdlList2.add( i * i);
         }
-        StemVariable stem1 = new StemVariable();
-        StemVariable stem2 = new StemVariable();
+        QDLStem stem1 = new QDLStem();
+        QDLStem stem2 = new QDLStem();
         stem1.setQDLList(qdlList1);
         stem2.setQDLList(qdlList2);
         stem1.listAppend(stem2);
@@ -953,8 +953,8 @@ public class StemTest extends AbstractQDLTester {
         for (long i = 0L; i < count2; i++) {
             qdlList2.add(i * i);
         }
-        StemVariable stem1 = new StemVariable();
-        StemVariable stem2 = new StemVariable();
+        QDLStem stem1 = new QDLStem();
+        QDLStem stem2 = new QDLStem();
         stem1.setQDLList(qdlList1);
         stem2.setQDLList(qdlList2);
         stem1.listCopy(3, 5, stem2, 2);
@@ -1073,8 +1073,8 @@ public class StemTest extends AbstractQDLTester {
         for (long i = 0L; i < count2; i++) {
             targetSL.append(i * i);
         }
-        StemVariable sourceStem = new StemVariable();
-        StemVariable targetStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
+        QDLStem targetStem = new QDLStem();
         sourceStem.setQDLList(sourceSL);
         targetStem.setQDLList(targetSL);
         sourceStem.listInsertAt(2, 5, targetStem, 3);
@@ -1094,9 +1094,9 @@ public class StemTest extends AbstractQDLTester {
         for (long i = 0L; i < count1; i++) {
             sourceSL.append(i + 20);
         }
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.setQDLList(sourceSL);
-        StemVariable targetStem = sourceStem.listSubset(2, 3);
+        QDLStem targetStem = sourceStem.listSubset(2, 3);
         QDLList result = targetStem.getQDLList();
         // should return sorted set
         Object expectedValues[] = new Object[]{22L, 23L, 24L};
@@ -1113,10 +1113,10 @@ public class StemTest extends AbstractQDLTester {
         for (long i = 0L; i < count1; i++) {
             sourceSL.append(i + 20);
         }
-        StemVariable sourceStem = new StemVariable();
+        QDLStem sourceStem = new QDLStem();
         sourceStem.setQDLList(sourceSL);
         // Test copying the tail of the list from the given index.
-        StemVariable targetStem = sourceStem.listSubset(7);
+        QDLStem targetStem = sourceStem.listSubset(7);
         QDLList result = targetStem.getQDLList();
         // should return sorted set
         Object expectedValues[] = new Object[]{27L, 28L, 29L};
@@ -1218,7 +1218,7 @@ public class StemTest extends AbstractQDLTester {
 
 
     public void testobjectAppend() throws Throwable {
-        StemVariable stemVariable = new StemVariable();
+        QDLStem stemVariable = new QDLStem();
         stemVariable.listAppend("foo");
         assert stemVariable.size() == 1;
         assert stemVariable.get(0L).equals("foo");
@@ -1315,13 +1315,13 @@ public class StemTest extends AbstractQDLTester {
         assert !getBooleanValue("test_bad", state);
         assert !getBooleanValue("test_bad2", state);
 
-        StemVariable test_a_b = getStemValue("test_a_b.", state);
+        QDLStem test_a_b = getStemValue("test_a_b.", state);
         assert test_a_b.size() == 3;
         assert !test_a_b.getBoolean(0L);
         assert !test_a_b.getBoolean(1L);
         assert test_a_b.getBoolean(2L);
 
-        StemVariable test_b_a = getStemValue("test_b_a.", state);
+        QDLStem test_b_a = getStemValue("test_b_a.", state);
         assert test_b_a.size() == 5;
         assert test_b_a.getBoolean(0L);
         assert !test_b_a.getBoolean(1L);
@@ -1329,13 +1329,13 @@ public class StemTest extends AbstractQDLTester {
         assert !test_b_a.getBoolean(3L);
         assert !test_b_a.getBoolean(4L);
 
-        StemVariable test_a_c = getStemValue("test_a_c.", state);
+        QDLStem test_a_c = getStemValue("test_a_c.", state);
         assert test_a_c.size() == 3;
         assert !test_a_c.getBoolean(0L);
         assert test_a_c.getBoolean(1L);
         assert !test_a_c.getBoolean(2L);
 
-        StemVariable test_c_a = getStemValue("test_c_a.", state);
+        QDLStem test_c_a = getStemValue("test_c_a.", state);
         assert test_c_a.size() == 2;
         assert test_c_a.getBoolean("foo");
         assert !test_c_a.getBoolean("bar");
@@ -1682,10 +1682,10 @@ public class StemTest extends AbstractQDLTester {
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        StemVariable x = getStemValue("x.", state);
+        QDLStem x = getStemValue("x.", state);
         assert x.size() == 1;
         assert x.getBoolean(0L);
-        StemVariable ndx = getStemValue("ndx.", state);
+        QDLStem ndx = getStemValue("ndx.", state);
         assert ndx.size() == 1;
         assert getBooleanValue("ok", state);
     }
@@ -1983,7 +1983,7 @@ public class StemTest extends AbstractQDLTester {
 
     /*
             a. := n(3,4,5,n(60))
-            reduce(@+, axis(a., 2))
+            reduce(@+, transpose(a., 2))
             reduce(@+, axis(a., 0))
             reduce(@+, axis(a., 1))
     [[10,35,60,85],[110,135,160,185],[210,235,260,285]]

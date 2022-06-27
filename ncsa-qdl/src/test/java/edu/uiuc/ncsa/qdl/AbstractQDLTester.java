@@ -3,8 +3,8 @@ package edu.uiuc.ncsa.qdl;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.variables.QDLCodec;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.VThing;
 import edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
@@ -43,8 +43,8 @@ public class AbstractQDLTester extends TestBase {
         return (Boolean) state.getValue(variable);
     }
 
-    protected StemVariable getStemValue(String variable, State state) {
-        return (StemVariable) state.getValue(variable);
+    protected QDLStem getStemValue(String variable, State state) {
+        return (QDLStem) state.getValue(variable);
     }
 
     protected BigDecimal comparisonTolerance = new BigDecimal(".000000000001");
@@ -82,7 +82,7 @@ public class AbstractQDLTester extends TestBase {
      * @param stem2
      * @return
      */
-    protected boolean areEqual(StemVariable stem1, StemVariable stem2) {
+    protected boolean areEqual(QDLStem stem1, QDLStem stem2) {
         if (stem1.size() != stem2.size()) return false;
         for (Object key1 : stem1.keySet()) {
             Object v1 = null;
@@ -111,42 +111,42 @@ public class AbstractQDLTester extends TestBase {
     }
 
     /**
-     * For use in conjunction with {@link #areEqual(StemVariable, StemVariable)}.
+     * For use in conjunction with {@link #areEqual(QDLStem, QDLStem)}.
      * <br/>
      * Note: These will be exact decimals and later no comparison tolerance is used.
      *
      * @param array
      * @return
      */
-    protected StemVariable arrayToStem(double[] array) {
+    protected QDLStem arrayToStem(double[] array) {
         ArrayList<Object> arrayList = new ArrayList<>();
         for (double dd : array) {
             // Have to convert to a string then back since otherwise the BigD adds rounding cruft
             // and these cannot be check for equality
             arrayList.add(new BigDecimal(Double.toString(dd)));
         }
-        StemVariable stemVariable = new StemVariable();
+        QDLStem stemVariable = new QDLStem();
         stemVariable.addList(arrayList);
         return stemVariable;
     }
 
-    protected StemVariable arrayToStem(long[] array) {
+    protected QDLStem arrayToStem(long[] array) {
         ArrayList<Object> arrayList = new ArrayList<>();
         for (long dd : array) {
             arrayList.add(dd);
         }
-        StemVariable stemVariable = new StemVariable();
+        QDLStem stemVariable = new QDLStem();
         stemVariable.addList(arrayList);
         return stemVariable;
 
     }
 
-    protected StemVariable arrayToStem(int[] array) {
+    protected QDLStem arrayToStem(int[] array) {
         ArrayList<Object> arrayList = new ArrayList<>();
         for (int dd : array) {
             arrayList.add(new Long(dd));
         }
-        StemVariable stemVariable = new StemVariable();
+        QDLStem stemVariable = new QDLStem();
         stemVariable.addList(arrayList);
         return stemVariable;
 

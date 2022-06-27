@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 
 import java.util.ArrayList;
 
@@ -27,7 +27,7 @@ public class IndexList extends ArrayList {
     public IndexList() {
     }
 
-    public IndexList(StemVariable stemVariable) {
+    public IndexList(QDLStem stemVariable) {
         if (!stemVariable.isList()) {
             throw new IndexError("generic stem not supported as index", null);
         }

@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 
 /**
  * tests for "glomming" i.e. using the new tilde, ~, operator.  There are apt to be a lot of these ultimately , so
@@ -23,7 +23,7 @@ public class GlomTest extends AbstractQDLTester {
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        StemVariable stem = getStemValue("a.", state);
+        QDLStem stem = getStemValue("a.", state);
         assert stem.size() == 3;
         assert stem.getLong("0") == 1L;
         assert stem.getLong("1") == 2L;
@@ -38,7 +38,7 @@ public class GlomTest extends AbstractQDLTester {
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        StemVariable stem = getStemValue("a.", state);
+        QDLStem stem = getStemValue("a.", state);
         assert stem.size() == 4;
         assert stem.getLong("0") == 1L;
         assert stem.getLong("1") == 2L;
@@ -54,7 +54,7 @@ public class GlomTest extends AbstractQDLTester {
         // should result in [4,abcd]
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        StemVariable stem = getStemValue("a.", state);
+        QDLStem stem = getStemValue("a.", state);
         assert stem.size() == 2;
         assert stem.getLong("0") == 4L;
         assert stem.getString("1").equals("abcd");
@@ -68,7 +68,7 @@ public class GlomTest extends AbstractQDLTester {
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        StemVariable stemVariable=getStemValue("a.", state);
+        QDLStem stemVariable=getStemValue("a.", state);
         assert stemVariable.size() == 1;
         assert stemVariable.getLong(0L) == 1L;
    }
@@ -81,7 +81,7 @@ public class GlomTest extends AbstractQDLTester {
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        StemVariable stem = getStemValue("a.", state);
+        QDLStem stem = getStemValue("a.", state);
         assert stem.size() == 2;
         assert stem.getString("a").equals("p");
         assert stem.getString("b").equals("r");
@@ -100,7 +100,7 @@ public class GlomTest extends AbstractQDLTester {
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        StemVariable stem = getStemValue("a.", state);
+        QDLStem stem = getStemValue("a.", state);
         assert stem.size() == 1;
         assert stem.getString("a").equals("r");
     }
@@ -112,7 +112,7 @@ public class GlomTest extends AbstractQDLTester {
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        StemVariable stem = getStemValue("a.", state);
+        QDLStem stem = getStemValue("a.", state);
         assert stem.size() == 3;
         assert stem.getLong("0") == 1L;
         assert stem.getString("1").equals("abc");
