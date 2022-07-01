@@ -736,6 +736,18 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitEqExpression(QDLParserParser.EqExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code extract}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterExtract(QDLParserParser.ExtractContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code extract}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitExtract(QDLParserParser.ExtractContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code null}
 	 * labeled alternative in {@link QDLParserParser#expression}.
 	 * @param ctx the parse tree
@@ -760,17 +772,41 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitAddExpression(QDLParserParser.AddExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code restriction}
+	 * Enter a parse tree produced by the {@code extract2}
 	 * labeled alternative in {@link QDLParserParser#expression}.
 	 * @param ctx the parse tree
 	 */
-	void enterRestriction(QDLParserParser.RestrictionContext ctx);
+	void enterExtract2(QDLParserParser.Extract2Context ctx);
 	/**
-	 * Exit a parse tree produced by the {@code restriction}
+	 * Exit a parse tree produced by the {@code extract2}
 	 * labeled alternative in {@link QDLParserParser#expression}.
 	 * @param ctx the parse tree
 	 */
-	void exitRestriction(QDLParserParser.RestrictionContext ctx);
+	void exitExtract2(QDLParserParser.Extract2Context ctx);
+	/**
+	 * Enter a parse tree produced by the {@code extract3}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterExtract3(QDLParserParser.Extract3Context ctx);
+	/**
+	 * Exit a parse tree produced by the {@code extract3}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitExtract3(QDLParserParser.Extract3Context ctx);
+	/**
+	 * Enter a parse tree produced by the {@code extract4}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterExtract4(QDLParserParser.Extract4Context ctx);
+	/**
+	 * Exit a parse tree produced by the {@code extract4}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitExtract4(QDLParserParser.Extract4Context ctx);
 	/**
 	 * Enter a parse tree produced by the {@code is_a}
 	 * labeled alternative in {@link QDLParserParser#expression}.

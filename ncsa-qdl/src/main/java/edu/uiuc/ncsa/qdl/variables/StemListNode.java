@@ -136,4 +136,11 @@ public class StemListNode implements StatementWithResultInterface {
         newSLN.setEvaluated(isEvaluated());
         return newSLN;
     }
+
+    @Override
+    public String toString() {
+        return "StemListNode{" +
+                "sourceCode=" + sourceCode +
+                '}';
+    }
 }

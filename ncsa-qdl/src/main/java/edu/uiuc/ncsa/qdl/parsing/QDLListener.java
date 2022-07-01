@@ -16,7 +16,6 @@ import edu.uiuc.ncsa.qdl.state.QDLConstants;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.*;
 import edu.uiuc.ncsa.qdl.variables.*;
-import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
@@ -1032,6 +1031,7 @@ illegal argument:no module named "b" was  imported at (1, 67)
     }
 
     static String FDOC_MARKER = "»";
+
     /*
     module['a:a','A'][module['b:b','B'][u:=2;f(x)->x+1;];];module_import('b:b');say(B#u);];
      */
@@ -1638,8 +1638,8 @@ illegal argument:no module named "b" was  imported at (1, 67)
                 constantNode.setResult(new QDLSet());
                 constantNode.setResultType(Constant.SET_TYPE);
                 break;
-            case QDLConstants.RESERVED_COMPLEX_I:
-                throw new IllegalArgumentException("Complex numbers not supported.");
+/*            case QDLConstants.RESERVED_COMPLEX_I:
+                throw new IllegalArgumentException("Complex numbers not supported.");*/
             default:
                 throw new IllegalArgumentException("error: unknown reserved keyword constant");
         }
@@ -1699,26 +1699,144 @@ illegal argument:no module named "b" was  imported at (1, 67)
         assertStatement.setSourceCode(source);
     }
 
+
     @Override
-    public void enterRestriction(QDLParserParser.RestrictionContext ctx) {
+    public void enterExtract(QDLParserParser.ExtractContext ctx) {
 
     }
 
     @Override
-    public void exitRestriction(QDLParserParser.RestrictionContext ctx) {
-        throw new NotImplementedException("restrictions not implemented");
+    public void exitExtract(QDLParserParser.ExtractContext extractContext) {
+        doSubset(extractContext, false);
     }
 
-/*    @Override
-    public void enterIndex(QDLParserParser.IndexContext ctx) {
+    @Override
+    public void enterExtract2(QDLParserParser.Extract2Context ctx) {
 
     }
 
     @Override
-    public void exitIndex(QDLParserParser.IndexContext ctx) {
-    throw new NotImplementedException("index sets not implemented");
-    }*/
+    public void exitExtract2(QDLParserParser.Extract2Context ctx) {
+        doSubset(ctx, true);
+    }
 
+    @Override
+    public void enterExtract3(QDLParserParser.Extract3Context ctx) {
+
+    }
+
+    @Override
+    public void exitExtract3(QDLParserParser.Extract3Context ctx) {
+        doSubset(ctx, false);
+
+    }
+
+    @Override
+    public void enterExtract4(QDLParserParser.Extract4Context ctx) {
+
+    }
+
+    @Override
+    public void exitExtract4(QDLParserParser.Extract4Context ctx) {
+        doSubset(ctx, true);
+
+    }
+
+    protected void doSubset(ParserRuleContext parseTree, boolean isWildcard) {
+        StemSubsettingNode ssn = new StemSubsettingNode();
+        ssn.setTokenPosition(tp(parseTree));
+        ssn.setSourceCode(getSource(parseTree));
+        stash(parseTree, ssn);
+        boolean isStrict = false;
+        IndexArg indexArg = new IndexArg();
+        for (int i = 0; i < parseTree.getChildCount(); i++) {
+            ParseTree p = parseTree.getChild(i);
+
+            if ((p instanceof TerminalNodeImpl)) {
+                switch(p.getText()){
+                    default:
+                        throw new IllegalArgumentException("unknown extraction operator");
+                    case StemSubsettingNode.EXTRACT:
+                        break;
+                    case StemSubsettingNode.EXTRACT_UNIQUE:
+                        indexArg.strictOrder = true; // This gets set in a different pass, so must be stored
+                        break;
+                    case StemSubsettingNode.EXTRACT_UNIQUE_STAR:
+                    case StemSubsettingNode.EXTRACT_LIST_UNIQUE_STAR:
+                        indexArg.strictOrder = true; // This gets set in a different pass, so must be stored
+                    case StemSubsettingNode.EXTRACT_STAR:
+                    case StemSubsettingNode.EXTRACT_LIST_STAR:
+                        indexArg.swri = new StemSubsettingNode.AllIndices();
+                        ssn.addArgument(indexArg);
+                        break;
+                    case StemSubsettingNode.EXTRACT_LIST:
+                        indexArg.interpretListArg = true;
+                        break;
+                    case StemSubsettingNode.EXTRACT_LIST_UNIQUE:
+                        indexArg.interpretListArg = true;
+                        indexArg.strictOrder = true;
+
+                }
+/*                if (p.getText().equals("\\!")) {
+                    indexArg.strictOrder = true; // This gets set in a different pass, so must be stored
+                }
+
+                if (p.getText().equals("\\*") || p.getText().equals("\\!*")) {
+                    // mark the node as a
+                    indexArg.swri = new StemSubsettingNode.AllIndices();
+                    ssn.addArgument(indexArg);
+                }*/
+
+            } else {
+                StatementWithResultInterface swri = (StatementWithResultInterface) resolveChild(p);
+                if (i == 0) {
+                    if (swri instanceof VariableNode) {
+                        VariableNode vNode = (VariableNode) swri;
+                        vNode.setVariableReference(vNode.getVariableReference() + STEM_INDEX_MARKER);
+                        indexArg.swri = vNode;
+                        ssn.addArgument(indexArg);
+                    } else {
+                        if (swri instanceof ModuleExpression) {
+                            // If it's a module (e.g. a#b.i) then mark the variable, b here, as b. so
+                            // it is interpreted as a stem in later resolution.
+                            ModuleExpression moduleExpression = (ModuleExpression) swri;
+                            if (moduleExpression.getExpression() instanceof VariableNode) {
+                                VariableNode vNode = (VariableNode) moduleExpression.getExpression();
+                                vNode.setVariableReference(vNode.getVariableReference() + STEM_INDEX_MARKER);
+                            }
+                            indexArg.swri = moduleExpression;
+                            ssn.addArgument(indexArg);
+
+                        } else {
+                            indexArg.swri = swri;
+
+                            ssn.addArgument(indexArg);
+                        }
+                    }
+                } else {
+                    indexArg.swri = swri;
+                    ssn.addArgument(indexArg);
+                }
+                indexArg = new IndexArg();
+            }
+        }
+    }
+
+    /*
+        a. := n(2,3,4,5)
+   a\[1,2]\*\[;3]
+  a\![2,1]\*\!*
+
+    a\![;3]\[2,1]\!*
+      a\![;3]\[2,1]\!*
+  a\![3]\![2,1]\![2,3]
+
+          a. := n(2,3,4,5)
+  a\![3]\[2,1]\[2,3]\!*\[;4]\![|;4|]
+  a\![3]\[2,1]\[2,3]\![5,7]\[;4]\![|;4|]
+    a\1\*\!*\2\3\*\!*\!*\*\*
+
+     */
     @Override
     public void enterDotOp2(QDLParserParser.DotOp2Context ctx) {
 
@@ -2111,28 +2229,7 @@ illegal argument:no module named "b" was  imported at (1, 67)
         finish(dyad, ctx);
     }
 
-/*    @Override
-    public void enterUrl(QDLParserParser.UrlContext ctx) {
-        System.out.println("enterURL");
 
-    }
-
-    @Override
-    public void exitUrl(QDLParserParser.UrlContext ctx) {
-        System.out.println("exitURL");
-
-    }
-
-    @Override
-    public void enterUrl2(QDLParserParser.Url2Context ctx) {
-        System.out.println("enterURL2");
-
-    }
-
-    @Override
-    public void exitUrl2(QDLParserParser.Url2Context ctx) {
-         System.out.println("exitURL2");
-    }*/
 }
 
 

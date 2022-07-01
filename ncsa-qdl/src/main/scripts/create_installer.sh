@@ -44,6 +44,8 @@ mkdir "bin"
 cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/scripts/qdl bin
 mkdir "docs"
 cp /home/ncsa/dev/ncsa-git/cilogon.github.io.git/qdl/docs/*.pdf docs
+cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/docs/jsonpath.pdf docs
+
 mkdir "etc"
 cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/min-cfg.xml etc/min-cfg.xml
 cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/qdl.nanorc etc/qdl.nanorc

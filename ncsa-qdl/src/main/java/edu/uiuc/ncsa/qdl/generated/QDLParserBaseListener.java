@@ -808,6 +808,18 @@ public class QDLParserBaseListener implements QDLParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterExtract(QDLParserParser.ExtractContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitExtract(QDLParserParser.ExtractContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterNull(QDLParserParser.NullContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -832,13 +844,37 @@ public class QDLParserBaseListener implements QDLParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRestriction(QDLParserParser.RestrictionContext ctx) { }
+	@Override public void enterExtract2(QDLParserParser.Extract2Context ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRestriction(QDLParserParser.RestrictionContext ctx) { }
+	@Override public void exitExtract2(QDLParserParser.Extract2Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterExtract3(QDLParserParser.Extract3Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitExtract3(QDLParserParser.Extract3Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterExtract4(QDLParserParser.Extract4Context ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitExtract4(QDLParserParser.Extract4Context ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

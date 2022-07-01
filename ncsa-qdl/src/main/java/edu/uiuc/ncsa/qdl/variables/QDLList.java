@@ -731,7 +731,11 @@ subset(b., 3, 6)
             return;
         }
         if (index < getArrayList().size()) {
-            getArrayList().set((int) index, element);
+            if(index < 0){
+                getArrayList().set((int) (getArrayList().size()+(index%getArrayList().size())), element);
+            }else {
+                getArrayList().set((int) index, element);
+            }
             return;
         }
         if (getArrayList().size() == index) {

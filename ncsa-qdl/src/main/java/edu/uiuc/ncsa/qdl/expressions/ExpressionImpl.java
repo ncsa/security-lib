@@ -95,7 +95,7 @@ public abstract class ExpressionImpl implements ExpressionNode {
             // E.g. IndexError, NamespaceError, ReturnException,...
              throw returnException;
         }catch(Throwable t){
-            // Generate a bonafide error if there is a non-QDL one.
+            // Generate a bona fide error if there is a non-QDL one.
             throw new QDLExceptionWithTrace(t, this);
         }
     }

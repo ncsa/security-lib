@@ -2230,5 +2230,117 @@ public class StemTest extends AbstractQDLTester {
          assert getBooleanValue("ok", state) : "failed to round trip default value with a ~.";
      }
 
+     protected String SUBSTEM_LIST_QDL_SETUP = "b.0 := [;3];b.1 := [;5]+10;b.2 := [;7] + 20;b.3 := [;11] + 100;";
+     protected String SUBSTEM_QDL_SETUP = "a.'p'.'r':='pr';a.'p'.'s':='ps';a.'p'.'t':='pt';" +
+             "a.'q'.'r':='qr';a.'q'.'s':='qs';a.'q'.'t':='qt';"+
+             "a.'q'.'z':='qz';a.'p'.'s':='ps';a.'n'.'m':='nm'; a.0.'s':='0s';";
+     /*  b. has different length elements, so the keys have to be actually done right.
+        b.
+        [
+         [0,1,2],
+         [10,11,12,13,14],
+         [20,21,22,23,24,25,26],
+         [100,101,102,103,104,105,106,107,108,109,110]
+         ]
+
+     a.'p'.'r':='pr';a.'p'.'s':='ps';a.'p'.'t':='pt';a.'q'.'r':='qr';a.'q'.'s':='qs';a.'q'.'t':='qt';"a.'q'.'z':='qz';a.'p'.'s':='ps';a.'n'.'m':='nm';
+
+      */
+    /**
+     * test subsetting with the \ operator for all non-wildcard cases.
+     * Case is for a scalar
+     * @throws Throwable
+     */
+
+    public void testExtractionFiniteCase() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, SUBSTEM_LIST_QDL_SETUP);
+        addLine(script, "d.:=[;200];");
+        addLine(script, "ok :=reduce(@&&, b\\1\\[1,2] == [11,12]);");
+        addLine(script, "ok1 :=reduce(@&&, b\\[1,3]\\2 == [12,102]);");
+        addLine(script, "ok2 :=reduce(@&&, d\\[3,99] == [3,99]);");
+        addLine(script, "ok3 :=reduce(@&&, reduce(@&&, b\\![1,3]\\![2,1] == {1:{1:11, 2:12}, 3:{1:101, 2:102}}));");
+        addLine(script, "ok4 :=reduce(@&&, reduce(@&&,  b\\[1,37]\\* == {1:[10,11,12,13,14]}));");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "b\\1\\[1,2] failed";
+        assert getBooleanValue("ok1", state) : "b\\[1,3]\\2 failed";
+        assert getBooleanValue("ok2", state) : "d\\[3,99] -- sparse index set -- failed";
+        assert getBooleanValue("ok3", state) : "b\\![1,3]\\![2,1] failed";
+        assert getBooleanValue("ok4", state) : "b\\[1,37]\\* -- missing indices ignored --failed";
+    }
+
+    public void testExtractionFiniteCase2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, SUBSTEM_LIST_QDL_SETUP);
+        addLine(script, "d.:=[;200];");
+        addLine(script, "ok :=reduce(@&&, b\\>[1,[1,2]] == [11,12]);");
+        addLine(script, "ok1 :=reduce(@&&, b\\>[[1,3],2] == [12,102]);");
+        addLine(script, "ok2 :=reduce(@&&, d\\>[[3,99]] == [3,99]);");
+        addLine(script, "ok3 :=reduce(@&&, reduce(@&&, b\\>![[1,3],[2,1]] == {1:{1:11, 2:12}, 3:{1:101, 2:102}}));");
+        addLine(script, "ok4 :=reduce(@&&, reduce(@&&,  b\\>[[1,37]]\\* == {1:[10,11,12,13,14]}));");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "b\\1\\[1,2] failed";
+        assert getBooleanValue("ok1", state) : "b\\[1,3]\\2 failed";
+        assert getBooleanValue("ok2", state) : "d\\[3,99] -- sparse index set -- failed";
+        assert getBooleanValue("ok3", state) : "b\\![1,3]\\![2,1] failed";
+        assert getBooleanValue("ok4", state) : "b\\[1,37]\\* -- missing indices ignored --failed";
+    }
+        //  reduce(@&&, b\1\[1,2] == [11,12])
+
+    public void testExtractionWildcard() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, SUBSTEM_LIST_QDL_SETUP);
+        addLine(script, "ok :=reduce(@&&, b\\*\\2 == [2,12,22,102]);");
+        addLine(script, "ok1 :=reduce(@&&, b\\2\\* == [20,21,22,23,24,25,26]);"); // same as b.2, essentially
+        addLine(script, "ok2 :=reduce(@&&, reduce(@&&, b\\*\\* == b.));"); // same as b.
+        addLine(script, "ok3 :=reduce(@&&, reduce(@&&, b\\!* == b.));"); // same as b.
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "b\\*\\2 failed";
+        assert getBooleanValue("ok1", state) : "b\\*\\2 failed";
+        assert getBooleanValue("ok2", state) : "b\\*\\* failed";
+        assert getBooleanValue("ok3", state) : "b\\!* failed";
+    }
+
+
+
+
+    public void testStemExtraction() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, SUBSTEM_QDL_SETUP);
+        addLine(script, "ok :=reduce(@&&, a\\p\\* == {'r':'pr', 's':'ps', 't':'pt'});");
+        addLine(script, "ok1 :=reduce(@&&, a\\*\\s == {'p':'ps', 'q':'qs'});"); // same as b.2, essentially
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "b\\*\\2 failed";
+        assert getBooleanValue("ok1", state) : "b\\*\\2 failed";
+    }
+
+    public void testMixedExtraction() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, SUBSTEM_QDL_SETUP);
+        addLine(script, SUBSTEM_LIST_QDL_SETUP);
+        addLine(script, "c. := b.~a.;");
+        addLine(script, "ok :=reduce(@&&, c\\*\\s == {4:'0s', 'p':'ps', 'q':'qs'});");
+        addLine(script, "ok1 :=reduce(@&&,reduce(@&&, c\\[2,'n']\\[0,'s'] == [[20]]));"); // not all present is ok
+        // c\\[2,'n']\\[0,'m'] == [[20],{1:'nm'}]"        );
+        addLine(script,"dd.:=c\\[2,'n']\\[0,'m'];"        );
+        addLine(script, "ok2 := dd.0.0==20 && dd.1.1=='nm';"); // can't use repeated reduce here because lists and stems can't be compared.
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "c\\*\\s failed";
+        assert getBooleanValue("ok1", state) : "c\\[2,'n']\\[0,'s'] failed";
+        assert getBooleanValue("ok2", state) : "c\\[2,'n']\\[0,'m'] failed";
+    }
 }
 

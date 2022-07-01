@@ -7,7 +7,8 @@ lexer grammar QDLLexer;
 
 
 // § 1 Keywords
-  ConstantKeywords: BOOL_TRUE | BOOL_FALSE | Null | Null_Set | COMPLEX_I;
+  //ConstantKeywords: BOOL_TRUE | BOOL_FALSE | Null | Null_Set | COMPLEX_I;
+  ConstantKeywords: BOOL_TRUE | BOOL_FALSE | Null | Null_Set;
 
          ASSERT : 'assert'; 
         ASSERT2 : '⊨'; // unicode 22a8
@@ -17,7 +18,7 @@ lexer grammar QDLLexer;
           LOCAL : 'local';
            BODY : 'body';
           CATCH : 'catch';
-      COMPLEX_I : 'I';
+//      COMPLEX_I : 'I';
          DEFINE : 'define';
              DO : 'do';
            ELSE : 'else';
@@ -125,7 +126,10 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
           Backtick : '`';
            Percent : '%' | '∆'; // \u2206 -- laplace or symm diff operator
              Tilde : '~';
-         Backslash : '\\';
+         Backslash : '\\!' | '\\' ;
+        Backslash2 : '\\!*' | '\\*' ;
+        Backslash3 : '\\>!' | '\\>' ;
+        Backslash4 : '\\>!*' | '\\>*' ;
               Hash : '#';
              Stile : '|';
         TildeRight : '~|' | '≁'; // unicode 2241, tilde slash

@@ -115,8 +115,12 @@ expression
    function                                                                    #functions
   | expression StemDot+ expression                                             #dotOp
   | expression postfix=StemDot                                                 #dotOp2
- // | me                                                                         #moduleExpression
-  |  variable? Hash expression                                                 #moduleExpression
+ // | me                                                                          #moduleExpression
+   | expression Backslash  expression                                         #extract
+   | expression postfix=Backslash2                                            #extract2
+   | expression Backslash3  expression                                        #extract3
+   | expression postfix=Backslash4                                            #extract4
+ |  variable? Hash expression                                                 #moduleExpression
   | (function | '(' f_args* ')')
        LambdaConnector (expression | expressionBlock)                          #lambdaDef
  | stemVariable                                                                #stemVar
@@ -143,15 +147,16 @@ expression
  | expression '<<' expression                                                  #is_a
  | expression And expression                                                   #andExpression
  | expression Or expression                                                    #orExpression
- | LogicalNot expression                                                       #notExpression
+ //| LogicalNot expression                                                       #notExpression
+ | ('!'  | '¬') expression                                                       #notExpression
 // | expression '<<' typeList                                                    #is_a
  | '(' expression ')'                                                          #association
  | expression '?' expression ':' expression                                    #altIFExpression
- | expression Backslash + expression                                           #restriction
 //| expression '&'+ expression                                                  #typeCheck
 // | expression '`'+ expression                                                  #index
 // | expression '|'+ expression                                                  #stile
 // | prefix=',' expression                                                       #unravel
+// | expression ((Stile + expression ) | (Stile '*'))                            #restriction
  | expression op=Membership expression                                         #epsilon  // unicode 2208, 2209
  | STRING                                                                      #strings
  | integer                                                                     #integers

@@ -52,4 +52,17 @@ public class Constant {
         if(value instanceof Long) return (Long)value;
         return 0L;
     }
+    public static boolean isNull(Object obj){
+        return obj instanceof QDLNull;
+    }
+    public static boolean isScalar(Object obj){
+         int type = getType(obj);
+         return type != STEM_TYPE && type != SET_TYPE && type != FUNCTION_TYPE && type != UNKNOWN_TYPE;
+    }
+    public static boolean isStem(Object obj){
+        return getType(obj) == STEM_TYPE ;
+    }
+    public static boolean isSet(Object obj){
+        return getType(obj) == SET_TYPE;
+    }
 }

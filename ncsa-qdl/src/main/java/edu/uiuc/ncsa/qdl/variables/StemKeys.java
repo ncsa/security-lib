@@ -120,9 +120,22 @@ public class StemKeys implements Set {
             StemKeys arg = (StemKeys) c;
             return listkeys.addAll(arg.getListkeys()) || stemKeys.addAll(arg.getStemKeys());
         }
-        throw new NotImplementedException("addAll(Collection) not implemented in " + getClass().getSimpleName() + " for general collection");
+        for(Object obj : c){
+            boolean gotOne = false;
+            if(obj instanceof Long){
+                listkeys.add((Long)obj);
+                gotOne = true;
+            }
+            if(obj instanceof String){
+                stemKeys.add((String)obj);
+                gotOne = true;
+            }
+            if(!gotOne) {
+                throw new NotImplementedException("addAll(Collection) unknown element type " + getClass().getSimpleName() + " for general collection");
+            }
+        }
 
-//        return false;
+        return true;
     }
 
     @Override
