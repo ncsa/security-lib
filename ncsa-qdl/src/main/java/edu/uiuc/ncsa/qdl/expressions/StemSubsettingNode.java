@@ -5,7 +5,8 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.statements.TokenPosition;
-import edu.uiuc.ncsa.qdl.variables.*;
+import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
 import java.util.ArrayList;
@@ -19,15 +20,15 @@ import java.util.List;
  * on 6/27/22 at  4:02 PM
  */
 public class StemSubsettingNode extends ExpressionImpl {
-     public static final String EXTRACT = "\\";
-     public static final String EXTRACT_STAR = "\\*";
-     public static final String EXTRACT_UNIQUE = "\\!";
-     public static final String EXTRACT_UNIQUE_STAR = "\\!*";
+    public static final String EXTRACT = "\\";
+    public static final String EXTRACT_STAR = "\\*";
+    public static final String EXTRACT_UNIQUE = "\\!";
+    public static final String EXTRACT_UNIQUE_STAR = "\\!*";
 
     public static final String EXTRACT_LIST = "\\>";
     public static final String EXTRACT_LIST_STAR = "\\>*";
-    public static final String EXTRACT_LIST_UNIQUE = "\\>!";
-    public static final String EXTRACT_LIST_UNIQUE_STAR = "\\>!*";
+    public static final String EXTRACT_LIST_UNIQUE = "\\!>";
+    public static final String EXTRACT_LIST_UNIQUE_STAR = "\\!>*";
 
     public StemSubsettingNode() {
     }
@@ -56,22 +57,22 @@ public class StemSubsettingNode extends ExpressionImpl {
         for (int i = 0; i < indexArgs.size(); i++) {
             IndexArg ia = indexArgs.get(i);
             ia.swri.evaluate(state);
-            if(0 < i){
-                if(ia.swri.getResult() == null){
-                    if(ia.swri instanceof VariableNode){
-                        VariableNode vNode = (VariableNode)ia.swri;
-                        if(vNode.getVariableReference().endsWith(QDLStem.STEM_INDEX_MARKER)){
+            if (0 < i) {
+                if (ia.swri.getResult() == null) {
+                    if (ia.swri instanceof VariableNode) {
+                        VariableNode vNode = (VariableNode) ia.swri;
+                        if (vNode.getVariableReference().endsWith(QDLStem.STEM_INDEX_MARKER)) {
                             throw new QDLExceptionWithTrace(vNode.getVariableReference() + " not found", this);
                         }
                         vNode.setResult(vNode.getVariableReference());
                     }
                 }
             }
-            System.out.println(ia);
+            //     System.out.println(ia);
         }
         Object larg = args.get(0).swri.getResult();
         if (!(larg instanceof QDLStem)) {
-            throw new QDLExceptionWithTrace("Subsetting operator only applies to stems.", getLeftArg());
+            throw new QDLExceptionWithTrace("Extraction operator only applies to stems.", getLeftArg());
         }
         QDLStem inStem = (QDLStem) larg;
         if (indexArgs.isAllWildcards()) {
@@ -97,15 +98,15 @@ public class StemSubsettingNode extends ExpressionImpl {
             targetIndices = indexArgs.createTargetIndices();
         }
         // edge case. They requested something like b\2\3 -- this should be a scalar
-        if(sourceIndices.size() == 1 && targetIndices.size() == 1 && targetIndices.get(0).size()==0){
-                IndexList value = inStem.get(sourceIndices.get(0), false);
-                if (value != null && !value.isEmpty()) {
-                    setResult(value.get(0));
-                    setEvaluated(true);
-                    setResultType(Constant.getType(getResult()));
-                    return getResult();
-                }
-                throw new QDLExceptionWithTrace("no such value ", this);
+        if (sourceIndices.size() == 1 && targetIndices.size() == 1 && targetIndices.get(0).size() == 0) {
+            IndexList value = inStem.get(sourceIndices.get(0), false);
+            if (value != null && !value.isEmpty()) {
+                setResult(value.get(0));
+                setEvaluated(true);
+                setResultType(Constant.getType(getResult()));
+                return getResult();
+            }
+            throw new QDLExceptionWithTrace("no such value ", this);
         }
         QDLStem out = new QDLStem();
         for (int i = 0; i < sourceIndices.size(); i++) {
@@ -149,12 +150,7 @@ a.
 ]
 
      */
-    protected QDLStem noWildCards(QDLStem inStem) {
 
-        QDLStem out = new QDLStem();
-
-        return out;
-    }
 
     /**
      * Starts descent through all of the
@@ -167,7 +163,7 @@ a.
         QDLStem out = new QDLStem();
         int startIndex = 1;
         IndexArg root = indexArgs.get(startIndex);
-        long strictIndex = 0L;
+        long autoIndex = 0L;
         for (Object key : root.createKeySet(in)) {
             Object value = in.get(key);
             if (value == null) {
@@ -175,23 +171,32 @@ a.
             }
             if (value instanceof QDLStem) {
                 IndexList indexList = new IndexList();
+
                 if ((root.swri instanceof AllIndices) || !Constant.isScalar(root.swri.getResult())) {
-                    indexList.add(key);
+                    if (root.isWildcard()) {
+                        indexList.add(key);
+                    } else {
+                        if (root.strictOrder || Constant.isString(key)) {
+                            indexList.add(key);
+                        } else {
+                            indexList.add(autoIndex++);
+                        }
+                    }
                 }
-                System.out.println("recurse 1 indexList=" + indexList);
+       //           System.out.println("recurse 1 indexList=" + indexList);
                 recurse((QDLStem) value, out, indexList, sourceIndices, startIndex + 1, 0L);
             } else {
                 if (indexArgs.size() - 1 == startIndex) {
                     // set the value, but only if it is the end of an index list (so there
                     // are no more indices to traverse.
-                    if(root.isWildcard()){
+                    if (root.isWildcard()) {
                         out.putLongOrString(key, value);
-                    }else{
-                        if(!Constant.isScalar(root.swri.getResult())){
+                    } else {
+                        if (!Constant.isScalar(root.swri.getResult())) {
                             if (root.strictOrder) {
                                 out.putLongOrString(key, value);
                             } else {
-                                out.putLongOrString(strictIndex++, value);
+                                out.putLongOrString(autoIndex++, value);
                             }
 
                         }
@@ -217,7 +222,7 @@ a.
         IndexArg indexArg = sourceIndices.get(indexLocation);
         for (Object key : indexArg.createKeySet(in)) {
             Object value = in.get(key);
-            System.out.println("recurse 2 key =" + key + ", value=" + value);
+            //   System.out.println("recurse 2 key =" + key + ", value=" + value);
 
             if (value == null) {
                 continue;
@@ -238,10 +243,10 @@ a.
                 if (sourceIndices.size() - 1 == indexLocation) {
                     // Only set it if there are more indices. otherwise you get a ton of garbage
                     IndexList indexList = targetIndex.clone();
-                    if(indexArg.isWildcard()){
+                    if (indexArg.isWildcard()) {
                         indexList.add(key);
-                    }else{
-                        if(!Constant.isScalar(indexArg.swri.getResult())){
+                    } else {
+                        if (!Constant.isScalar(indexArg.swri.getResult())) {
                             if (indexArg.strictOrder) {
                                 indexList.add(key);
                             } else {
@@ -250,7 +255,7 @@ a.
                         }
 
                     }
-                    System.out.println("recurse: setting value key =" + indexList + ", value = " + value);
+                    //              System.out.println("recurse: setting value key =" + indexList + ", value = " + value);
                     out.set(indexList, value);
                 }
 
@@ -291,7 +296,7 @@ a.
         if ((!(indices.get(left).swri instanceof StemSubsettingNode)) && (!(indices.get(right).swri instanceof StemSubsettingNode))) {
             // simplest case: a\* so nothing to linearize.
             swris.add(indices.get(left), state);
-            swris.add(indices.get(right),state);
+            swris.add(indices.get(right), state);
             return swris;
         }
 
@@ -334,6 +339,7 @@ a.
             return swris;
         }
         boolean isStrict = indexArgs.get(right).strictOrder; // This is read as part of the operator, so previous op has it.
+        boolean interpretAsList = indexArgs.get(right).interpretListArg;
         List<IndexArg> currentIAs = indexArgs;
         //List<IndexArg> currentIAs = ((StemSubsettingNode) indexArgs.get(right).swri).indexArgs;
         IndexArg leftArg = currentIAs.get(left);
@@ -344,9 +350,11 @@ a.
                 swris.addAll(ll);
             } else {
                 leftArg.strictOrder = isStrict; // This is read as part of the operator
+                leftArg.interpretListArg = interpretAsList;
                 swris.add(leftArg);
             }
             isStrict = rightArg.strictOrder;
+            interpretAsList = rightArg.interpretListArg;
             currentIAs = ((StemSubsettingNode) rightArg.swri).indexArgs;
             rightArg = currentIAs.get(right);
             leftArg = currentIAs.get(left);
@@ -356,6 +364,7 @@ a.
             swris.addAll(linearizeLeftArgs(((StemSubsettingNode) leftArg.swri).indexArgs, state));
         } else {
             leftArg.strictOrder = isStrict; // This is read as part of the operator
+            leftArg.interpretListArg = interpretAsList;
 
             swris.add(leftArg, state);
         }
@@ -407,28 +416,6 @@ a.
             return null;
         }
         return getArguments().get(1);
-    }
-
-    /**
-     * Marker class to show all the indices are to be used.
-     */
-    public static class AllIndices extends ConstantNode {
-        public AllIndices() {
-            super(QDLNull.getInstance());
-        }
-
-        @Override
-        public List<String> getSourceCode() {
-            List<String> a = new ArrayList<>();
-            a.add("*");
-            return a;
-        }
-
-        @Override
-        public String toString() {
-            return "*";
-        }
-
     }
 
 

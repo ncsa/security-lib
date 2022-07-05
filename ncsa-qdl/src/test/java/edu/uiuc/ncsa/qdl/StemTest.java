@@ -910,11 +910,11 @@ public class StemTest extends AbstractQDLTester {
 
         for (long i = 0L; i < count1; i++) {
             //qdlList1.add(new SparseEntry(i, new BigDecimal("0." + i)));
-            qdlList1.add( new BigDecimal("0." + i));
+            qdlList1.add(new BigDecimal("0." + i));
         }
         for (long i = 0L; i < count2; i++) {
             //qdlList2.add(new SparseEntry(i, i * i));
-            qdlList2.add( i * i);
+            qdlList2.add(i * i);
         }
         QDLStem stem1 = new QDLStem();
         QDLStem stem2 = new QDLStem();
@@ -948,7 +948,7 @@ public class StemTest extends AbstractQDLTester {
         long count1 = 10L;
         long count2 = 5L;
         for (long i = 0L; i < count1; i++) {
-            qdlList1.add( i / 10.0);
+            qdlList1.add(i / 10.0);
         }
         for (long i = 0L; i < count2; i++) {
             qdlList2.add(i * i);
@@ -996,10 +996,10 @@ public class StemTest extends AbstractQDLTester {
         addLine(script, "b.:=[-10;0];");
         addLine(script, "copy(a., 1,3,b., 5);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        try{
+        try {
             interpreter.execute(script.toString());
             assert false : "Was able to copy over a gap in the source list";
-        }catch (QDLException x){
+        } catch (QDLException x) {
             assert true;
         }
     }
@@ -1011,7 +1011,7 @@ public class StemTest extends AbstractQDLTester {
     insert_at(b., 1,3,a., 5)
     test.:={0:0, 1:1, 2:2, 4:4, 5:-9, 6:-8, 7:-7, 8:5, 9:6, 10:7, 11:8, 12:9};
      */
-        public void testSparseListInsert() throws Throwable {
+    public void testSparseListInsert() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a.:=[;10];");
@@ -1024,6 +1024,7 @@ public class StemTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state) : "failed sparse list insert_at.";
     }
+
     /*
 
      */
@@ -1039,6 +1040,7 @@ public class StemTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state) : "failed to round trip JSON array with QDL nulls in it.";
     }
+
     /*
           a.:=[;10];
     remove(a.3)
@@ -1949,7 +1951,7 @@ public class StemTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
         interpreter.execute(script.toString());
-        assert getBooleanValue("ok", state) :  StemEvaluator.ALL_KEYS + " and " + StemEvaluator.KEYS + " check failed";
+        assert getBooleanValue("ok", state) : StemEvaluator.ALL_KEYS + " and " + StemEvaluator.KEYS + " check failed";
         assert getBooleanValue("ok0", state) : StemEvaluator.ALL_KEYS + " on axis 0 failed";
         assert getBooleanValue("ok1", state) : StemEvaluator.ALL_KEYS + " on axis 1 failed";
         assert getBooleanValue("ok2", state) : StemEvaluator.ALL_KEYS + " on axis -1 failed";
@@ -2094,23 +2096,23 @@ public class StemTest extends AbstractQDLTester {
     // Managed to break subset doing a refactor, so these are the regression tests to detect that
     // should something like it happen again.  These test a contiguous list
     public void testSubsetContract() throws Throwable {
-            State state = testUtils.getNewState();
-            StringBuffer script = new StringBuffer();
-            addLine(script, "ok0 := reduce(@&&, sublist([;10],7) == [7,8,9]);");
-            addLine(script, "ok1 := reduce(@&&, sublist([;10],2,4) == [2,3,4,5]);");
-            addLine(script, "ok2 := reduce(@&&, sublist([;10],-3) == [7,8,9]);");
-            addLine(script, "ok3 := reduce(@&&, sublist([;10],-3,2) == [7,8]);");
-            addLine(script, "ok4 := reduce(@&&, sublist('a',-3,2) == ['a']);"); // scalars are just returned
-            addLine(script, "ok5 := size(sublist([;10],-3,0)) == 0;");
-            QDLInterpreter interpreter = new QDLInterpreter(null, state);
-            interpreter.execute(script.toString());
-            assert getBooleanValue("ok0", state) : " reqesting tail of list failed";
-            assert getBooleanValue("ok1", state) : " requesting 4 elements from middle of list failed";
-            assert getBooleanValue("ok2", state) : "negative count should return tail";
-            assert getBooleanValue("ok3", state) : "negative start index failed";
-            assert getBooleanValue("ok4", state) : "subset of scalar should return list with single value ";
-            assert getBooleanValue("ok5", state) : "count of 0 should return empty list";
-        }
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok0 := reduce(@&&, sublist([;10],7) == [7,8,9]);");
+        addLine(script, "ok1 := reduce(@&&, sublist([;10],2,4) == [2,3,4,5]);");
+        addLine(script, "ok2 := reduce(@&&, sublist([;10],-3) == [7,8,9]);");
+        addLine(script, "ok3 := reduce(@&&, sublist([;10],-3,2) == [7,8]);");
+        addLine(script, "ok4 := reduce(@&&, sublist('a',-3,2) == ['a']);"); // scalars are just returned
+        addLine(script, "ok5 := size(sublist([;10],-3,0)) == 0;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok0", state) : " reqesting tail of list failed";
+        assert getBooleanValue("ok1", state) : " requesting 4 elements from middle of list failed";
+        assert getBooleanValue("ok2", state) : "negative count should return tail";
+        assert getBooleanValue("ok3", state) : "negative start index failed";
+        assert getBooleanValue("ok4", state) : "subset of scalar should return list with single value ";
+        assert getBooleanValue("ok5", state) : "count of 0 should return empty list";
+    }
 
     public void testSubsetSparseContract() throws Throwable {
         State state = testUtils.getNewState();
@@ -2206,6 +2208,7 @@ public class StemTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state);
     }
+
     public void testRoundtripJSONWithNull() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2218,22 +2221,23 @@ public class StemTest extends AbstractQDLTester {
 
     /**
      * Makes sure that ~ handles default values in stems
+     *
      * @throws Throwable
      */
     public void testTildeDefaultValues() throws Throwable {
-         State state = testUtils.getNewState();
-         StringBuffer script = new StringBuffer();
-         addLine(script, "qq. := {*:4}~[2];");
-         addLine(script, "ok := 4 ==  execute(input_form(qq.)).42;"); // round trip it, check default value
-         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-         interpreter.execute(script.toString());
-         assert getBooleanValue("ok", state) : "failed to round trip default value with a ~.";
-     }
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "qq. := {*:4}~[2];");
+        addLine(script, "ok := 4 ==  execute(input_form(qq.)).42;"); // round trip it, check default value
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "failed to round trip default value with a ~.";
+    }
 
-     protected String SUBSTEM_LIST_QDL_SETUP = "b.0 := [;3];b.1 := [;5]+10;b.2 := [;7] + 20;b.3 := [;11] + 100;";
-     protected String SUBSTEM_QDL_SETUP = "a.'p'.'r':='pr';a.'p'.'s':='ps';a.'p'.'t':='pt';" +
-             "a.'q'.'r':='qr';a.'q'.'s':='qs';a.'q'.'t':='qt';"+
-             "a.'q'.'z':='qz';a.'p'.'s':='ps';a.'n'.'m':='nm'; a.0.'s':='0s';";
+    protected String SUBSTEM_LIST_QDL_SETUP = "b.0 := [;3];b.1 := [;5]+10;b.2 := [;7] + 20;b.3 := [;11] + 100;";
+    protected String SUBSTEM_QDL_SETUP = "a.'p'.'r':='pr';a.'p'.'s':='ps';a.'p'.'t':='pt';" +
+            "a.'q'.'r':='qr';a.'q'.'s':='qs';a.'q'.'t':='qt';" +
+            "a.'q'.'z':='qz';a.'p'.'s':='ps';a.'n'.'m':='nm'; a.0.'s':='0s';a.4.'s':='4s';";
      /*  b. has different length elements, so the keys have to be actually done right.
         b.
         [
@@ -2246,9 +2250,11 @@ public class StemTest extends AbstractQDLTester {
      a.'p'.'r':='pr';a.'p'.'s':='ps';a.'p'.'t':='pt';a.'q'.'r':='qr';a.'q'.'s':='qs';a.'q'.'t':='qt';"a.'q'.'z':='qz';a.'p'.'s':='ps';a.'n'.'m':='nm';
 
       */
+
     /**
      * test subsetting with the \ operator for all non-wildcard cases.
      * Case is for a scalar
+     *
      * @throws Throwable
      */
 
@@ -2261,7 +2267,7 @@ public class StemTest extends AbstractQDLTester {
         addLine(script, "ok1 :=reduce(@&&, b\\[1,3]\\2 == [12,102]);");
         addLine(script, "ok2 :=reduce(@&&, d\\[3,99] == [3,99]);");
         addLine(script, "ok3 :=reduce(@&&, reduce(@&&, b\\![1,3]\\![2,1] == {1:{1:11, 2:12}, 3:{1:101, 2:102}}));");
-        addLine(script, "ok4 :=reduce(@&&, reduce(@&&,  b\\[1,37]\\* == {1:[10,11,12,13,14]}));");
+        addLine(script, "ok4 :=reduce(@&&, reduce(@&&,  b\\[1,37]\\* == [[10,11,12,13,14]]));");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state) : "b\\1\\[1,2] failed";
@@ -2279,17 +2285,17 @@ public class StemTest extends AbstractQDLTester {
         addLine(script, "ok :=reduce(@&&, b\\>[1,[1,2]] == [11,12]);");
         addLine(script, "ok1 :=reduce(@&&, b\\>[[1,3],2] == [12,102]);");
         addLine(script, "ok2 :=reduce(@&&, d\\>[[3,99]] == [3,99]);");
-        addLine(script, "ok3 :=reduce(@&&, reduce(@&&, b\\>![[1,3],[2,1]] == {1:{1:11, 2:12}, 3:{1:101, 2:102}}));");
-        addLine(script, "ok4 :=reduce(@&&, reduce(@&&,  b\\>[[1,37]]\\* == {1:[10,11,12,13,14]}));");
+        addLine(script, "ok3 :=reduce(@&&, reduce(@&&, b\\!>[[1,3],[2,1]] == {1:{1:11, 2:12}, 3:{1:101, 2:102}}));");
+        addLine(script, "ok4 :=reduce(@&&, reduce(@&&,  b\\>[[1,37]]\\* == [[10,11,12,13,14]]));");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getBooleanValue("ok", state) : "b\\1\\[1,2] failed";
-        assert getBooleanValue("ok1", state) : "b\\[1,3]\\2 failed";
-        assert getBooleanValue("ok2", state) : "d\\[3,99] -- sparse index set -- failed";
-        assert getBooleanValue("ok3", state) : "b\\![1,3]\\![2,1] failed";
-        assert getBooleanValue("ok4", state) : "b\\[1,37]\\* -- missing indices ignored --failed";
+        assert getBooleanValue("ok", state) : "b\\>[1,[1,2]] failed";
+        assert getBooleanValue("ok1", state) : "b\\>[[1,3],2] failed";
+        assert getBooleanValue("ok2", state) : "d\\>[[3,99]] -- sparse index set -- failed";
+        assert getBooleanValue("ok3", state) : "b\\!>[[1,3],[2,1]] failed";
+        assert getBooleanValue("ok4", state) : "b\\>[[1,37]]\\* -- missing indices ignored --failed";
     }
-        //  reduce(@&&, b\1\[1,2] == [11,12])
+    //  reduce(@&&, b\1\[1,2] == [11,12])
 
     public void testExtractionWildcard() throws Throwable {
         State state = testUtils.getNewState();
@@ -2308,7 +2314,22 @@ public class StemTest extends AbstractQDLTester {
         assert getBooleanValue("ok3", state) : "b\\!* failed";
     }
 
+    public void testExtractionWildcard2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, SUBSTEM_LIST_QDL_SETUP);
+        addLine(script, "ok :=reduce(@&&, b\\>[star(),2] == [2,12,22,102]);");
+        addLine(script, "ok1 :=reduce(@&&, b\\>[2,star()] == [20,21,22,23,24,25,26]);"); // same as b.2, essentially
+        addLine(script, "ok2 :=reduce(@&&, reduce(@&&, b\\>[star(),star()] == b.));"); // same as b.
+        addLine(script, "ok3 :=reduce(@&&, reduce(@&&, b\\!>[star()] == b.));"); // same as b.
 
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "b\\>[star(),2] failed";
+        assert getBooleanValue("ok1", state) : "b\\>[2,star()] failed";
+        assert getBooleanValue("ok2", state) : "b\\>[star(),star()] failed";
+        assert getBooleanValue("ok3", state) : "b\\!>[star()]* failed";
+    }
 
 
     public void testStemExtraction() throws Throwable {
@@ -2317,11 +2338,10 @@ public class StemTest extends AbstractQDLTester {
         addLine(script, SUBSTEM_QDL_SETUP);
         addLine(script, "ok :=reduce(@&&, a\\p\\* == {'r':'pr', 's':'ps', 't':'pt'});");
         addLine(script, "ok1 :=reduce(@&&, a\\*\\s == {'p':'ps', 'q':'qs'});"); // same as b.2, essentially
-
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getBooleanValue("ok", state) : "b\\*\\2 failed";
-        assert getBooleanValue("ok1", state) : "b\\*\\2 failed";
+        assert getBooleanValue("ok", state) : " a\\p\\* failed";
+        assert getBooleanValue("ok1", state) : "a\\*\\s failed";
     }
 
     public void testMixedExtraction() throws Throwable {
@@ -2332,8 +2352,7 @@ public class StemTest extends AbstractQDLTester {
         addLine(script, "c. := b.~a.;");
         addLine(script, "ok :=reduce(@&&, c\\*\\s == {4:'0s', 'p':'ps', 'q':'qs'});");
         addLine(script, "ok1 :=reduce(@&&,reduce(@&&, c\\[2,'n']\\[0,'s'] == [[20]]));"); // not all present is ok
-        // c\\[2,'n']\\[0,'m'] == [[20],{1:'nm'}]"        );
-        addLine(script,"dd.:=c\\[2,'n']\\[0,'m'];"        );
+        addLine(script, "dd.:=c\\[2,'n']\\[0,'m'];");
         addLine(script, "ok2 := dd.0.0==20 && dd.1.1=='nm';"); // can't use repeated reduce here because lists and stems can't be compared.
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
@@ -2342,5 +2361,66 @@ public class StemTest extends AbstractQDLTester {
         assert getBooleanValue("ok1", state) : "c\\[2,'n']\\[0,'s'] failed";
         assert getBooleanValue("ok2", state) : "c\\[2,'n']\\[0,'m'] failed";
     }
+
+    public void testMixedExtraction2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, SUBSTEM_QDL_SETUP);
+        addLine(script, SUBSTEM_LIST_QDL_SETUP);
+        addLine(script, "z.:=n(3,4,n(12));");
+
+        addLine(script, "c. := b.~a.;");
+        addLine(script, "ok :=reduce(@&&, c\\>[star(),'s'] == {4:'0s',5:'4s', 'p':'ps', 'q':'qs'});");
+        addLine(script, "ok1 :=reduce(@&&,reduce(@&&, c\\>[[2,'n'],[0,'s']] == [[20]]));"); // not all present is ok
+        addLine(script, "dd.:=c\\>[[2,'n'],[0,'m']];");
+        addLine(script, "ok2 := dd.0.0==20 && dd.1.1=='nm';"); // can't use repeated reduce here because lists and stems can't be compared.
+        addLine(script, "ok3 := reduce(@&&, z\\>(1~(size(z.)<4?star():2)) == [4,5,6,7]);");
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "c\\>[star(),'s'] failed";
+        assert getBooleanValue("ok1", state) : "c\\>[[2,'n'],[0,'s']] failed";
+        assert getBooleanValue("ok2", state) : "c\\>[[2,'n'],[0,'s']] failed";
+        assert getBooleanValue("ok3", state) : "z\\>(1~(size(z.)<4?star():2)) failed";
+    }
+
+    public static String BIG_JSON_OBJECT = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/test.json";
+
+    /**
+     * This grabs a large randomly generated JSON object (which is stashed for reprodicibility)
+     * turns it into a stem, then interrogates it using the extraction operator. It compares
+     * \ with \> and double checks that a bunch of cases work right.
+     *
+     * @throws Throwable
+     */
+    public void testJSONExtractions() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := from_json(file_read('" + BIG_JSON_OBJECT + "'));");
+
+        addLine(script, "q.:=a\\[1,2]\\friends\\*\\name;");
+        addLine(script, "q2.:=a\\>[[1,2],'friends',star(),'name'];");
+        addLine(script, "q_value.:=[['Leola Mcdowell','Pate Vaughn','Bennett Kane'],['Jackie Webb','Baker Hartman','Sandra Johns']];");
+        addLine(script, "ok :=reduce(@&&, reduce(@&&,q.==q_value.));");
+        addLine(script, "ok_2 :=reduce(@&&, reduce(@&&,q2.==q_value.));");
+        addLine(script, "ok1 := reduce(@&&, a\\*\\index == [0,1,2,3,4,5,6,7,8,9]);");
+        addLine(script, "ok1_2 := reduce(@&&, a\\>[star(),'index'] == [0,1,2,3,4,5,6,7,8,9]);");
+        addLine(script, "ok2 := reduce(@&&, 10 + a\\*\\age == [46,48,50,30,45,31,32,36,49,37]);");
+        addLine(script, "ok2_2 := reduce(@&&,  a\\>[star(),'age'] + 10 == [46,48,50,30,45,31,32,36,49,37]);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "a\\[1,2]\\friends\\*\\name failed";
+        assert getBooleanValue("ok_2", state) : "a\\>[[1,2],'friends',star(),name] failed";
+        assert getBooleanValue("ok1", state) : "a\\*\\index failed";
+        assert getBooleanValue("ok1_2", state) : "a\\[star(),'index'] failed";
+        assert getBooleanValue("ok2", state) : " 10 + a\\*\\age failed";
+        assert getBooleanValue("ok2_2", state) : "a\\>[star(),'age'] + 10 failed";
+    }
+      /*
+        from_json(file_read('/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/test.json'))=:a.
+          a\[1,2]\friends\*\name
+            10 + a\*\age
+[46,48,50,30,45,31,32,36,49,37]
+       */
 }
 

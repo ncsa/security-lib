@@ -128,8 +128,8 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
              Tilde : '~';
          Backslash : '\\!' | '\\' ;
         Backslash2 : '\\!*' | '\\*' ;
-        Backslash3 : '\\>!' | '\\>' ;
-        Backslash4 : '\\>!*' | '\\>*' ;
+        Backslash3 : '\\!>' | '\\>' ;
+        Backslash4 : '\\!>*' | '\\>*' ;
               Hash : '#';
              Stile : '|';
         TildeRight : '~|' | '≁'; // unicode 2241, tilde slash

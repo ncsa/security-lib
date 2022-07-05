@@ -1766,7 +1766,7 @@ illegal argument:no module named "b" was  imported at (1, 67)
                         indexArg.strictOrder = true; // This gets set in a different pass, so must be stored
                     case StemSubsettingNode.EXTRACT_STAR:
                     case StemSubsettingNode.EXTRACT_LIST_STAR:
-                        indexArg.swri = new StemSubsettingNode.AllIndices();
+                        indexArg.swri = new AllIndices();
                         ssn.addArgument(indexArg);
                         break;
                     case StemSubsettingNode.EXTRACT_LIST:

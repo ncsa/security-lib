@@ -57,7 +57,7 @@ public class IndexArg {
     }
 
     public boolean isWildcard() {
-        return swri instanceof StemSubsettingNode.AllIndices;
+        return swri instanceof AllIndices;
     }
 
     public StatementWithResultInterface swri;

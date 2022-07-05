@@ -4228,6 +4228,49 @@ hence the values are copied.
    ]]>
         </example>
     </entry>
+    <entry id="\>">
+       <body>
+  <![CDATA[Extraction using a simple list of elements. Each element of the list
+is treated like an argument. In essence, in this context > distrubutes \
+to each element of the list
+
+E.g.
+a\p\q\r\t == a\>[p,q,r,t]
+
+One caveat is that with \, like the stem reference operator ., you may
+supply unknown variables which will be replaced with their constant values.
+So
+a\b == a\'b'
+
+if and only if b is undefined, otherwise b's value is substituted. However
+with \>, the system evaluates the list before handing it over, so this is
+not possible and all list elements must be resolvable.
+  See \, star()
+  ]]>
+       </body>
+       <example>
+   <![CDATA[
+   ]]>
+        </example>
+    </entry>
+    <entry id="star">
+       <body>
+  <![CDATA[star() is a functional analog of the wildcard or * operator
+in extractions. That assumes the full set of indices in context.
+a\* == a\star()
+
+This is most useful if you are constructing an argument for extraction, e.g.
+  a.:=n(3,4,n(12))
+  a\>(1~(size(a.)<4?star():2))
+[4,5,6,7]
+  ]]>
+       </body>
+       <example>
+   <![CDATA[
+   ]]>
+        </example>
+    </entry>
+
     <!--
         entry template
     -->

@@ -128,6 +128,10 @@ public class StemEvaluator extends AbstractEvaluator {
     public static final int VALUES_TYPE = 208 + STEM_FUNCTION_BASE_VALUE;
 
 
+    public static final String STAR = "star";
+    public static final int STAR_TYPE = 209 + STEM_FUNCTION_BASE_VALUE;
+
+
     // Conversions to/from JSON.
     public static final String TO_JSON = "to_json";
     public static final int TO_JSON_TYPE = 300 + STEM_FUNCTION_BASE_VALUE;
@@ -147,6 +151,7 @@ public class StemEvaluator extends AbstractEvaluator {
     public String[] getFunctionNames() {
         if (fNames == null) {
             fNames = new String[]{
+                    STAR,
                     DIMENSION, RANK,
                     TRANSPOSE, TRANSPOSE2,
                     REMAP,
@@ -182,6 +187,8 @@ public class StemEvaluator extends AbstractEvaluator {
     @Override
     public int getType(String name) {
         switch (name) {
+            case STAR:
+                return STAR_TYPE;
             case DIMENSION:
                 return DIMENSION_TYPE;
             case RANK:
@@ -265,6 +272,9 @@ public class StemEvaluator extends AbstractEvaluator {
 
     public boolean evaluate2(Polyad polyad, State state) {
         switch (polyad.getName()) {
+            case STAR:
+                doStar(polyad, state);
+                return true;
             case DIMENSION:
                 doDimension(polyad, state);
                 return true;
@@ -361,6 +371,21 @@ public class StemEvaluator extends AbstractEvaluator {
                 return true;
         }
         return false;
+    }
+
+    private void doStar(Polyad polyad, State state) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{0});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (polyad.getArgCount() != 0) {
+            throw new MissingArgException(STAR + " takes no arguments", polyad.getArgCount() == 1 ? polyad.getArgAt(0) : polyad);
+        }
+        polyad.setResult(new AllIndices());
+        polyad.setResultType(NULL_TYPE);
+        polyad.setEvaluated(true);
+        return;
     }
 
     private void doRemap(Polyad polyad, State state) {

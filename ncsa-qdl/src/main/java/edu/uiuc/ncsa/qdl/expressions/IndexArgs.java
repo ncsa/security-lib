@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
+import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -59,7 +60,7 @@ public class IndexArgs extends ArrayList<IndexArg> {
         if (Constant.isScalar(obj)) {
             return 1;
         }
-        if (obj instanceof StemSubsettingNode.AllIndices) {
+        if (obj instanceof AllIndices) {
             throw new IllegalStateException("cannot compute size for wildcards");
         }
         if (obj instanceof QDLStem) {
@@ -215,13 +216,23 @@ d  |  [0,      2,       0]
             for (Object key : args.keySet()) {
                 IndexArg indexArg1 = new IndexArg();
                 indexArg1.strictOrder = indexArg.strictOrder;
-                ConstantNode constantNode = new ConstantNode(args.get(key));
-                constantNode.setEvaluated(true);
-                indexArg1.swri = constantNode;
+                if(args.get(key) instanceof AllIndices){
+                    indexArg1.swri = (AllIndices) args.get(key);
+
+                }else{
+                    ConstantNode constantNode = new ConstantNode(args.get(key));
+                    constantNode.setEvaluated(true);
+                    indexArg1.swri = constantNode;
+                }
                 indexArgs.add(indexArg1);
 
             }
         } else {
+            if((indexArg.swri instanceof Polyad)){
+                if(((Polyad)indexArg.swri).getName().equals(StemEvaluator.STAR)){
+                    indexArg.swri = new AllIndices();
+                }
+            }
             indexArgs.add(indexArg);
         }
         return indexArgs;

@@ -35,6 +35,10 @@ public class Constant {
     Object value;
     int type = UNKNOWN_TYPE;
 
+    public static boolean isString(Object key) {
+        return key instanceof String;
+    }
+
 
     public int getType() {
         return type;
