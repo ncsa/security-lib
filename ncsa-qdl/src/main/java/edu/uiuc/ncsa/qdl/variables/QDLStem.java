@@ -881,7 +881,7 @@ public class QDLStem implements Map<String, Object>, Serializable {
                 if (hasDefaultValue()) {
                     obj = getDefaultValue();
                 } else {
-                    throw new IndexError("the index of \"" + indexList.get(i) + "\" was not found in this stem", null);
+                    throw new IndexError("the index " + i + " for " + indexList + "\" was not found in this stem", null);
                 }
             }
 
@@ -889,7 +889,7 @@ public class QDLStem implements Map<String, Object>, Serializable {
                 currentStem = (QDLStem) obj;
             } else {
                 if (strictMatching && i != indexList.size() - 1) {
-                    throw new IndexError("no such stem at this multi-index.", null);
+                    throw new IndexError("no such stem at  multi-index " + indexList, null);
                 }
                 rc.add(obj); // 0th entry is returned value
                 gotOne = true;

@@ -73,7 +73,7 @@ public class OpEvaluator extends AbstractEvaluator {
     public static final String REGEX_MATCH = "=~";
     public static final String REGEX_MATCH2 = "≈";
     public static final String TO_SET = "⊢";
-    public static final String TO_SET2 = "|>";
+    public static final String TO_SET2 = "|=";
     public static final String EPSILON = "∈";
     public static final String EPSILON_NOT = "∉";
     public static final String IS_A = "<<";

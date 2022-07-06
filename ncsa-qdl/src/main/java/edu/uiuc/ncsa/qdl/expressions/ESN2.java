@@ -295,7 +295,7 @@ public class ESN2 extends ExpressionImpl {
             gotOne = true;
         }
         if (!gotOne) {
-            System.out.println("uh-oh");
+            throw new IndexError("no such element", null);
         }
         // it is possible that the left most expression is a stem node, so make sure there is
         // something to return

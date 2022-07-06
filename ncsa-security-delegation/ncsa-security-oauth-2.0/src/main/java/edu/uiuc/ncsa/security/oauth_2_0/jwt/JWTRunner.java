@@ -152,7 +152,8 @@ public class JWTRunner {
             h.setAccountingInformation();
         }
         doScript(SRE_PRE_USER_INFO);
-
+        //CIL-1328 fix
+        getFromSources(transaction.getFlowStates(), SRE_PRE_AUTH, false);
         doScript(SRE_POST_USER_INFO);
         for (PayloadHandler h : handlers) {
             h.checkClaims();
