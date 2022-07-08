@@ -219,6 +219,7 @@ public class JWTRunner {
                         isRunAtAuthz = !claimSource.isRunAtAuthorization();
                     }
                     if (isRunAtAuthz) {
+                        DebugUtil.trace(this, "executing get claims");
                         claims = h.execute(claimSource, claims);
                         //claimSource.process(claims, request, transaction);
 

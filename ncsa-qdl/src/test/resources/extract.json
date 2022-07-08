@@ -1,0 +1,28 @@
+{
+ "qdl":  [
+    {
+   "args":    {
+    "bind_dn": "uid=oa4mp_user,ou=system,o=MESSIER,o=CO,dc=cilogon,dc=org",
+    "bind_password": "xxxxxxxxxx",
+    "list_attributes": [],
+    "return_attributes": ["isMemberOf"],
+    "search_attribute": "uid",
+    "search_base": "ou=people,o=MESSIER,o=CO,dc=cilogon,dc=org",
+    "server_fqdn": "ldap-dev.cilogon.org",
+    "server_port": 636
+   },
+   "load": "COmanageRegistry/default/identity_token_ldap_claim_source.qdl",
+   "xmd": {"exec_phase": "pre_auth"}
+  },
+    {
+   "args": {"isMemberOf": "is_member_of"},
+   "load": "COmanageRegistry/default/identity_token_ldap_claim_process.qdl",
+   "xmd": {"exec_phase":    [
+    "post_refresh",
+    "post_token",
+    "post_user_info"
+   ]}
+  }
+ ],
+ "type": "identity"
+}

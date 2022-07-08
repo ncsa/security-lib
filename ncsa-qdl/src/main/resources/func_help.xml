@@ -2344,7 +2344,7 @@ assert[][]     ⊨       a    \u22a8         assert
 |]             ⟧       }    \u27e7         right closed slice bracket
 ceiling        ⌈       k    \u2308         ceiling
 floor          ⌊       l    \u230a         floor
-|=             ⊢       s    \u22a2         create a set
+|^             ⊢       s    \u22a2         create a set
 transpose      τ       t    \u03c4         alias for the transpose function.
 pi             π       p    \u03c0         Greek letter pi.
 
@@ -3647,7 +3647,7 @@ another.
 See also: ∈ (has_value), comparisons, subset(@pick arg)]]>
         </body>
         <example>
-<![CDATA[  z := |=[;20]*3+2
+<![CDATA[  z := |^[;20]*3+2
   z == z
 true
    'abcd' == 'Abcd'
@@ -3754,21 +3754,21 @@ with stems is a bit clunky.
 See also: slice, set]]>
         </body>
     </entry>
-    <entry id="|=" alt="⊢">
+    <entry id="|^" alt="⊢">
             <body>
 <![CDATA[Ascii digraph for the operator to convert its argument to a set.
 
-   |=false
+   |^false
 {false}]]>
             </body>
         <example>
-            <![CDATA[   |=3; // convert a scalar to a set
+            <![CDATA[   |^3; // convert a scalar to a set
 {3}
-   |=[2;7]; // convert the values of a list to a set
+   |^[2;7]; // convert the values of a list to a set
 {2,3,4,5,6}
-   |={'a':2/3,'b':-3/pi()}; // convert the values of a stem to a set
+   |^{'a':2/3,'b':-3/pi()}; // convert the values of a stem to a set
 {0.666666666666666,-0.954929658551372}
-   |=keys({'a':2/3,'b':-3/pi()}); // convert the keys of a stem to a set
+   |^keys({'a':2/3,'b':-3/pi()}); // convert the keys of a stem to a set
 {a,b}
   ⊢[;5]; // use the other form of the operator
 {0,1,2,3,4}]]>

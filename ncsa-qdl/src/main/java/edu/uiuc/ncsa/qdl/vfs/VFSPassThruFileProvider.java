@@ -36,7 +36,7 @@ public class VFSPassThruFileProvider extends AbstractVFSFileProvider {
     }
 
 
-    protected String getRealPath(String path) {
+    public String getRealPath(String path) {
         return rootDir + super.getRealPath(path);
     }
 

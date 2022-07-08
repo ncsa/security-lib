@@ -2422,5 +2422,40 @@ public class StemTest extends AbstractQDLTester {
             10 + a\*\age
 [46,48,50,30,45,31,32,36,49,37]
        */
+
+    //
+
+    /**
+     * This is a snippet that was particularly troublesome to get working right, so it should end up as
+     * a regression test. These are partial ttests, since full tests would be a lot. Will probably
+     * write them later though.
+     *
+     * @throws Throwable
+     */
+    public void testJSONExtractions2() throws Throwable {
+        String jsonFile = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources/extract.json";
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x. := from_json(file_read('" + jsonFile + "'));");
+        addLine(script, "z. := x\\qdl\\*\\xmd;"); // should give list
+        // [{'exec_phase':'pre_auth'},{'exec_phase':['post_refresh','post_token','post_user_info']}]
+        addLine(script, "okz := size(z.)==2 && (z.0.'exec_phase'=='pre_auth') && (size(z.1.'exec_phase')==3);");
+        addLine(script, "oky := size(x\\qdl\\*) == 2;"); // should give x.qdl
+        addLine(script, "w. := x\\qdl\\*\\load;"); // should give x.qdl.[0,2].load
+        addLine(script, "w_check. := ['COmanageRegistry/default/identity_token_ldap_claim_source.qdl','COmanageRegistry/default/identity_token_ldap_claim_process.qdl'];");
+        addLine(script, "okw := reduce(@&&, w. == w_check.);");
+        addLine(script, "s. := x\\qdl\\0\\args;"); // should give x.qdl.0.args
+        addLine(script, "oks := size(s.) == 8 && s.'server_port'==636;");
+        addLine(script, "t. := x\\qdl\\0\\*;"); // should give x.qdl.0
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("oky", state) : "size(x\\qdl\\*) == 2 failed";
+        assert getBooleanValue("okz", state) : "x\\qdl\\*\\xmd failed";
+        assert getBooleanValue("okw", state) : "x\\qdl\\*\\load failed";
+        assert getBooleanValue("oks", state) : "x\\qdl\\0\\args failed";
+
+    }
+
 }
 

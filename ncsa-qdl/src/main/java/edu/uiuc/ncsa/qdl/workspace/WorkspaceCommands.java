@@ -650,7 +650,7 @@ public class WorkspaceCommands implements Logable, Serializable {
     }
 
     protected boolean useExternalEditor() {
-        return getQdlEditors() != null && !getQdlEditors().isEmpty() && isUseExternalEditor() && !getExternalEditorName().equals(LINE_EDITOR_NAME);
+        return hasEditors() && !getQdlEditors().isEmpty() && isUseExternalEditor() && !getExternalEditorName().equals(LINE_EDITOR_NAME);
     }
 
     private int _doFileEdit(InputLine inputLine) {
@@ -1091,7 +1091,7 @@ public class WorkspaceCommands implements Logable, Serializable {
             say("edit (index | name)");
             sayi("invoke the editor on the given buffer");
             sayi("-list - list available editors");
-            sayi("-add name exec - add a (basic) editor configuration.");
+            sayi("-add name exec - add a (basic) editor configuration: ");
             sayi("-rm name - remove an editor: note it cannot be the currently active one");
             sayi("-use name - use this as the default. Implicitly enables using external editors if needed.");
             return RC_NO_OP;
@@ -1101,6 +1101,7 @@ public class WorkspaceCommands implements Logable, Serializable {
             return RC_NO_OP;
         }
         if (inputLine.hasArg("-add")) {
+
             if (inputLine.getArgCount() != 3) {
                 say("Sorry, wrong number of arguments for -add");
                 return RC_NO_OP;
@@ -1112,6 +1113,7 @@ public class WorkspaceCommands implements Logable, Serializable {
             }
             inputLine.removeSwitchAndValue("-add");
             String exec = inputLine.getLastArg();
+
             if (getQdlEditors().hasEntry(name)) {
                 boolean ok = readline("The editor named \"" + name + "\" already exists. Do you want to over write it (y/n)?").equals("y");
                 if (!ok) {
@@ -4611,8 +4613,14 @@ public class WorkspaceCommands implements Logable, Serializable {
 
     boolean compressXML = true;
 
+    public boolean hasEditors(){
+        return qdlEditors!=null;
+    }
 
     public Editors getQdlEditors() {
+        if(qdlEditors == null){
+            qdlEditors = new Editors();
+        }
         return qdlEditors;
     }
 

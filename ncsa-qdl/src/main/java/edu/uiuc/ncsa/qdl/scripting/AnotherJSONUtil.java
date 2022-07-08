@@ -82,7 +82,9 @@ public class AnotherJSONUtil implements ScriptingConstants {
         if (topNode.isArray()) {
             JSONArray a = (JSONArray) topNode;
             for (int i = 0; i < a.size(); i++) {
-                scripts.add(createScript(a.getJSONObject(i).getJSONObject("qdl")));
+                // CIL-1333 remove next line. It does nto reflect the structure of the object.
+           //     scripts.add(createScript(a.getJSONObject(i).getJSONObject("qdl")));
+                scripts.add(createScript(a.getJSONObject(i)));
             }
         } else {
             scripts.add(createScript((JSONObject) topNode));
@@ -226,7 +228,7 @@ public class AnotherJSONUtil implements ScriptingConstants {
 
     public static void main(String[] args) {
         try {
-            JSONObject j = JSONObject.fromObject(test4);
+            JSONObject j = JSONObject.fromObject(test6);
             System.out.println(j.toString(1));
             ScriptSet<QDLScript> scripts = createScripts((JSON) j.get("qdl"));
             scripts.get(SRE_EXEC_PHASE, SRE_POST_AT);
@@ -237,6 +239,7 @@ public class AnotherJSONUtil implements ScriptingConstants {
     }
 
     static String test0 = "{\"qdl\":{\"load\":\"x.qdl\"}}";
+    static String test0a = "{\"qdl\":[{\"load\":\"x.qdl\", \"xmd\":\"pre_auth\"},{\"load\":\"x.qdl\",\"xmd\":\"pre_token\"}]}";
     static String test1 = "{\"qdl\":{\"code\":\"init();\"}}";
     static String test2 = "{\"qdl\":\n" +
             "   {\n" +
@@ -272,4 +275,33 @@ public class AnotherJSONUtil implements ScriptingConstants {
             "     \"xmd\":{\"phase\":\"pre_auth\",\"token_type\":\"scitoken\"}\n" +
             "   }\n" +
             "}\n";
+
+    static String test6 = "{\n" +
+            "                         \"qdl\":  [\n" +
+            "                            {\n" +
+            "                           \"args\":    {\n" +
+            "                            \"bind_dn\": \"uid=oa4mp_user,ou=system,o=MESSIER,o=CO,dc=cilogon,dc=org\",\n" +
+            "                            \"bind_password\": \"A81IyAb2sa5MUc5jMQzx\",\n" +
+            "                            \"list_attributes\": [],\n" +
+            "                            \"return_attributes\": [\"isMemberOf\"],\n" +
+            "                            \"search_attribute\": \"uid\",\n" +
+            "                            \"search_base\": \"ou=people,o=MESSIER,o=CO,dc=cilogon,dc=org\",\n" +
+            "                            \"server_fqdn\": \"ldap-dev.cilogon.org\",\n" +
+            "                            \"server_port\": 636\n" +
+            "                           },\n" +
+            "                           \"load\": \"COmanageRegistry/default/identity_token_ldap_claim_source.qdl\",\n" +
+            "                           \"xmd\": {\"exec_phase\": \"pre_auth\"}\n" +
+            "                          },\n" +
+            "                            {\n" +
+            "                           \"args\": {\"isMemberOf\": \"is_member_of\"},\n" +
+            "                           \"load\": \"COmanageRegistry/default/identity_token_ldap_claim_process.qdl\",\n" +
+            "                           \"xmd\": {\"exec_phase\":    [\n" +
+            "                            \"post_refresh\",\n" +
+            "                            \"post_token\",\n" +
+            "                            \"post_user_info\"\n" +
+            "                           ]}\n" +
+            "                          }\n" +
+            "                         ],\n" +
+            "                         \"type\": \"identity\"\n" +
+            "                        }\n";
 }
