@@ -12,9 +12,7 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -72,17 +70,21 @@ public class MIStack<V extends MITable<? extends XKey, ? extends MIWrapper>> ext
      * @param xKey
      * @return
      */
+/*
     public Set<MTKey> getByAlias(XKey xKey) {
         HashSet<MTKey> keys = new HashSet<>();
         Set<XKey> allKeys = keySet();
         for (XKey tempKey : allKeys) {
             // Remember that the key of the module is its alias, not its
             // namespace (which is used to key templates).
-            Module m = (Module) get(tempKey);
-            keys.add(new MTKey(m.getNamespace()));
+            MIWrapper wrapper = (MIWrapper) get(tempKey);
+            if(tempKey.equals(xKey)) {
+                keys.add(new MTKey(wrapper.getModule().getNamespace()));
+            }
         }
         return keys;
     }
+*/
 
     /**
      * For a given module namespace, return all current aliases. Note that this means

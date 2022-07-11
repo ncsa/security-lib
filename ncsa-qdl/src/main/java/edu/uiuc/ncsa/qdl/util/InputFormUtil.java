@@ -195,7 +195,7 @@ public class InputFormUtil {
         return set.inputForm();
     }
     /**
-     * Finds teh input form for a module. Note that the name is either
+     * Finds the input form for a module. Note that the name is either
      * an alias, like acl or acl# (trailing # is optional) or the namespace
      * (like oa4mp:/util/acl)
      *

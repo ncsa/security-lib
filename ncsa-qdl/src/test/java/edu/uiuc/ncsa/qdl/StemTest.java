@@ -2442,7 +2442,8 @@ public class StemTest extends AbstractQDLTester {
         addLine(script, "okz := size(z.)==2 && (z.0.'exec_phase'=='pre_auth') && (size(z.1.'exec_phase')==3);");
         addLine(script, "oky := size(x\\qdl\\*) == 2;"); // should give x.qdl
         addLine(script, "w. := x\\qdl\\*\\load;"); // should give x.qdl.[0,2].load
-        addLine(script, "w_check. := ['COmanageRegistry/default/identity_token_ldap_claim_source.qdl','COmanageRegistry/default/identity_token_ldap_claim_process.qdl'];");
+        addLine(script, "w_check. := ['COmanageRegistry/default/identity_token_ldap_claim_source.qdl'," +
+                "'COmanageRegistry/default/identity_token_ldap_claim_process.qdl'];");
         addLine(script, "okw := reduce(@&&, w. == w_check.);");
         addLine(script, "s. := x\\qdl\\0\\args;"); // should give x.qdl.0.args
         addLine(script, "oks := size(s.) == 8 && s.'server_port'==636;");

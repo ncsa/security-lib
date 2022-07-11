@@ -39,10 +39,7 @@ import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.util.cli.*;
-import edu.uiuc.ncsa.security.util.cli.editing.EditorEntry;
-import edu.uiuc.ncsa.security.util.cli.editing.EditorUtils;
-import edu.uiuc.ncsa.security.util.cli.editing.Editors;
-import edu.uiuc.ncsa.security.util.cli.editing.LineEditor;
+import edu.uiuc.ncsa.security.util.cli.editing.*;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import edu.uiuc.ncsa.security.util.terminal.ISO6429IO;
@@ -214,10 +211,10 @@ public class WorkspaceCommands implements Logable, Serializable {
         sayi(RJustify(MODULES_COMMAND, length) + " - lists all the loaded modules this workspace knows about.");
         sayi(RJustify(OFF_COMMAND, length) + " - exit the workspace.");
         sayi(RJustify(LOAD_COMMAND, length) + " - Load a file of QDL commands and execute it immediately in the current workspace.");
-        sayi(RJustify(STATE_INDICATOR_COMMAND, length) + " - commands relating to teh state indicator.");
+        sayi(RJustify(STATE_INDICATOR_COMMAND, length) + " - commands relating to the state indicator.");
         sayi(RJustify(VARS_COMMAND, length) + " - lists all of the variables this workspace knows about.");
         sayi(RJustify(WS_COMMAND, length) + " - commands relating to this workspace.");
-        sayi(RJustify(EDIT_COMMAND, length) + " - commands relating to running the line editor.");
+        sayi(RJustify(EDIT_COMMAND, length) + " - commands relating to running the current editor.");
         sayi(RJustify(EXECUTE_COMMAND, length) + " - short hand to execute whatever is in the current buffer.");
         say("Generally, supplying --help as a parameter to a command will print out something useful.");
         say("Full documentation is available in the docs directory of the distro or at https://cilogon.github.io/qdl/docs/qdl_workspace.pdf");
@@ -273,8 +270,14 @@ public class WorkspaceCommands implements Logable, Serializable {
             case CLEAR_COMMAND:
                 return _wsClear(inputLine);
             case EDIT_COMMAND:
-                //  return doEditCommand(inputLine);
-                return _doBufferEdit(inputLine);
+                try{
+                    // if the last argument is an integer,
+                    inputLine.getIntArg(1);
+                    return _doBufferEdit(inputLine);
+                }catch(ArgumentNotFoundException t){
+
+                }
+                return _doEditor(inputLine);
             case EXECUTE_COMMAND:
                 return _doBufferRun(inputLine);
             case RESUME_COMMAND:
@@ -1082,37 +1085,41 @@ public class WorkspaceCommands implements Logable, Serializable {
     }
 
     boolean useExternalEditor = false;
-    String externalEditorName = "";
+    String externalEditorName = LINE_EDITOR_NAME; // default
 
     List<String> editorClipboard = new LinkedList<>();
 
-    private int _doBufferEdit(InputLine inputLine) {
-        if (_doHelp(inputLine)) {
-            say("edit (index | name)");
-            sayi("invoke the editor on the given buffer");
-            sayi("-list - list available editors");
-            sayi("-add name exec - add a (basic) editor configuration: ");
-            sayi("-rm name - remove an editor: note it cannot be the currently active one");
-            sayi("-use name - use this as the default. Implicitly enables using external editors if needed.");
-            return RC_NO_OP;
-        }
-        if (inputLine.getArgCount() == 0) {
-            say("you must supply either an buffer index or name to edit.");
-            return RC_NO_OP;
-        }
-        if (inputLine.hasArg("-add")) {
+    public static String EDITOR_ADD = "add";
+    public static String EDITOR_USE = "use";
+    public static String EDITOR_LIST = "list";
+    public static String EDITOR_REMOVE = "rm";
+    public static String EDITOR_CLEAR_SCREEN;
 
-            if (inputLine.getArgCount() != 3) {
-                say("Sorry, wrong number of arguments for -add");
+    private int _doEditor(InputLine inputLine){
+        if(_doHelp(inputLine)){
+            sayi("list - list available editors");
+            sayi("add name [-clear_screen] exec  - add a (basic) editor configuration.");
+            sayi("       -clear_screen tells QDL to try and clear the screen before launching the editor. This is");
+            sayi("            usually only needed if the application does not do this (most do).");
+            sayi("        Adding editors can be quite complex, so it might require adding it in the configuration file.");
+            sayi("rm name - remove an editor: note it cannot be the currently active one");
+            sayi("use name - use this as the default. Implicitly enables using external editors if needed.");
+            return RC_NO_OP;
+        }
+        if (inputLine.hasArg(EDITOR_ADD)) {
+
+            if (3 <= inputLine.getArgCount() ) {
+                say("Sorry, wrong number of arguments for " + EDITOR_ADD);
                 return RC_NO_OP;
             }
-            String name = inputLine.getNextArgFor("-use");
+            boolean isClearScreen = inputLine.hasArg(EDITOR_CLEAR_SCREEN);
+            inputLine.removeSwitch(EDITOR_CLEAR_SCREEN);
+            String name = inputLine.getNextArgFor(EDITOR_ADD);
             if (isTrivial(name)) {
                 say("no name specified.");
                 return RC_NO_OP;
             }
-            inputLine.removeSwitchAndValue("-add");
-            String exec = inputLine.getLastArg();
+            inputLine.removeSwitchAndValue(EDITOR_ADD);
 
             if (getQdlEditors().hasEntry(name)) {
                 boolean ok = readline("The editor named \"" + name + "\" already exists. Do you want to over write it (y/n)?").equals("y");
@@ -1121,15 +1128,38 @@ public class WorkspaceCommands implements Logable, Serializable {
                     return RC_NO_OP;
                 }
             }
+            // At this point all that should be left is the executable (and a list of arguments.)
+            String exec = inputLine.getArg(1);
+/*            List<String> args = new ArrayList<>();
+            for(int i = 1; i < inputLine.getArgCount(); i++){
+                EditorArg editorArg = new EditorArg();
+                editorArg.
+                  args.add(inputLine.getArg(i));
+            }*/
+
             EditorEntry ee = new EditorEntry();
             ee.name = name;
             ee.exec = exec;
+            ee.clearScreen = isClearScreen;
+//            ee.args =
             getQdlEditors().put(ee);
+            say("added '" + name + "' with executable '" + exec + "' ");
+            File file = new File(exec);
+            if(!file.exists()){
+                say("warn: '" + exec + "' does not exist");
+            }
+            if(file.isDirectory()){
+                say("warn: '" + exec + "' is a directory");
+            }
+            if(!file.canRead()){
+                say("warn: you do not have permission to access '" + exec + "'");
+            }
+
             return RC_CONTINUE;
         }
 
-        if (inputLine.hasArg("-use")) {
-            String name = inputLine.getNextArgFor("-use");
+        if (inputLine.hasArg(EDITOR_USE)) {
+            String name = inputLine.getNextArgFor(EDITOR_USE);
             if (isTrivial(name)) {
                 say("no name specified.");
                 return RC_NO_OP;
@@ -1138,8 +1168,8 @@ public class WorkspaceCommands implements Logable, Serializable {
             setUseExternalEditor(!name.equals(LINE_EDITOR_NAME));
             return RC_CONTINUE;
         }
-        if (inputLine.hasArg("-rm")) {
-            String name = inputLine.getNextArgFor("-use");
+        if (inputLine.hasArg(EDITOR_REMOVE)) {
+            String name = inputLine.getNextArgFor(EDITOR_REMOVE);
             if (isTrivial(name)) {
                 say("no name specified.");
                 return RC_NO_OP;
@@ -1157,10 +1187,26 @@ public class WorkspaceCommands implements Logable, Serializable {
             }
             return RC_CONTINUE;
         }
-        if (inputLine.hasArg("-list")) {
+
+        if (inputLine.hasArg(EDITOR_LIST) || inputLine.getArgCount() == 0) {
             listEditors();
             return RC_NO_OP;
         }
+
+        say("unrecognized command");
+        return RC_CONTINUE;
+    }
+    private int _doBufferEdit(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("edit (handle | name)");
+            sayi("invoke the editor on the given buffer");
+            return RC_NO_OP;
+        }
+        if (inputLine.getArgCount() == 0) {
+            say("you must supply either an buffer handle or command.");
+            return RC_NO_OP;
+        }
+
         BufferManager.BufferRecord br = getBR(inputLine);
         if (br == null || br.deleted) {
             say("Sorry. No such buffer");
@@ -1453,7 +1499,15 @@ public class WorkspaceCommands implements Logable, Serializable {
             BufferManager.BufferRecord br = bufferManager.getBufferRecords().get(i);
             if (!br.deleted) {
                 count++;
-                say(formatBufferRecord(i, bufferManager.getBufferRecords().get(i)));
+                String x = formatBufferRecord(i, bufferManager.getBufferRecords().get(i));
+                if(br.isLink()){
+                    
+                } else{
+                    if(!br.memoryOnly){
+                      x = x + " [" + br.srcSavePath + "]";
+                    }
+                }
+                say(x);
             }
         }
         say("there are " + count + " active buffers.");
@@ -3567,7 +3621,7 @@ public class WorkspaceCommands implements Logable, Serializable {
                 }
                 String oldName = getExternalEditorName();
                 setExternalEditorName(value);
-                say("external editor was " + (isTrivial(oldName) ? "(null)" : oldName) + " now is '" + getExternalEditorName() + "'");
+                say("external editor was '" + oldName + "' now is '" + getExternalEditorName() + "'");
                 break;
             case ENABLE_LIBRARY_SUPPORT:
                 getState().setEnableLibrarySupport(isOnOrTrue(value));

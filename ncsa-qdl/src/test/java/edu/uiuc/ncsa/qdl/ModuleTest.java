@@ -1173,7 +1173,7 @@ cannot access '__a'
 
     /**
      * Test that defining a function with the same name as a built-in function
-     * (here size()) works at teh module level.
+     * (here size()) works at the module level.
      *
      * @throws Throwable
      */

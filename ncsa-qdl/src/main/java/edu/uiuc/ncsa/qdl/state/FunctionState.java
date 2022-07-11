@@ -73,17 +73,17 @@ public abstract class FunctionState extends VariableState {
         if (0 < nsDelimIndex) {
             // This is at least of the form x#y
             StringTokenizer st = new StringTokenizer(name, NS_DELIMITER);
-            MIWrapper wrapper  = (MIWrapper) getMInstances().get(new XKey(st.nextToken()));
-            if(wrapper == null){
+            MIWrapper wrapper = (MIWrapper) getMInstances().get(new XKey(st.nextToken()));
+            if (wrapper == null) {
                 throw new QDLIllegalAccessException("module not found");
             }
             // We need the last token
             String lastName = st.nextToken();
             State currentState = wrapper.getModule().getState();
-            while(st.hasMoreTokens()){
-                if(st.hasMoreTokens()) {
+            while (st.hasMoreTokens()) {
+                if (st.hasMoreTokens()) {
                     wrapper = (MIWrapper) currentState.getMInstances().get(new XKey(lastName));
-                    if(wrapper == null){
+                    if (wrapper == null) {
                         throw new QDLIllegalAccessException("module not found");
                     }
                     currentState = wrapper.getModule().getState();
@@ -91,22 +91,22 @@ public abstract class FunctionState extends VariableState {
                 lastName = st.nextToken();
             }
             if (wrapper != null) {
-                for(FunctionRecord fr : wrapper.getModule().getState().getFTStack().getByAllName(lastName)){
+                for (FunctionRecord fr : wrapper.getModule().getState().getFTStack().getByAllName(lastName)) {
                     list.add(new FR_WithState(fr.clone(), wrapper.getModule().getState(), true));
                 }
             }
             return list;
         }   // just a name, look for all of them
-        for(FunctionRecord fr : getFTStack().getByAllName(name)){
+        for (FunctionRecord fr : getFTStack().getByAllName(name)) {
             list.add(new FR_WithState(fr.clone(), this, false));
         }
 
         for (Object key : getMInstances().keySet()) {
             MIWrapper wrapper = (MIWrapper) getMInstances().get((XKey) key);
-            if(wrapper == null){
+            if (wrapper == null) {
                 throw new QDLIllegalAccessException("module not found");
             }
-            for(FunctionRecord fr : wrapper.getModule().getState().getFTStack().getByAllName(name)){
+            for (FunctionRecord fr : wrapper.getModule().getState().getFTStack().getByAllName(name)) {
                 list.add(new FR_WithState(fr.clone(), wrapper.getModule().getState(), true));
             }
         }
@@ -132,17 +132,17 @@ public abstract class FunctionState extends VariableState {
                 // for this. Such arguments are stored with no arg count (so < 0)
                 // The next bit gets that and, if this is a function ref with the right number
                 // arguments, uses that.
-                XThing  xThing = getFTStack().get(new FKey(name, -1));
-                if(xThing instanceof FunctionRecord){
+                XThing xThing = getFTStack().get(new FKey(name, -1));
+                if (xThing instanceof FunctionRecord) {
                     FunctionRecord functionRecord = (FunctionRecord) xThing;
                 }
                 XThing xThing1 = getFTStack().get(new FKey(name, argCount));
-                if(xThing1 instanceof FunctionRecord){
+                if (xThing1 instanceof FunctionRecord) {
                     frs.functionRecord = (FunctionRecord) xThing1;
-                }else{
-                    if(xThing1 instanceof FR_WithState){
+                } else {
+                    if (xThing1 instanceof FR_WithState) {
                         frs = (FR_WithState) xThing1;
-                    }else{
+                    } else {
                         frs.functionRecord = null;
                     }
                 }
@@ -154,12 +154,12 @@ public abstract class FunctionState extends VariableState {
         // check for unqualified names.
         FR_WithState fr_withState = new FR_WithState();
         XThing xThing = getFTStack().get(new FKey(name, argCount));
-        if(xThing instanceof FunctionRecord) {
+        if (xThing instanceof FunctionRecord) {
             fr_withState.functionRecord = (FunctionRecord) getFTStack().get(new FKey(name, argCount));
             fr_withState.state = this;
-        }else{
-            if(xThing instanceof FR_WithState){
-                    fr_withState = (FR_WithState)  xThing;
+        } else {
+            if (xThing instanceof FR_WithState) {
+                fr_withState = (FR_WithState) xThing;
             }
         }
         // if there is an unqualified named function, return it.
@@ -348,8 +348,11 @@ public abstract class FunctionState extends VariableState {
                 // so they asked for something that didn't exist
                 return new ArrayList<>();
             }
-            Module module = (Module) getMInstances().getByAlias(aliasKey);
+            MIWrapper wrapper = (MIWrapper) getMInstances().get(aliasKey);
+            Module module = wrapper.getModule();
+
             List<String> docs;
+
             if (argCount == -1) {
                 docs = module.getState().getFTStack().listAllDocs(realName);
             } else {
@@ -359,6 +362,7 @@ public abstract class FunctionState extends VariableState {
                 return new ArrayList<>();
             }
             return docs;
+            // Should only ever be exactly one since this is fully qualified
             // easy cases.
 
         }
