@@ -1753,7 +1753,7 @@ illegal argument:no module named "b" was  imported at (1, 67)
             ParseTree p = parseTree.getChild(i);
 
             if ((p instanceof TerminalNodeImpl)) {
-                switch(p.getText()){
+                switch (p.getText()) {
                     default:
                         throw new IllegalArgumentException("unknown extraction operator");
                     case StemSubsettingNode.EXTRACT:
@@ -1944,13 +1944,17 @@ illegal argument:no module named "b" was  imported at (1, 67)
 
         functionRecord.name = name;
         //for (QDLParserParser.ArgListContext argListContext : nameAndArgsNode.argList()) {
-        for (QDLParserParser.F_argsContext argListContext : justArgs) {
-            // this is a comma delimited list of arguments.
-            String allArgs = argListContext.getText();
+        if (justArgs.isEmpty()) {
+            functionRecord.argNames = new ArrayList<>();
+        } else {
+            for (QDLParserParser.F_argsContext argListContext : justArgs) {
+                // this is a comma delimited list of arguments.
+                String allArgs = argListContext.getText();
 
-            StringTokenizer st = new StringTokenizer(allArgs, ",");
-            while (st.hasMoreElements()) {
-                functionRecord.argNames.add(st.nextToken());
+                StringTokenizer st = new StringTokenizer(allArgs, ",");
+                while (st.hasMoreElements()) {
+                    functionRecord.argNames.add(st.nextToken());
+                }
             }
         }
 

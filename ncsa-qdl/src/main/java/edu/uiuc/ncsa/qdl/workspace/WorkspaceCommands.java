@@ -39,7 +39,10 @@ import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.util.cli.*;
-import edu.uiuc.ncsa.security.util.cli.editing.*;
+import edu.uiuc.ncsa.security.util.cli.editing.EditorEntry;
+import edu.uiuc.ncsa.security.util.cli.editing.EditorUtils;
+import edu.uiuc.ncsa.security.util.cli.editing.Editors;
+import edu.uiuc.ncsa.security.util.cli.editing.LineEditor;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import edu.uiuc.ncsa.security.util.terminal.ISO6429IO;
@@ -257,6 +260,19 @@ public class WorkspaceCommands implements Logable, Serializable {
     public List<String> commandHistory = new LinkedList<>();
 
     public int execute(String inline) {
+        try {
+            return execute2(inline);
+        } catch (Throwable t) {
+            say("uh-oh. That did not work.");
+            if (isDebugOn()) {
+                t.printStackTrace();
+            }
+            return RC_NO_OP;
+        }
+
+    }
+
+    public int execute2(String inline) {
 
         inline = TemplateUtil.replaceAll(inline, env); // allow replacements in commands too...
         InputLine inputLine = new InputLine(CLT.tokenize(inline));
@@ -270,11 +286,11 @@ public class WorkspaceCommands implements Logable, Serializable {
             case CLEAR_COMMAND:
                 return _wsClear(inputLine);
             case EDIT_COMMAND:
-                try{
+                try {
                     // if the last argument is an integer,
                     inputLine.getIntArg(1);
                     return _doBufferEdit(inputLine);
-                }catch(ArgumentNotFoundException t){
+                } catch (ArgumentNotFoundException t) {
 
                 }
                 return _doEditor(inputLine);
@@ -697,19 +713,8 @@ public class WorkspaceCommands implements Logable, Serializable {
             case "help":
             case "--help":
                 say("buffer commands:");
-                say("# refers to the buffer number");
-                sayi("create {" + BUFFER_IN_MEMORY_ONLY_SWITCH + "} - create a new buffer.");
-                sayi("check # - run the buffer through the parser and check for syntax errors. Do not execute.");
-                sayi("delete or rm #- delete the buffer. This does not delete the file.");
-                sayi("edit # - Start the built-in line editor and load the given buffer ");
-                sayi("link source target - create a link for given source to the target. The target will be copied to source on save.");
-                sayi("ls or list - display all the active buffers and their numbers");
-                sayi("path {new_path} - (no arg) means to displa y current default save path, otherwise set it. Default is qdl temp dir.");
-                say("reload # - reload the buffer from disk.");
-                sayi("reset - deletes all buffers and sets the start number to zero. This clears the buffer state.");
-                sayi("run # {&} -  Run the buffer. If & is there, do it in its own environment");
-                sayi("show # - identical to ls. ");
-                sayi("write or save # - save the buffer. If linked, source is copied to target.");
+                say("# refers to the buffer handle");
+
                 return RC_NO_OP;
             case "reload":
                 return _doBufferReload(inputLine);
@@ -742,10 +747,14 @@ public class WorkspaceCommands implements Logable, Serializable {
                 say("unrecognized buffer command");
                 return RC_NO_OP;
         }
-
     }
 
     private int _doBufferReload(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("reload handle | alias - re-read the buffer from storage.");
+            say("If the buffer resides in memory, this has no effect");
+            return RC_NO_OP;
+        }
         BufferManager.BufferRecord br = getBR(inputLine);
         if (br == null) {
             say("buffer not found");
@@ -779,7 +788,7 @@ public class WorkspaceCommands implements Logable, Serializable {
 
     private int _doBufferPath(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("path [new_path]");
+            say("path {new_path}");
             say("(no arg) - show the current default path for saving buffers. This is used ");
             say("           in the case that the buffer is not an absolute path.");
             say("new_path - sets the current path.");
@@ -837,7 +846,7 @@ public class WorkspaceCommands implements Logable, Serializable {
         }
         String oldPath = getBufferDefaultSavePath();
         bufferDefaultSavePath = newPath;
-        say("new default buffer save path is \"" + newPath + "\", was \"" + oldPath + "\"");
+        say("new default buffer save path is '" + newPath + "', was '" + oldPath + "'");
         return RC_CONTINUE;
     }
 
@@ -904,7 +913,7 @@ public class WorkspaceCommands implements Logable, Serializable {
     protected int _doBufferReset(InputLine inputLine) {
         if (_doHelp(inputLine)) {
             say("reset");
-            sayi("Drops ALL buffers and the index resets to zero. Do this only if you have to.");
+            sayi("Drops ALL buffers and the handle resets to zero. Do this only if you have to.");
             return RC_NO_OP;
         }
         if (!"y".equals(readline("Are you SURE you want to delete all buffers and reset them?"))) {
@@ -920,11 +929,12 @@ public class WorkspaceCommands implements Logable, Serializable {
 
     protected int _doBufferRun(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("run (index | name) [& | !]");
-            sayi("Run the given buffer. This will execute as if you had types it in to the current session. ");
+            say("run (handle | alias) [& | !]");
+            sayi("Run the given buffer. This will execute as if you had typed it in to the current session. ");
             sayi("If you supply an &, then the current workspace is cloned and the code is run in that. ");
             sayi("If you supply an !, then completely clean state is created (VFS and script path are still set,");
             sayi("but no imports etc.) and the code is run in that. ");
+            sayi("N.B. & and ! are mutually exclusive.");
             sayi("See the state indicator documentation for more");
             sayi(" Synonyms: ");
             sayi("   ) index|name  - start running a buffer. You must start a process before it can be suspended.");
@@ -1043,22 +1053,50 @@ public class WorkspaceCommands implements Logable, Serializable {
 
     protected int _doBufferWrite(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("(write | save) (index | name)");
+            say("(write | save) (index | alias) {path}");
             sayi("Write (aka save) the buffer. If there is a link, the target is written to the source.");
+            sayi("path - (memory only) convert buffer to a regular file, save it and use that.");
+            sayi("   The path must be fully qualified.");
             return RC_NO_OP;
         }
         // If it is a link, br.link is read and written to br.src
+        String path = "";
+        if (inputLine.getArgCount() == 3) {
+            path = inputLine.getLastArg();
+            inputLine.removeArgAt(3);
+        }
         BufferManager.BufferRecord br = getBR(inputLine);
         if (br == null || br.deleted) {
             say("buffer not found");
             return RC_NO_OP;
         }
         if (br.memoryOnly) {
-            say("buffer is in-memory only");
+            if (path.isEmpty()) {
+                say("no save path given");
+                return RC_NO_OP;
+            }
+            File f = new File(path);
+            if (f.exists()) {
+                say("sorry, '" + f.getAbsolutePath() + "' exists");
+                return RC_NO_OP;
+            }
+            try {
+                FileUtil.writeStringToFile(f.getAbsolutePath(), StringUtils.listToString(br.getContent()));
+            } catch (Throwable e) {
+                say("that didn't work: " + e.getMessage());
+                return RC_NO_OP;
+            }
+            br.srcSavePath = f.getAbsolutePath();
+            br.memoryOnly = false;
+            br.edited = false; // it was just saved.
+            return RC_CONTINUE;
+        }
+        if (!br.edited) {
+            say("buffer not edited, nothing to save");
             return RC_NO_OP;
         }
-
         boolean ok = bufferManager.write(br);
+
         if (ok) {
             say("done");
         } else {
@@ -1095,8 +1133,8 @@ public class WorkspaceCommands implements Logable, Serializable {
     public static String EDITOR_REMOVE = "rm";
     public static String EDITOR_CLEAR_SCREEN;
 
-    private int _doEditor(InputLine inputLine){
-        if(_doHelp(inputLine)){
+    private int _doEditor(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
             sayi("list - list available editors");
             sayi("add name [-clear_screen] exec  - add a (basic) editor configuration.");
             sayi("       -clear_screen tells QDL to try and clear the screen before launching the editor. This is");
@@ -1108,7 +1146,7 @@ public class WorkspaceCommands implements Logable, Serializable {
         }
         if (inputLine.hasArg(EDITOR_ADD)) {
 
-            if (3 <= inputLine.getArgCount() ) {
+            if (inputLine.getArgCount() < 3) {
                 say("Sorry, wrong number of arguments for " + EDITOR_ADD);
                 return RC_NO_OP;
             }
@@ -1145,13 +1183,13 @@ public class WorkspaceCommands implements Logable, Serializable {
             getQdlEditors().put(ee);
             say("added '" + name + "' with executable '" + exec + "' ");
             File file = new File(exec);
-            if(!file.exists()){
+            if (!file.exists()) {
                 say("warn: '" + exec + "' does not exist");
             }
-            if(file.isDirectory()){
+            if (file.isDirectory()) {
                 say("warn: '" + exec + "' is a directory");
             }
-            if(!file.canRead()){
+            if (!file.canRead()) {
                 say("warn: you do not have permission to access '" + exec + "'");
             }
 
@@ -1166,6 +1204,7 @@ public class WorkspaceCommands implements Logable, Serializable {
             }
             setExternalEditorName(name);
             setUseExternalEditor(!name.equals(LINE_EDITOR_NAME));
+            say("editor set to " + name);
             return RC_CONTINUE;
         }
         if (inputLine.hasArg(EDITOR_REMOVE)) {
@@ -1196,9 +1235,10 @@ public class WorkspaceCommands implements Logable, Serializable {
         say("unrecognized command");
         return RC_CONTINUE;
     }
+
     private int _doBufferEdit(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("edit (handle | name)");
+            say("edit (handle | alias)");
             sayi("invoke the editor on the given buffer");
             return RC_NO_OP;
         }
@@ -1363,8 +1403,9 @@ public class WorkspaceCommands implements Logable, Serializable {
 
     protected int _doBufferDelete(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("(delete | rm) )index | name)");
-            sayi("removes the buffer.");
+            say("(delete | rm) handle | alias)");
+            sayi("removes the buffer. This does NOT touch the physical file in any way.");
+            sayi("If there are edits pending, they will be lost, so write it first if need be.");
             return RC_NO_OP;
         }
         BufferManager.BufferRecord br = getBR(inputLine);
@@ -1475,9 +1516,14 @@ public class WorkspaceCommands implements Logable, Serializable {
         }
         boolean isBinary = inputLine.hasArg("-binary");
         inputLine.removeSwitch("-binary");
+        String source = inputLine.getArg(FIRST_ARG_INDEX);
+        String target = inputLine.getArg(FIRST_ARG_INDEX + 1);
+        return _fileCopy(source, target, isBinary);
+    }
+
+    private int _fileCopy(String source, String target, boolean isBinary) {
+
         try {
-            String source = inputLine.getArg(FIRST_ARG_INDEX);
-            String target = inputLine.getArg(FIRST_ARG_INDEX + 1);
             String readIt = IOEvaluator.READ_FILE + "('" + source + "'," + (isBinary ? FILE_OP_BINARY : FILE_OP_TEXT_STRING) + ")";
             String raw = IOEvaluator.WRITE_FILE + "('" + target + "'," + readIt + ");";
             getInterpreter().execute(raw);
@@ -1500,13 +1546,6 @@ public class WorkspaceCommands implements Logable, Serializable {
             if (!br.deleted) {
                 count++;
                 String x = formatBufferRecord(i, bufferManager.getBufferRecords().get(i));
-                if(br.isLink()){
-                    
-                } else{
-                    if(!br.memoryOnly){
-                      x = x + " [" + br.srcSavePath + "]";
-                    }
-                }
                 say(x);
             }
         }
@@ -1514,9 +1553,10 @@ public class WorkspaceCommands implements Logable, Serializable {
         return RC_CONTINUE;
     }
 
+    // q. := ws_macro([')b create temp -m',')b create foo /tmp/foo.qdl',')b link f2 /tmp/foo2.qdl /tmp/lll.qdl',')b'])
     private int _doBufferShow(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("show (index | name) [-src]");
+            say("show (handle | alias) {-src}");
             sayi("Show the buffer. If the buffer is linked, it will show the target.");
             sayi("-src will only have an effect with links and will show the source rather than the target.");
             return RC_NO_OP;
@@ -1525,7 +1565,7 @@ public class WorkspaceCommands implements Logable, Serializable {
         try {
             br = getBR(inputLine);
             if (br == null || br.deleted) {
-                say("buffer not found");
+                say("buffer index not found");
                 return RC_NO_OP;
             }
         } catch (Throwable t) {
@@ -1568,51 +1608,74 @@ public class WorkspaceCommands implements Logable, Serializable {
 
     protected String formatBufferRecord(int ndx, BufferManager.BufferRecord br) {
         // so a ? is shown if its a link, a * if its a buffer that hasn't been saved.
-        String saved = (br.isLink() ? "?" : "") + (br.hasContent() ? "*" : " ");
+        String saved = " ";
+        if (br.memoryOnly) {
+            saved = "m";
+        } else {
+            if (br.isLink()) {
+                saved = "?";
+            } else {
+                if (br.hasContent()) {
+                    saved = "*";
+                }
+
+            }
+        }
 
         String a = BUFFER_RECORD_SEPARATOR + saved + BUFFER_RECORD_SEPARATOR;
-        if (br.memoryOnly) {
-            a = a + "m" + BUFFER_RECORD_SEPARATOR;
-        }
         return ndx + a + br;
     }
 
     private int _doBufferLink(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("link source target [-copy]");
-            sayi("Creates a link (for external editing) between source and target.");
+            say("link alias source target [-copy]");
+            sayi("Creates a link (for external editing) from source to target. Source must exist.");
             sayi("A common pattern is that source is on a VFS and target is a local file that you edit");
             sayi("Generally this is only needed if for some reason your editor cannot be configured to");
             sayi("work as an external editor.");
             sayi("If the -copy flag is used, target will be overwritten. In subsequent commands, e.g. run, save this will resolve the link.");
             return RC_NO_OP;
         }
+        boolean doCopy = inputLine.hasArg("-copy");
+        inputLine.removeSwitch("-copy");
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
-            say("sorry, you must supply a file name.");
+            say("sorry, missing arguments.");
             return RC_CONTINUE;
         }
-        String source = inputLine.getArg(FIRST_ARG_INDEX);
+        String alias = inputLine.getArg(FIRST_ARG_INDEX);
+        String source = inputLine.getArg(FIRST_ARG_INDEX + 1);
         if (bufferManager.hasBR(source)) {
             say("sorry but a buffer for " + source + " already exists.");
             return RC_NO_OP;
         }
         String target = null;
-        if (inputLine.hasArgAt(FIRST_ARG_INDEX + 1)) {
-            target = inputLine.getArg(FIRST_ARG_INDEX + 1);
+        if (inputLine.hasArgAt(FIRST_ARG_INDEX + 2)) {
+            target = inputLine.getArg(FIRST_ARG_INDEX + 2);
         }
-        int ndx = bufferManager.link(source, target);
+        int ndx = bufferManager.link(alias, source, target);
 
         BufferManager.BufferRecord br = bufferManager.getBufferRecord(ndx);
-        br.srcSavePath = bufferManager.figureOutSavePath(getBufferDefaultSavePath(), br.src);
-        br.linkSavePath = bufferManager.figureOutSavePath(getBufferDefaultSavePath(), br.link);
+        File sourceFile = new File(source);
+        File targetFile = new File(target);
+        if (sourceFile.isAbsolute()) {
+            br.srcSavePath = source;
+            ;
+        } else {
+            br.srcSavePath = bufferManager.figureOutSavePath(getBufferDefaultSavePath(), br.src);
+        }
+        if (targetFile.isAbsolute()) {
+            br.linkSavePath = target;
+        } else {
+            br.linkSavePath = bufferManager.figureOutSavePath(getBufferDefaultSavePath(), br.link);
+        }
         say(formatBufferRecord(ndx, br));
 
-        if (inputLine.hasArg("-copy")) {
+        if (doCopy) {
             try {
-                _fileCopy(inputLine);
-                say(inputLine.getArg(FIRST_ARG_INDEX) + " copied to " + inputLine.getArg(FIRST_ARG_INDEX + 1));
+                _fileCopy(br.srcSavePath, br.linkSavePath, false);
+                say(source + " copied to " + target);
             } catch (Throwable t) {
-                say("could not copy " + inputLine.getArg(FIRST_ARG_INDEX) + "to " + inputLine.getArg(FIRST_ARG_INDEX + 1));
+                say("could not copy " + source + "to " + target);
             }
         }
         return RC_CONTINUE;
@@ -1634,35 +1697,72 @@ public class WorkspaceCommands implements Logable, Serializable {
 
     private int _doBufferCreate(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("create path [" + BUFFER_IN_MEMORY_ONLY_SWITCH + "]");
-            sayi("create a new buffer for the path.");
+            say("create alias {path | " + BUFFER_IN_MEMORY_ONLY_SWITCH + "}");
+            sayi("create a new buffer for the path and give it the local name of alias.");
             sayi(BUFFER_IN_MEMORY_ONLY_SWITCH + " (optional) set this to be an in-memory only buffer.");
+            sayi("E.g.\n");
+            sayi("   )b create foo\n");
+            sayi("This will create a buffer with alias of foo and assign it a path");
+            sayi("relative to the buffer save path. If the path has not been set (use )b path) then");
+            sayi("an error will result.");
+            sayi("\nE.g.\n");
+            sayi("   )b create foo -m\n");
+            sayi("This will create an in memory buffer that is saved as part of the workspace.");
+            sayi("\nE.g.\n");
+            sayi("    )b create foo /path/to/foo.qdl\n");
+            sayi("This will create the buffer with alias 'foo'. Note that this is VFS aware so the path");
+            sayi("may point to a file in the VFS. If the VFS is read-only, you will need to link to it");
+            sayi("For any editing you may want to do (and read only means the original cannot be modified.");
             return RC_CONTINUE;
         }
+
         boolean inMemoryOnly = inputLine.hasArg(BUFFER_IN_MEMORY_ONLY_SWITCH);
         inputLine.removeSwitch(BUFFER_IN_MEMORY_ONLY_SWITCH);
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
             say("sorry, you must supply a file name.");
             return RC_CONTINUE;
         }
-        String source = inputLine.getArg(FIRST_ARG_INDEX);
+        String alias = inputLine.getArg(FIRST_ARG_INDEX);
+        String source = null;
+
         if (FIRST_ARG_INDEX + 2 <= inputLine.size()) { // +2 because there is the ) command and the action,
-            say("warning: Additional arguments detected. Did you want to create a link instead?");
+            source = inputLine.getArg(FIRST_ARG_INDEX + 1);
+        }
+        boolean hasSource = source != null;
+        if (FIRST_ARG_INDEX + 3 <= inputLine.size()) { // +2 because there is the ) command and the action,
+            say("warning: Additional arguments detected. These are ignored");
+        }
+
+        if (bufferManager.hasBR(alias)) {
+            say("sorry but a buffer for " + alias + " already exists.");
             return RC_NO_OP;
         }
-        if (bufferManager.hasBR(source)) {
-            say("sorry but a buffer for " + source + " already exists.");
-            return RC_NO_OP;
+        File sourceFile = null;
+        File aliasFile = new File(alias);
+        if (hasSource) {
+            sourceFile = new File(source);
+        } else {
+            sourceFile = aliasFile;
         }
-        int ndx = bufferManager.create(source);
-        BufferManager.BufferRecord br = bufferManager.getBufferRecord(ndx);
-        br.memoryOnly = inMemoryOnly;
-        if (!inMemoryOnly) {
-            if (getTempDir() == null) {
-                say("You must set the buffer save path");
+        if (!sourceFile.isAbsolute()) {
+            // If they created a relative buffer, besure there is abuffer record to create or you will get a dud one
+            // and have to delete it later.
+            if (!inMemoryOnly && getTempDir() == null) {
+                say("You must set the buffer save path to create a relative file for the buffer '" + alias + "'");
                 return RC_NO_OP;
             }
-            br.srcSavePath = bufferManager.figureOutSavePath(getBufferDefaultSavePath(), br.src);
+        }
+
+        int ndx = bufferManager.create(alias);
+        BufferManager.BufferRecord br = bufferManager.getBufferRecord(ndx);
+        br.memoryOnly = inMemoryOnly;
+        br.src = br.alias; // backwards compatibility
+        if (!inMemoryOnly) {
+            if (sourceFile.isAbsolute()) {
+                br.srcSavePath = sourceFile.getAbsolutePath();
+            } else {
+                br.srcSavePath = bufferManager.figureOutSavePath(getBufferDefaultSavePath(), br.src);
+            }
         }
         say(formatBufferRecord(ndx, br));
         return RC_CONTINUE;
@@ -2563,14 +2663,14 @@ public class WorkspaceCommands implements Logable, Serializable {
             return printList(inputLine, treeSet);
 
         }
-        if (onlineHelp.containsKey(name) || altLookup.getByValue(name)!=null) {
+        if (onlineHelp.containsKey(name) || altLookup.getByValue(name) != null) {
             String realName = null;
             String altName = null;
-            if(onlineHelp.containsKey(name)){
+            if (onlineHelp.containsKey(name)) {
                 realName = name;
                 altName = altLookup.get(realName);
-            }else{
-                altName =name;
+            } else {
+                altName = name;
                 realName = altLookup.getByValue(name);
             }
 
@@ -2585,12 +2685,12 @@ public class WorkspaceCommands implements Logable, Serializable {
                 say(onlineHelp.get(realName));
                 if (altName != null) {
                     String altKey = null;
-                    if(QDLTerminal.getCharLookupMap().containsKey(altName)){
-                             altKey = QDLTerminal.getCharLookupMap().get(altName);
+                    if (QDLTerminal.getCharLookupMap().containsKey(altName)) {
+                        altKey = QDLTerminal.getCharLookupMap().get(altName);
                     }
-                    say("unicode: " + altName + " (" + StringUtils.toUnicode(altName) + ")" + (altKey==null?"":", alt + " + altKey));
+                    say("unicode: " + altName + " (" + StringUtils.toUnicode(altName) + ")" + (altKey == null ? "" : ", alt + " + altKey));
                 }
-                if(onlineExamples.containsKey(realName)){
+                if (onlineExamples.containsKey(realName)) {
                     say("use -ex to see examples for this topic.");
                 }
             }
@@ -4271,7 +4371,7 @@ public class WorkspaceCommands implements Logable, Serializable {
             }
             say("sorry, but '" + f.getAbsolutePath() + "' does not exist");
             t.printStackTrace();
-        }
+        } 
         return false;
     }
 
@@ -4313,7 +4413,7 @@ public class WorkspaceCommands implements Logable, Serializable {
             }
             return true;
         } catch (Throwable t) {
-            if (DebugUtil.isEnabled()) {
+            if (isDebugOn()) {
                 t.printStackTrace();
             }
         }
@@ -4667,12 +4767,12 @@ public class WorkspaceCommands implements Logable, Serializable {
 
     boolean compressXML = true;
 
-    public boolean hasEditors(){
-        return qdlEditors!=null;
+    public boolean hasEditors() {
+        return qdlEditors != null;
     }
 
     public Editors getQdlEditors() {
-        if(qdlEditors == null){
+        if (qdlEditors == null) {
             qdlEditors = new Editors();
         }
         return qdlEditors;
@@ -4718,8 +4818,8 @@ public class WorkspaceCommands implements Logable, Serializable {
         MetaDebugUtil du = new MetaDebugUtil();
         du.setDebugLevel(qe.getDebugLevel());
         state.setDebugUtil(du);
-         state.setServerMode(qe.isServerModeOn());
-         state.setRestrictedIO(qe.isRestrictedIO());
+        state.setServerMode(qe.isServerModeOn());
+        state.setRestrictedIO(qe.isRestrictedIO());
         // Next is for logging, which is not the same as debug.
         if (qe.isDebugOn()) {
             setDebugOn(true);

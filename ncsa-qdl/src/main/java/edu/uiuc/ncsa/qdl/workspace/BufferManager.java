@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.qdl.workspace;
 
-import edu.uiuc.ncsa.qdl.evaluate.AbstractEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
@@ -24,6 +23,7 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static edu.uiuc.ncsa.qdl.evaluate.AbstractEvaluator.FILE_OP_TEXT_STEM;
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.*;
 
 /**
@@ -35,6 +35,7 @@ public class BufferManager implements Serializable {
 
 
     public static class BufferRecord implements Serializable{
+        String alias;
         String src;
         String link;
         boolean edited = false;
@@ -66,11 +67,24 @@ public class BufferManager implements Serializable {
         }
 
         public String toString() {
-            return src + (isLink() ? " --> " + link : "");
+            String x = alias + ": ";
+            if(memoryOnly){
+                x = x + src;
+            }else{
+                x = x +  srcSavePath ;
+                if(isLink()){
+                 x = x +   " --> " + linkSavePath;
+                }
+            }
+            return x;
         }
 
         public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
             xsw.writeStartElement(BUFFER_RECORD);
+            if (!StringUtils.isTrivial(alias)) {
+                xsw.writeAttribute(BR_ALIAS, alias);
+            }
+
             if (!StringUtils.isTrivial(src)) {
                 xsw.writeAttribute(BR_SOURCE, src);
             }
@@ -104,6 +118,9 @@ public class BufferManager implements Serializable {
                 Attribute a = (Attribute) iterator.next();
                 String v = a.getValue();
                 switch (a.getName().getLocalPart()) {
+                    case BR_ALIAS:
+                        alias = v;
+                        break;
                     case BR_SOURCE:
                         src = v;
                         break;
@@ -206,20 +223,21 @@ public class BufferManager implements Serializable {
         return brMap.containsKey(name);
     }
 
-    public int create(String source) {
+    public int create(String alias) {
         BufferRecord br = new BufferRecord();
-        br.src = source;
+        br.alias = alias;
         bufferRecords.add(br);
-        brMap.put(source, br);
+        brMap.put(alias, br);
         return bufferRecords.size() - 1;
     }
 
-    public int link(String source, String target) {
+    public int link(String alias, String source, String target) {
         BufferRecord br = new BufferRecord();
+        br.alias = alias;
         br.src = source;
         br.link = target;
         bufferRecords.add(br);
-        brMap.put(source, br);
+        brMap.put(alias, br);
         return bufferRecords.size() - 1;
     }
 
@@ -251,7 +269,7 @@ public class BufferManager implements Serializable {
     protected List<String> readFile(String fName) {
         Polyad request = new Polyad(IOEvaluator.READ_FILE);
         request.addArgument(new ConstantNode(fName, Constant.STRING_TYPE));
-        request.addArgument(new ConstantNode(new Long(AbstractEvaluator.FILE_OP_TEXT_STEM), Constant.LONG_TYPE));
+        request.addArgument(new ConstantNode(new Long(FILE_OP_TEXT_STEM), Constant.LONG_TYPE));
         getState().getMetaEvaluator().evaluate(request, getState());
         if (request.getResultType() != Constant.STEM_TYPE) {
             throw new IllegalStateException("Error: Could not read file \"" + fName + "\"");
@@ -337,7 +355,8 @@ public class BufferManager implements Serializable {
             stemVariable.addList(castList);
             request.addArgument(new ConstantNode(currentBR.srcSavePath, Constant.STRING_TYPE));
             request.addArgument(new ConstantNode(stemVariable, Constant.STEM_TYPE));
-            request.addArgument(new ConstantNode(Boolean.FALSE, Constant.BOOLEAN_TYPE)); // or its will be treated as binary
+            Long type = new Long(FILE_OP_TEXT_STEM); // or it bombs as an integer
+            request.addArgument(new ConstantNode(type, Constant.LONG_TYPE)); // or its will be treated as binary
             getState().getMetaEvaluator().evaluate(request, getState());
             currentBR.setContent(null); // flush the buffer.
             currentBR.edited = false;

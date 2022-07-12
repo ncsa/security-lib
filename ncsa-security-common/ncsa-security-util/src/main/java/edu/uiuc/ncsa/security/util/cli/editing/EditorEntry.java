@@ -13,4 +13,5 @@ public class EditorEntry implements Serializable {
     public String exec;
     public boolean clearScreen;
     public List<EditorArg> args = new ArrayList<>();
+
 }

@@ -603,14 +603,21 @@ public class IOEvaluator extends AbstractEvaluator {
         }
         String fileName = obj.toString();
         //boolean isBase64 = false;
-        int fileType = FILE_OP_TEXT_STRING;
+        int fileType = FILE_OP_TEXT_STRING;// default
         if (polyad.getArgCount() == 3) {
             Object obj3 = polyad.evalArg(2, state);
             checkNull(obj3, polyad.getArgAt(2));
-            if (!isLong(obj3)) {
-                throw new BadArgException("The third argument to '" + WRITE_FILE + "' must be an integer.", polyad.getArgAt(2));
+            if(isBoolean(obj3)){
+                // Allow to send true = base64 or false (default
+                if((Boolean)obj3){
+                    fileType = FILE_OP_BINARY;
+                }
+            }else {
+                if (!isLong(obj3)) {
+                    throw new BadArgException("The third argument to '" + WRITE_FILE + "' must be an integer.", polyad.getArgAt(2));
+                }
+                fileType = ((Long) obj3).intValue();
             }
-            fileType = ((Long) obj3).intValue();
         }
         if (state.isVFSFile(fileName)) {
             try {

@@ -85,6 +85,7 @@ public interface XMLConstants {
     String BUFFER_RECORDS = "records";
     String BUFFER_RECORD = "record";
     String BR_SOURCE = "src";
+    String BR_ALIAS = "alias";
     String BR_SOURCE_SAVE_PATH = "src_save_path";
     String BR_LINK = "link";
     String BR_LINK_SAVE_PATH = "link_save_path";

@@ -74,7 +74,7 @@ public class FunctionRecord implements XThing {
     Integer argCount = null;
     public int getArgCount() {
         if(argCount == null){
-            if(argNames == null || argNames.isEmpty()){
+            if(argNames == null){
                 argCount = FREF_ARG_COUNT;
             }else {
                 argCount = argNames.size();

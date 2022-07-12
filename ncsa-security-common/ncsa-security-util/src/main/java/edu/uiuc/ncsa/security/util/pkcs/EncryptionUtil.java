@@ -26,7 +26,7 @@ public class EncryptionUtil {
     // encrypted text.
     // So first line has that it requires a password and there is a hash of
     // it. This allows reading off the first line and knowing if the text is
-    // encrypted with teh current password rather than trying to decode the entire
+    // encrypted with the current password rather than trying to decode the entire
     // contents and seeing if it bombs or if there is gobbly-gook, since it is also
     // possible to encrypt something like a base 64 encoding of a binary file, hence
     // no way to tell if the contents are correctly decrypted without something like this.
