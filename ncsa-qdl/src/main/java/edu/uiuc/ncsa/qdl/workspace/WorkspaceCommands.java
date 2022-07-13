@@ -417,7 +417,7 @@ public class WorkspaceCommands implements Logable, Serializable {
         switch (inputLine.getArg(ACTION_INDEX)) {
             case "--help":
                 say("State indicator commands:");
-                sayi("      --help - this messages");
+                sayi("      --help - this message");
                 sayi("        list - list all current states in the indicator by process id (pid)");
                 sayi("       reset - clear the entire state indicator, restoring the system process as the default");
                 sayi("resume [pid] - resume running the given process. No arguments means restart the current one.");
@@ -713,8 +713,21 @@ public class WorkspaceCommands implements Logable, Serializable {
             case "help":
             case "--help":
                 say("buffer commands:");
-                say("# refers to the buffer handle");
-
+                say("# refers to the buffer number aka index aka handle.");
+                sayi("create alias { path | " + BUFFER_IN_MEMORY_ONLY_SWITCH + "} - create a new buffer.");
+                sayi("check (# | alias)- run the buffer through the parser and check for syntax errors. Does not execute.");
+                sayi("delete or rm (# | alias)- delete the buffer. This does not delete the file.");
+                sayi("edit (# | alias) - Start the built-in line editor and load the given buffer ");
+                sayi("link alias source target - create a link for given source to the target. The target will be copied to source on save.");
+                sayi("ls | list - display all the active buffers and their numbers");
+                sayi("path {new_path} - (no arg) means to displa y current default save path, otherwise set it. Default is qdl temp dir.");
+                sayi("reload (# | alias) - reload the buffer from disk.");
+                sayi("reset - deletes all buffers and sets the start number to zero. This clears the buffer state.");
+                sayi("run (# | alias) {&| !} -  Run the buffer. If & is there, do it in its own environment");
+                sayi("show (# | alias) - display contents of buffer in the workspace. ");
+                sayi("(write | save) (# | alias) {path}- save the buffer. If linked, source is copied to target. ");
+                sayi("     path only applies to in memory buffers. The buffer will be written to the path and will be converted");
+                sayi("     to a regular file buffer.");
                 return RC_NO_OP;
             case "reload":
                 return _doBufferReload(inputLine);
@@ -1846,7 +1859,8 @@ public class WorkspaceCommands implements Logable, Serializable {
     private int _envSave(InputLine inputLine) {
         if (_doHelp(inputLine)) {
             say("save [filename]");
-            sayi("Saves the environment. If there is a default file it will save to that. Specifying the name forces the save to that file.");
+            sayi("Saves the environment. If there is a default file it will save to that.");
+            sayi("Specifying the name forces the save to that file.");
             return RC_NO_OP;
         }
 
@@ -1965,7 +1979,7 @@ public class WorkspaceCommands implements Logable, Serializable {
 
     private int _envList(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("-list");
+            say("list");
             sayi("List all the variables and their values in the current environment.");
             return RC_NO_OP;
         }
