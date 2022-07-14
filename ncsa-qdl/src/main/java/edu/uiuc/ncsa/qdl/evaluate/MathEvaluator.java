@@ -4,9 +4,9 @@ import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.Statement;
-import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLCodec;
+import edu.uiuc.ncsa.qdl.variables.QDLStem;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.TokenUtil;
 import org.apache.commons.codec.binary.Base64;
@@ -294,32 +294,34 @@ public class MathEvaluator extends AbstractEvaluator {
                     r.resultType = polyad.getArguments().get(0).getResultType();
                     return r;
                 }
+                String arg = objects[0].toString();
                 switch (type) {
                     case 0:// vencode
                         QDLCodec codec = new QDLCodec();
                         if (isEncode) {
-                            r.result = codec.encode(objects[0].toString());
+                            r.result = codec.encode(arg);
                         } else {
-                            r.result = codec.decode(objects[0].toString());
+                            r.result = codec.decode(arg);
                         }
                         break;
                     case 1:// url encode
                         try {
                             if (isEncode) {
-                                r.result = URLEncoder.encode(objects[0].toString(), "UTF-8");
+                                r.result = URLEncoder.encode(arg, "UTF-8");
                             } else {
-                                r.result = URLDecoder.decode(objects[0].toString(), "UTF-8");
+                                r.result = URLDecoder.decode(arg, "UTF-8");
                             }
                         }catch(UnsupportedEncodingException unsupportedEncodingException){
                             throw new QDLException("internal error doing URL code:" + unsupportedEncodingException.getMessage());
                         }
                         break;
+
                     case 16:
                         if (isEncode) {
-                            r.result = Hex.encodeHexString(objects[0].toString().getBytes());
+                            r.result = Hex.encodeHexString(arg.getBytes());
                         } else {
                             try {
-                                byte[] decoded = Hex.decodeHex(objects[0].toString().toCharArray());
+                                byte[] decoded = Hex.decodeHex(arg.toCharArray());
                                 r.result = new String(decoded);
                             } catch (Throwable t) {
                                 r.result = "(error)";
@@ -328,29 +330,29 @@ public class MathEvaluator extends AbstractEvaluator {
                         break;
                     case 32:
                         if (isEncode) {
-                            r.result = TokenUtil.b32EncodeToken(objects[0].toString());
+                            r.result = TokenUtil.b32EncodeToken(arg);
                         } else {
-                            r.result = TokenUtil.b32DecodeToken(objects[0].toString().toUpperCase(Locale.ROOT));
+                            r.result = TokenUtil.b32DecodeToken(arg.toUpperCase(Locale.ROOT));
                         }
                         break;
                     case 64:
                         if (isEncode) {
-                            r.result = Base64.encodeBase64URLSafeString(objects[0].toString().getBytes());
+                            r.result = Base64.encodeBase64URLSafeString(arg.getBytes());
                         } else {
-                            r.result = new String(Base64.decodeBase64(objects[0].toString()));
+                            r.result = new String(Base64.decodeBase64(arg));
                         }
                         break;
                     default:
                         throw new IllegalArgumentException("unknown conversion type " + type);
                 }
-                r.resultType = Constant.STRING_TYPE;
+                r.resultType = Constant.getType(r.result);
                 return r;
             }
         };
         if(polyad.getArgCount() == 1){
             process1(polyad, pointer, isEncode ? ENCODE : DECODE, state);
         }else{
-            process2(polyad, pointer, isEncode ? ENCODE : DECODE, state);
+            process2(polyad, pointer, isEncode ? ENCODE : DECODE, state,true);
         }
 
 

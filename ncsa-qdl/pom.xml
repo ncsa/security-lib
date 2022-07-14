@@ -150,6 +150,14 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.9.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+
+        <dependency>
 <!--
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>

@@ -176,3 +176,19 @@ public class FunctionRecord implements XThing {
        b. := 100 + a.
      */
 }
+/*
+syntax match qdlOperator "\v\*"
+syntax match qdlOperator "\v/"
+syntax match qdlOperator "\v\+"
+syntax match qdlOperator "\v-"
+syntax match qdlOperator "\v\~"
+syntax match qdlOperator "\v\:\="
+syntax match qdlOperator "\v\*\="
+syntax match qdlOperator "\v/\="
+syntax match qdlOperator "\v\+\="
+syntax match qdlOperator "\v-\="
+
+highlight link potionOperator Operator
+
+
+ */

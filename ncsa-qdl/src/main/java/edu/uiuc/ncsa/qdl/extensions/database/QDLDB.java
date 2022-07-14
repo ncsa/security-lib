@@ -146,7 +146,7 @@ public class QDLDB implements QDLModuleMetaClass {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            if(!isConnected){
+            if (!isConnected) {
                 throw new IllegalStateException("No databasse connection. Please run " + CONNECT_COMMAND + " first.");
             }
             // This provides
@@ -343,7 +343,7 @@ public class QDLDB implements QDLModuleMetaClass {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            if(!isConnected){
+            if (!isConnected) {
                 throw new IllegalStateException("No databasse connection. Please run " + CONNECT_COMMAND + " first.");
             }
             String rawStatement = (String) objects[0];
@@ -429,7 +429,6 @@ public class QDLDB implements QDLModuleMetaClass {
     }
 
 
-
     public static String TYPE_VAR_NAME = "types.";
 
     public class SQLTypes implements QDLVariable {
@@ -482,7 +481,7 @@ public class QDLDB implements QDLModuleMetaClass {
      * @return
      */
     public Object doSQLExecute(Object[] objects, String name) {
-        if(!isConnected){
+        if (!isConnected) {
             throw new IllegalStateException("No databasse connection. Please run " + CONNECT_COMMAND + " first.");
         }
         String rawStatement = (String) objects[0];

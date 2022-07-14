@@ -1094,7 +1094,7 @@ has 0->2, 1->1, 2->3, 3->0. This works generally with stems too.]]>
     </entry>
     <entry id="script_args">
         <body>
- <![CDATA[  script_args() - return out the number of arguments to this script
+ <![CDATA[  script_args() - returns the number of arguments to this script
 script_args(-1) - returns the script arguments as a list.
  script_args(n) - return the nth argument (first argument is 0).
 
