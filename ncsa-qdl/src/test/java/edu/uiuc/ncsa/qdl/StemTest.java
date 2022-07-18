@@ -2247,7 +2247,8 @@ public class StemTest extends AbstractQDLTester {
          [100,101,102,103,104,105,106,107,108,109,110]
          ]
 
-     a.'p'.'r':='pr';a.'p'.'s':='ps';a.'p'.'t':='pt';a.'q'.'r':='qr';a.'q'.'s':='qs';a.'q'.'t':='qt';"a.'q'.'z':='qz';a.'p'.'s':='ps';a.'n'.'m':='nm';
+     a.'p'.'r':='pr';a.'p'.'s':='ps';a.'p'.'t':='pt';a.'q'.'r':='qr';
+     a.'q'.'s':='qs';a.'q'.'t':='qt';"a.'q'.'z':='qz';a.'p'.'s':='ps';a.'n'.'m':='nm';
 
       */
 
@@ -2309,7 +2310,7 @@ public class StemTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state) : "b\\*\\2 failed";
-        assert getBooleanValue("ok1", state) : "b\\*\\2 failed";
+        assert getBooleanValue("ok1", state) : "b\\2\\* failed";
         assert getBooleanValue("ok2", state) : "b\\*\\* failed";
         assert getBooleanValue("ok3", state) : "b\\!* failed";
     }
@@ -2353,7 +2354,7 @@ public class StemTest extends AbstractQDLTester {
         addLine(script, "ok :=reduce(@&&, c\\*\\s == {4:'0s', 'p':'ps', 'q':'qs'});");
         addLine(script, "ok1 :=reduce(@&&,reduce(@&&, c\\[2,'n']\\[0,'s'] == [[20]]));"); // not all present is ok
         addLine(script, "dd.:=c\\[2,'n']\\[0,'m'];");
-        addLine(script, "ok2 := dd.0.0==20 && dd.1.1=='nm';"); // can't use repeated reduce here because lists and stems can't be compared.
+        addLine(script, "ok2 := dd.0.0==20 && dd.n.m=='nm';"); // can't use repeated reduce here because lists and stems can't be compared.
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -2373,7 +2374,7 @@ public class StemTest extends AbstractQDLTester {
         addLine(script, "ok :=reduce(@&&, c\\>[star(),'s'] == {4:'0s',5:'4s', 'p':'ps', 'q':'qs'});");
         addLine(script, "ok1 :=reduce(@&&,reduce(@&&, c\\>[[2,'n'],[0,'s']] == [[20]]));"); // not all present is ok
         addLine(script, "dd.:=c\\>[[2,'n'],[0,'m']];");
-        addLine(script, "ok2 := dd.0.0==20 && dd.1.1=='nm';"); // can't use repeated reduce here because lists and stems can't be compared.
+        addLine(script, "ok2 := dd.0.0==20 && dd.n.m=='nm';"); // can't use repeated reduce here because lists and stems can't be compared.
         addLine(script, "ok3 := reduce(@&&, z\\>(1~(size(z.)<4?star():2)) == [4,5,6,7]);");
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
@@ -2382,6 +2383,65 @@ public class StemTest extends AbstractQDLTester {
         assert getBooleanValue("ok1", state) : "c\\>[[2,'n'],[0,'s']] failed";
         assert getBooleanValue("ok2", state) : "c\\>[[2,'n'],[0,'s']] failed";
         assert getBooleanValue("ok3", state) : "z\\>(1~(size(z.)<4?star():2)) failed";
+    }
+
+
+    /**
+     * This compares *, lists and hard coded extractions to make sure nothing is getting lost
+     * Mostly this is a regression test that must be passed.
+     *
+     * @throws Throwable
+     */
+    public void testExtractionCompare() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, SUBSTEM_QDL_SETUP);
+        addLine(script, SUBSTEM_LIST_QDL_SETUP);
+        addLine(script, "a.:=n(5,5,n(25));");
+        addLine(script, "rr(x.)->reduce(@&&, reduce(@&&, x.));");
+
+        addLine(script, "check.0 :=[[3,4],[8,9],[13,14],[18,19],[23,24]];");
+        addLine(script, "ok00 := rr( a\\[;5]\\[3;7] == check.0);"); // extra trailing indices
+        addLine(script, "ok01 := rr( a\\*\\[3;7] == check.0);");
+        addLine(script, "ok02 := rr( a\\>[star(),[3;7]] == check.0);");
+
+        addLine(script, "check.1 :=[[1,3],[6,8],[11,13],[16,18],[21,23]];");
+        addLine(script, "ok10 := rr( a\\[;5]\\[1,3,5,7] == check.1);"); // extra trailing indices w/gaps
+        addLine(script, "ok11 := rr( a\\*\\[1,3,5,7] == check.1);");
+        addLine(script, "ok12 := rr( a\\>[star(),[1,3,5,7]] == check.1);");
+
+        addLine(script, "check.2 :=check.1;");
+        addLine(script, "ok20 := rr( a\\[;5]\\[8,9,1,3] == check.2);");
+        addLine(script, "ok21 := rr( a\\*\\[8,9,1,3] == check.2);");
+        addLine(script, "ok22 := rr( a\\>[star(),[8,9,1,3]] == check.2);");
+
+        addLine(script, "check.3 :=[[3,2,1],[8,7,6],[13,12,11],[18,17,16],[23,22,21]];");
+        addLine(script, "ok30 := rr( a\\[;5]\\[3,2,1] == check.3);"); // reorder
+        addLine(script, "ok31 := rr( a\\*\\[3,2,1] == check.3);");
+        addLine(script, "ok32 := rr( a\\>[star(),[3,2,1]] == check.3);");
+
+        addLine(script, "check.4 :=[[0,0,0],[5,5,5],[10,10,10],[15,15,15],[20,20,20]];");
+        addLine(script, "ok40 := rr( a\\[;5]\\[0,0,0] == check.4);"); // repeat
+        addLine(script, "ok41 := rr( a\\*\\[0,0,0] == check.4);");
+        addLine(script, "ok42 := rr( a\\>[star(),[0,0,0]] == check.4);");
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok00", state) : "failure processing a\\[;5]\\[3;7]";
+        assert getBooleanValue("ok01", state) : "failure processing a\\*\\[3;7]";
+        assert getBooleanValue("ok02", state) : "failure processing a\\[star(),[3;7]]";
+        assert getBooleanValue("ok10", state) : "failure processing a\\[;5]\\[1,3,5,7]";
+        assert getBooleanValue("ok11", state) : "failure processing a\\*\\[1,3,5,7]";
+        assert getBooleanValue("ok12", state) : "failure processing a\\>[star(),[1,3,5,7]]";
+        assert getBooleanValue("ok20", state) : "failure processing a\\[;5]\\[8,9,1,3]";
+        assert getBooleanValue("ok21", state) : "failure processing a\\*\\[8,9,1,3]";
+        assert getBooleanValue("ok22", state) : "failure processing a\\>[star(),[8,9,1,3]]";
+        assert getBooleanValue("ok30", state) : "failure processing a\\[;5]\\[3,2,1]";
+        assert getBooleanValue("ok31", state) : "failure processing a\\*\\[3,2,1]";
+        assert getBooleanValue("ok32", state) : "failure processing a\\>[star(),[3,2,1]]";
+        assert getBooleanValue("ok40", state) : "failure processing a\\[;5]\\[0,0,0]";
+        assert getBooleanValue("ok41", state) : "failure processing a\\*\\[0,0,0]";
+        assert getBooleanValue("ok42", state) : "failure processing a\\>[star(),[0,0,0]]";
     }
 
     public static String BIG_JSON_OBJECT = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/test.json";
@@ -2417,8 +2477,14 @@ public class StemTest extends AbstractQDLTester {
         assert getBooleanValue("ok2_2", state) : "a\\>[star(),'age'] + 10 failed";
     }
       /*
-        from_json(file_read('/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/test.json'))=:a.
-          a\[1,2]\friends\*\name
+        from_json(file_read('/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources/extract.json'))=:x.
+          x\[1,2]\friends\*\name
+          z. := x\qdl\*\xmd
+          q.:=a\[1,2]\friends\*\name
+          q2.:=a\>[[1,2],'friends',star(),'name']
+          w. := x\qdl\*\load
+          s. := x\qdl\0\args
+          t. := x\qdl\0\*
             10 + a\*\age
 [46,48,50,30,45,31,32,36,49,37]
        */

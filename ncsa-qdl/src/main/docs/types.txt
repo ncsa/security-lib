@@ -1,4 +1,33 @@
 QDL and Types
+
+2022-07-15
+One thought with types from Cue Definition Language (which has the same file extension
+of qdl that we use, which is how I tripped over it). It is an extension of JSON that
+allows for typing entries, so
+#MyThing{
+  a: int,
+  b: string
+  c: boolean
+  }
+
+with the '#' sets this as a JSOn template and creating the template My_Impl:
+My_Impl & MyThing{
+  a:123,
+  b:"asd"
+  c:false
+  }
+
+  would restrict those entries to the given types and an attempt to set My_impl.a to "bar"
+  would throw a type exception.
+
+This is a genuinely interesting idea for stems (the rest of Cue is mostly syntactic sugar on
+JSON, since Cue is a language to describe  configurations)
+
+If we allow for types and built in types, this allows for integrity checking by the
+system if we want.  Not sure how to have a good notation that gives types for stems though...
+
+==> Objects in C are emulated as struc + methods. Could also do this in QDL as stem + functions???
+
 2022-06-13
 
 Rather than have classes, QDL should have user defined types. This allows for

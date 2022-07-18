@@ -1743,7 +1743,7 @@ illegal argument:no module named "b" was  imported at (1, 67)
     }
 
     protected void doSubset(ParserRuleContext parseTree, boolean isWildcard) {
-        StemSubsettingNode ssn = new StemSubsettingNode();
+        StemExtractionNode ssn = new StemExtractionNode();
         ssn.setTokenPosition(tp(parseTree));
         ssn.setSourceCode(getSource(parseTree));
         stash(parseTree, ssn);
@@ -1756,23 +1756,23 @@ illegal argument:no module named "b" was  imported at (1, 67)
                 switch (p.getText()) {
                     default:
                         throw new IllegalArgumentException("unknown extraction operator");
-                    case StemSubsettingNode.EXTRACT:
+                    case StemExtractionNode.EXTRACT:
                         break;
-                    case StemSubsettingNode.EXTRACT_UNIQUE:
+                    case StemExtractionNode.EXTRACT_UNIQUE:
                         indexArg.strictOrder = true; // This gets set in a different pass, so must be stored
                         break;
-                    case StemSubsettingNode.EXTRACT_UNIQUE_STAR:
-                    case StemSubsettingNode.EXTRACT_LIST_UNIQUE_STAR:
+                    case StemExtractionNode.EXTRACT_UNIQUE_STAR:
+                    case StemExtractionNode.EXTRACT_LIST_UNIQUE_STAR:
                         indexArg.strictOrder = true; // This gets set in a different pass, so must be stored
-                    case StemSubsettingNode.EXTRACT_STAR:
-                    case StemSubsettingNode.EXTRACT_LIST_STAR:
+                    case StemExtractionNode.EXTRACT_STAR:
+                    case StemExtractionNode.EXTRACT_LIST_STAR:
                         indexArg.swri = new AllIndices();
                         ssn.addArgument(indexArg);
                         break;
-                    case StemSubsettingNode.EXTRACT_LIST:
+                    case StemExtractionNode.EXTRACT_LIST:
                         indexArg.interpretListArg = true;
                         break;
-                    case StemSubsettingNode.EXTRACT_LIST_UNIQUE:
+                    case StemExtractionNode.EXTRACT_LIST_UNIQUE:
                         indexArg.interpretListArg = true;
                         indexArg.strictOrder = true;
 

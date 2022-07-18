@@ -426,13 +426,23 @@ public class QDLStem implements Map<String, Object>, Serializable {
         }
         return getQDLMap().remove(key);
     }
+    public void addAll(QDLStem qdlStem){
+        getQDLMap().putAll(qdlStem.getQDLMap());
+           getQDLList().addAll(qdlStem.getQDLList());
+    }
 
+    /**
+     * This does <b>not</b> add the list elements because that causes issues
+     * with the contract for maps. If you are adding all the values of a stem
+     * to this one, use {@link #addAll(QDLStem)}.
+     * @param m
+     */
     @Override
     public void putAll(Map<? extends String, ?> m) {
         if(m instanceof QDLStem){
-            QDLStem QDLStem = (QDLStem) m;
-            getQDLMap().putAll(QDLStem.getQDLMap());
-    //        getQDLList().addAll(abstractStemVariable.getQDLList());
+            QDLStem qdlStem = (QDLStem) m;
+            getQDLMap().putAll(qdlStem.getQDLMap());
+         //   getQDLList().addAll(qdlStem.getQDLList());
             return;
         }
         throw new IllegalArgumentException("Unknown map type");
