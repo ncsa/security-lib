@@ -591,7 +591,8 @@ pick(@f, arg) - picks elements from arg based on the boolean @f
           If f is dyadic  the values are (key, value).
 
 Note that any indices are returned as well.
-  ]]>
+
+See also: \ (extraction)]]>
        </body>
        <example>
    <![CDATA[  pick((v)->v<3, {-2,0,4,5}); // pick elements in a set whose value < 3
@@ -4187,17 +4188,35 @@ m_set(a., keys., values) - set multiple values
     </entry>
     <entry id="\">
        <body>
-  <![CDATA[\ is the subset operator for stems. This allows you to
-extract part of a stem.
+  <![CDATA[\ is the extractionoperator for stems. This allows you to
+pull out parts of a stem.
 
 var ((\ scalar | stem | *) | (\! scalar | stem | *))+
-
 
  \! (uniqueness) will force the resulting stem to have exactly the
     indices of that dimension,
  \  for integers, they will be re-ordered. String keys are, however, never altered.
  * means to take all of the indices for that dimension.
- scalar indicates to use that for accessing the value, but do not include it in the final result.
+ A scalar index indicates to use that for accessing the value, but do not include the index
+ in the final result. Each element corresponds to a dimension in var. 
+
+This will return
+
+- a stem if the arguments are lists (e.g. [;5]\[3,1])
+- a scalar if the arguments are all scalars (e.g. [;5]\2)
+- a null if nothing at all is found (e.g. [;5]\100)
+
+Unlike other operators, extraction is "forgiving" in the sense that
+it will never give you an index error -- missing indices are simply
+skipped. This allows you to work with very ragged data sets and not
+have to do painstaking conformability tests.
+
+The result is independent of the original stem, i.e., the values are copied.
+Changes to the result are not reflected in the original stem.
+
+If all scalars are used, then the following are equivalent
+var\a\b\c\... == var.a.b.c...
+i.e. the extraction operator, '\', reduces to the reference operator, '.'.
 
  E.g.
    a.:=n(5,5,n(25)); // 5 x 5 stem
@@ -4206,32 +4225,38 @@ var ((\ scalar | stem | *) | (\! scalar | stem | *))+
 
 The result is [a.1.1, a.1.3] note that the scalar in the first dimension omits it. giving a list.
 
-   a\![1]\[1,3]
-{1:[6,8]}
-The ! means that the first dimension must preserve the index 1.
-
    a\[1]\[1,3]
 [[6,8]]
-No ! means that the system should re-index.
-  ]]>
+Results in a 1x2 list.
+
+   a\![1]\[1,3]
+{1:[6,8]}
+The ! means that the first dimension must preserve the index 1. Sometimes it is critical to
+preserve the indices for further uses (such as mask).
+
+   n(5,5,[-15;10])\[4,1]\[2,2,1]
+[[7,7,6],[-8,-8,-9]]
+So you can reorder elements, select multiples etc. \ lets you restructure
+the result too!
+
+See also: pick]]>
        </body>
        <example>
    <![CDATA[Let us say you read in a large JSON object which had a structure like
 z.content.clients.i.transactions.j.user_uid
 You could simply get all of the clients and user ids for the 0th transactions with
 
-   z\'content'\'clients'\*\'transactions'\0\'user_uid'
+   z\content\clients\*\transactions\0\user_uid
 [tom@bsu.edu,dick@bsu.edu,harry@bsu.edu]
 
-Note that this returns a subset that is independant of the original stem
-hence the values are copied.
-   ]]>
+Note that this returns a subset that is independent of the original stem
+hence the values are copied.]]>
         </example>
     </entry>
     <entry id="\>">
        <body>
   <![CDATA[Extraction using a simple list of elements. Each element of the list
-is treated like an argument. In essence, in this context > distrubutes \
+is treated like an argument. In essence, in this context > distributes \
 to each element of the list
 
 var ((\> stem)  | (\!> stem ))+
@@ -4240,7 +4265,7 @@ think of > as an operator in this context which means to distribute the \ to
 each element  of the stem argument.
 
 E.g.
-a\p\q\r\t == a\>[p,q,r,t]
+a\p\q\r\t == a\>['p','q','r','t']
 
 One caveat is that with \, like the stem reference operator ., you may
 supply unknown variables which will be replaced with their constant values.
@@ -4250,8 +4275,7 @@ a\b == a\'b'
 if and only if b is undefined, otherwise b's value is substituted. However
 with \>, the system evaluates the list before handing it over, so this is
 not possible and all list elements must be resolvable.
-  See \, star()
-  ]]>
+  See \, star()]]>
        </body>
     </entry>
     <entry id="star">

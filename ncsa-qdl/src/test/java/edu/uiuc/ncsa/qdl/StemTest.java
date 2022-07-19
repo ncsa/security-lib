@@ -2447,7 +2447,7 @@ public class StemTest extends AbstractQDLTester {
     public static String BIG_JSON_OBJECT = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/test.json";
 
     /**
-     * This grabs a large randomly generated JSON object (which is stashed for reprodicibility)
+     * This grabs a large randomly generated JSON object (which is stashed for reproducibility)
      * turns it into a stem, then interrogates it using the extraction operator. It compares
      * \ with \> and double checks that a bunch of cases work right.
      *
@@ -2477,24 +2477,35 @@ public class StemTest extends AbstractQDLTester {
         assert getBooleanValue("ok2_2", state) : "a\\>[star(),'age'] + 10 failed";
     }
       /*
-        from_json(file_read('/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources/extract.json'))=:x.
-          x\[1,2]\friends\*\name
+         // x. is a very messy configuration from an OA4MP script.
+         // This is everything from the test below.
+
+         x. := from_json(file_read('/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources/extract.json'));
+
           z. := x\qdl\*\xmd
-          q.:=a\[1,2]\friends\*\name
-          q2.:=a\>[[1,2],'friends',star(),'name']
+          size(z.)==2 && (z.0.'exec_phase'=='pre_auth') && (size(z.1.'exec_phase')==3);
+          size(x\qdl\*) == 2;
+
           w. := x\qdl\*\load
+          w_check. := ['COmanageRegistry/default/identity_token_ldap_claim_source.qdl','COmanageRegistry/default/identity_token_ldap_claim_process.qdl'];
+          reduce(@&&, w. == w_check.)
+
           s. := x\qdl\0\args
-          t. := x\qdl\0\*
-            10 + a\*\age
-[46,48,50,30,45,31,32,36,49,37]
+          size(s.) == 8 && s.'server_port'==636;
+
+          x\qdl\0\args\return_attributes << List
+          (x.qdl.0.args.return_attributes.0) == (x\qdl\0\args\return_attributes\0);
+          (x.qdl.0.args.bind_dn) == (x\qdl\0\args\bind_dn)
+
        */
 
     //
 
     /**
-     * This is a snippet that was particularly troublesome to get working right, so it should end up as
-     * a regression test. These are partial ttests, since full tests would be a lot. Will probably
-     * write them later though.
+     * This is a JSON snippet from OA4MP  that was particularly troublesome to get working right (in OA4MP that is),
+     * so it should end up as a regression test, since a lot of forensics were required to explore it and
+     * find out why it was malformed -- a first great success for the \ operator.
+     * These are several partial tests, since a full test would be a lot. Will probably write them later though...
      *
      * @throws Throwable
      */
@@ -2504,25 +2515,72 @@ public class StemTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "x. := from_json(file_read('" + jsonFile + "'));");
         addLine(script, "z. := x\\qdl\\*\\xmd;"); // should give list
-        // [{'exec_phase':'pre_auth'},{'exec_phase':['post_refresh','post_token','post_user_info']}]
         addLine(script, "okz := size(z.)==2 && (z.0.'exec_phase'=='pre_auth') && (size(z.1.'exec_phase')==3);");
+
         addLine(script, "oky := size(x\\qdl\\*) == 2;"); // should give x.qdl
+
         addLine(script, "w. := x\\qdl\\*\\load;"); // should give x.qdl.[0,2].load
         addLine(script, "w_check. := ['COmanageRegistry/default/identity_token_ldap_claim_source.qdl'," +
                 "'COmanageRegistry/default/identity_token_ldap_claim_process.qdl'];");
         addLine(script, "okw := reduce(@&&, w. == w_check.);");
+
         addLine(script, "s. := x\\qdl\\0\\args;"); // should give x.qdl.0.args
         addLine(script, "oks := size(s.) == 8 && s.'server_port'==636;");
-        addLine(script, "t. := x\\qdl\\0\\*;"); // should give x.qdl.0
+        addLine(script, "s. := x\\qdl\\0\\args;"); // should give x.qdl.0.args
 
+        // next is checking that mining various attributes return the right value and shape
+        addLine(script, "ok0:=(x.qdl.0.args.bind_dn) == (x\\qdl\\0\\args\\bind_dn);");
+        addLine(script, "ok0a:=(x.qdl.0.args.bind_dn) == (x\\>['qdl',0,'args','bind_dn']);");
+        addLine(script, "ok1 :=(x.qdl.0.args.return_attributes.0) == (x\\qdl\\0\\args\\return_attributes\\0);" );
+        addLine(script, "ok1a :=(x.qdl.0.args.return_attributes.0) == (x\\>['qdl',0,'args','return_attributes',0]);" );
+        addLine(script, "ok2 := x\\qdl\\0\\args\\return_attributes << List;" );
+        addLine(script, "ok3 := x\\woof == null;" );
+        addLine(script, "ok4 := x\\['woof'] << Stem;" );
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("oky", state) : "size(x\\qdl\\*) == 2 failed";
         assert getBooleanValue("okz", state) : "x\\qdl\\*\\xmd failed";
         assert getBooleanValue("okw", state) : "x\\qdl\\*\\load failed";
         assert getBooleanValue("oks", state) : "x\\qdl\\0\\args failed";
+        assert getBooleanValue("ok0", state) : "(x.qdl.0.args.bind_dn.0) == ((x\\qdl\\0\\args\\bind_dn).0) failed";
+        assert getBooleanValue("ok0a", state) : "(x.qdl.0.args.bind_dn.0) == (x\\>['qdl',0,'args','bind_dn',0]) failed";
+        assert getBooleanValue("ok1", state) : "(x.qdl.0.args.return_attributes.0) == (x\\qdl\\0\\args\\return_attributes\\0) failed";
+        assert getBooleanValue("ok1a", state) : "(x.qdl.0.args.return_attributes.0) == (x\\>['qdl',0,'args','return_attributes',0]) failed";
+        assert getBooleanValue("ok2", state) : "x\\qdl\\0\\args\\return_attributes << List failed";
+        assert getBooleanValue("ok3", state) : "x\\woof == null failed";
+        assert getBooleanValue("ok4", state) : "x\\['woof'] << Stem failed";
+    }
 
+    public void testExtractionStemKey() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script,"           zeta.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames', 'read:/GraceDB'];\n" +
+                "      zeta.'Communities:LVC:SegDB:SegDBWriter' := 'write:/DQSegDB';\n" +
+                "        zeta.'gw-astronomy:KAGRA-LIGO:members' := ['read:/GraceDB', 'read:/frames'];\n" +
+                "  g. := [{'name': 'Services:MailingLists:Testing:eligible_factor'},{'name': 'Communities:LSCVirgoLIGOGroupMembers'},{'name':'Communities:LVC:SegDB:SegDBWriter'}];");
+
+        addLine(script, "ok :=reduce(@&&, b\\>[star(),2] == [2,12,22,102]);");
+        addLine(script, "ok1 :=reduce(@&&, b\\>[2,star()] == [20,21,22,23,24,25,26]);"); // same as b.2, essentially
+        addLine(script, "ok2 :=reduce(@&&, reduce(@&&, b\\>[star(),star()] == b.));"); // same as b.
+        addLine(script, "ok3 :=reduce(@&&, reduce(@&&, b\\!>[star()] == b.));"); // same as b.
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "b\\>[star(),2] failed";
+        assert getBooleanValue("ok1", state) : "b\\>[2,star()] failed";
+        assert getBooleanValue("ok2", state) : "b\\>[star(),star()] failed";
+        assert getBooleanValue("ok3", state) : "b\\!>[star()]* failed";
     }
 
 }
+/*
+           zeta.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames', 'read:/GraceDB'];
+      zeta.'Communities:LVC:SegDB:SegDBWriter' := 'write:/DQSegDB';
+        zeta.'gw-astronomy:KAGRA-LIGO:members' := ['read:/GraceDB', 'read:/frames'];
+  g. := [{'name': 'Services:MailingLists:Testing:eligible_factor'},{'name': 'Communities:LSCVirgoLIGOGroupMembers'},{'name':'Communities:LVC:SegDB:SegDBWriter'}]
+        ~values(mask(zeta., in_group2(keys(zeta.),g.)))
+[write:/DQSegDB,read:/frames,read:/DQSegDB,read:/GraceDB]
+  zeta\(g\*\name)
+[write:/DQSegDB]
+ */
 
