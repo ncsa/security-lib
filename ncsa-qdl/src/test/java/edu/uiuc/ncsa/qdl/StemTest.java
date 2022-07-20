@@ -2558,18 +2558,25 @@ public class StemTest extends AbstractQDLTester {
                 "      zeta.'Communities:LVC:SegDB:SegDBWriter' := 'write:/DQSegDB';\n" +
                 "        zeta.'gw-astronomy:KAGRA-LIGO:members' := ['read:/GraceDB', 'read:/frames'];\n" +
                 "  g. := [{'name': 'Services:MailingLists:Testing:eligible_factor'},{'name': 'Communities:LSCVirgoLIGOGroupMembers'},{'name':'Communities:LVC:SegDB:SegDBWriter'}];");
-
-        addLine(script, "ok :=reduce(@&&, b\\>[star(),2] == [2,12,22,102]);");
-        addLine(script, "ok1 :=reduce(@&&, b\\>[2,star()] == [20,21,22,23,24,25,26]);"); // same as b.2, essentially
-        addLine(script, "ok2 :=reduce(@&&, reduce(@&&, b\\>[star(),star()] == b.));"); // same as b.
-        addLine(script, "ok3 :=reduce(@&&, reduce(@&&, b\\!>[star()] == b.));"); // same as b.
+        addLine(script, "i. := g\\*\\name;");
+        addLine(script, "w.0 := zeta.;"); // have one a level down too
+        addLine(script, "okz0 := 2== size(zeta\\i.);");
+        addLine(script, "okw0 := 2== size(w\\0\\i.);"); // have one a level down too
+        // GOT: {0:[read:/DQSegDB,read:/frames,read:/GraceDB], Communities:LVC:SegDB:SegDBWriter:write:/DQSegDB}
+        // WANT:  {Communities:LSCVirgoLIGOGroupMembers:[read:/DQSegDB,read:/frames,read:/GraceDB], Communities:LVC:SegDB:SegDBWriter:write:/DQSegDB}
+        addLine(script, "okz1 := (zeta\\i.).'Communities:LVC:SegDB:SegDBWriter' == 'write:/DQSegDB';");
+        addLine(script, "okz2 := (zeta\\i.).'Communities:LSCVirgoLIGOGroupMembers'.0 == 'read:/DQSegDB';");
+        addLine(script, "okw1 := (w\\0\\i.).'Communities:LVC:SegDB:SegDBWriter' == 'write:/DQSegDB';");
+        addLine(script, "okw2 := (w\\0\\i.).'Communities:LSCVirgoLIGOGroupMembers'.0 == 'read:/DQSegDB';");
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getBooleanValue("ok", state) : "b\\>[star(),2] failed";
-        assert getBooleanValue("ok1", state) : "b\\>[2,star()] failed";
-        assert getBooleanValue("ok2", state) : "b\\>[star(),star()] failed";
-        assert getBooleanValue("ok3", state) : "b\\!>[star()]* failed";
+        assert getBooleanValue("okz0", state) : "2== size(zeta\\i.) failed";
+        assert getBooleanValue("okz1", state) : "(zeta\\i.).'Communities:LVC:SegDB:SegDBWriter' == 'write:/DQSegDB' failed";
+        assert getBooleanValue("okz2", state) : "(zeta\\i.).'Communities:LSCVirgoLIGOGroupMembers'.0 == 'read:/DQSegDB' failed";
+        assert getBooleanValue("okw0", state) : "2== size(w\\0\\i.) failed";
+        assert getBooleanValue("okw1", state) : "(w\\0\\i.).'Communities:LVC:SegDB:SegDBWriter' == 'write:/DQSegDB' failed";
+        assert getBooleanValue("okw2", state) : "(w\\0\\i.).'Communities:LSCVirgoLIGOGroupMembers'.0 == 'read:/DQSegDB' failed";
     }
 
 }

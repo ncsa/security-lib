@@ -606,7 +606,7 @@ pick((v)-> 7<v<20,[|pi(); pi(3) ; 10|])
      * @param polyad
      * @param state
      */
-    // list_starts_with(['a','qrs','pqr'],['a','p','s','t'])
+    // starts_with(['a','qrs','pqr'],['a','p','s','t'])
     protected void doListStartsWith(Polyad polyad, State state) {
         if (polyad.isSizeQuery()) {
             polyad.setResult(new int[]{2});

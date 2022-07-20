@@ -228,6 +228,34 @@ a.
         int startIndex = 1;
         IndexArg root = indexArgs.get(startIndex);
         long autoIndex = 0L;
+        boolean isList = indexArgs.size() == 2; // This does list processing only
+        // Very simple case of list only -- this is just an optimization for a very common case, so we don't
+        // start the recursion.
+        if (isList) {
+            for (Object key : root.createKeySet(in)) {
+                Object value = in.get(key);
+                if (Constant.isScalar(root.swri.getResult())) {
+                    if (value == null) {
+                        // edge case, they asked for a non-existent index
+                        // E.g. v.:=[;5]; v\42;
+                        return QDLNull.getInstance();
+                    }
+                    return value;
+                }
+                if (value == null) {
+                    continue;
+                }
+                if (root.strictOrder || (key instanceof String)) {
+                    out.putLongOrString(key, value);
+                } else {
+                    out.put(autoIndex++, value);
+
+                }
+            } // end for
+            return out;
+        }
+
+
         for (Object key : root.createKeySet(in)) {
             Object value = in.get(key);
             if (value == null) {
@@ -239,6 +267,7 @@ a.
 
                 continue;
             }
+
             if (value instanceof QDLStem) {
                 IndexList indexList = new IndexList();
 
@@ -256,20 +285,24 @@ a.
                 otherOut = recurse((QDLStem) value, out, indexList, sourceIndices, startIndex + 1, 0L);
             } else {
                 if (indexArgs.size() - 1 == startIndex) {
+                    System.out.println("recurse: last args index size =" + (indexArgs.size() - 1));
                     // set the value, but only if it is the end of an index list (so there
                     // are no more indices to traverse.
                     if (root.isWildcard()) {
+                        System.out.println("         set wildcard key=" + key + ", value=" + value);
                         out.putLongOrString(key, value);
                     } else {
                         if (Constant.isScalar(root.swri.getResult())) {
+                            System.out.println("         return value=" + value);
                             return value;
                         } else {
                             if (root.strictOrder || (key instanceof String)) {
+                                System.out.println("         put key=" + key + ", value=" + value);
                                 out.putLongOrString(key, value);
                             } else {
+                                System.out.println("         autoindex put key=" + key + ", value=" + value);
                                 out.put(autoIndex++, value);
                             }
-
                         }
 
                     }
@@ -286,18 +319,28 @@ a.
     }
 
     protected Object recurse(QDLStem in,
-                                QDLStem out,
-                                IndexList targetIndex,
-                                List<IndexArg> sourceIndices,
-                                int indexLocation,
-                                long strictIndex) {
+                             QDLStem out,
+                             IndexList targetIndex,
+                             List<IndexArg> sourceIndices,
+                             int indexLocation,
+                             long strictIndex) {
 
         if (sourceIndices.size() <= indexLocation) {
-              System.out.println("*** recurseNEW: targetIndex = " + targetIndex + ", strictIndex=" + strictIndex + ", loc=" + indexLocation + ", in=" + in + ", out=" + out);
+            System.out.println("*** recurseNEW: " +
+                    "\n        in=" + in +
+                    "\n        out=" + out +
+                    "\n        targetIndex = " + targetIndex +
+                    "\n        sourceIndices = " + sourceIndices +
+                    "\n        loc=" + indexLocation +
+                    "\n        strictIndex=" + strictIndex
+            );
             IndexArg lastIndex = sourceIndices.get(indexLocation - 1);
             if (Constant.isScalar(lastIndex.swri.getResult())) {
+                System.out.println("    recurseNEW: adding all inStem");
                 out.addAll(in);
             } else {
+                System.out.println("    recurseNEW: strict add inStem");
+
                 out.putLongOrString(strictIndex, in);
             }
             return out;
@@ -339,34 +382,36 @@ a.
                     }
                     out.set(indexList, value);
                 }
-                //       System.out.println("recurse: setting value key =" + indexList + ", value = " + value);
+                System.out.println("    recurseNEW: setting value key =" + indexList + ", value = " + value);
+            }else{
+                if (value instanceof QDLStem) {
+                                IndexList indexList = targetIndex.clone();
+                                if (indexLocation + 1 < sourceIndices.size()) {
+                                    //  System.out.println("recurseNEW: INDEX CHECK, targetIndex = " + targetIndex + ", strictIndex=" + strictIndex + ", loc=" + indexLocation + ", in=" + in + ", out=" + out);
+                                }
+
+                                if ((indexArg.swri instanceof AllIndices) || !Constant.isScalar(indexArg.swri.getResult())) {
+                                    if (indexArg.strictOrder && indexArg.isWildcard()) {
+                                        indexList.add(key);
+                                    } else {
+                                        indexList.add(strictIndex++);
+                                    }
+                                }
+                                if (sourceIndices.size() <= indexLocation) {
+                                    IndexArg lastIndex = sourceIndices.get(indexLocation - 1);
+                                    if (Constant.isScalar(lastIndex.swri.getResult())) {
+                                        out.addAll(in);
+                                    } else {
+                                        out.putLongOrString(strictIndex++, in);
+                                    }
+
+                                } else {
+                                    otherOut = recurse((QDLStem) value, out, indexList, sourceIndices, indexLocation + 1, 0L);
+                                }
+                            }
             }
 
-            if (value instanceof QDLStem) {
-                IndexList indexList = targetIndex.clone();
-                if (indexLocation + 1 < sourceIndices.size()) {
-                    //  System.out.println("recurseNEW: INDEX CHECK, targetIndex = " + targetIndex + ", strictIndex=" + strictIndex + ", loc=" + indexLocation + ", in=" + in + ", out=" + out);
-                }
 
-                if ((indexArg.swri instanceof AllIndices) || !Constant.isScalar(indexArg.swri.getResult())) {
-                    if (indexArg.strictOrder && indexArg.isWildcard()) {
-                        indexList.add(key);
-                    } else {
-                        indexList.add(strictIndex++);
-                    }
-                }
-                if (sourceIndices.size() <= indexLocation) {
-                    IndexArg lastIndex = sourceIndices.get(indexLocation - 1);
-                    if (Constant.isScalar(lastIndex.swri.getResult())) {
-                        out.addAll(in);
-                    } else {
-                        out.putLongOrString(strictIndex++, in);
-                    }
-
-                } else {
-                    otherOut = recurse((QDLStem) value, out, indexList, sourceIndices, indexLocation + 1, 0L);
-                }
-            }
         }
         if (!(otherOut instanceof QDLStem)) {
             return otherOut;
