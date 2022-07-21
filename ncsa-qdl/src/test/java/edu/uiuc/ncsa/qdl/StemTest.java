@@ -2579,15 +2579,40 @@ public class StemTest extends AbstractQDLTester {
         assert getBooleanValue("okw2", state) : "(w\\0\\i.).'Communities:LSCVirgoLIGOGroupMembers'.0 == 'read:/DQSegDB' failed";
     }
 
+    /*
+          a. := n(5,5,[;25])~ {'p':{'t':'a', 'u':'b', 'v':'c'}, 'q':{'t':'d', 'u':'e', 'v':'f'}, 'r':{'t':'g', 'u':'h', 'v':'i'}}
+       a\[1,2,'p']\[3,'t','q',1]
+    {0:[8,6], 1:[13,11], p:{t:a}}
+     */
+
+    /**
+     * Test mixed data extraction with some gaps.
+     * @throws Throwable
+     */
+    public void testMixedExtraction3() throws Throwable {
+
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := n(5,5,[;25])~ {'p':{'t':'a', 'u':'b', 'v':'c'}, 'q':{'t':'d', 'u':'e', 'v':'f'}, 'r':{'t':'g', 'u':'h', 'v':'i'}};");
+        addLine(script, "b. := a\\[1,2,'p']\\[3,'t','q',1];");
+        addLine(script, "ok := b.0.0 == 8 && b.0.1 == 6 && b.1.0 == 13 && b.1.1 == 11 && b.p.t=='a';");
+        addLine(script, "ok := size(b.)==3 && ok;");
+
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "testing ever element in an extraction failed failed";
+    }
+
+
 }
 /*
-           zeta.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames', 'read:/GraceDB'];
+   zeta.'Communities:LSCVirgoLIGOGroupMembers' := ['read:/DQSegDB' ,'read:/frames', 'read:/GraceDB'];
       zeta.'Communities:LVC:SegDB:SegDBWriter' := 'write:/DQSegDB';
         zeta.'gw-astronomy:KAGRA-LIGO:members' := ['read:/GraceDB', 'read:/frames'];
   g. := [{'name': 'Services:MailingLists:Testing:eligible_factor'},{'name': 'Communities:LSCVirgoLIGOGroupMembers'},{'name':'Communities:LVC:SegDB:SegDBWriter'}]
-        ~values(mask(zeta., in_group2(keys(zeta.),g.)))
-[write:/DQSegDB,read:/frames,read:/DQSegDB,read:/GraceDB]
-  zeta\(g\*\name)
-[write:/DQSegDB]
+  i. := g\*\name
+  w.0 := zeta.
+  w\0\i.
  */
 

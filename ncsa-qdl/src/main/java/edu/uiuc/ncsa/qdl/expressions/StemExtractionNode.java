@@ -285,22 +285,22 @@ a.
                 otherOut = recurse((QDLStem) value, out, indexList, sourceIndices, startIndex + 1, 0L);
             } else {
                 if (indexArgs.size() - 1 == startIndex) {
-                    System.out.println("recurse: last args index size =" + (indexArgs.size() - 1));
+             //       System.out.println("recurse: last args index size =" + (indexArgs.size() - 1));
                     // set the value, but only if it is the end of an index list (so there
                     // are no more indices to traverse.
                     if (root.isWildcard()) {
-                        System.out.println("         set wildcard key=" + key + ", value=" + value);
+                //        System.out.println("         set wildcard key=" + key + ", value=" + value);
                         out.putLongOrString(key, value);
                     } else {
                         if (Constant.isScalar(root.swri.getResult())) {
-                            System.out.println("         return value=" + value);
+                  //          System.out.println("         return value=" + value);
                             return value;
                         } else {
                             if (root.strictOrder || (key instanceof String)) {
-                                System.out.println("         put key=" + key + ", value=" + value);
+                   //             System.out.println("         put key=" + key + ", value=" + value);
                                 out.putLongOrString(key, value);
                             } else {
-                                System.out.println("         autoindex put key=" + key + ", value=" + value);
+                      //          System.out.println("         autoindex put key=" + key + ", value=" + value);
                                 out.put(autoIndex++, value);
                             }
                         }
@@ -326,21 +326,20 @@ a.
                              long strictIndex) {
 
         if (sourceIndices.size() <= indexLocation) {
-            System.out.println("*** recurseNEW: " +
+           /* System.out.println("*** recurseNEW: " +
                     "\n        in=" + in +
                     "\n        out=" + out +
                     "\n        targetIndex = " + targetIndex +
                     "\n        sourceIndices = " + sourceIndices +
                     "\n        loc=" + indexLocation +
                     "\n        strictIndex=" + strictIndex
-            );
+            );*/
             IndexArg lastIndex = sourceIndices.get(indexLocation - 1);
             if (Constant.isScalar(lastIndex.swri.getResult())) {
-                System.out.println("    recurseNEW: adding all inStem");
+                //System.out.println("    recurseNEW: adding all inStem");
                 out.addAll(in);
             } else {
-                System.out.println("    recurseNEW: strict add inStem");
-
+                //System.out.println("    recurseNEW: strict add inStem");
                 out.putLongOrString(strictIndex, in);
             }
             return out;
@@ -382,7 +381,7 @@ a.
                     }
                     out.set(indexList, value);
                 }
-                System.out.println("    recurseNEW: setting value key =" + indexList + ", value = " + value);
+                //System.out.println("    recurseNEW: setting value key =" + indexList + ", value = " + value);
             }else{
                 if (value instanceof QDLStem) {
                                 IndexList indexList = targetIndex.clone();
@@ -422,24 +421,12 @@ a.
 
 
     /*
-       a. := n(3,4,5,n(3*4*5))
-     a\[;2]\![3,1]
 
-     expected:
-     b.0.3 == a.0.3; b.0.1 := a.0.1
-     b.1.3 == a.1.3; b.1.1 := a.1.1
+       a. := n(5,5,[;25])~ {'p':{'t':'a', 'u':'b', 'v':'c'}, 'q':{'t':'d', 'u':'e', 'v':'f'}, 'r':{'t':'g', 'u':'h', 'v':'i'}}
+       a\[1,2,'p']\[3,'t','q',1]
+    {0:[8,6], 1:[13,11], p:{t:a}}
 
-     a\[;2]\[3,1]
-     expected:
-     b.0.0 := a.0.3; b.0.1 == a.0.1;
-     b.1.0 := a.1.3; b.1.1 == a.1.1
 
-    a.:=[[0,1,2,3,4],[5,6,7,8,9],[10,11,12,13,14],[15,16,17,18,19],[20,21,22,23,24]]~{'p':{'t':'a', 'u':'b', 'v':'c'}, 'q':{'t':'d', 'u':'e', 'v':'f'}, 'r':{'t':'g', 'u':'h', 'v':'i'}}
-
-     a.:=n(5,5,n(25))
-     m_set(x., y., z.)->local[while[k∈[;size(y.)]][x.y.k :=z.k];return(x.);]
-     [[p,t],[p,u],[p,v],[q,t],[q,u],[q,v],[r,t],[r,u],[r,v]]
-     m_indices(
      */
 
     /**
