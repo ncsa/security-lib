@@ -26,57 +26,12 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
 
-                <!-- This next argument suppresses the built-in warnings that we are using Sun's
-                 PKCS10 classes. -->
-                <configuration>
-                    <compilerArgument>-XDignore.symbol.file</compilerArgument>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
-                    <useIncrementalCompilation>false</useIncrementalCompilation>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.9.1</version>
-                <configuration>
-                    <sourceDirectory>
-                        /home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/main/antlr4/
-                    </sourceDirectory>
-                    <outputDirectory>
-                        /home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/qdl/generated
-                    </outputDirectory>
-                    <includes>
-                        <include>QDLParser.g4</include>
-                    </includes>
-                    <visitor>false</visitor>
-                    <listener>true</listener>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>antlr</id>
-                        <goals>
-                            <goal>antlr4</goal>
-                        </goals>
 
-                    </execution>
-                </executions>
-            </plugin>
-          
         </plugins>
     </build>
     <dependencies>
-        <dependency>
-            <groupId>org.jline</groupId>
-            <artifactId>jline</artifactId>
-            <version>3.14.1</version>
-        </dependency>
+
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
@@ -103,15 +58,9 @@
 
         <dependency>
             <groupId>com.sun.mail</groupId>
-             <artifactId>javax.mail</artifactId>
+            <artifactId>javax.mail</artifactId>
             <version>1.6.2</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>ncsa-security-core</artifactId>
-            <version>5.2-SNAPSHOT</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
@@ -124,11 +73,11 @@
             <version>2.4</version>
             <classifier>jdk15</classifier>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4</artifactId>
             <version>4.9.3</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.jline</groupId>
             <artifactId>jline</artifactId>
@@ -139,13 +88,19 @@
         Used for text encryption utility.
         -->
         <dependency>
-          <groupId>org.jasypt</groupId>
-          <artifactId>jasypt</artifactId>
-          <version>1.9.0</version>
-          <scope>compile</scope>
+            <groupId>org.jasypt</groupId>
+            <artifactId>jasypt</artifactId>
+            <version>1.9.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>edu.uiuc.ncsa.security</groupId>
+            <artifactId>java-8</artifactId>
+            <version>5.2-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
 
     </dependencies>
 
-   
+
 </project>

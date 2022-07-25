@@ -11,7 +11,7 @@ import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
-import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
+import edu.uiuc.ncsa.security.util.pkcs.MyKeyUtil;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
@@ -414,17 +414,17 @@ public class JWTUtil2 {
         JSONObject claims = verifyAndReadJWT(idTokken, keys);
         System.out.println("claims = " + claims);
         JSONWebKey webKey = keys.get(keyID);
-        System.out.println(KeyUtil.toX509PEM(webKey.publicKey));
+        System.out.println(MyKeyUtil.toX509PEM(webKey.publicKey));
     }
 
     public static void firstTest() throws Exception {
-        PublicKey publicKey = KeyUtil.fromX509PEM(new FileReader("/tmp/pub.pem"));
+        PublicKey publicKey = MyKeyUtil.fromX509PEM(new FileReader("/tmp/pub.pem"));
                 System.out.println(publicKey);
 
         JSONObject header = new JSONObject();
         header.put(TYPE, "JWT");
         header.put(ALGORITHM, "RS256");
-        KeyPair keyPair = KeyUtil.generateKeyPair();
+        KeyPair keyPair = MyKeyUtil.generateKeyPair();
         JSONWebKey webKey = new JSONWebKey();
         webKey.algorithm = "RS256";
         webKey.privateKey = keyPair.getPrivate();
@@ -470,7 +470,7 @@ public class JWTUtil2 {
         JSONWebKey key = keys.get(keyID);
         String signature = sign(header, payload, key);
         System.out.println(concat(header, payload) + "." + signature);
-        System.out.println(KeyUtil.toX509PEM(key.publicKey));
+        System.out.println(MyKeyUtil.toX509PEM(key.publicKey));
 
         System.out.println("verified?" + verify(header, payload, signature, key));
 
@@ -478,7 +478,7 @@ public class JWTUtil2 {
 
     public static void generateAndSign() throws Exception {
         String keyID = "aQEiCy2fJcVgkOft";
-        KeyPair keyPair = KeyUtil.generateKeyPair();
+        KeyPair keyPair = MyKeyUtil.generateKeyPair();
 
         JSONWebKeys keys = new JSONWebKeys(keyID);
         JSONWebKey key = new JSONWebKey();
@@ -506,7 +506,7 @@ public class JWTUtil2 {
     public static void printKeys() throws Exception {
         String text = "eyJ0eXAiOiJKV1QiLCJraWQiOiI5azBIUEczbW9YRU5uZSIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJodHRwczovL2FzaGlnYXJ1Lm5jc2EudWl1Yy5lZHU6OTQ0MyIsInN1YiI6ImpnYXlub3IiLCJleHAiOjE0ODQ3NjQ3NDQsImF1ZCI6Im15cHJveHk6b2E0bXAsMjAxMjovY2xpZW50X2lkLzE0NjQ5ZTJmNDY4NDUwZGFjMGMxODM0ODExZGJkNGM3IiwiaWF0IjoxNDg0NzYzODQ0LCJub25jZSI6IjBaSWktRXV4ZUNfWDhBZ0IzVmlmT29xS2lYV3N6X05sWFN6SXU3aDhyelUiLCJhdXRoX3RpbWUiOiIxNDg0NzYzODQzIn0";
         String keyID = "aQEiCy2fJcVgkOft";
-        KeyPair keyPair = KeyUtil.generateKeyPair();
+        KeyPair keyPair = MyKeyUtil.generateKeyPair();
 
         JSONWebKeys keys = new JSONWebKeys(keyID);
         JSONWebKey key = new JSONWebKey();
@@ -519,9 +519,9 @@ public class JWTUtil2 {
         keys.put(key);
 
         System.out.println("----- START keys");
-        System.out.println(KeyUtil.toX509PEM(keyPair.getPublic()));
-        System.out.println(KeyUtil.toPKCS1PEM(keyPair.getPrivate()));
-        System.out.println(KeyUtil.toPKCS8PEM(keyPair.getPrivate()));
+        System.out.println(MyKeyUtil.toX509PEM(keyPair.getPublic()));
+        System.out.println(MyKeyUtil.toPKCS1PEM(keyPair.getPrivate()));
+        System.out.println(MyKeyUtil.toPKCS8PEM(keyPair.getPrivate()));
         System.out.println("----- END keys\n");
 
 
@@ -534,9 +534,9 @@ public class JWTUtil2 {
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(webKey.privateKey.getEncoded());
         RSAPrivateKey privateKey = (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
 
-        System.out.println(KeyUtil.toX509PEM(webKey.publicKey));
-        System.out.println(KeyUtil.toPKCS1PEM(privateKey));
-        System.out.println(KeyUtil.toPKCS8PEM(privateKey));
+        System.out.println(MyKeyUtil.toX509PEM(webKey.publicKey));
+        System.out.println(MyKeyUtil.toPKCS1PEM(privateKey));
+        System.out.println(MyKeyUtil.toPKCS8PEM(privateKey));
 
     }
 
@@ -554,9 +554,9 @@ public class JWTUtil2 {
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(webKey.privateKey.getEncoded());
         RSAPrivateKey privateKey = (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
 
-        System.out.println(KeyUtil.toX509PEM(webKey.publicKey));
-        System.out.println(KeyUtil.toPKCS1PEM(privateKey));
-        System.out.println(KeyUtil.toPKCS8PEM(privateKey));
+        System.out.println(MyKeyUtil.toX509PEM(webKey.publicKey));
+        System.out.println(MyKeyUtil.toPKCS1PEM(privateKey));
+        System.out.println(MyKeyUtil.toPKCS8PEM(privateKey));
         String tokken = createJWT(payload, keys.get(keyID));
 
         System.out.println("JWT=" + tokken);

@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.security.util.jwk;
 
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
+import edu.uiuc.ncsa.security.util.pkcs.MyKeyUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
@@ -359,12 +359,12 @@ public class JSONWebKeyUtil {
         //  File f = new File("/home/ncsa/temp/zzz/jwks.jwk");
         JSONWebKeys jwks = fromJSON(f);
         JSONWebKey key = jwks.getDefault();
-        System.out.println("keys valid? " + KeyUtil.validateKeyPair(key.publicKey, key.privateKey));
+        System.out.println("keys valid? " + MyKeyUtil.validateKeyPair(key.publicKey, key.privateKey));
         System.out.println("full key=" + toJSON(key).toString(2));
         System.out.println();
         System.out.println("public keys = " + toJSON(makePublic(jwks)).toString(2));
 
-        KeyPair kp = KeyUtil.generateKeyPair();
+        KeyPair kp = MyKeyUtil.generateKeyPair();
         System.out.println(toJSON(create(kp)).toString(2));
     }
 }

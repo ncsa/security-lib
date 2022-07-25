@@ -49,6 +49,7 @@
         <module>ncsa-qdl</module>
         <module>ncsa-qdl-website</module>
         <module>ncsa-qdl-gui</module>
+        <module>java-8</module>
     </modules>
     <dependencies>
         <dependency>

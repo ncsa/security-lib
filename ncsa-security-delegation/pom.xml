@@ -20,7 +20,7 @@
         <module>ncsa-security-delegation-common</module>
         <module>ncsa-security-delegation-client</module>
         <module>ncsa-security-delegation-server</module>
-        <module>ncsa-security-oauth-1.0a</module>
+    <!--    <module>ncsa-security-oauth-1.0a</module> -->
         <module>ncsa-security-oauth-2.0</module>
     </modules>
 

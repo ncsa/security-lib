@@ -17,7 +17,7 @@ public class KeyPairQueue extends QueueWithSpare<KeyPair> {
                return x;
            }
            try {
-               KeyPair keyPair = KeyUtil.generateKeyPair();
+               KeyPair keyPair = MyKeyUtil.generateKeyPair();
                setSpare(keyPair);
                return keyPair;
            } catch (Exception e) {

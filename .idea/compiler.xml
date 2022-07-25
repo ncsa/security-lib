@@ -18,25 +18,29 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="ncsa-security-storage" />
-        <module name="ncsa-security-delegation-client" />
         <module name="ncsa-security-oauth-2.0" />
+        <module name="java-8" />
         <module name="ncsa-qdl-website" />
         <module name="ncsa-security-delegation-common" />
         <module name="ncsa-security-core" />
         <module name="ncsa-security-util" />
         <module name="ncsa-security-delegation-server" />
+        <module name="ncsa-qdl-gui" />
+        <module name="ncsa-security-storage" />
+        <module name="ncsa-security-delegation-client" />
         <module name="ncsa-security-servlet" />
         <module name="ncsa-qdl" />
-        <module name="ncsa-security-oauth-1.0a" />
-        <module name="ncsa-qdl-gui" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="ncsa-security-oauth-1.0a" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="java-8" options="-XDignore.symbol.file" />
       <module name="ncsa-qdl" options="-XDignore.symbol.file" />
-      <module name="ncsa-security-util" options="-XDignore.symbol.file" />
+      <module name="ncsa-security-util" options="" />
     </option>
   </component>
 </project>

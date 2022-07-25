@@ -1,13 +1,13 @@
 package edu.uiuc.ncsa.security.util;
 
-import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
+import edu.uiuc.ncsa.security.util.pkcs.MyKeyUtil;
 
 import java.io.FileReader;
 import java.io.Reader;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-import static edu.uiuc.ncsa.security.util.pkcs.KeyUtil.fromPKCS1PEM;
+import static edu.uiuc.ncsa.security.util.pkcs.MyKeyUtil.fromPKCS1PEM;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -23,8 +23,8 @@ public class KeyTest extends TestBase{
         Reader privateFR = new FileReader("/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/test/resources/openssl-private.pem");
         Reader publicFR = new FileReader("/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/test/resources/openssl-public.pem");
         PrivateKey privateKey = fromPKCS1PEM(privateFR);
-        PublicKey publicKey = KeyUtil.fromX509PEM(publicFR);
-        assert KeyUtil.validateKeyPair(publicKey, privateKey) : "Invalid keypair";
+        PublicKey publicKey = MyKeyUtil.fromX509PEM(publicFR);
+        assert MyKeyUtil.validateKeyPair(publicKey, privateKey) : "Invalid keypair";
     }
 
     /**
@@ -35,7 +35,7 @@ public class KeyTest extends TestBase{
         Reader privateFR = new FileReader("/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/test/resources/private-key.pem");
         Reader publicFR = new FileReader("/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/test/resources/public-key.pem");
         PrivateKey privateKey = fromPKCS1PEM(privateFR);
-        PublicKey publicKey = KeyUtil.fromX509PEM(publicFR);
-        assert KeyUtil.validateKeyPair(publicKey, privateKey) : "Invalid keypair";
+        PublicKey publicKey = MyKeyUtil.fromX509PEM(publicFR);
+        assert MyKeyUtil.validateKeyPair(publicKey, privateKey) : "Invalid keypair";
     }
 }

@@ -9,7 +9,7 @@ import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.MyX509Certificates;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
-import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
+import edu.uiuc.ncsa.security.util.pkcs.MyCertUtil;
 
 import java.security.cert.CertificateException;
 import java.util.HashMap;
@@ -60,7 +60,7 @@ public class PAServer2 extends ASImpl implements PAServer {
         String response = getServiceClient().doGet(m); // No JSON in the spec. Just a string of certs.
         MyX509Certificates myX509Certificate = null;
         try {
-            myX509Certificate = new MyX509Certificates(CertUtil.fromX509PEM(response));
+            myX509Certificate = new MyX509Certificates(MyCertUtil.fromX509PEM(response));
         } catch (CertificateException e) {
             e.printStackTrace();
         }

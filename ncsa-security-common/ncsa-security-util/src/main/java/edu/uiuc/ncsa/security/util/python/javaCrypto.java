@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.security.util.python;
 
-import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
+import edu.uiuc.ncsa.security.util.pkcs.MyKeyUtil;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.BadPaddingException;
@@ -53,14 +53,14 @@ public class javaCrypto {
         KeyPair keyPair;
         public RSA gen_key(int keyLength, int exponent, Object callback) throws NoSuchProviderException, NoSuchAlgorithmException {
             RSA rsa = new RSA();
-            keyPair = KeyUtil.generateKeyPair();
+            keyPair = MyKeyUtil.generateKeyPair();
             return rsa;
         }
         public void save_key(String fullPath, String cipher, Object callback) throws IOException {
-            KeyUtil.toPKCS1PEM(keyPair.getPrivate(), new FileOutputStream(fullPath));
+            MyKeyUtil.toPKCS1PEM(keyPair.getPrivate(), new FileOutputStream(fullPath));
         }
         public void save_pub_key(String fullPath) throws IOException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-            KeyUtil.toX509PEM(keyPair.getPublic(), new FileWriter(fullPath));
+            MyKeyUtil.toX509PEM(keyPair.getPublic(), new FileWriter(fullPath));
         }
     }
 }

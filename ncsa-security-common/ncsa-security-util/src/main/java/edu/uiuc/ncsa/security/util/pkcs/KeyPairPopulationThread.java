@@ -23,7 +23,7 @@ public class KeyPairPopulationThread extends QueuePopulationThread<KeyPair> {
     @Override
     protected KeyPair createNew() {
         try {
-            return KeyUtil.generateKeyPair();
+            return MyKeyUtil.generateKeyPair();
         } catch (Exception e) {
             throw new GeneralException("Error generating keypair", e);
         }

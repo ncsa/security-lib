@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.security.delegation.token;
 
-import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
+import edu.uiuc.ncsa.security.util.pkcs.MyCertUtil;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -28,7 +28,7 @@ public class MyX509Certificates implements ProtectedAsset {
             throws CertificateEncodingException {
         String pem = "";
         for (int i = 0; i < x509Certificates.length; ++i){
-            pem += CertUtil.toPEM(x509Certificates[i]) + "\n";
+            pem += MyCertUtil.toPEM(x509Certificates[i]) + "\n";
         }
         return pem;
     }

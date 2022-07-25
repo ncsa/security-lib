@@ -2,7 +2,11 @@ package edu.uiuc.ncsa.security.util.pkcs;
 
 import org.apache.commons.codec.binary.Base64;
 
+/*
+   Keep! Used in OA4MP
+ */
 /**
+ *
  * Wrapper for Base 64 encoded strings. The assumption is that this is created around a string
  * that is a base 64 encoding of something. If you use the byte constructor,{@link Base64String#Base64String(byte[])}
  * this will

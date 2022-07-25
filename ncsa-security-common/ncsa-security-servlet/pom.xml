@@ -34,10 +34,6 @@
            Do not change this unless you have a very good reason.
         -->
         <dependency>
-<!--
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
--->
             <groupId>com.sun.mail</groupId>
              <artifactId>javax.mail</artifactId>
             <version>1.6.2</version>

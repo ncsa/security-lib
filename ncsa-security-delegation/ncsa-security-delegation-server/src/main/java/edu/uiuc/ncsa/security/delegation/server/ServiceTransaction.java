@@ -5,8 +5,8 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.impl.BasicTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
-import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
-import edu.uiuc.ncsa.security.util.pkcs.MyPKCS10CertRequest;
+import edu.uiuc.ncsa.security.util.pkcs.MyCertUtil;
+import edu.uiuc.ncsa.security.util.crypto.MyPKCS10CertRequest;
 
 import java.net.URI;
 
@@ -100,12 +100,12 @@ public class ServiceTransaction extends BasicTransaction {
             return null;
         }
         // Need to do it this way since cert requests are not actually serializable
-        return CertUtil.fromStringToCertReq(getCertReqString());
+        return MyCertUtil.fromStringToCertReq(getCertReqString());
     }
 
     public void setCertReqString(String certReqString) {
         if (certReqString == null && certReq != null) {
-            certReqString = CertUtil.fromCertReqToString(certReq);
+            certReqString = MyCertUtil.fromCertReqToString(certReq);
         }
         this.certReqString = certReqString;
     }
@@ -122,7 +122,7 @@ public class ServiceTransaction extends BasicTransaction {
 
     public void setCertReq(MyPKCS10CertRequest certReq) {
         this.certReq = certReq;
-        certReqString = CertUtil.fromCertReqToString(certReq);
+        certReqString = MyCertUtil.fromCertReqToString(certReq);
     }
 
     transient MyPKCS10CertRequest certReq;

@@ -7,7 +7,7 @@ package edu.uiuc.ncsa.security.util.ssl;
 
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
+import edu.uiuc.ncsa.security.util.pkcs.MyCertUtil;
 
 import javax.net.ssl.X509TrustManager;
 import java.io.File;
@@ -140,7 +140,7 @@ public class MyTrustManager implements X509TrustManager {
             }
         }
         try {
-            issuers = CertUtil.getX509CertsFromStringList(certData, certFilenames);
+            issuers = MyCertUtil.getX509CertsFromStringList(certData, certFilenames);
             dbg("Got " + issuers.length + " issuers.");
         } catch (Exception e) {
             if (stackTracesOn) e.printStackTrace();

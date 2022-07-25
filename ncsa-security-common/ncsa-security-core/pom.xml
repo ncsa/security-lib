@@ -22,7 +22,7 @@
             <artifactId>commons-configuration</artifactId>
             <version>1.10</version>
         </dependency>
-        <dependency>
+<!--        <dependency>
              <groupId>commons-collections</groupId>
              <artifactId>commons-collections</artifactId>
              <version>3.2.2</version>
@@ -31,7 +31,7 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>1.9.4</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
@@ -42,16 +42,6 @@
             <artifactId>javax.inject</artifactId>
             <version>1</version>
         </dependency>
-        <!--
-            we don't user log4j, but enough other people do that we have to kill it off, hence this dependency.
-            -->
-<!--           <dependency>
-               <groupId>log4j</groupId>
-               <artifactId>log4j</artifactId>
-               <version>1.2.17</version>
-           </dependency>-->
-
-
 <!--
     CIL-1147 remove log 4 java.
 -->
@@ -62,13 +52,7 @@
             <version>2.4</version>
             <classifier>jdk15</classifier>
         </dependency>
-<!--        <dependency>
-            <groupId>net.sf.json-lib</groupId>
-            <artifactId>json-lib</artifactId>
-            <version>2.4</version>
-            <classifier>jdk15</classifier>
-            <scope>compile</scope>
-        </dependency>-->
+
     </dependencies>
     <build>
         <plugins>

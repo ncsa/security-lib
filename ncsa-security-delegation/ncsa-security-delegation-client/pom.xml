@@ -12,11 +12,11 @@
     <name>NCSA delegation layer for clients</name>
     <packaging>jar</packaging>
     <dependencies>
-        <dependency>
+<!--        <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
             <version>5.2-SNAPSHOT</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>
             <artifactId>ncsa-security-delegation-common</artifactId>

@@ -9,7 +9,9 @@ import java.util.Date;
 
 import static edu.uiuc.ncsa.security.util.cli.json_edit.JSONPaths.normalize;
 import static edu.uiuc.ncsa.security.util.cli.json_edit.JSONPaths.resolve;
-
+ /*
+    Keep! Used in OA4MP along with stuff in cli/json_edit
+  */
 /**
  * A utility for navigating JSON objects. You provide an absolute path or a root and a relative path.
  * Note that arrays are treated consistently, so if /a is the path to the array, /a/0 is the zeroth element.
