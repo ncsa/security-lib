@@ -39,7 +39,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="java-8" options="-XDignore.symbol.file" />
-      <module name="ncsa-qdl" options="-XDignore.symbol.file" />
+      <module name="ncsa-qdl" options="" />
       <module name="ncsa-security-util" options="" />
     </option>
   </component>
