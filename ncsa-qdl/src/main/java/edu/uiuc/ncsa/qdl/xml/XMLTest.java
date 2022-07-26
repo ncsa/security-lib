@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.qdl.xml;
 
-import com.sun.xml.internal.stream.events.CommentEvent;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
@@ -82,7 +81,7 @@ public class XMLTest {
                     }
                     break;
                 case XMLEvent.COMMENT:
-                    System.out.println(" comment:" + ((CommentEvent) xe).getText());
+                    System.out.println(" comment:" +xe);
                     break;
                 case XMLEvent.ATTRIBUTE:
                     System.out.println("attributes # = " + xe);

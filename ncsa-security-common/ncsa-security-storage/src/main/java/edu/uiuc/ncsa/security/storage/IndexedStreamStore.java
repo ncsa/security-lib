@@ -31,10 +31,9 @@ public abstract class IndexedStreamStore<V extends Identifiable> implements Stor
     protected Initializable initializer;
 
     /**
-     * A hash map of items created by this store. You <i>should</i> keep track of every item created
-     * and if an item already exists return that.
-     *
-     * @return
+     *   A hash map of items created by this store. You <i>should</i> keep track of every item created
+     *   and if an item already exists return that.
+     * @return returns created items.
      */
     public HashMap<Identifier, V> getCreatedItems() {
         if (createdItems == null) {

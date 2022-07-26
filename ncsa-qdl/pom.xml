@@ -36,20 +36,17 @@
                 </executions>
             </plugin>
 
-            <plugin>
+<!--            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
-
-                <!-- This next argument suppresses the built-in warnings that we are using Sun's
-                 PKCS10 classes. -->
                 <configuration>
                     <compilerArgument>-XDignore.symbol.file</compilerArgument>
                     <source>1.8</source>
                     <target>1.8</target>
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
                 </configuration>
-            </plugin>
+            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -67,22 +64,6 @@
 
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.14.1</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/*Test.java</exclude>
-<!--                        <exclude>**/*Suite.java</exclude> -->
-                    </excludes>
-                  <!--  <forkMode>perTest</forkMode>-->
-                    <forkCount>1</forkCount>
-                    <reuseForks>false</reuseForks>
-
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
@@ -214,6 +195,12 @@
             <groupId>ch.obermuhlner</groupId>
             <artifactId>big-math</artifactId>
             <version>2.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

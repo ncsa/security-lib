@@ -20,7 +20,7 @@ import javax.servlet.ServletContextListener;
  * Simply supply an instance of
  * the your bootstrapper, returned by {@link #getConfigurationLoader(javax.servlet.ServletContext)}
  * and this will in turn stick it into your servlets (by putting it in the
- * environemtn for the top-level {@link AbstractServlet} which everything should inherit from.
+ * environment for the top-level {@link AbstractServlet} which everything should inherit from.
  * Note that this
  * is designed for a single use in a web application. The environment will be static
  * and shared by all the servlets in a single web application.
