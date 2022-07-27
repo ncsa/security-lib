@@ -22,17 +22,17 @@
         <module name="ncsa-security-oauth-2.0" />
         <module name="ncsa-security-delegation-client" />
         <module name="java-8" />
-        <module name="ncsa-qdl-website" />
         <module name="ncsa-security-delegation-common" />
         <module name="ncsa-security-core" />
         <module name="ncsa-security-util" />
         <module name="ncsa-security-delegation-server" />
         <module name="ncsa-security-servlet" />
-        <module name="ncsa-qdl" />
         <module name="ncsa-qdl-gui" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="ncsa-qdl" target="11" />
+      <module name="ncsa-qdl-website" target="1.5" />
       <module name="ncsa-security-oauth-1.0a" target="1.8" />
     </bytecodeTargetLevel>
   </component>

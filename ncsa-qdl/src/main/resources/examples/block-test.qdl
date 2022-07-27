@@ -1,4 +1,0 @@
-/*
-   Test that returns from a block statement work. This just echos the zeroth parameter.
-*/
-block[return(script_args(0));];

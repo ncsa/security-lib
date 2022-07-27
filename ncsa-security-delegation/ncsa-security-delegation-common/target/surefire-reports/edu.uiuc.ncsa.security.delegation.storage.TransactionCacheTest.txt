@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest
 -------------------------------------------------------------------------------
-Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.079 sec
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.159 sec

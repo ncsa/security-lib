@@ -1,7 +1,0 @@
-#! /usr/bin/env -S qdl-run
-/*
-  The expected Hello World program.  
-  Jeff Gaynor
-  1/26/2020
-*/
-say('Hello world!');

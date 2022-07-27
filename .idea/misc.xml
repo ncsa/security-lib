@@ -29,6 +29,8 @@
     </option>
     <option name="ignoredFiles">
       <set>
+        <option value="$PROJECT_DIR$/ncsa-qdl-website/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-qdl/pom.xml" />
         <option value="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/pom.xml" />
       </set>
     </option>
