@@ -18,18 +18,18 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="ncsa-security-storage" />
         <module name="ncsa-security-oauth-2.0" />
+        <module name="ncsa-security-delegation-client" />
         <module name="java-8" />
         <module name="ncsa-qdl-website" />
         <module name="ncsa-security-delegation-common" />
         <module name="ncsa-security-core" />
         <module name="ncsa-security-util" />
         <module name="ncsa-security-delegation-server" />
-        <module name="ncsa-qdl-gui" />
-        <module name="ncsa-security-storage" />
-        <module name="ncsa-security-delegation-client" />
         <module name="ncsa-security-servlet" />
         <module name="ncsa-qdl" />
+        <module name="ncsa-qdl-gui" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

@@ -5,13 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9fdd0c4a-20be-4be4-802c-6391237ac776" name="Changes" comment="More">
+      <change afterPath="$PROJECT_DIR$/build.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/java-8/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/java-8/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl-gui/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_reference.odt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_reference.odt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Identifiable.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Identifiable.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/IdentifiableProvider.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/IdentifiableProvider.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Identifier.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Identifier.class" afterDir="false" />
@@ -205,6 +203,7 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -293,7 +292,7 @@
       <recent name="edu.uiuc.ncsa.security.util.crypto" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.QDL test suite">
+  <component name="RunManager" selected="Shell Script.build.sh">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -366,20 +365,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="QDLList" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.qdl.variables.QDLList" />
-      <module name="ncsa-qdl" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.qdl.variables.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="TokenImpl" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.delegation.token.impl.TokenImpl" />
       <module name="ncsa-security-delegation-common" />
@@ -444,24 +429,39 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="build.sh" type="ShConfigurationType" temporary="true">
+      <option name="SCRIPT_TEXT" value="" />
+      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+      <option name="SCRIPT_PATH" value="$PROJECT_DIR$/build.sh" />
+      <option name="SCRIPT_OPTIONS" value="" />
+      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+      <option name="INTERPRETER_PATH" value="/bin/bash" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="EXECUTE_IN_TERMINAL" value="true" />
+      <option name="EXECUTE_SCRIPT_FILE" value="true" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Application.QDL basic" />
       <item itemvalue="Application.QDL default" />
       <item itemvalue="Application.AnotherJSONUtil" />
-      <item itemvalue="Application.QDLList" />
       <item itemvalue="Application.TokenImpl" />
       <item itemvalue="Application.BasicIdentifier" />
+      <item itemvalue="Application.EncryptionUtil" />
       <item itemvalue="JUnit.Generic test suite" />
       <item itemvalue="JUnit.QDL test suite" />
-      <item itemvalue="Application.EncryptionUtil" />
+      <item itemvalue="Shell Script.build.sh" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Shell Script.build.sh" />
         <item itemvalue="Application.EncryptionUtil" />
         <item itemvalue="Application.AnotherJSONUtil" />
         <item itemvalue="Application.BasicIdentifier" />
         <item itemvalue="Application.TokenImpl" />
-        <item itemvalue="Application.QDLList" />
       </list>
     </recent_temporary>
   </component>
@@ -524,14 +524,8 @@
       <workItem from="1657367916250" duration="51858000" />
       <workItem from="1657836927458" duration="8823000" />
       <workItem from="1657916006897" duration="708000" />
-      <workItem from="1658058926515" duration="102523000" />
-    </task>
-    <task id="LOCAL-00029" summary="Changed how debugging works so it is more modular.">
-      <created>1648590855983</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1648590855983</updated>
+      <workItem from="1658058926515" duration="102827000" />
+      <workItem from="1658874491296" duration="8976000" />
     </task>
     <task id="LOCAL-00030" summary="CIL-1206">
       <created>1648673100843</created>
@@ -869,7 +863,14 @@
       <option name="project" value="LOCAL" />
       <updated>1658866165434</updated>
     </task>
-    <option name="localTasksCounter" value="78" />
+    <task id="LOCAL-00078" summary="Drivers updated. Several drivers were stuck at lower levels since they required java 9 or above. These can now be updated.">
+      <created>1658873746055</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1658873746055</updated>
+    </task>
+    <option name="localTasksCounter" value="79" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -916,7 +917,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Renamed a couple of classes to be far more descriptive." />
     <MESSAGE value="Rewrote list processing in QDL. This originally used TreeSet in certain places -- the slowest possible Java Collection. It became clear that those components were among actually the most frequently used in practice. TreeSet was almost compeltely replaced with ArrayList -- the fastest Java Collection. Speed increase by 25% right off the bat in unit tests from 17 seconds to 13 seconds." />
     <MESSAGE value="Last bit of housekeeping in QDL before turning my attention fully to CIL-1081 and delegation. Wanted to add some regression tests and check a few edge cases so this can be unattended for the next bit." />
     <MESSAGE value="New documentation did not get added to git. Adding it." />
@@ -941,7 +941,8 @@
     <MESSAGE value="Last couple of tests, removed a ton of print statements for debugging." />
     <MESSAGE value="Migrate to Java 11, maven module restructure, remove OAuth 1.0a code." />
     <MESSAGE value="CIL-627: Build is now done with Java 17 targeting Java 11 output. This allows for completely updating all Maven plugins." />
-    <option name="LAST_COMMIT_MESSAGE" value="CIL-627: Build is now done with Java 17 targeting Java 11 output. This allows for completely updating all Maven plugins." />
+    <MESSAGE value="Drivers updated. Several drivers were stuck at lower levels since they required java 9 or above. These can now be updated." />
+    <option name="LAST_COMMIT_MESSAGE" value="Drivers updated. Several drivers were stuck at lower levels since they required java 9 or above. These can now be updated." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">

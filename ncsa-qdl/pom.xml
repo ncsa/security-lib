@@ -35,18 +35,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-<!--            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-                <configuration>
-                    <compilerArgument>-XDignore.symbol.file</compilerArgument>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
-                </configuration>
-            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -58,7 +46,6 @@
                     <includes>
                         <include>**/*Suite.java</include>
                     </includes>
-                  <!--  <forkMode>perTest</forkMode>-->
                     <forkCount>1</forkCount>
                     <reuseForks>false</reuseForks>
 
@@ -103,7 +90,7 @@
             <version>2.6.0</version>
         </dependency>
         <!--
-             Stupid json-path component loads with loud errors without its logger which is not enabled for output.
+             Stupid json-path component loads with loud errors about its logger, which is not enabled for output.
              Have to include the dependency so it can see it should not run.
         -->
         <dependency>
