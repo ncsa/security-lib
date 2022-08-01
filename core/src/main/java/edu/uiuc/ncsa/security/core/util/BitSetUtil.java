@@ -27,7 +27,7 @@ public class BitSetUtil {
     /**
      * Ditto {@link #orCompress(BitSet)} except the returned value is
      * <pre>
-     *     a0 && a1 && a2 && ... && an
+     *     a0 &amp;&amp; a1 &amp;&amp; a2 &amp;&amp; ... &amp;&amp; an
      * </pre>
      *
      * @return

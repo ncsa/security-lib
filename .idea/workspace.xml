@@ -7,20 +7,44 @@
     <list default="true" id="e2370508-a694-4084-b56a-b8e77c115dc1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/core/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/BitSetUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/BitSetUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/Identifiers.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/Identifiers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java-8/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/crypto/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java-8/src/main/java/edu/uiuc/ncsa/security/util/crypto/CertUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/crypto/src/main/java/edu/uiuc/ncsa/security/util/crypto/CertUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java-8/src/main/java/edu/uiuc/ncsa/security/util/crypto/CryptoException.java" beforeDir="false" afterPath="$PROJECT_DIR$/crypto/src/main/java/edu/uiuc/ncsa/security/util/crypto/CryptoException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java-8/src/main/java/edu/uiuc/ncsa/security/util/crypto/InvalidCertRequestException.java" beforeDir="false" afterPath="$PROJECT_DIR$/crypto/src/main/java/edu/uiuc/ncsa/security/util/crypto/InvalidCertRequestException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java-8/src/main/java/edu/uiuc/ncsa/security/util/crypto/KeyUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/crypto/src/main/java/edu/uiuc/ncsa/security/util/crypto/KeyUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java-8/src/main/java/edu/uiuc/ncsa/security/util/crypto/MyPKCS10CertRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/crypto/src/main/java/edu/uiuc/ncsa/security/util/crypto/MyPKCS10CertRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java-8/src/main/java/edu/uiuc/ncsa/security/util/crypto/PEMFormatUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/crypto/src/main/java/edu/uiuc/ncsa/security/util/crypto/PEMFormatUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/java-8/src/main/resources/readme.txt" beforeDir="false" afterPath="$PROJECT_DIR$/crypto/src/main/resources/readme.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl-gui/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/servlet/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/Presentable.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/Presentable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/mail/package.html" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/mail/package.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/storage/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/FileStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/FileStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLConnectionImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLConnectionImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/internals/ColumnMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/internals/ColumnMap.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/test/java/edu/uiuc/ncsa/security/util/FunctorParserTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/test/java/edu/uiuc/ncsa/security/util/FunctorParserTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/test/java/edu/uiuc/ncsa/security/util/KeyTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/test/java/edu/uiuc/ncsa/security/util/KeyTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/editing/LineEditor.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/editing/LineEditor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/FunctorMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/FunctorMap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/json/MyJPathUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/json/MyJPathUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/make-website.sh" beforeDir="false" afterPath="$PROJECT_DIR$/website/make-website.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/fml/faq.fml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/fml/faq.fml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeInsightWorkspaceSettings">
+    <option name="optimizeImportsOnTheFly" value="true" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -47,6 +71,10 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
@@ -54,7 +82,7 @@
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
   </component>
-  <component name="RunManager" selected="JUnit.TestSuite">
+  <component name="RunManager" selected="Shell Script.make-website.sh">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -129,8 +157,40 @@
       <envs />
       <method v="2" />
     </configuration>
+    <configuration name="javadoc.sh" type="ShConfigurationType" temporary="true">
+      <option name="SCRIPT_TEXT" value="" />
+      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+      <option name="SCRIPT_PATH" value="$PROJECT_DIR$/website/target/site/apidocs/javadoc.sh" />
+      <option name="SCRIPT_OPTIONS" value="" />
+      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$/website/target/site/apidocs" />
+      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+      <option name="INTERPRETER_PATH" value="/bin/bash" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="EXECUTE_IN_TERMINAL" value="true" />
+      <option name="EXECUTE_SCRIPT_FILE" value="true" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="make-website.sh" type="ShConfigurationType" temporary="true">
+      <option name="SCRIPT_TEXT" value="" />
+      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+      <option name="SCRIPT_PATH" value="$PROJECT_DIR$/website/make-website.sh" />
+      <option name="SCRIPT_OPTIONS" value="" />
+      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$/website" />
+      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+      <option name="INTERPRETER_PATH" value="/bin/bash" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="EXECUTE_IN_TERMINAL" value="true" />
+      <option name="EXECUTE_SCRIPT_FILE" value="true" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Shell Script.make-website.sh" />
+        <item itemvalue="Shell Script.javadoc.sh" />
         <item itemvalue="JUnit.TestSuite" />
         <item itemvalue="Shell Script.build.sh" />
       </list>
@@ -161,8 +221,17 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1659363578396</updated>
-      <workItem from="1659363580704" duration="640000" />
+      <workItem from="1659363580704" duration="2164000" />
+      <workItem from="1659365755464" duration="9807000" />
     </task>
+    <task id="LOCAL-00001" summary="CIL-627: everything updated. Basic refactor done.">
+      <created>1659364398070</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1659364398070</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -170,6 +239,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
+    <MESSAGE value="CIL-627: everything updated. Basic refactor done." />
+    <option name="LAST_COMMIT_MESSAGE" value="CIL-627: everything updated. Basic refactor done." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
 </project>

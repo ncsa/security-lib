@@ -42,7 +42,7 @@ abstract public class SQLConnectionImpl implements ConnectionParameters {
     /**
      * Add parameters from the configuration file if they exist. The parameter string is of the form
      * <pre>
-     *     key0=value0&key1=value1&key2=value2...
+     *     key0=value0&apm;key1=value1&apm;key2=value2...
      * </pre>
      * <b>NOTE:</b> this method does not set the ssl connection parameter -- tjhat should be done before invoking this method
      * because that is very vendor specific. This method passes along whatever parameters to the driver the user needs or skips them

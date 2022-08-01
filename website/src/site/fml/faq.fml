@@ -3,23 +3,26 @@
   xsi:schemaLocation="https://maven.apache.org/FML/1.0 https://maven.apache.org/xsd/fml-1.0.xsd"
   id="General FAQ">
   <part id="General">
-    <faq id="where">
-      <question>Where did Maven come from?</question>
+    <faq id="what">
+      <question>What is this project?</question>
       <answer>
         <p>
-          Maven was created by a group of software developers who were tired
-          of wasting their time fiddling around with builds and wanted to get
-          down to brass tacks and actually develop software!
+          This is a set of various extremely useful bits of code that have evolved
+          over several projects at the NCSA's CSD.<br/>
+          (National Center for Supercomputing Applications, Cybersecurity Directorate).
+          <br/>
+          They are widely used in projects such as OA4MP, CILogon and QDL.
         </p>
       </answer>
     </faq>
     <faq id="why">
-      <question>Why is Maven so wildly popular?</question>
+      <question>Why have these?</question>
       <answer>
         <p>
-          Maven saves you so much time in your software development efforts that
-          you will have time to learn a second language, relax ten hours a
-          day, and train for that marathon you've always wanted to run!
+          Mostly these are specialized and do common operations that may be much
+          more complex in other packages. For instance, the crypto module has X 509 certificate
+          and key utilities that use native Java, so you don't have to import some
+          huge stack of code to do them.
         </p>
       </answer>
     </faq>

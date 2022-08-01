@@ -8,7 +8,7 @@
         <version>9</version>
     </parent>
     <groupId>edu.uiuc.ncsa.security</groupId>
-    <artifactId>ncsa-security-all</artifactId>
+    <artifactId>security-lib</artifactId>
     <version>5.2-SNAPSHOT</version>
     <name>Parent module for everything of interest.</name>
     <packaging>pom</packaging>
@@ -45,10 +45,8 @@
     </properties>
 
     <modules>
-        <!-- <module>ncsa-security-common</module> -->
-      <!--  <module>ncsa-security-delegation</module> -->
-        <module>ncsa-qdl-gui</module>
-        <module>java-8</module>
+      <!--  <module>ncsa-qdl-gui</module>-->
+        <module>crypto</module>
         <module>website</module>
         <module>core</module>
         <module>util</module>

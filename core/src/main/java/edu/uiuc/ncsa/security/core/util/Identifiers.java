@@ -74,7 +74,7 @@ public class Identifiers {
     /**
      * Creates a new token of the form
      * <pre>
-     *     caput/id?param1=&param2=...
+     *     caput/id?param1=&amp;param2=...
      * </pre>
      *
      * @param caput

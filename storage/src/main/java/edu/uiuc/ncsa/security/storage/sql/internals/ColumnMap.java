@@ -22,7 +22,6 @@ import java.util.List;
  * the keys are automatically converted to/from lower case. This is because this object may have its
  * values given from a result set metadata object and most vendors allow only case-insensitive column names,
  * so they may or may not elect to convert them to lower or upper case as they see fit.
- * </>
  * <p>Created by Jeff Gaynor<br>
  * on 8/31/11 at  4:05 PM
  */

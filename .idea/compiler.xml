@@ -19,19 +19,21 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="core" />
-        <module name="java-8" />
         <module name="website" />
         <module name="util" />
         <module name="servlet" />
         <module name="storage" />
-        <module name="ncsa-qdl-gui" />
+        <module name="crypto" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="ncsa-qdl-gui" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="java-8" options="-XDignore.symbol.file" />
-      <module name="util" options="--add-modules java.base" />
+      <module name="crypto" options="-XDignore.symbol.file" />
+      <module name="util" options="" />
     </option>
   </component>
 </project>

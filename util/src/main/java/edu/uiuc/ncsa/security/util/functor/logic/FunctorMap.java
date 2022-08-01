@@ -35,7 +35,6 @@ public class FunctorMap extends HashMap<String, List<JFunctor>> {
      * Add all of the functors in the argument to this map.
      *
      * @param functorMap
-     * @return
      */
     public void addAll(FunctorMap functorMap) {
         if(functorMap == null){

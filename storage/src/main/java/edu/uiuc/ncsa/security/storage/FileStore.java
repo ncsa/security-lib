@@ -134,11 +134,6 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
 
     protected File indexDirectory;
 
-    /**
-     * Make sure everything exists like it's supposed to
-     *
-     * @param directory
-     */
 
     protected File storageDirectory = null;
 

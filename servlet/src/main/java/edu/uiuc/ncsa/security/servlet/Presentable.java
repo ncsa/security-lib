@@ -42,7 +42,6 @@ public interface Presentable {
      * If this is due to an exception,
      * the exception handler will pass along the exception as an attribute named
      * <b>exception</b> in the request.
-     * @return
      */
     public abstract void handleError(PresentableState state, Throwable t) throws IOException, ServletException;
 }

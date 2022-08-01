@@ -717,12 +717,12 @@ public class LineEditor extends AbstractEditor {
      * The form of the line is command [x,y,z] arg0 arg1 arg2...
      * So for instance<br/>
      * <pre>
-     *     >m [2,5,15]
+     *     &gt;m [2,5,15]
      * </pre>
      * would move lines 2,3,4 and 5 to before line 15, this implies that lines 2,3,4 and 5 are removed from their original location.
      * Another example might be
      * <pre>
-     *     >s [1,6] "fnord" "baz"
+     *     &gt;s [1,6] "fnord" "baz"
      * </pre>
      * Replaces every instance of "baz" by "fnord" in the range of lines 1 through 6.
      *

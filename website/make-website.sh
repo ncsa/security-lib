@@ -3,12 +3,12 @@
 #
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 NCSA_ROOT=/home/ncsa/dev/ncsa-git/security-lib
-WEBSITE_ROOT=$NCSA_ROOT/website
+# Output of everything goes to WEBSITE_ROOT
+WEBSITE_ROOT=$NCSA_ROOT/docs
 
 
-cd $NCSA_ROOT/language
+cd $NCSA_ROOT
 mvn javadoc:javadoc
-cp -r $NCSA_ROOT/language/target/site/apidocs/* $GITHUB_ROOT/apidocs
 cd $NCSA_ROOT/website
 mvn clean site
 # Note the source directory in the next command has no apidocs subdirectory, so this overlays

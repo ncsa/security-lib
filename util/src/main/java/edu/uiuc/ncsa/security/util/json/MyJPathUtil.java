@@ -72,7 +72,7 @@ public class MyJPathUtil {
      * <pre>
      *     /a/b/c/d/e
      * </pre>
-     * It can be invoked safely on <code>a -> b -> c -> d</code> but e generally will require the specific type
+     * It can be invoked safely on <code>a -&gt; b -&gt; c -&gt; d</code> but e generally will require the specific type
      * (int, long, etc.) and is not JSON.
      *
      * @param current

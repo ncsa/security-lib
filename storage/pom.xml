@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>ncsa-security-all</artifactId>
+        <artifactId>security-lib</artifactId>
         <groupId>edu.uiuc.ncsa.security</groupId>
         <version>5.2-SNAPSHOT</version>
     </parent>
@@ -29,4 +29,20 @@
             <version>5.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-javadoc-plugin</artifactId>
+                 <version>3.4.0</version>
+                 <configuration>
+                     <!--<aggregate>true</aggregate>-->
+                     <includeDependencySources>false</includeDependencySources>
+                     <dependencySourceIncludes>
+                         <dependencySourceInclude>edu.uiuc.ncsa.qdl.*</dependencySourceInclude>
+                     </dependencySourceIncludes>
+                 </configuration>
+             </plugin>
+        </plugins>
+    </build>
 </project>

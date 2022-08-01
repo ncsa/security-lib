@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>ncsa-security-all</artifactId>
+        <artifactId>security-lib</artifactId>
         <groupId>edu.uiuc.ncsa.security</groupId>
         <version>5.2-SNAPSHOT</version>
     </parent>
@@ -25,11 +25,11 @@
             <artifactId>lanterna</artifactId>
             <version>3.0.2</version>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-qdl</artifactId>
             <version>1.4-QDL-SNAPSHOT</version>
-        </dependency>
+        </dependency>-->
         <dependency>
               <groupId>com.gitlab.klamonte</groupId>
               <artifactId>jexer</artifactId>

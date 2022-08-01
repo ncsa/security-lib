@@ -1,6 +1,6 @@
 **/target/*
 /core/target/
-/java-8/target/
+/crypto/target/
 /ncsa-qdl-gui/target/
 /servlet/target/
 /storage/target/
