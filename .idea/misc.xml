@@ -31,7 +31,18 @@
       <set>
         <option value="$PROJECT_DIR$/ncsa-qdl-website/pom.xml" />
         <option value="$PROJECT_DIR$/ncsa-qdl/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-common/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/pom.xml" />
         <option value="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-delegation/pom.xml" />
+        <option value="$PROJECT_DIR$/untitled/pom.xml" />
       </set>
     </option>
   </component>

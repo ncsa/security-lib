@@ -18,22 +18,30 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="ncsa-security-storage" />
-        <module name="ncsa-security-oauth-2.0" />
-        <module name="ncsa-security-delegation-client" />
+        <module name="core" />
         <module name="java-8" />
-        <module name="ncsa-security-delegation-common" />
-        <module name="ncsa-security-core" />
-        <module name="ncsa-security-util" />
-        <module name="ncsa-security-delegation-server" />
-        <module name="ncsa-security-servlet" />
+        <module name="website" />
+        <module name="util" />
+        <module name="servlet" />
+        <module name="storage" />
         <module name="ncsa-qdl-gui" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="ncsa-qdl" target="11" />
       <module name="ncsa-qdl-website" target="1.5" />
+      <module name="ncsa-security-common" target="11" />
+      <module name="ncsa-security-core" target="11" />
+      <module name="ncsa-security-delegation" target="11" />
+      <module name="ncsa-security-delegation-client" target="11" />
+      <module name="ncsa-security-delegation-common" target="11" />
+      <module name="ncsa-security-delegation-server" target="11" />
       <module name="ncsa-security-oauth-1.0a" target="1.8" />
+      <module name="ncsa-security-oauth-2.0" target="11" />
+      <module name="ncsa-security-servlet" target="11" />
+      <module name="ncsa-security-storage" target="11" />
+      <module name="ncsa-security-util" target="11" />
+      <module name="untitled" target="11" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

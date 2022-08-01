@@ -1,7 +1,0 @@
-# shell script to debug ansi terminal. Builds it and runs it with minimal config so full build is not needed.
-
-mvn clean install
-cd ncsa-qdl
-mvn -P qdl package
-java -jar target/qdl-jar-with-dependencies.jar  -ansi
-cd ~/dev/ncsa-git/security-lib

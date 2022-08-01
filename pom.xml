@@ -45,10 +45,15 @@
     </properties>
 
     <modules>
-        <module>ncsa-security-common</module>
-        <module>ncsa-security-delegation</module>
+        <!-- <module>ncsa-security-common</module> -->
+      <!--  <module>ncsa-security-delegation</module> -->
         <module>ncsa-qdl-gui</module>
         <module>java-8</module>
+        <module>website</module>
+        <module>core</module>
+        <module>util</module>
+        <module>servlet</module>
+        <module>storage</module>
     </modules>
     <build>
         <plugins>
