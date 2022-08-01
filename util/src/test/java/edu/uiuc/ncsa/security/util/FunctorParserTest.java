@@ -530,7 +530,7 @@ public class FunctorParserTest extends TestBase {
     @Test
     public void testScript1() throws Exception {
         //File f = new File("src/test/resources/test-script1.cmd");
-        File f = new File("/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/test/resources/test-script1.cmd");
+        File f = new File("/home/ncsa/dev/ncsa-git/security-lib/util/src/test/resources/test-script1.cmd");
         if (!f.exists()) {
             System.out.print("Warning: test file '" + f.getAbsolutePath() + "' does not exist. Skipping test");
         }
@@ -545,7 +545,7 @@ public class FunctorParserTest extends TestBase {
     @Test
        public void testScript2() throws Exception {
            //File f = new File("src/test/resources/test-script2.cmd");
-           File f = new File("/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/test/resources/test-script2.cmd");
+           File f = new File("/home/ncsa/dev/ncsa-git/security-lib/util/src/test/resources/test-script2.cmd");
            if (!f.exists()) {
                System.out.print("Warning: test file '" + f.getAbsolutePath() + "' does not exist. Skipping test");
            }
