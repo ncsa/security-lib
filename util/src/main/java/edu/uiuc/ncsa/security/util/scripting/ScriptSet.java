@@ -39,7 +39,7 @@ public class ScriptSet<V extends ScriptInterface> implements Iterable<V> {
                 // CIL-1301
                 if (key.equals(SRE_EXEC_PHASE)) {
                     ArrayList<String> list = s.getProperties().getArrayList(key);
-                    if(value.equals(ALL_PHASES)){
+                    if(value.equals(ALL_PHASES)){ // if the phase is all, do it everywhere.
                         // match any
                         return s;
                     }

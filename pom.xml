@@ -62,6 +62,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-source-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
                 <version>3.2.1</version>
                 <executions>
                     <execution>
@@ -130,4 +131,47 @@
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
     </distributionManagement>
+    <reporting>
+           <plugins>
+               <plugin>
+                   <groupId>org.apache.maven.plugins</groupId>
+                   <artifactId>maven-project-info-reports-plugin</artifactId>
+                   <version>3.0.0</version>
+                   <reportSets>
+                       <reportSet>
+                           <reports><!-- select reports -->
+                               <report>index</report>
+                               <report>dependencies</report>
+                               <report>summary</report>
+                               <report>mailing-lists</report>
+                               <report>licenses</report>
+                               <report>scm</report>
+                           </reports>
+                       </reportSet>
+                   </reportSets>
+               </plugin>
+               <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-javadoc-plugin</artifactId>
+                 <version>3.4.0</version>
+
+                 <reportSets>
+                   <reportSet>
+                     <id>aggregate</id>
+                     <inherited>false</inherited>
+                     <reports>
+                       <report>aggregate</report>
+                     </reports>
+                   </reportSet>
+                   <reportSet>
+                     <id>default</id>
+                     <reports>
+                       <report>javadoc</report>
+                     </reports>
+                   </reportSet>
+                 </reportSets>
+                   
+               </plugin>
+           </plugins>
+       </reporting>
 </project>
