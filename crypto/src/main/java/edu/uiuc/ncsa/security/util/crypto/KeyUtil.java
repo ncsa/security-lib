@@ -135,6 +135,7 @@ public class KeyUtil {
 
     /**
      * See {@link #validateKeyPair(KeyPair)}
+     *
      * @param publicKey
      * @param privateKey
      * @return
@@ -240,8 +241,8 @@ public class KeyUtil {
      * @param encodedPrivate
      * @return
      */
-    public static PrivateKey fromPKCS8DER(byte[] encodedPrivate)  {
-            PKCS8EncodedKeySpec encodedPrivatePKCS8 = new PKCS8EncodedKeySpec(encodedPrivate);
+    public static PrivateKey fromPKCS8DER(byte[] encodedPrivate) {
+        PKCS8EncodedKeySpec encodedPrivatePKCS8 = new PKCS8EncodedKeySpec(encodedPrivate);
         try {
             return getKeyFactory().generatePrivate(encodedPrivatePKCS8);
         } catch (InvalidKeySpecException e) {
@@ -285,7 +286,7 @@ public class KeyUtil {
     }
 
 
-    public static PublicKey fromX509DER(byte[] encodedPublic)  {
+    public static PublicKey fromX509DER(byte[] encodedPublic) {
         X509EncodedKeySpec x = new X509EncodedKeySpec(encodedPublic);
         try {
             return getKeyFactory().generatePublic(x);
@@ -340,7 +341,7 @@ public class KeyUtil {
     protected static String keyAlgorithm = "RSA";
     protected static KeyFactory keyFactory;
 
-    public static KeyFactory getKeyFactory(){
+    public static KeyFactory getKeyFactory() {
         if (keyFactory == null) {
             try {
                 keyFactory = KeyFactory.getInstance(getKeyAlgorithm());
@@ -359,4 +360,10 @@ public class KeyUtil {
         return fromX509PEM(PEMFormatUtil.readerToString(reader));
     }
 
+    public static byte[] generateSKey(int length) {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] key = new byte[length];
+        secureRandom.nextBytes(key);
+        return key;
+    }
 }

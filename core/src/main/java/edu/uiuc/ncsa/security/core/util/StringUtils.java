@@ -715,4 +715,5 @@ public class StringUtils {
         }
         return toUnicode(chars[0]);
     }
+
 }

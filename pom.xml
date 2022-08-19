@@ -40,18 +40,16 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <additionalparam>-Xdoclint:none</additionalparam>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
     <modules>
-      <!--  <module>ncsa-qdl-gui</module>-->
         <module>crypto</module>
         <module>website</module>
         <module>core</module>
         <module>util</module>
         <module>servlet</module>
         <module>storage</module>
+        <module>sat-server</module>
     </modules>
     <build>
         <plugins>

@@ -1,16 +1,28 @@
  -----
- The Site
+ NCSA Security Libraries
  -----
- The Maven Team
+ Jeff Gaynor
  -----
 
-Maven Site for your project
+The NCSA CSD's library of very useful utilities.
 
- Congratulations! If you are looking at this page then you have successfully generated a
- template site employing the site archetype and you have run:
+ This project represents several years worth of accumulated awfully darn useful libraries for
+ things that are needed in various projects (OA4MP, QDL, CILogon). These are made public
+ simply because they are useful and many of them are very simplified versions of
+ things. So if you need to do some work with, say, converting a key to another format,
+ you don't need to pull in a large library and slog through it, just use crypto and do your call.
 
-+-----+
+ One other point is that much of this has been heavily used for years so it is quite
+ reliable and well tested.
 
-mvn site
+ * crypto - Use internal java libraries to create keys, convert formats, create certificate
+   requests and work with parts of  certificates (such as extracting the distinguished name or DN).
 
-+-----+
+ * storage - Models a map with a unique key that has persistent storage. This supports in-memory
+   versions, a file store and general SQL support.
+
+ * servlet - Framework for a full but barebone web application.
+
+ * util - Various utilities that support configuration (XML), an easy to extend command line interface,
+   mail, native java cursor addressing, add email notifications to things
+

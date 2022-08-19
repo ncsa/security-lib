@@ -12,6 +12,7 @@ import java.util.StringTokenizer;
 
 /**
  * This loads a configuration of tests from a configuration file.
+ * This is not used in any other package and exists as a way to test configurations, naught else.
  * <p>Created by Jeff Gaynor<br>
  * on 4/21/16 at  1:55 PM
  */

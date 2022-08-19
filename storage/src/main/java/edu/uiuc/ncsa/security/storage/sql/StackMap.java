@@ -8,11 +8,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 
+ *
+ * This will block until the capacity drops below max.
  * <p>Created by Jeff Gaynor<br>
  * on 5/11/21 at  8:49 AM
  */
 public class StackMap<V extends Identifiable>  extends LinkedBlockingQueue<V> {
+   /**
+    * Default capacity is used which is the maximum integer for Java, effectively making
+    * this unbounded.
+    */
    public StackMap() {
    }
 

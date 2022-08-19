@@ -182,7 +182,7 @@ public class ServiceClient {
     }
 
     /**
-     * Do amn HTTP POST to the endpoint sending along basic authorization and any parameters.
+     * Do an HTTP POST to the endpoint sending along basic authorization and any parameters.
      * This returns a string, so do process the result.
      *
      * @param parameters
@@ -203,10 +203,11 @@ public class ServiceClient {
         return doRequest(post, id, secret);
     }
 
+
+
     /**
      * Do post using a bearer token
      *
-     * @param parameters
      * @param bearerToken
      * @return
      */
