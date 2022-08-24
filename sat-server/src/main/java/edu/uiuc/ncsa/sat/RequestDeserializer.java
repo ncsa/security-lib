@@ -1,10 +1,13 @@
 package edu.uiuc.ncsa.sat;
 
+import edu.uiuc.ncsa.sat.thing.*;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.crypto.DecryptUtils;
+import net.sf.json.JSON;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,7 +15,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -29,20 +34,25 @@ public class RequestDeserializer implements SATConstants {
      * @return
      * @throws IOException
      */
-    public JSONObject rsaDeserialize(SATServlet.SessionRecord sessionRecord, HttpServletRequest request) throws IOException {
+    public List<Action> rsaDeserialize(SessionRecord sessionRecord, HttpServletRequest request) throws IOException {
         StringBuffer stringBuffer = getStringBuffer(request);
         if (stringBuffer.length() == 0) {
             throw new IllegalArgumentException("Error: There is no content for this request");
         }
-        return rsaDeserialize(sessionRecord, stringBuffer.toString());
+        List<Action> actions = new ArrayList<>();
+        actions.add(rsaDeserialize(sessionRecord, stringBuffer.toString()));
+        return actions;
     }
-    public JSONObject sDeserialize(SATServlet.SessionRecord sessionRecord, HttpServletRequest request) throws IOException {
+
+    public List<Action> sDeserialize(SessionRecord sessionRecord, HttpServletRequest request) throws IOException {
         StringBuffer stringBuffer = getStringBuffer(request);
-        if(stringBuffer.length() == 0){
+        if (stringBuffer.length() == 0) {
             throw new IllegalArgumentException("Error: There is no content for this request");
         }
+
         return sDeserialize(sessionRecord, stringBuffer.toString());
     }
+
     private StringBuffer getStringBuffer(HttpServletRequest request) throws IOException {
         BufferedReader br = request.getReader();
         StringBuffer stringBuffer = new StringBuffer();
@@ -56,18 +66,94 @@ public class RequestDeserializer implements SATConstants {
         return stringBuffer;
     }
 
-    public JSONObject rsaDeserialize(SATServlet.SessionRecord sessionRecord, String payload) {
+    public Action rsaDeserialize(SessionRecord sessionRecord, String payload) {
         try {
-            return JSONObject.fromObject(DecryptUtils.decryptPublic(sessionRecord.client.getPublicKey(), payload));
+            JSONObject jsonObject = JSONObject.fromObject(DecryptUtils.decryptPublic(sessionRecord.client.getPublicKey(), payload));
+
+            return toAction(jsonObject.getJSONObject(SATConstants.KEYS_SAT));
         } catch (GeneralSecurityException | UnsupportedEncodingException gsx) {
             throw new EncryptionException("Unable to decrypt:" + gsx.getMessage(), gsx);
         }
     }
 
-    public JSONObject sDeserialize(SATServlet.SessionRecord sessionRecord, String payload){
-        return JSONObject.fromObject(DecryptUtils.sDecrypt(sessionRecord.sKey, payload));
+    public List<Action> sDeserialize(SessionRecord sessionRecord, String payload) {
+        return toActions(JSONObject.fromObject(DecryptUtils.sDecrypt(sessionRecord.sKey, payload)));
 
     }
+
+    /**
+     * Options for format are
+     * <pre>
+     *     {"sat":{simple action}}
+     * </pre>
+     * <b>or</b>
+     * <pre>
+     *     {"sat":[{action0}, {action1},...]}
+     * </pre>
+     * This method always returns a {@link List}.
+     *
+     * @param jsonObject
+     * @return
+     */
+    public List<Action> toActions(JSONObject jsonObject) {
+        JSON json = jsonObject.getJSONObject(KEYS_SAT);
+        List<Action> actions = new ArrayList<>();
+        if (json.isArray()) {
+            JSONArray array = (JSONArray) json;
+                for(int i = 0; i < array.size(); i++){
+                    actions.add(toAction(array.getJSONObject(i)));
+                }
+        } else {
+             actions.add(toAction((JSONObject) json));
+        }
+        return actions;
+    }
+
+    /**
+     * Takes a <i>single</i> known action item and returns the right one
+     *
+     * @param jsonObject
+     * @return
+     */
+    public Action toAction(JSONObject jsonObject) {
+        String a = getAction(jsonObject);
+        Action action = null;
+        switch (a) {
+            case ACTION_LOGON:
+                action = new LogonAction();
+                break;
+            case ACTION_NEW_KEY:
+                NewKeyAction newKeyAction = new NewKeyAction();
+                newKeyAction.setSize(jsonObject.getInt(KEYS_ARGUMENT));
+                action = newKeyAction;
+                break;
+            case ACTION_EXECUTE:
+                ExecuteAction executeAction = new ExecuteAction();
+                executeAction.setArg(getArg(jsonObject));
+                action = executeAction;
+                break;
+            case ACTION_INVOKE:
+                InvokeAction invokeAction = new InvokeAction();
+                invokeAction.setName(getMethod(jsonObject));
+                if (jsonObject.get(KEYS_ARGUMENT) instanceof JSONArray) {
+                    invokeAction.setArgs(jsonObject.getJSONArray(KEYS_ARGUMENT));
+                } else {
+                    JSONArray array = new JSONArray();
+                    array.add(jsonObject.get(KEYS_ARGUMENT));
+                    invokeAction.setArgs(array);
+                }
+                action = invokeAction;
+                break;
+            case ACTION_LOGOFF:
+                action = new LogoffAction();
+                break;
+            default:
+                throw new IllegalArgumentException("unknown action \"" + a + "\".");
+        }
+        setStateAndID(action, jsonObject);
+        return action;
+    }
+
     /**
      * Rerturns the action to be done.
      *
@@ -75,13 +161,13 @@ public class RequestDeserializer implements SATConstants {
      * @return
      */
     public String getAction(JSONObject json) {
-        JSONObject api = json.getJSONObject(KEYS_SAT);
-        return api.getString(KEYS_ACTION);
+       // JSONObject api = json.getJSONObject(KEYS_SAT);
+        return json.getString(KEYS_ACTION);
     }
 
-    public String getContent(JSONObject json) {
-        JSONObject api = json.getJSONObject(KEYS_SAT);
-        String object = api.getString(KEYS_CONTENT);        // always a base64 encoded string
+    public String getArg(JSONObject json) {
+        //JSONObject api = json.getJSONObject(KEYS_SAT);
+        String object = json.getString(KEYS_ARGUMENT);        // always a base64 encoded string
         if (object == null) {
             return null;
         }
@@ -92,9 +178,20 @@ public class RequestDeserializer implements SATConstants {
         }
     }
 
+    /**
+     * For an invoke action, get the method name
+     *
+     * @param json
+     * @return
+     */
+    public String getMethod(JSONObject json) {
+       // JSONObject api = json.getJSONObject(KEYS_SAT);
+        return json.getString(KEYS_METHOD);
+    }
+
     public String getPrompt(JSONObject json) {
-        JSONObject api = json.getJSONObject(KEYS_SAT);
-        String object = api.getString(KEYS_PROMPT);        // always a base64 encoded string
+        //JSONObject api = json.getJSONObject(KEYS_SAT);
+        String object = json.getString(KEYS_PROMPT);        // always a base64 encoded string
         if (object == null) {
             return null;
         }
@@ -146,6 +243,18 @@ public class RequestDeserializer implements SATConstants {
             subject.sessionID = UUID.fromString(uuid);
         }
         return subject;
+    }
+
+    protected void setStateAndID(Action action, JSONObject object) {
+        if (object.containsKey(KEYS_STATE)) {
+            action.setState(object.getString(KEYS_STATE));
+        }
+        if (object.containsKey(KEYS_INTERNAL_ID)) {
+            action.setId(object.getString(KEYS_INTERNAL_ID));
+        }
+        if (object.containsKey(KEYS_COMMENT)) {
+            action.setComment(object.getString(KEYS_COMMENT));
+        }
     }
 
     /**

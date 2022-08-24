@@ -98,7 +98,7 @@ public abstract class CommonCommands implements Commands {
     BufferedReader bufferedReader;
 
     public IOInterface getIoInterface() {
-        if(ioInterface == null){
+        if (ioInterface == null) {
             ioInterface = new BasicIO();
         }
         return ioInterface;
@@ -109,9 +109,11 @@ public abstract class CommonCommands implements Commands {
     }
 
     IOInterface ioInterface;
+
     protected String readline(String prompt) throws IOException {
-                                          return getIoInterface().readline(prompt);
+        return getIoInterface().readline(prompt);
     }
+
     protected String readline() {
         try {
             String x = getBufferedReader().readLine();
@@ -126,7 +128,7 @@ public abstract class CommonCommands implements Commands {
     }
 
     @Override
-    public void print_help(InputLine inputLine) throws Exception{
+    public void print_help(InputLine inputLine) throws Exception {
         say("All commands have detailed help by typing:");
         say("command --help");
         say("--Environment commands: these control variables managed by this component");
@@ -204,7 +206,7 @@ public abstract class CommonCommands implements Commands {
 
     protected boolean isOk(String x) {
         if (x == null || x.length() == 0) return false;
-        return x.trim().toLowerCase().equals("y");
+        return x.trim().equalsIgnoreCase("y");
     }
 
     /**
@@ -217,7 +219,7 @@ public abstract class CommonCommands implements Commands {
      */
     protected String getInput(String prompt, String defaultValue) throws IOException {
         //sayi2(prompt + "[" + (defaultValue == null ? "(null)" : defaultValue) + "]:");
-      //  sayi2(prompt + "[" + (defaultValue == null ? "(null)" : defaultValue) + "]:");
+        //  sayi2(prompt + "[" + (defaultValue == null ? "(null)" : defaultValue) + "]:");
         String inLine = readline(prompt + "[" + (defaultValue == null ? "(null)" : defaultValue) + "]:");
         if (isEmpty(inLine)) {
             // assumption is that the default value is required
@@ -336,15 +338,15 @@ public abstract class CommonCommands implements Commands {
             return;
         }
         String key = inputline.getLastArg();
-        if(inputline.hasArg(ENV_KEY_FLAG)){
+        if (inputline.hasArg(ENV_KEY_FLAG)) {
             key = inputline.getNextArgFor(ENV_KEY_FLAG);
         }
         Object r = getDriver().getEnv().get(key);
-        if(r == null){
+        if (r == null) {
             say("value not found for \"" + key + "\"");
             return;
         }
-                   say(r.toString());
+        say(r.toString());
     }
 
     String curentEnvFile = null;
@@ -430,7 +432,7 @@ public abstract class CommonCommands implements Commands {
             fos.flush();
             fos.close();
         }
-        say("stored env file to \"" + f.getAbsolutePath()+"\"");
+        say("stored env file to \"" + f.getAbsolutePath() + "\"");
     }
 
     protected void printEnvHelp() {

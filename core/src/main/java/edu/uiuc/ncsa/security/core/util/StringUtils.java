@@ -391,7 +391,8 @@ public class StringUtils {
     }
 
     /**
-     * Pad a string with blanks as needed.
+     * Pad a string with blanks as needed. This does <b>not</b> truncate if the string is too
+     * long. If you want truncation, use {@link #pad2(String, int)}.
      *
      * @param s
      * @param commandBufferMaxWidth

@@ -25,6 +25,7 @@ public class ClientTable extends Table {
         getColumnDescriptor().add(new ColumnDescriptorEntry(getClientKeys().name(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getClientKeys().config(), LONGVARCHAR));
         getColumnDescriptor().add(new ColumnDescriptorEntry(getClientKeys().creation_ts(), TIMESTAMP));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(getClientKeys().publicKey(), LONGVARCHAR));
 
     }
 }

@@ -120,13 +120,14 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
      * @throws IOException
      * @throws ServletException
      */
-    protected void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    protected void handleException(Throwable t,
+                                   HttpServletRequest request,
+                                   HttpServletResponse response) throws IOException, ServletException {
         if(t instanceof NFWException) {
             error("INTERNAL ERROR: " + (t.getMessage() == null ? "(no message)" : t.getMessage()), t); // log it appropriately
         }
         // ok, if it is a strange error, print a stack if you need to.
         getExceptionHandler().handleException(t, request, response);
-
     }
 
     public ExceptionHandler getExceptionHandler() {

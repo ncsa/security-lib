@@ -35,7 +35,7 @@ public class SATServletInitializer implements Initialization {
             return;
         }
         isInitRun = true;
-        setupDebug();
+        //setupDebug();
     }
 
     public static Identifier testClientID = BasicIdentifier.newID(SATConstants.CLIENT_ID_HEAD + "debug_client");
@@ -106,7 +106,7 @@ public class SATServletInitializer implements Initialization {
     @Override
     public ExceptionHandler getExceptionHandler() {
         if (satExceptionHandler == null) {
-            satExceptionHandler = new SATExceptionHandler();
+            satExceptionHandler = new SATExceptionHandler(getEnvironment());
         }
         return satExceptionHandler;
     }

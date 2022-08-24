@@ -19,7 +19,7 @@ public class SATClient extends IdentifiableImpl implements DateComparable {
 
     @Override
     public Date getCreationTS() {
-        return null;
+        return creationTS;
     }
     PublicKey publicKey;
     String name;

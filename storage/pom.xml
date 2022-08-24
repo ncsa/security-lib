@@ -28,6 +28,12 @@
             <artifactId>core</artifactId>
             <version>5.2-SNAPSHOT</version>
         </dependency>
+        <!-- HOCON support for CLI-->
+        <dependency>
+            <groupId>com.typesafe</groupId>
+            <artifactId>config</artifactId>
+            <version>1.4.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

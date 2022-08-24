@@ -5,13 +5,14 @@ package edu.uiuc.ncsa.sat.thing;
  * on 8/16/22 at  7:25 AM
  */
 public class LogoffResponse extends Response{
-    public LogoffResponse(String message) {
+    public LogoffResponse(Action action, String message) {
+        super(action);
         this.message = message;
     }
 
-    public LogoffResponse() {
-    }
+
 
     // nothing really.
     public String message;
+
 }

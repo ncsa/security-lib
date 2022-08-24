@@ -2,32 +2,27 @@ package edu.uiuc.ncsa.sat;
 
 import edu.uiuc.ncsa.sat.client.ClientProvider;
 import edu.uiuc.ncsa.sat.client.SATClient;
-import edu.uiuc.ncsa.sat.thing.LogoffResponse;
-import edu.uiuc.ncsa.sat.thing.LogonResponse;
-import edu.uiuc.ncsa.sat.thing.OutputResponse;
+import edu.uiuc.ncsa.sat.loader.SATExceptionHandler;
+import edu.uiuc.ncsa.sat.thing.*;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
-import edu.uiuc.ncsa.security.util.cli.Executable;
 import edu.uiuc.ncsa.security.util.cli.IOInterface;
-import edu.uiuc.ncsa.security.util.cli.Message;
 import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
-import net.sf.json.JSONObject;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.security.interfaces.RSAPublicKey;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -61,30 +56,37 @@ public class SATServlet extends AbstractServlet {
     }
 
 
-    protected void doLogon(SATClient client, HttpServletResponse response) throws IOException {
+    protected LogonResponse doLogon(LogonAction logonAction, SessionRecord sessionRecord) throws IOException {
+
         // check they are a user
         UUID sessionID = UUID.randomUUID();
         // have to figure out the public key size.
-        int pkeySize = ((RSAPublicKey) client.getPublicKey()).getModulus().bitLength();
+        int pkeySize = ((RSAPublicKey) sessionRecord.client.getPublicKey()).getModulus().bitLength();
         // Take the minimum. This way if the RSA key is smaller (E.g. 1024) the symmetric key
         // still fits in the response.
-        int sKeySize = Math.min(pkeySize / 4, 1024) / 8;
+        int sKeySize = Math.min(pkeySize / 3, 1024) / 8;
         System.out.println(getClass().getSimpleName() + ": s key size =" + sKeySize);
         byte[] sKey = KeyUtil.generateSKey(sKeySize); //1024 bits, probably.
-        LogonResponse logonResponse = new LogonResponse(sessionID);
-        SessionRecord sessionRecord = new SessionRecord(client, createExecutable());
+        LogonResponse logonResponse = new LogonResponse(logonAction, sessionID);
+        sessionRecord.executable = createExecutable();
         sessionRecord.sKey = sKey;
         sessionRecord.sessionID = sessionID;
         sessions.put(sessionID, sessionRecord);
-        getSATE().getResponseSerializer().serialize(logonResponse, response, sessionRecord);
+        return logonResponse;
     }
 
     protected Executable createExecutable() {
         return new Executable() {
             @Override
-            public void execute(String x) {
-                System.out.println("test exec, got:" + x);
-                getIO().println("test exec, got:" + x);
+            public void execute(Action action) {
+                if (action instanceof ExecuteAction) {
+                    getIO().println("test exec, got:" + ((ExecuteAction) action).getArg());
+
+                } else {
+
+                    getIO().println("test exec, got action:" + action);
+                }
+
             }
 
             IOInterface ioInterface = new StringIO("");
@@ -101,10 +103,11 @@ public class SATServlet extends AbstractServlet {
         };
     }
 
-    protected void doLogoff(SATClient client, HttpServletResponse response, SessionRecord sessionRecord, String message) throws IOException {
-        LogoffResponse logoffResponse = new LogoffResponse(message);
-        getSATE().getResponseSerializer().serialize(logoffResponse, response, sessionRecord);
+    protected LogoffResponse doLogoff(SATClient client, LogoffAction logoffAction, HttpServletResponse response, SessionRecord sessionRecord, String message) throws IOException {
+        LogoffResponse logoffResponse = new LogoffResponse(logoffAction, message);
+        //getSATE().getResponseSerializer().serialize(logoffResponse, response, sessionRecord);
         sessions.remove(sessionRecord.sessionID);
+        return logoffResponse;
     }
 
     @Override
@@ -124,6 +127,7 @@ public class SATServlet extends AbstractServlet {
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
         // Either there is basic auth (to do logon) or there is a session id. The payload is always a blob.
+
         String rawSessionID = httpServletRequest.getHeader(SATConstants.HEADER_SESSION_ID);
         Identifier clientID = null;
         UUID sessionID = null;
@@ -131,6 +135,7 @@ public class SATServlet extends AbstractServlet {
         if (rawSessionID == null) {
             clientID = HeaderUtils.getIDFromHeaders(httpServletRequest);
             isLogon = true;
+
         } else {
             sessionID = UUID.fromString(rawSessionID);
         }
@@ -145,72 +150,108 @@ public class SATServlet extends AbstractServlet {
                 throw new UnknownClientException("unknown client \"" + clientID + "\"");
             }
             client = getSATE().getClientStore().get(clientID);
-            doLogon(client, httpServletResponse);
-            return;
+  /*          doLogon(client, httpServletResponse);
+            return;*/
         }
 
         // If it gets to here, then this is a pending session.
-        SessionRecord sessionRecord = sessions.get(sessionID);
-        JSONObject payload;
-        if (sessionRecord == null) {
-            throw new UnknownSessionException("No session for uuid \"" + sessionID + "\"");
-        }
-        client = sessionRecord.client;
-        if (isLogon) {
-            payload = getSATE().getRequestDeserializer().rsaDeserialize(sessionRecord, httpServletRequest);
+        SessionRecord sessionRecord = null;
+        if (sessionID != null) {
+            sessionRecord = sessions.get(sessionID);
         } else {
-            payload = getSATE().getRequestDeserializer().sDeserialize(sessionRecord, httpServletRequest);
+            sessionRecord = new SessionRecord(client, null);
+        }
+        // From this point forward, we can do secure error responses. Up until here we don't
+        // have the key, etc.
+        try {
+            List<Action> actions;
+            if (isLogon) {
+                actions = getSATE().getRequestDeserializer().rsaDeserialize(sessionRecord, httpServletRequest);
+            } else {
+                actions = getSATE().getRequestDeserializer().sDeserialize(sessionRecord, httpServletRequest);
+            }
+            List<Response> responses = new ArrayList<>();
+
+            for (int i = 0; i < actions.size(); i++) {
+                Response response = null;
+                switch (actions.get(i).getType()) {
+                    case SATConstants.ACTION_LOGON:
+                        response = doLogon((LogonAction) actions.get(i), sessionRecord);
+                        break;
+                    case SATConstants.ACTION_LOGOFF:
+                        response = doLogoff(client, (LogoffAction) actions.get(i), httpServletResponse, sessionRecord, "log off");
+                        break;
+                    case SATConstants.ACTION_NEW_KEY:
+                        response = doNewKey(client, (NewKeyAction)actions.get(i), httpServletResponse, sessionRecord);
+                        break;
+                    case SATConstants.ACTION_EXECUTE:
+                        response = execute(sessionRecord, (ExecuteAction) actions.get(i));
+                        break;
+                    case SATConstants.ACTION_INVOKE:
+                        response = invoke(sessionRecord, (InvokeAction) actions.get(i));
+                        break;
+                }
+                responses.add(response);
+            }
+            sessionRecord.lastAccessed = new Date();
+            getSATE().getResponseSerializer().serialize(responses, httpServletResponse, sessionRecord);
+
+        } catch (Throwable t) {
+            handleException(t, httpServletRequest, httpServletResponse, sessionRecord);
         }
 
-        switch (getSATE().getRequestDeserializer().getAction(payload)) {
-            case SATConstants.ACTION_LOGON:
-                doLogon(client, httpServletResponse);
-                break;
-            case SATConstants.ACTION_LOGOFF:
-                doLogoff(client, httpServletResponse, sessionRecord, "log off");
-                break;
-            case SATConstants.ACTION_EXECUTE:
-                OutputResponse outputResponse = new OutputResponse();
-                outputResponse.content = execute(sessionRecord, getSATE().getRequestDeserializer().getContent(payload));
-                getSATE().getResponseSerializer().serialize(outputResponse, httpServletResponse, sessionRecord);
-                sessionRecord.lastAccessed = new Date();
-                break;
-        }
+    }
 
+    protected Response doNewKey(SATClient client, NewKeyAction newKeyAction, HttpServletResponse httpServletResponse, SessionRecord sessionRecord) {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] key = new byte[newKeyAction.getSize()];
+        secureRandom.nextBytes(key);
+        return new NewKeyResponse(newKeyAction, key);
+    }
+
+    /**
+     * Invoke a specific method in the {@link Executable}
+     *
+     * @param sessionRecord
+     * @param invokeAction
+     * @return
+     */
+    protected OutputResponse invoke(SessionRecord sessionRecord, InvokeAction invokeAction) {
+        OutputResponse outputResponse = new OutputResponse(invokeAction, "");
+        sessionRecord.executable.execute(invokeAction);
+        return outputResponse;
     }
 
     Map<UUID, SessionRecord> sessions = new HashMap<>();
 
-    public static class SessionRecord {
-
-        public SessionRecord(SATClient client, Executable executable) {
-            this.client = client;
-            this.executable = executable;
-        }
-
-        public SATClient client;
-        public Executable executable;
-        public Date createTS = new Date();
-        public Date lastAccessed = new Date();
-        public Message message = new Message();
-        public byte[] sKey;
-        public UUID sessionID;
-    }
-
-    protected String execute(SessionRecord sessionRecord, String content) {
+    protected OutputResponse execute(SessionRecord sessionRecord, ExecuteAction executeAction) {
         Executable exe = sessionRecord.executable;
         if (exe == null) {
             throw new GeneralException("Session with id " + sessionRecord.sessionID + " not found");
         }
         exe.getIO().flush();
-        exe.execute(content);
+        exe.execute(executeAction);
         sessionRecord.lastAccessed = new Date();
         StringBuilder output = ((StringIO) exe.getIO()).getOutput();
-        if (output == null) {
-            return "";
-        }
-        return output.toString();
-
+        return new OutputResponse(executeAction, output.toString());
     }
 
+    protected void handleException(Throwable t,
+                                   HttpServletRequest request,
+                                   HttpServletResponse response,
+                                   SessionRecord sessionRecord) throws IOException, ServletException {
+        if (t instanceof NFWException) {
+            error("INTERNAL ERROR: " + (t.getMessage() == null ? "(no message)" : t.getMessage()), t); // log it appropriately
+        }
+        // ok, if it is a strange error, print a stack if you need to.
+        if (sessionRecord == null) {
+            getExceptionHandler().handleException(t, request, response);
+        }
+        getExceptionHandler().handleException(t, request, response, sessionRecord);
+    }
+
+    @Override
+    public SATExceptionHandler getExceptionHandler() {
+        return (SATExceptionHandler) super.getExceptionHandler();
+    }
 }

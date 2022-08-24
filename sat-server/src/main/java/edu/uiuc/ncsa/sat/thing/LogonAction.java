@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.sat.SATConstants;
  * on 8/15/22 at  10:51 AM
  */
 public class LogonAction extends Action{
-    public LogonAction(String value) {
+    public LogonAction() {
         super(SATConstants.ACTION_LOGON);
     }
 }

@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.sat.client;
 
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 
-import java.security.PublicKey;
 import java.util.List;
 
 /**
@@ -10,7 +9,7 @@ import java.util.List;
  * on 8/15/22 at  9:09 AM
  */
 public class ClientKeys extends SerializationKeys {
-    PublicKey publicKey;
+    String publicKey="public_key";
     String name = "name";
     String creation_ts = "creation_ts";
     String config = "config";
@@ -24,6 +23,12 @@ public class ClientKeys extends SerializationKeys {
         if (0 < x.length) config = x[0];
         return config;
     }
+
+    public String publicKey(String... x) {
+        if (0 < x.length) publicKey = x[0];
+        return publicKey;
+    }
+
 
     public String creation_ts(String... x) {
         if (0 < x.length) creation_ts = x[0];
