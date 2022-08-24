@@ -4,11 +4,11 @@
     <root id="archive" name="unnamed.war">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
-          <element id="module-output" name="sat-server" />
+          <element id="module-output" name="sas-server" />
         </element>
       </element>
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/sat-server/src/main/webapp/WEB-INF/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/sas-server/src/main/webapp/WEB-INF/META-INF/MANIFEST.MF" />
       </element>
     </root>
   </artifact>

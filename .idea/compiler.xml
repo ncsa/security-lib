@@ -21,8 +21,8 @@
         <module name="core" />
         <module name="website" />
         <module name="util" />
-        <module name="sat-server" />
         <module name="servlet" />
+        <module name="sas-server" />
         <module name="storage" />
         <module name="crypto" />
       </profile>

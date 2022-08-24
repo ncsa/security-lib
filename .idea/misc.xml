@@ -18,7 +18,7 @@
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
-    <file type="web" url="file://$PROJECT_DIR$/sat-server" />
+    <file type="web" url="file://$PROJECT_DIR$/sas-server" />
   </component>
   <component name="IdProvider" IDEtalkID="215A14033C971CCE717D28767B12EEA0" />
   <component name="JavadocGenerationManager">

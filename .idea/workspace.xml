@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="sat-server:war" />
+      <artifact name="sas-server:war" />
     </artifacts-to-build>
   </component>
   <component name="AutoImportSettings">
@@ -10,52 +10,60 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e2370508-a694-4084-b56a-b8e77c115dc1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/SessionRecord.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/admin/SATCommands.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/loader/ClientFSStoreProvider.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/loader/SQLClientStoreProvider.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/storage/ClientMemoryStore.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/storage/FSClientStore.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/storage/SATClientStore.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/storage/SATClientStoreProvider.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/storage/SATSQLStore.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/InvokeAction.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/NewKeyAction.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/NewKeyResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreArchiver.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/storage/SASClientStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/unnamed.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/unnamed.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/RequestDeserializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/RequestDeserializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/SATConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/SATConstants.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/SATEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/SATEnvironment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/SATServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/SATServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/admin/SATCLI.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/client/ClientConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/client/ClientConverter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/client/ClientKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/client/ClientKeys.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/client/ClientTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/client/ClientTable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/client/SATClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/client/SATClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/loader/SATConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/loader/SATConfigurationLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/loader/SATExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/loader/SATExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/loader/SATServletInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/loader/SATServletInitializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/Action.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/Action.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/ExecuteAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/ExecuteAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/LogoffAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/LogoffAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/LogoffResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/LogoffResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/LogonAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/LogonAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/LogonResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/LogonResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/OutputResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/OutputResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/Response.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/Response.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/ResponseSerializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/ResponseSerializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/Thing.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/Thing.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/AbstractServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/AbstractServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/storage/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CommonCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CommonCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/Executable.java" beforeDir="false" afterPath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/Executable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/StoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/EncryptionException.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/EncryptionException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/Executable.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/Executable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/RequestDeserializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/RequestDeserializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/SATConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/SASConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/SATEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/SASEnvironment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/SATServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/SASServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/SessionRecord.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/SessionRecord.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/StringIO.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/StringIO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/Subject.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/Subject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/UnknownSessionException.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/UnknownSessionException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/admin/SATCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/admin/SASCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/client/ClientConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/client/ClientConverter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/client/ClientKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/client/ClientKeys.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/client/ClientProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/client/ClientProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/client/ClientTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/client/ClientTable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/client/SATClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/client/SATClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/loader/ClientFSStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/loader/ClientFSStoreProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/loader/SATBootstrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/loader/SASBootstrapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/loader/SATConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/loader/SASConfigurationLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/loader/SATExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/loader/SASExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/loader/SATServletInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/loader/SASServletInitializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/loader/SQLClientStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/loader/SQLClientStoreProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/storage/ClientMemoryStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/storage/ClientMemoryStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/storage/FSClientStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/storage/FSClientStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/storage/SATClientStore.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/storage/SATClientStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/storage/SASClientStoreProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/storage/SATSQLStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/storage/SASSQLStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/Action.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/Action.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/ExecuteAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/ExecuteAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/InvokeAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/InvokeAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/LogoffAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/LogoffAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/LogoffResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/LogoffResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/LogonAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/LogonAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/LogonResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/LogonResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/NewKeyAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/NewKeyAction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/NewKeyResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/NewKeyResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/OutputResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/OutputResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/PromptResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/PromptResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/Response.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/Response.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/ResponseSerializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/ResponseSerializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/Thing.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/Thing.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/webapp/WEB-INF/META-INF/MANIFEST.MF" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/webapp/WEB-INF/META-INF/MANIFEST.MF" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/webapp/WEB-INF/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/webapp/WEB-INF/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sat-server/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JSONWebKeyUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JSONWebKeyUtil.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -126,7 +134,7 @@
       <recent name="edu.uiuc.ncsa.sat" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.SAT Client">
+  <component name="RunManager" selected="Application.SAS Client">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -142,7 +150,7 @@
       <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.crypto.DecryptUtils" />
-      <module name="sat-server" />
+      <module name="sas-server" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="edu.uiuc.ncsa.security.util.crypto.*" />
@@ -182,19 +190,19 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="SAT Client" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.sat.Client" />
-      <module name="sat-server" />
-      <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/sat-config.xml" />
+    <configuration name="SAS Client" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.sas.Client" />
+      <module name="sas-server" />
+      <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/sas-config.xml" />
       <method v="2" />
     </configuration>
-    <configuration name="SATCommands" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.sat.admin.SATCommands" />
-      <module name="sat-server" />
+    <configuration name="SASCommands" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.sas.admin.SASCommands" />
+      <module name="sas-server" />
       <option name="PROGRAM_PARAMETERS" value="-cfg &quot;$PROJECT_DIR$/../../csd/config/sat.xml&quot; -name default" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.sat.admin.*" />
+          <option name="PATTERN" value="edu.uiuc.ncsa.sas.admin.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -239,13 +247,13 @@
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="SAT" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 9.0.65" ALTERNATIVE_JRE_ENABLED="false">
-      <option name="OPEN_IN_BROWSER_URL" value="https://localhost:9443/sat-server/" />
+    <configuration name="SAS" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 9.0.65" ALTERNATIVE_JRE_ENABLED="false">
+      <option name="OPEN_IN_BROWSER_URL" value="https://localhost:9443/sas-server/" />
       <option name="UPDATING_POLICY" value="restart-server" />
       <deployment>
-        <artifact name="sat-server:war">
+        <artifact name="sas-server:war">
           <settings>
-            <option name="CONTEXT_PATH" value="/sat-server" />
+            <option name="CONTEXT_PATH" value="/sas-server" />
           </settings>
         </artifact>
       </deployment>
@@ -323,17 +331,17 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Application.SAT Client" />
-      <item itemvalue="Application.SATCommands" />
+      <item itemvalue="Application.SAS Client" />
+      <item itemvalue="Application.SASCommands" />
       <item itemvalue="Application.DecryptUtils" />
       <item itemvalue="Application.KeyUtil" />
       <item itemvalue="Java Scratch.Scratch" />
       <item itemvalue="Shell Script.build.sh" />
-      <item itemvalue="Tomcat Server.SAT" />
+      <item itemvalue="Tomcat Server.SAS" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.SATCommands" />
+        <item itemvalue="Application.SASCommands" />
         <item itemvalue="Application.DecryptUtils" />
         <item itemvalue="Java Scratch.Scratch" />
         <item itemvalue="Shell Script.build.sh" />
@@ -373,7 +381,8 @@
       <workItem from="1660562330685" duration="112887000" />
       <workItem from="1661193711049" duration="9387000" />
       <workItem from="1661205816439" duration="105000" />
-      <workItem from="1661253024897" duration="35423000" />
+      <workItem from="1661253024897" duration="38909000" />
+      <workItem from="1661361698764" duration="6862000" />
     </task>
     <task id="LOCAL-00001" summary="CIL-627: everything updated. Basic refactor done.">
       <created>1659364398070</created>
@@ -403,7 +412,14 @@
       <option name="project" value="LOCAL" />
       <updated>1660941860427</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="More refactoring.">
+      <created>1661357583808</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1661357583808</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -417,36 +433,27 @@
     <MESSAGE value="Starting work on web site redo" />
     <MESSAGE value="Getting documentation to work with new maven plugin versions" />
     <MESSAGE value="Migrated old client management framework over into this module where it really ought to be. Might repurpose it. More updates in documentation." />
-    <option name="LAST_COMMIT_MESSAGE" value="Migrated old client management framework over into this module where it really ought to be. Might repurpose it. More updates in documentation." />
+    <MESSAGE value="More refactoring." />
+    <option name="LAST_COMMIT_MESSAGE" value="More refactoring." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/Client.java</url>
-          <line>229</line>
-          <option name="timeStamp" value="21" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/SATServlet.java</url>
+          <url>file://$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/SASServlet.java</url>
           <line>166</line>
           <option name="timeStamp" value="24" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/thing/ResponseSerializer.java</url>
+          <url>file://$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/ResponseSerializer.java</url>
           <line>133</line>
           <option name="timeStamp" value="29" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/Client.java</url>
-          <line>128</line>
+          <url>file://$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/Client.java</url>
+          <line>129</line>
           <option name="timeStamp" value="43" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/sat-server/src/main/java/edu/uiuc/ncsa/sat/Client.java</url>
-          <line>216</line>
-          <option name="timeStamp" value="45" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>

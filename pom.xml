@@ -49,7 +49,7 @@
         <module>util</module>
         <module>servlet</module>
         <module>storage</module>
-        <module>sat-server</module>
+        <module>sas-server</module>
     </modules>
     <build>
         <plugins>

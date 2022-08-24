@@ -107,6 +107,7 @@ public class JSONWebKeyUtil {
     /**
      * Takes the serialized form of a <i>single</i> JSON web key and returns the object. This is a compliment
      * to {@link  #toJSON(JSONWebKey)}.
+     *
      * @param rawJSON
      * @return
      * @throws NoSuchAlgorithmException
@@ -114,12 +115,13 @@ public class JSONWebKeyUtil {
      */
     public static JSONWebKey getJsonWebKey(String rawJSON) throws NoSuchAlgorithmException, InvalidKeySpecException {
         JSONObject json = (JSONObject) JSONSerializer.toJSON(rawJSON);
-                                                                   return getJsonWebKey(json);
+        return getJsonWebKey(json);
     }
 
 
     /**
      * Convert the JSON for a <i>single</i> JSON web key to a single key.
+     *
      * @param key
      * @return
      * @throws NoSuchAlgorithmException
