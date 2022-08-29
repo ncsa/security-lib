@@ -1,9 +1,10 @@
 package edu.uiuc.ncsa.sas;
 
-import edu.uiuc.ncsa.sas.client.ClientProvider;
-import edu.uiuc.ncsa.sas.client.SATClient;
+import edu.uiuc.ncsa.sas.satclient.ClientProvider;
+import edu.uiuc.ncsa.sas.satclient.SATClient;
 import edu.uiuc.ncsa.sas.loader.SASExceptionHandler;
-import edu.uiuc.ncsa.sas.thing.*;
+import edu.uiuc.ncsa.sas.thing.action.*;
+import edu.uiuc.ncsa.sas.thing.response.*;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
@@ -61,13 +62,20 @@ public class SASServlet extends AbstractServlet {
         // check they are a user
         UUID sessionID = UUID.randomUUID();
         // have to figure out the public key size.
-        int pkeySize = ((RSAPublicKey) sessionRecord.client.getPublicKey()).getModulus().bitLength();
-        // Take the minimum. This way if the RSA key is smaller (E.g. 1024) the symmetric key
-        // still fits in the response.
-        int sKeySize = Math.min(pkeySize / 3, 1024) / 8;
-        System.out.println(getClass().getSimpleName() + ": s key size =" + sKeySize);
-        byte[] sKey = KeyUtil.generateSKey(sKeySize); //1024 bits, probably.
-        LogonResponse logonResponse = new LogonResponse(logonAction, sessionID);
+        int totalBytes = ((RSAPublicKey) sessionRecord.client.getPublicKey()).getModulus().bitLength() / 8;
+        LogonResponse logonResponse = new LogonResponse(logonAction, sessionID, new byte[]{32, 64});
+        // Take the total bytes (limited by RSA key size), remove the response size withoout key,
+        // estimate key. The 3/4 accounts for the amount of space lost to base 64 encoding.
+        //    System.out.println(getClass().getCanonicalName() + " stats:")
+        //    System.out.println(getClass().getCanonicalName() + " total bytes:" + totalBytes);
+        //    System.out.println(getClass().getCanonicalName() + " JSON =" + logonResponse.serialize().toString(1));
+        //    System.out.println(getClass().getCanonicalName() + " JSON size=" + logonResponse.serialize().toString(1).length());
+
+        int keySize = (totalBytes - logonResponse.serialize().toString(1).length()) * 3 / 4;
+        //   System.out.println(getClass().getCanonicalName() + " key size:" + keySize);
+        //   System.out.println(getClass().getSimpleName() + ": s key size =" + keySize);
+        byte[] sKey = KeyUtil.generateSKey(keySize); //1024 bits, probably.
+        logonResponse = new LogonResponse(logonAction, sessionID, sKey);
         sessionRecord.executable = createExecutable();
         sessionRecord.sKey = sKey;
         sessionRecord.sessionID = sessionID;
@@ -78,14 +86,22 @@ public class SASServlet extends AbstractServlet {
     protected Executable createExecutable() {
         return new Executable() {
             @Override
-            public void execute(Action action) {
-                if (action instanceof ExecuteAction) {
-                    getIO().println("test exec, got:" + ((ExecuteAction) action).getArg());
-
-                } else {
-
-                    getIO().println("test exec, got action:" + action);
+            public Response execute(Action action) {
+                StringBuilder output;
+                switch (action.getType()) {
+                    case SASConstants.ACTION_EXECUTE:
+                        ExecuteAction executeAction = (ExecuteAction) action;
+                        getIO().println("test: execute(" + executeAction.getArg() + ")");
+                        break;
+                    case SASConstants.ACTION_INVOKE:
+                        InvokeAction invokeAction = (InvokeAction) action;
+                        getIO().println("test: " + invokeAction.getName() + "(" + invokeAction.getArgs() + ")");
+                        break;
+                    default:
+                        getIO().println("test exec, got action:" + action.getType());
                 }
+                output = ((StringIO) getIO()).getOutput();
+                return new OutputResponse(action, output.toString());
 
             }
 
@@ -120,6 +136,7 @@ public class SASServlet extends AbstractServlet {
         try {
             doIt(httpServletRequest, httpServletResponse);
         } catch (Throwable e) {
+            e.printStackTrace();
             handleException(e, httpServletRequest, httpServletResponse);
         }
     }
@@ -182,13 +199,11 @@ public class SASServlet extends AbstractServlet {
                         response = doLogoff(client, (LogoffAction) actions.get(i), httpServletResponse, sessionRecord, "log off");
                         break;
                     case SASConstants.ACTION_NEW_KEY:
-                        response = doNewKey(client, (NewKeyAction)actions.get(i), httpServletResponse, sessionRecord);
+                        response = doNewKey(client, (NewKeyAction) actions.get(i), httpServletResponse, sessionRecord);
                         break;
+                    default:
                     case SASConstants.ACTION_EXECUTE:
-                        response = execute(sessionRecord, (ExecuteAction) actions.get(i));
-                        break;
-                    case SASConstants.ACTION_INVOKE:
-                        response = invoke(sessionRecord, (InvokeAction) actions.get(i));
+                        response = doExecute(sessionRecord, actions.get(i));
                         break;
                 }
                 responses.add(response);
@@ -217,24 +232,27 @@ public class SASServlet extends AbstractServlet {
      * @return
      */
     protected OutputResponse invoke(SessionRecord sessionRecord, InvokeAction invokeAction) {
-        OutputResponse outputResponse = new OutputResponse(invokeAction, "");
+        Executable exe = sessionRecord.executable;
+        exe.getIO().flush();
         sessionRecord.executable.execute(invokeAction);
-        return outputResponse;
+        sessionRecord.lastAccessed = new Date();
+        StringBuilder output = ((StringIO) exe.getIO()).getOutput();
+        return new OutputResponse(invokeAction, output.toString());
     }
 
     Map<UUID, SessionRecord> sessions = new HashMap<>();
 
-    protected OutputResponse execute(SessionRecord sessionRecord, ExecuteAction executeAction) {
+    protected Response doExecute(SessionRecord sessionRecord, Action action) {
         Executable exe = sessionRecord.executable;
         if (exe == null) {
             throw new GeneralException("Session with id " + sessionRecord.sessionID + " not found");
         }
         exe.getIO().flush();
-        exe.execute(executeAction);
+        Response r = exe.execute(action);
         sessionRecord.lastAccessed = new Date();
-        StringBuilder output = ((StringIO) exe.getIO()).getOutput();
-        return new OutputResponse(executeAction, output.toString());
+        return r;
     }
+
 
     protected void handleException(Throwable t,
                                    HttpServletRequest request,

@@ -2,10 +2,10 @@ package edu.uiuc.ncsa.sas.loader;
 
 import edu.uiuc.ncsa.sas.SASConstants;
 import edu.uiuc.ncsa.sas.SASEnvironment;
-import edu.uiuc.ncsa.sas.client.ClientConverter;
-import edu.uiuc.ncsa.sas.client.ClientKeys;
-import edu.uiuc.ncsa.sas.client.ClientProvider;
-import edu.uiuc.ncsa.sas.client.SATClient;
+import edu.uiuc.ncsa.sas.satclient.ClientConverter;
+import edu.uiuc.ncsa.sas.satclient.ClientKeys;
+import edu.uiuc.ncsa.sas.satclient.ClientProvider;
+import edu.uiuc.ncsa.sas.satclient.SATClient;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;

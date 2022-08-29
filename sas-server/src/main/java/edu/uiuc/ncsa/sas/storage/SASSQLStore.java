@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.sas.storage;
 
-import edu.uiuc.ncsa.sas.client.ClientConverter;
-import edu.uiuc.ncsa.sas.client.SATClient;
+import edu.uiuc.ncsa.sas.satclient.ClientConverter;
+import edu.uiuc.ncsa.sas.satclient.SATClient;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;

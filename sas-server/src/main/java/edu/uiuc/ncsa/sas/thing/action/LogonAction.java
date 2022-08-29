@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.sas.thing;
+package edu.uiuc.ncsa.sas.thing.action;
 
 import edu.uiuc.ncsa.sas.SASConstants;
 

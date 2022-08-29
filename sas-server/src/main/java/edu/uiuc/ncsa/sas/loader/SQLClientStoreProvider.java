@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.sas.loader;
 
-import edu.uiuc.ncsa.sas.client.ClientKeys;
-import edu.uiuc.ncsa.sas.client.ClientProvider;
-import edu.uiuc.ncsa.sas.client.ClientTable;
+import edu.uiuc.ncsa.sas.satclient.ClientKeys;
+import edu.uiuc.ncsa.sas.satclient.ClientProvider;
+import edu.uiuc.ncsa.sas.satclient.ClientTable;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;

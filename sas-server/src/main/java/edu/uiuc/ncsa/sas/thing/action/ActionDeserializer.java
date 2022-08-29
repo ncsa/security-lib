@@ -1,10 +1,10 @@
-package edu.uiuc.ncsa.sas;
+package edu.uiuc.ncsa.sas.thing.action;
 
-import edu.uiuc.ncsa.sas.thing.*;
-import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.sas.SASConstants;
+import edu.uiuc.ncsa.sas.SessionRecord;
+import edu.uiuc.ncsa.sas.Subject;
+import edu.uiuc.ncsa.sas.exceptions.EncryptionException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.crypto.DecryptUtils;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -16,16 +16,14 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Convert the request payload into objects
  * <p>Created by Jeff Gaynor<br>
  * on 8/15/22 at  8:42 AM
  */
-public class RequestDeserializer implements SASConstants {
+public class ActionDeserializer implements SASConstants {
     /**
      * Given the request, grab the body of the post
      *
@@ -57,7 +55,7 @@ public class RequestDeserializer implements SASConstants {
         BufferedReader br = request.getReader();
         StringBuffer stringBuffer = new StringBuffer();
         String line = br.readLine();
-        DebugUtil.trace(RequestDeserializer.class, "line=" + line);
+        DebugUtil.trace(ActionDeserializer.class, "line=" + line);
         while (line != null) {
             stringBuffer.append(line);
             line = br.readLine();
@@ -108,54 +106,43 @@ public class RequestDeserializer implements SASConstants {
         }
         return actions;
     }
-
     /**
-     * Takes a <i>single</i> known action item and returns the right one
-     *
-     * @param jsonObject
-     * @return
-     */
+       * Takes a <i>single</i> known action item and returns the right one
+       *
+       * @param jsonObject
+       * @return
+       */
     public Action toAction(JSONObject jsonObject) {
-        String a = getAction(jsonObject);
-        Action action = null;
-        switch (a) {
-            case ACTION_LOGON:
-                action = new LogonAction();
-                break;
-            case ACTION_NEW_KEY:
-                NewKeyAction newKeyAction = new NewKeyAction();
-                newKeyAction.setSize(jsonObject.getInt(KEYS_ARGUMENT));
-                action = newKeyAction;
-                break;
-            case ACTION_EXECUTE:
-                ExecuteAction executeAction = new ExecuteAction();
-                executeAction.setArg(getArg(jsonObject));
-                action = executeAction;
-                break;
-            case ACTION_INVOKE:
-                InvokeAction invokeAction = new InvokeAction();
-                invokeAction.setName(getMethod(jsonObject));
-                if (jsonObject.get(KEYS_ARGUMENT) instanceof JSONArray) {
-                    invokeAction.setArgs(jsonObject.getJSONArray(KEYS_ARGUMENT));
-                } else {
-                    JSONArray array = new JSONArray();
-                    array.add(jsonObject.get(KEYS_ARGUMENT));
-                    invokeAction.setArgs(array);
-                }
-                action = invokeAction;
-                break;
-            case ACTION_LOGOFF:
-                action = new LogoffAction();
-                break;
-            default:
-                throw new IllegalArgumentException("unknown action \"" + a + "\".");
-        }
-        setStateAndID(action, jsonObject);
-        return action;
-    }
+          String a = getAction(jsonObject);
+          Action action = null;
+          switch (a) {
+              case ACTION_LOGON:
+                  action = new LogonAction();
+                  break;
+              case ACTION_NEW_KEY:
+                  action = new NewKeyAction();
+                  break;
+              case ACTION_EXECUTE:
+                  action = new ExecuteAction();
+                  break;
+              case ACTION_INVOKE:
+                  action = new InvokeAction();
+                 break;
+              case ACTION_LOGOFF:
+                  action = new LogoffAction();
+                  break;
+              default:
+                  throw new IllegalArgumentException("unknown action \"" + a + "\".");
+          }
+          action.deserialize(jsonObject);
+          //setStateAndID(action, jsonObject);
+          return action;
+      }
+
+
 
     /**
-     * Rerturns the action to be done.
+     * Returns the action to be done.
      *
      * @param json
      * @return
@@ -165,7 +152,7 @@ public class RequestDeserializer implements SASConstants {
         return json.getString(KEYS_ACTION);
     }
 
-    public String getArg(JSONObject json) {
+/*    public String getArg(JSONObject json) {
         //JSONObject api = json.getJSONObject(KEYS_SAT);
         String object = json.getString(KEYS_ARGUMENT);        // always a base64 encoded string
         if (object == null) {
@@ -176,7 +163,7 @@ public class RequestDeserializer implements SASConstants {
         } catch (UnsupportedEncodingException unsupportedEncodingException) {
             throw new NFWException("UTF-8 is not a supported encoding in Java");
         }
-    }
+    }*/
 
     /**
      * For an invoke action, get the method name
@@ -184,7 +171,7 @@ public class RequestDeserializer implements SASConstants {
      * @param json
      * @return
      */
-    public String getMethod(JSONObject json) {
+/*    public String getMethod(JSONObject json) {
        // JSONObject api = json.getJSONObject(KEYS_SAT);
         return json.getString(KEYS_METHOD);
     }
@@ -200,7 +187,7 @@ public class RequestDeserializer implements SASConstants {
         } catch (UnsupportedEncodingException unsupportedEncodingException) {
             throw new NFWException("UTF-8 is not a supported encoding in Java");
         }
-    }
+    }*/
 
     /**
      * Session {@link Subject} is JSON encoded as
@@ -221,7 +208,7 @@ public class RequestDeserializer implements SASConstants {
      * @param jsonObject
      * @return
      */
-    public Subject getSubject(JSONObject jsonObject) {
+ /*   public Subject getSubject(JSONObject jsonObject) {
         Subject subject = new Subject();
         JSONObject api = jsonObject.getJSONObject(KEYS_SAT);
         Object object = api.get(KEYS_SUBJECT);
@@ -243,29 +230,5 @@ public class RequestDeserializer implements SASConstants {
             subject.sessionID = UUID.fromString(uuid);
         }
         return subject;
-    }
-
-    protected void setStateAndID(Action action, JSONObject object) {
-        if (object.containsKey(KEYS_STATE)) {
-            action.setState(object.getString(KEYS_STATE));
-        }
-        if (object.containsKey(KEYS_INTERNAL_ID)) {
-            action.setId(object.getString(KEYS_INTERNAL_ID));
-        }
-        if (object.containsKey(KEYS_COMMENT)) {
-            action.setComment(object.getString(KEYS_COMMENT));
-        }
-    }
-
-    /**
-     * The comment is at the top level of the JSONObject. It is generally ignored
-     * in processing, but may be, e.g., entered into the logs.
-     *
-     * @param jsonObject
-     * @return
-     */
-    public String getComment(JSONObject jsonObject) {
-        return jsonObject.getString(KEYS_COMMENT);
-
-    }
+    }*/
 }

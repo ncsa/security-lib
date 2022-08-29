@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.sas.admin;
 
 import edu.uiuc.ncsa.sas.SASEnvironment;
-import edu.uiuc.ncsa.sas.client.ClientKeys;
-import edu.uiuc.ncsa.sas.client.SATClient;
+import edu.uiuc.ncsa.sas.satclient.ClientKeys;
+import edu.uiuc.ncsa.sas.satclient.SATClient;
 import edu.uiuc.ncsa.sas.loader.SASConfigurationLoader;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;

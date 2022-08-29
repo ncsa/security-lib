@@ -6,7 +6,11 @@ package edu.uiuc.ncsa.sas.thing;
  * on 8/15/22 at  8:34 AM
  */
 public  class Thing {
-      String type;
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    protected String type;
 
       public Thing(String type) {
           this.type = type;

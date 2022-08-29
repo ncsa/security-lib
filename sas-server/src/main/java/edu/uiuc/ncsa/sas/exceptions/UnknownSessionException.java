@@ -1,12 +1,10 @@
-package edu.uiuc.ncsa.sas;
-
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+package edu.uiuc.ncsa.sas.exceptions;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 8/17/22 at  7:10 AM
  */
-public class UnknownSessionException extends GeneralException {
+public class UnknownSessionException extends SASException {
     public UnknownSessionException() {
     }
 

@@ -1,7 +1,8 @@
 package edu.uiuc.ncsa.sas;
 
-import edu.uiuc.ncsa.sas.client.SATClient;
-import edu.uiuc.ncsa.sas.thing.ResponseSerializer;
+import edu.uiuc.ncsa.sas.satclient.SATClient;
+import edu.uiuc.ncsa.sas.thing.action.ActionDeserializer;
+import edu.uiuc.ncsa.sas.thing.response.ResponseSerializer;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -13,11 +14,11 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 public class SASEnvironment extends AbstractEnvironment {
     public SASEnvironment(MyLoggingFacade myLogger,
                           Store<? extends SATClient> clientStore,
-                          RequestDeserializer requestDeserializer,
+                          ActionDeserializer actionDeserializer,
                           ResponseSerializer responseSerializer) {
         super(myLogger);
         this.clientStore = clientStore;
-        this.requestDeserializer = requestDeserializer;
+        this.actionDeserializer = actionDeserializer;
         this.responseSerializer = responseSerializer;
     }
 
@@ -30,14 +31,14 @@ public class SASEnvironment extends AbstractEnvironment {
     }
 
     Store<? extends SATClient> clientStore;
-    public RequestDeserializer getRequestDeserializer() {
-        if(requestDeserializer == null){
-            requestDeserializer = new RequestDeserializer();
+    public ActionDeserializer getRequestDeserializer() {
+        if(actionDeserializer == null){
+            actionDeserializer = new ActionDeserializer();
         }
-        return requestDeserializer;
+        return actionDeserializer;
     }
 
-    RequestDeserializer requestDeserializer;
+    ActionDeserializer actionDeserializer;
 
     public ResponseSerializer getResponseSerializer() {
         if(responseSerializer == null){

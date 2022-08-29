@@ -1,12 +1,10 @@
-package edu.uiuc.ncsa.sas;
-
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+package edu.uiuc.ncsa.sas.exceptions;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 8/16/22 at  6:37 AM
  */
-public class EncryptionException extends GeneralException {
+public class EncryptionException extends SASException {
     public EncryptionException() {
     }
 

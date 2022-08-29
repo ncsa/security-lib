@@ -1,15 +1,15 @@
 package edu.uiuc.ncsa.sas.loader;
 
-import edu.uiuc.ncsa.sas.RequestDeserializer;
+import edu.uiuc.ncsa.sas.thing.action.ActionDeserializer;
 import edu.uiuc.ncsa.sas.SASEnvironment;
-import edu.uiuc.ncsa.sas.client.ClientConverter;
-import edu.uiuc.ncsa.sas.client.ClientKeys;
-import edu.uiuc.ncsa.sas.client.ClientProvider;
-import edu.uiuc.ncsa.sas.client.SATClient;
+import edu.uiuc.ncsa.sas.satclient.ClientConverter;
+import edu.uiuc.ncsa.sas.satclient.ClientKeys;
+import edu.uiuc.ncsa.sas.satclient.ClientProvider;
+import edu.uiuc.ncsa.sas.satclient.SATClient;
 import edu.uiuc.ncsa.sas.storage.ClientMemoryStore;
 import edu.uiuc.ncsa.sas.storage.SASClientStore;
 import edu.uiuc.ncsa.sas.storage.SASClientStoreProvider;
-import edu.uiuc.ncsa.sas.thing.ResponseSerializer;
+import edu.uiuc.ncsa.sas.thing.response.ResponseSerializer;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
@@ -44,7 +44,7 @@ public class SASConfigurationLoader<T extends SASEnvironment> extends DBConfigLo
     public T createInstance() {
         return (T) new SASEnvironment(loggerProvider.get(),
                 (Store<? extends SATClient>) getCSP().get(),
-                new RequestDeserializer(),
+                new ActionDeserializer(),
                 new ResponseSerializer());
 
     }

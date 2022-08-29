@@ -22,16 +22,16 @@ public class FileUtil {
      * @return
      * @throws FileNotFoundException
      */
-    protected static File checkFile(String fileName) {
+    protected static File checkFile(String fileName) throws FileNotFoundException, IllegalAccessException {
         File file = new File(fileName);
         if (!file.exists()) {
-            throw new IllegalArgumentException("Error: The file \"" + fileName + "\" does not exist.");
+            throw new FileNotFoundException("Error: The file \"" + fileName + "\" does not exist.");
         }
         if (!file.isFile()) {
             throw new IllegalArgumentException("Error: \"" + fileName + "\" is not a file.");
         }
         if (!file.canRead()) {
-            throw new IllegalArgumentException("Error: the file \"" + fileName + "\" is not readable.");
+            throw new IllegalAccessException("Error: the file \"" + fileName + "\" is not readable.");
         }
         return file;
     }

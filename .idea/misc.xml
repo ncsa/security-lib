@@ -32,6 +32,7 @@
     </option>
     <option name="ignoredFiles">
       <set>
+        <option value="$PROJECT_DIR$/crypto/pom.xml" />
         <option value="$PROJECT_DIR$/ncsa-qdl-gui/pom.xml" />
       </set>
     </option>

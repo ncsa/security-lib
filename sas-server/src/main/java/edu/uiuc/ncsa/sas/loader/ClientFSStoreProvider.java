@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.sas.loader;
 
-import edu.uiuc.ncsa.sas.client.SATClient;
+import edu.uiuc.ncsa.sas.satclient.SATClient;
 import edu.uiuc.ncsa.sas.storage.FSClientStore;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;

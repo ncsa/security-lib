@@ -1,13 +1,17 @@
-package edu.uiuc.ncsa.sas.thing;
+package edu.uiuc.ncsa.sas.thing.action;
+
+import edu.uiuc.ncsa.sas.SASConstants;
+import edu.uiuc.ncsa.sas.thing.Thing;
+import net.sf.json.JSONObject;
 
 /**
  * Models an actions, such as logon, execute, logoff, etc.
  * <p>Created by Jeff Gaynor<br>
  * on 8/15/22 at  10:39 AM
  */
-public class Action extends Thing {
-    public Action(String value) {
-        super(value);
+public class Action extends Thing implements SASConstants {
+    public Action(String type) {
+        super(type);
     }
 
     /**
@@ -64,5 +68,31 @@ public class Action extends Thing {
                 ", comment='" + comment + '\'' +
                 ", type='" + type + '\'' +
                 '}';
+    }
+
+    /**
+     * Typically this is called by the {@link edu.uiuc.ncsa.sas.webclient.Client} during POST
+     * @return
+     */
+    public JSONObject serialize(){
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(KEYS_ACTION, getType());
+        jsonObject.put(KEYS_STATE, state == null?"":state);
+        jsonObject.put(KEYS_INTERNAL_ID, id == null?"":id);
+        jsonObject.put(KEYS_COMMENT, comment == null?"":comment);
+        return jsonObject;
+    }
+
+    public void deserialize(JSONObject json){
+       setType(json.getString(KEYS_ACTION));
+       if(json.containsKey(KEYS_STATE)){
+           state = json.getString(KEYS_STATE);
+       }
+       if(json.containsKey(KEYS_INTERNAL_ID)){
+           state = json.getString(KEYS_INTERNAL_ID);
+       }
+       if(json.containsKey(KEYS_COMMENT)){
+           comment = json.getString(KEYS_COMMENT);
+       }
     }
 }

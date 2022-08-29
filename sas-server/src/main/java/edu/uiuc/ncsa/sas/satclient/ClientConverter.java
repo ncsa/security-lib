@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.sas.client;
+package edu.uiuc.ncsa.sas.satclient;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;

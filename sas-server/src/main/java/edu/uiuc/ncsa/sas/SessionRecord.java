@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.sas;
 
-import edu.uiuc.ncsa.sas.client.SATClient;
+import edu.uiuc.ncsa.sas.satclient.SATClient;
 import edu.uiuc.ncsa.security.util.cli.Message;
 
 import java.util.Date;

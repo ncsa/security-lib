@@ -12,7 +12,8 @@ public interface SASConstants {
     public static final String KEYS_STATE = "state";
     public static final String KEYS_INTERNAL_ID = "id";
     public static final String KEYS_ACTION = "action";
-    public static final String KEYS_TARGET = "object";
+    public static final String REQUEST_TYPE = KEYS_ACTION;
+    public static final String RESPONSE_TYPE = "response_type";
     public static final String KEYS_ARGUMENT = "arg";
     public static final String KEYS_METHOD = "method";
     public static final String KEYS_PROMPT = "prompt";
@@ -35,14 +36,23 @@ public interface SASConstants {
     public static final String RESPONSE_SESSION_ID = "session_id";
     public static final String RESPONSE_SYMMETRIC_KEY = "s_key";
     public static final String RESPONSE_MESSAGE = "message";
+    public static final String RESPONSE_TYPE_ERROR = "error";
+    public static final String RESPONSE_TYPE_OUTPUT = "output";
+    public static final String RESPONSE_TYPE_NEW_KEY = "new_key";
+    public static final String RESPONSE_TYPE_LOGON = "logon";
+    public static final String RESPONSE_TYPE_LOGOFF = "logoff";
+    public static final String RESPONSE_TYPE_PROMPT = "prompt";
 
     // Response codes
     public static final int RESPONSE_STATUS_OK = 0;
     public static final int RESPONSE_STATUS_ERROR = 1;
 
+    /**
+     * For the header in the HTTP request. Used only in logon
+     */
     public static final String CLIENT_ID_HEAD = "sas:client/";
 
-    // Header
+    // Header seesion ID. Used in every other request after logon.
     public static final String HEADER_SESSION_ID = "sas-session-id";
 
 }

@@ -1,5 +1,11 @@
-package edu.uiuc.ncsa.sas;
+package edu.uiuc.ncsa.sas.webclient;
 
+import edu.uiuc.ncsa.sas.SASConstants;
+import edu.uiuc.ncsa.sas.thing.action.*;
+import edu.uiuc.ncsa.sas.thing.response.LogonResponse;
+import edu.uiuc.ncsa.sas.thing.response.NewKeyResponse;
+import edu.uiuc.ncsa.sas.thing.response.OutputResponse;
+import edu.uiuc.ncsa.sas.thing.response.Response;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
@@ -13,8 +19,8 @@ import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 
@@ -23,11 +29,12 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.*;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
+import java.util.List;
+import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -36,6 +43,16 @@ import java.util.Vector;
  * on 8/18/22 at  3:14 PM
  */
 public class Client extends ServiceClient implements SASConstants {
+
+    public ResponseDeserializer getResponseDeserializer() {
+        return responseDeserializer;
+    }
+
+    public void setResponseDeserializer(ResponseDeserializer responseDeserializer) {
+        this.responseDeserializer = responseDeserializer;
+    }
+
+    ResponseDeserializer responseDeserializer = new ResponseDeserializer();
 
     public Client(URI address, SSLConfiguration sslConfiguration) {
         super(address, sslConfiguration);
@@ -49,16 +66,7 @@ public class Client extends ServiceClient implements SASConstants {
     public static final String FLAG_CONFIG = "-cfg"; // name of config file
     public static final String FLAG_HELP = "--help"; // help
     public static final String FLAG_VERBOSE = "-v"; // help
-    /*
-            xmlMap.put("client_id", getInput("enter client id"));
-        xmlMap.put("private_key", getInput("enter private key"));
 
-        if ("y".equals("enter ssl configuration (y/n)?")) {
-            xmlMap.put("trust_root_path", getInput("enter trust root path"));
-            xmlMap.put("trust_root_password", getInput("enter trust root password"));
-            xmlMap.put("trust_root_type", getInput("enter trust root store type, e.g. JKS"));
-            xmlMap.put("trust_root_cert_dn", getInput("enter trust root store cert DN"));
-     */
     public static final String CONFIG_CLIENT_ID = "client_id";
     public static final String CONFIG_PRIVATE_KEY = "private_key";
     public static final String CONFIG_TR_FILE = "trust_root_path";
@@ -143,18 +151,19 @@ public class Client extends ServiceClient implements SASConstants {
         }
     }
 
-
-    public static void main(String[] args) throws Throwable {
-        Vector<String> vector = new Vector<>();
-        vector.add("dummy"); // Dummy zero-th arg.
-        for (String arg : args) {
-            vector.add(arg);
-        }
-        InputLine inputLine = new InputLine(vector); // now we have a bunch of utilities for this
-        if (inputLine.hasArg(FLAG_HELP)) {
-            showHelp();
-            return;
-        }
+    /**
+     * Create a new instance of this client. The arguyments are
+     * <ul>
+     *     <li>-cfg - path to the config file</li>
+     *     <li>-v - verbose. Be yacky (mostly for debugging the client itself</li>
+     *     <li>-edit - create a new config file if none exists. </li>
+     * </ul>
+     *
+     * @param inputLine
+     * @return
+     * @throws Throwable
+     */
+    public static Client newInstance(InputLine inputLine) throws Throwable {
         boolean isVerbose = inputLine.hasArg(FLAG_VERBOSE);
         if (inputLine.hasArg(FLAG_EDIT)) {
             if (inputLine.hasArg(FLAG_CONFIG)) {
@@ -162,7 +171,7 @@ public class Client extends ServiceClient implements SASConstants {
                 if (!f.exists()) {
                     if ("y".equals(getInput("Create a new configuration?"))) {
                         createConfig(f.getAbsolutePath());
-                        return;
+                        return null;
                     }
                 }
             }
@@ -182,11 +191,11 @@ public class Client extends ServiceClient implements SASConstants {
                 if (isVerbose) {
                     t.printStackTrace();
                 }
-                return;
+                return null;
             }
         } else {
             say("no configuration");
-            return;
+            return null;
         }
 
 
@@ -211,10 +220,27 @@ public class Client extends ServiceClient implements SASConstants {
         }
         if (privateKey == null) {
             say("Sorry: Could not determine private key. aborting...");
-            return;
+            return null;
         }
         client.setPrivateKey(privateKey);
-        client.repl();
+        return client;
+    }
+
+    public static void main(String[] args) throws Throwable {
+        Vector<String> vector = new Vector<>();
+        vector.add("dummy"); // Dummy zero-th arg.
+        for (String arg : args) {
+            vector.add(arg);
+        }
+        InputLine inputLine = new InputLine(vector); // now we have a bunch of utilities for this
+        if (inputLine.hasArg(FLAG_HELP)) {
+            showHelp();
+            return;
+        }
+        Client client = newInstance(inputLine);
+        if (inputLine.hasArg("-cli")) {
+            client.cli();
+        }
     }
 
     public XMLMap getConfig() {
@@ -227,11 +253,18 @@ public class Client extends ServiceClient implements SASConstants {
 
     XMLMap config;
 
-    protected void repl() throws Throwable {
+    /**
+     * A <it>very, very</it> simple command line. This is normally not used for
+     * anything except testing. When this class has main called, this is what you get.
+     *
+     * @throws Throwable
+     */
+    protected void cli() throws Throwable {
         boolean doIt = true;
         while (doIt) {
-            String lineIne = getInput("sas");
-            switch (lineIne) {
+            String lineIn = getInput("sas");
+            OutputResponse outputResponse = null;
+            switch (lineIn) {
                 case "/q":
                     return;
                 case "/logon":
@@ -242,11 +275,62 @@ public class Client extends ServiceClient implements SASConstants {
                     doLogoff();
                     say("logged off..");
                     break;
+                case "/help":
+                case "--help":
+                    say("Testing CLI. Commands are");
+                    say("/q - quit");
+                    say("/logon - logon");
+                    say("/logoff - logoff");
+                    say("/help or --help - this message");
+                    say("(text) - calls execute, passes text");
+                    say("/invoke function arg0 arg1 ... - invokes function and passes space separated arguments as string");
+                    say("/invoke function json_array ... - invokes function and passes the arguments as a JSON array");
+                    break;
+                case "/new_key":
+                    doNewKey(1024);
+                    break;
                 default:
-                    doExecute(lineIne);
+
+                    if (lineIn.startsWith("/invoke ")) {
+                        lineIn = lineIn.substring(8);
+                        // ok, surgery. See if this ends with a JSON array
+                        String name = lineIn.substring(0, lineIn.indexOf(" "));
+                        String tail = lineIn.substring(1 + lineIn.indexOf(" "));
+                        try {
+                            JSONArray array = JSONArray.fromObject(tail.trim());
+                            outputResponse = (OutputResponse) doInvoke(name, array); // second half parsed as an array.
+                        } catch (Throwable t) {
+                            outputResponse = (OutputResponse) doInvoke(lineIn); // Just a bunch of strings.
+                        }
+                    } else {
+                        if (lineIn.startsWith("/new_key")) {
+                            lineIn = lineIn.substring(8);
+                            int keySize = 1024;
+                            try {
+                                keySize = Integer.parseInt(lineIn);
+
+                            } catch (Throwable t) {
+                                say("Could not parse \"" + lineIn + "\" as an integer. Getting key with size " + keySize);
+                            }
+                            doNewKey(keySize);
+                            say("got new key");
+                        } else {
+                            outputResponse = (OutputResponse) doExecute(lineIn);
+                        }
+                    }
                     break;
             }
+            if (outputResponse != null) {
+                say(outputResponse.getContent());
+            }
         }
+    }
+
+    public Response doNewKey(int keySize) throws Throwable {
+        NewKeyAction newKeyAction = new NewKeyAction(keySize);
+        NewKeyResponse response = (NewKeyResponse) doPost(newKeyAction);
+        sKey = response.getKey();
+        return response;
     }
 
     private static void showHelp() {
@@ -260,47 +344,69 @@ public class Client extends ServiceClient implements SASConstants {
 
     UUID sessionID;
 
-    protected void doLogon(Identifier identifier) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, InvalidKeySpecException, IOException, BadPaddingException, InvalidKeyException {
+    public Response doLogon() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, InvalidKeySpecException, IOException, BadPaddingException, InvalidKeyException {
+        return doLogon(BasicIdentifier.newID(getConfig().getString(CONFIG_CLIENT_ID)));
+    }
+   boolean loggedOn = false;
+    public Response doLogon(Identifier identifier) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, InvalidKeySpecException, IOException, BadPaddingException, InvalidKeyException {
+        if(loggedOn){
+            return null;
+        }
+        LogonAction logonAction = new LogonAction();
         JSONObject top = new JSONObject();
-        JSONObject sat = new JSONObject();
-
-
-        sat.put(KEYS_ACTION, ACTION_LOGON);
-        top.put(KEYS_SAT, sat);
+        top.put(KEYS_SAT, logonAction.serialize());
         String raw = doPost(RSAEncrypt(top.toString()), identifier.toString(), "");
         String jj = RSADecrypt(raw);
-        System.out.println(jj);
-        JSONObject json = JSONObject.fromObject(jj); // This is the full on body
-        if (json.getInt(RESPONSE_STATUS) == 0) {
-            sessionID = UUID.fromString(json.getString(RESPONSE_SESSION_ID));
-            sKey = Base64.decodeBase64(json.getString(RESPONSE_SYMMETRIC_KEY));
-        } else {
-            throw new GeneralException("error logging on to service, status != 0");
+        List<Response> responseList = responseDeserializer.deserialize(jj);
+        LogonResponse response = (LogonResponse) responseList.get(0);
+        sessionID = response.getSessionID();
+        sKey = response.getsKey();
+        loggedOn = true;
+        return response;
+    }
+
+    public Response doLogoff() throws Throwable {
+        LogoffAction logoffAction = new LogoffAction();
+        loggedOn = false; // need better logic here --test logoff response for status etc.
+        return doPost(logoffAction);
+    }
+
+    public Response doExecute(String contents) throws Throwable {
+        ExecuteAction executeAction = new ExecuteAction();
+        executeAction.setArg(contents);
+        return execute(executeAction);
+    }
+
+    /**
+     * Call this for an arbitrary {@link Action}. It will call the SAS  and return the
+     * response.
+     * @param action
+     * @return
+     * @throws Throwable
+     */
+    public Response execute(Action action) throws Throwable{
+        return doPost(action);
+    }
+    public Response doInvoke(String name, JSONArray args) throws Throwable {
+        InvokeAction invokeAction = new InvokeAction();
+        invokeAction.setName(name);
+        invokeAction.setArgs(args);
+        return execute(invokeAction);
+
+    }
+
+    public Response doInvoke(String x) throws Throwable {
+        StringTokenizer stringTokenizer = new StringTokenizer(x);
+        String name = null;
+        JSONArray args = new JSONArray();
+        int i = 0;
+        while (stringTokenizer.hasMoreTokens()) {
+            if (0 == i++) {
+                name = stringTokenizer.nextToken();
+            }
+            args.add(stringTokenizer.nextToken());
         }
-    }
-
-    protected void doLogoff() throws Throwable {
-        JSONObject top = new JSONObject();
-        JSONObject sat = new JSONObject();
-
-        sat.put(KEYS_ACTION, ACTION_LOGOFF);
-        top.put(SASConstants.KEYS_SAT, sat);
-        String raw = doPost(top.toString());
-        String jj = sDecrypt(raw);
-        System.out.println(jj);
-
-    }
-
-    protected void doExecute(String contents) throws Throwable {
-        JSONObject top = new JSONObject();
-        JSONObject sat = new JSONObject();
-        sat.put(KEYS_ACTION, ACTION_EXECUTE);
-        sat.put(KEYS_ARGUMENT, Base64.encodeBase64URLSafeString(contents.getBytes(StandardCharsets.UTF_8)));
-        top.put(KEYS_SAT, sat);
-        String raw = doPost(top.toString());
-        String jj = sDecrypt(raw);
-        System.out.println(jj);
-
+        return doInvoke(name, args);
     }
 
     protected String sEncrypt(String contents) {
@@ -352,28 +458,44 @@ public class Client extends ServiceClient implements SASConstants {
         } catch (UnsupportedEncodingException e) {
             throw new GeneralException("error encoding form \"" + e.getMessage() + "\"", e);
         }
-
         return doRequest(post, id, secret);
     }
 
-    public String doPost(String contents) throws Throwable {
+    public String doPost(String contents, boolean rsaEncrypt) throws Throwable {
         HttpPost post = new HttpPost(host().toString());
-        post.setEntity(new StringEntity(sEncrypt(contents)));
+        if (rsaEncrypt) {
+            post.setEntity(new StringEntity(RSAEncrypt(contents)));
+        } else {
+            post.setEntity(new StringEntity(sEncrypt(contents)));
+        }
         post.setHeader(HEADER_SESSION_ID, sessionID.toString());
         return doRequest(post);
     }
-    /*
-          <ssl debug="false"
-             useJavaTrustStore="true">
-            <trustStore>
-                <path>/home/ncsa/certs/localhost-2020.jks</path>
-                <password><![CDATA[vnlH814i]]></password>
-                <type>JKS</type>
-                <certDN><![CDATA[CN=localhost]]></certDN>
-            </trustStore>
-        </ssl>
 
+    /**
+     * Wraps the action in and does the post. It does symmetric key decryption. Assumption is a single response
+     *
+     * @param action
+     * @return
+     * @throws Throwable
      */
+    public Response doPost(Action action) throws Throwable {
+        return doPost(action, false);
+    }
+
+    public Response doPost(Action action, boolean rsaEncrypt) throws Throwable {
+        JSONObject top = new JSONObject();
+        top.put(KEYS_SAT, action.serialize());
+        String raw = doPost(top.toString(), rsaEncrypt);
+        String jj;
+        if (rsaEncrypt) {
+            jj = RSADecrypt(raw);
+        } else {
+            jj = sDecrypt(raw);
+        }
+        List<Response> responseList = responseDeserializer.deserialize(jj);
+        return responseList.get(0);
+    }
 
     protected static String multiLineInput(String oldValue, String key) throws IOException {
         if (oldValue == null) {

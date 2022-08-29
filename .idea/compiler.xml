@@ -24,10 +24,10 @@
         <module name="servlet" />
         <module name="sas-server" />
         <module name="storage" />
-        <module name="crypto" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="crypto" target="1.8" />
       <module name="ncsa-qdl-gui" target="1.8" />
     </bytecodeTargetLevel>
   </component>
