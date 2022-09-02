@@ -36,6 +36,7 @@ public class FileUtil {
         return file;
     }
 
+    // Next two are used in OA4MP, QDL but not in this module, so don't delete.
     public static String readFileAsBinary(String fileName) throws Throwable {
         checkFile(fileName);
         byte[] contents = Files.readAllBytes(Paths.get(fileName));
