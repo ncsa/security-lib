@@ -19,7 +19,7 @@ import java.util.Map;
  * on 1/19/12 at  10:49 AM
  */
 public class MultipleInheritanceTest extends AbstractInheritanceTest {
-    protected String path = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/";
+    protected String path = "/home/ncsa/dev/ncsa-git/security-lib/core/src/test/resources/cfg_loader/";
 
 
    void verbose(String x){

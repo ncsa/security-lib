@@ -13,7 +13,7 @@ import java.util.Map;
  * on 2/3/21 at  11:33 AM
  */
 public class ConfigInheritanceTest extends AbstractInheritanceTest {
-    protected String path = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance/";
+    protected String path = "/home/ncsa/dev/ncsa-git/security-lib/core/src/test/resources/cfg_inheritance/";
     void verbose(String x){
         if( MultipleInheritanceEngine.DEBUG_ON){
            System.out.println(x);

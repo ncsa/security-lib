@@ -9,7 +9,7 @@ public interface ScriptingConstants {
          Execution actions for the SRE = script runtime engine.
         */
     String SRE_NO_EXEC_PHASE = "none";
-    String SRE_EXEC_PHASE = "phase";
+    String SRE_EXEC_PHASE = "exec_phase";
     String SRE_EXEC_INIT = "init";
     String PRE_PREFIX = "pre_";
     String POST_PREFIX = "post_";

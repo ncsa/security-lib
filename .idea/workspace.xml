@@ -10,8 +10,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e2370508-a694-4084-b56a-b8e77c115dc1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/FileUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/FileUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/ConfigInheritanceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/ConfigInheritanceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/MultipleInheritanceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/MultipleInheritanceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/WebClientConfig.form" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/WebClientConfig.form" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/WebClientConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/WebClientConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/scripting/ScriptingConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/scripting/ScriptingConstants.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,26 +72,26 @@
     <option name="showMembers" value="true" />
     <option name="showModules" value="false" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "WebServerToolWindowFactoryState": "false",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Artifacts",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "project.propGUI"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propGUI&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveInnerDialog.RECENTS_KEY">
       <recent name="edu.uiuc.ncsa.sat" />
     </key>
   </component>
-  <component name="RunManager" selected="Tomcat Server.SAS Servlet">
+  <component name="RunManager" selected="JUnit.Test Suite">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -161,6 +166,21 @@
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test Suite" type="JUnit" factoryName="JUnit">
+      <module name="util" />
+      <option name="PACKAGE_NAME" value="edu.uiuc.ncsa.security.util" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.TestSuite" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -292,6 +312,7 @@
       <item itemvalue="Application.SASCommands" />
       <item itemvalue="Application.DecryptUtils" />
       <item itemvalue="Java Scratch.Scratch" />
+      <item itemvalue="JUnit.Test Suite" />
       <item itemvalue="Shell Script.build.sh" />
       <item itemvalue="Tomcat Server.SAS Servlet" />
     </list>
@@ -339,7 +360,8 @@
       <workItem from="1661205816439" duration="105000" />
       <workItem from="1661253024897" duration="38909000" />
       <workItem from="1661361698764" duration="7185000" />
-      <workItem from="1661375203351" duration="102718000" />
+      <workItem from="1661375203351" duration="124782000" />
+      <workItem from="1662745938258" duration="5847000" />
     </task>
     <task id="LOCAL-00001" summary="CIL-627: everything updated. Basic refactor done.">
       <created>1659364398070</created>
@@ -390,7 +412,14 @@
       <option name="project" value="LOCAL" />
       <updated>1661805670006</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Rename of classes. Improved exception handling.">
+      <created>1662157635220</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1662157635220</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
