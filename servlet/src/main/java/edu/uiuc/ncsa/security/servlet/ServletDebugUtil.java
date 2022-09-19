@@ -13,7 +13,10 @@ import java.util.Enumeration;
 public class ServletDebugUtil extends DebugUtil {
 
     public static  void printAllParameters(Class klasse, HttpServletRequest request) {
-        if(!isEnabled()) {return;}
+            printAllParameters(klasse,request,isEnabled());
+    }
+    public static  void printAllParameters(Class klasse, HttpServletRequest request, boolean printIt) {
+        if(!printIt) {return;}
           String reqUrl = request.getRequestURL().toString();
           String queryString = request.getQueryString();   // d=789
           if (queryString != null) {
@@ -58,6 +61,5 @@ public class ServletDebugUtil extends DebugUtil {
               }
           }
       }
-
 
 }

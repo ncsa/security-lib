@@ -189,8 +189,16 @@ public class CLIDriver {
             say(REPEAT_LAST_COMMAND + " = repeat the last command. Identical to " + HISTORY_LIST_COMMAND + " 0");
             return null;
         }
+        cmdLine = cmdLine.substring(REPEAT_LAST_COMMAND.length());
         if (0 < commandHistory.size()) {
-            return commandHistory.get(0);
+            String current = commandHistory.get(0);
+            if(cmdLine.trim().length() == 0){
+                return current;
+            }
+            current = current + " " + cmdLine;
+            commandHistory.add(0, current);
+            return current;
+            //return commandHistory.get(0) + " " + cmdLine;
         }
         say("no commands found");
         return null;
@@ -215,10 +223,23 @@ public class CLIDriver {
         if (st.hasMoreTokens()) {
             try {
                 int lineNo = Integer.parseInt(st.nextToken());
+                String rest = "";
+                while(st.hasMoreTokens()){
+                    rest = rest + " " + st.nextToken();
+                }
+
                 // allow signed command history numbers. so /h -1 is ok.
                 lineNo = lineNo <0 ? (commandHistory.size() + lineNo): lineNo;
-                if (0 <= lineNo && lineNo < commandHistory.size()) {
-                    return commandHistory.get(lineNo);
+                if(rest.trim().length() == 0){
+                    if (0 <= lineNo && lineNo < commandHistory.size()) {
+                        return commandHistory.get(lineNo);
+                    }
+                }else{
+                    if (0 <= lineNo && lineNo < commandHistory.size()) {
+                        String current = commandHistory.get(lineNo) + rest;
+                        commandHistory.add(0, current);
+                        return current;
+                    }
                 }
             } catch (Throwable t) {
                 // do nothing, just print out the history.

@@ -10,13 +10,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e2370508-a694-4084-b56a-b8e77c115dc1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/ConfigInheritanceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/ConfigInheritanceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/MultipleInheritanceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/MultipleInheritanceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/WebClientConfig.form" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/WebClientConfig.form" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/WebClientConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/WebClientConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/scripting/ScriptingConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/scripting/ScriptingConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/core/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crypto/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/crypto/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServletDebugUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServletDebugUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -361,7 +360,9 @@
       <workItem from="1661253024897" duration="38909000" />
       <workItem from="1661361698764" duration="7185000" />
       <workItem from="1661375203351" duration="124782000" />
-      <workItem from="1662745938258" duration="5847000" />
+      <workItem from="1662745938258" duration="6394000" />
+      <workItem from="1663010672212" duration="1882000" />
+      <workItem from="1663167806991" duration="13310000" />
     </task>
     <task id="LOCAL-00001" summary="CIL-627: everything updated. Basic refactor done.">
       <created>1659364398070</created>
@@ -419,7 +420,14 @@
       <option name="project" value="LOCAL" />
       <updated>1662157635220</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Changed paths for some file in testing to reflect recent refactoring.">
+      <created>1662764382877</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1662764382877</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -436,7 +444,8 @@
     <MESSAGE value="More refactoring." />
     <MESSAGE value="Rename of classes" />
     <MESSAGE value="Rename of classes. Improved exception handling." />
-    <option name="LAST_COMMIT_MESSAGE" value="Rename of classes. Improved exception handling." />
+    <MESSAGE value="Changed paths for some file in testing to reflect recent refactoring." />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed paths for some file in testing to reflect recent refactoring." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
