@@ -12,10 +12,28 @@
     <list default="true" id="e2370508-a694-4084-b56a-b8e77c115dc1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/core/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/Version.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/Version.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/crypto/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/crypto/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServletDebugUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServletDebugUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/dependencies.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/dependencies.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/dependency-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/dependency-info.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/distribution-management.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/distribution-management.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/faq.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/faq.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/format.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/format.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/markdown-velocity.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/markdown-velocity.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/markdown.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/markdown.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/plugin-management.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/plugin-management.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/plugins.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/plugins.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/project-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/project-info.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/xdoc.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/xdoc.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl-gui/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sas-server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/servlet/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/storage/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,6 +54,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitSEFilterConfiguration">
@@ -362,7 +385,7 @@
       <workItem from="1661375203351" duration="124782000" />
       <workItem from="1662745938258" duration="6394000" />
       <workItem from="1663010672212" duration="1882000" />
-      <workItem from="1663167806991" duration="13310000" />
+      <workItem from="1663167806991" duration="17066000" />
     </task>
     <task id="LOCAL-00001" summary="CIL-627: everything updated. Basic refactor done.">
       <created>1659364398070</created>
@@ -427,7 +450,14 @@
       <option name="project" value="LOCAL" />
       <updated>1662764382877</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Getting ready for release">
+      <created>1663615610936</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1663615610936</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -445,7 +475,8 @@
     <MESSAGE value="Rename of classes" />
     <MESSAGE value="Rename of classes. Improved exception handling." />
     <MESSAGE value="Changed paths for some file in testing to reflect recent refactoring." />
-    <option name="LAST_COMMIT_MESSAGE" value="Changed paths for some file in testing to reflect recent refactoring." />
+    <MESSAGE value="Getting ready for release" />
+    <option name="LAST_COMMIT_MESSAGE" value="Getting ready for release" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
