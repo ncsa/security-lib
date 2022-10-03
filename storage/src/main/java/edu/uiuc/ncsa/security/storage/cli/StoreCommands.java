@@ -1939,8 +1939,12 @@ public abstract class StoreCommands extends CommonCommands {
      * @return null if the input is terminated (so retain the old object)
      */
     protected JSONObject inputJSON(JSONObject oldJSON, String key) throws IOException {
-
-        String out = multiLineInput(oldJSON.toString(1), key);
+        String out;
+        if(oldJSON == null){
+            out = multiLineInput(null, key);
+        }else {
+             out = multiLineInput(oldJSON.toString(1), key);
+        }
         if (out == null) {
             // do nothing
             return oldJSON;

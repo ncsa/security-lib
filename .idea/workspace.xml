@@ -11,11 +11,8 @@
   <component name="ChangeListManager">
     <list default="true" id="e2370508-a694-4084-b56a-b8e77c115dc1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/core/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crypto/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/crypto/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServletDebugUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServletDebugUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,6 +33,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="5.2.8" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitSEFilterConfiguration">
@@ -317,11 +319,11 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.WebClientConfig" />
-        <item itemvalue="Application.SASCommands" />
-        <item itemvalue="Application.DecryptUtils" />
-        <item itemvalue="Java Scratch.Scratch" />
         <item itemvalue="Shell Script.build.sh" />
+        <item itemvalue="Java Scratch.Scratch" />
+        <item itemvalue="Application.DecryptUtils" />
+        <item itemvalue="Application.SASCommands" />
+        <item itemvalue="Application.WebClientConfig" />
       </list>
     </recent_temporary>
   </component>
@@ -362,7 +364,10 @@
       <workItem from="1661375203351" duration="124782000" />
       <workItem from="1662745938258" duration="6394000" />
       <workItem from="1663010672212" duration="1882000" />
-      <workItem from="1663167806991" duration="13310000" />
+      <workItem from="1663167806991" duration="18482000" />
+      <workItem from="1663776586778" duration="17000" />
+      <workItem from="1663793388419" duration="10000" />
+      <workItem from="1664401348915" duration="4382000" />
     </task>
     <task id="LOCAL-00001" summary="CIL-627: everything updated. Basic refactor done.">
       <created>1659364398070</created>
@@ -427,7 +432,21 @@
       <option name="project" value="LOCAL" />
       <updated>1662764382877</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Getting ready for release">
+      <created>1663615610936</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1663615610936</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Release 5.2.8">
+      <created>1663620494318</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1663620494318</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -445,7 +464,9 @@
     <MESSAGE value="Rename of classes" />
     <MESSAGE value="Rename of classes. Improved exception handling." />
     <MESSAGE value="Changed paths for some file in testing to reflect recent refactoring." />
-    <option name="LAST_COMMIT_MESSAGE" value="Changed paths for some file in testing to reflect recent refactoring." />
+    <MESSAGE value="Getting ready for release" />
+    <MESSAGE value="Release 5.2.8" />
+    <option name="LAST_COMMIT_MESSAGE" value="Release 5.2.8" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
