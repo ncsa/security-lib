@@ -35,5 +35,7 @@ public interface Identifiable extends Serializable, Cloneable {
     boolean isReadOnly();
 
     void setReadOnly(boolean readOnly);
+   String getDescription();
+   void setDescription(String description);
 
 }

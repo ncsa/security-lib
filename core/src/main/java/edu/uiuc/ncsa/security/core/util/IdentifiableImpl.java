@@ -13,7 +13,9 @@ import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkBasic;
 public class IdentifiableImpl implements Identifiable, Cloneable {
     @Override
     public IdentifiableImpl clone() {
-        return new IdentifiableImpl(getIdentifier());
+        IdentifiableImpl identifiable =  new IdentifiableImpl(getIdentifier());
+        identifiable.setDescription(getDescription());
+        return identifiable;
     }
 
     public IdentifiableImpl(Identifier identifier) {
@@ -33,6 +35,15 @@ public class IdentifiableImpl implements Identifiable, Cloneable {
         return identifier.toString();
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    String description;
     @Override
     public void setIdentifier(Identifier identifier) {
         this.identifier = identifier;

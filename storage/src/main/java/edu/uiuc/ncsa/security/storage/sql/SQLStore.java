@@ -703,7 +703,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     /**
      * When invoked this will loop through the columns of the table and add columns as needed with the correct type.
      * NOTE that this should only be run once as a utility at, say, servlet loading time before any data access can
-     * occur. Also, all of the added columns are allowed to be null. You will have to change that (along with setting
+     * occur. Also, all the added columns are allowed to be null. You will have to change that (along with setting
      * a defaul) if you do not want that.
      */
     public void checkColumns() throws SQLException {
@@ -712,7 +712,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         Connection c = cr.connection;
 
         Statement stmt = c.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT * from " + getTable().getFQTablename());
+        // We need a result set, but we do not want to get any elements from the database
+        // Therefore, a trick is to add a where clause that is always false.
+        ResultSet rs = stmt.executeQuery("SELECT * from " + getTable().getFQTablename() + " WHERE 1=2");
         ResultSetMetaData metaData = rs.getMetaData();
         Hashtable<String, Integer> foundCols = new Hashtable<String, Integer>();
         // have to loop through these and get the column names and types first since we will

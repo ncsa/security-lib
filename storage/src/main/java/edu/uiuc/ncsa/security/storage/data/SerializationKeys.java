@@ -36,6 +36,12 @@ public class SerializationKeys {
      public List<String> allKeys(){
          LinkedList<String> allKeys = new LinkedList<>();
          allKeys.add(identifier());
+         allKeys.add(description());
          return allKeys;
      }
+     String description = "description";
+    public String description(String... x) {
+        if (0 < x.length) description = x[0];
+        return description;
+    }
 }

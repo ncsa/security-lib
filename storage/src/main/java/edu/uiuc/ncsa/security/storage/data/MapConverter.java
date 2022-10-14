@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 
 import java.util.List;
@@ -49,6 +50,9 @@ public class MapConverter<V extends Identifiable> implements XMLConverter<V> {
     public V fromMap(ConversionMap<String, Object> map, V v) {
         v = createIfNeeded(v);
         v.setIdentifier(map.getIdentifier(keys.identifier()));
+        if(map.containsKey(keys.identifier())){
+            v.setDescription(map.getString(keys.description()));
+        }
         return v;
 
     }
@@ -63,11 +67,14 @@ public class MapConverter<V extends Identifiable> implements XMLConverter<V> {
      */
     public void toMap(V value, ConversionMap<String, Object> data) {
         data.put(keys.identifier(), value.getIdentifierString());
+        if(!StringUtils.isTrivial(value.getDescription())){
+            data.put(keys.description(), value.getDescription());
+        }
     }
 
     /**
      * Given a set of attributes, create a new object whose properties are restricted to the given list of
-     * attributes. Note the the {@link SerializationKeys} has a method {@link SerializationKeys#allKeys()}
+     * attributes. Note the {@link SerializationKeys} has a method {@link SerializationKeys#allKeys()}
      * that allows you to get every key for this object so you can simply remove what you do not want or need.
      *
      * @param v

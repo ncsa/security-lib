@@ -637,12 +637,18 @@ public abstract class StoreCommands extends CommonCommands {
         say("Update the values. A return accepts the existing or default value in []'s");
 
         newIdentifier = getInput("enter the identifier", identifiable.getIdentifierString());
+        //sayi("Enter new "  + getMapConverter().getKeys().description() + ":");
+
         boolean removeCurrentObject = false;
         Identifier oldID = identifiable.getIdentifier();
 
         // set file not found message.
         extraUpdates(identifiable);
         sayi("here is the complete updated object:");
+        String description = multiLineInput(null, getMapConverter().getKeys().description());
+        if(!StringUtils.isTrivial(description)){
+            identifiable.setDescription(description);
+        }
         longFormat(identifiable);
         if (!newIdentifier.equals(identifiable.getIdentifierString())) {
             //  sayi2(" remove client with id=\"" + client.getIdentifier() + "\" [y/n]? ");
@@ -1969,6 +1975,13 @@ public abstract class StoreCommands extends CommonCommands {
         return oldJSON;
     }
 
+    /**
+     * For entering muli-line strings (includes JSON).
+     * @param oldValue may be null if a new value
+     * @param key used for constructing prompts.
+     * @return
+     * @throws IOException
+     */
     protected String multiLineInput(String oldValue, String key) throws IOException {
         if (oldValue == null) {
             sayi("no current value for " + key);

@@ -39,6 +39,7 @@ public abstract class Table  {
      */
     public void createColumnDescriptors(){
         getColumnDescriptor().add(new ColumnDescriptorEntry(keys.identifier(), LONGVARCHAR, false, true)); // primary key
+        getColumnDescriptor().add(new ColumnDescriptorEntry(keys.description(), LONGVARCHAR, false, false));
     }
 
     public ColumnDescriptors getColumnDescriptor() {

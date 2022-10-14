@@ -49,6 +49,17 @@ public class ConnectionRecord implements Identifiable {
     }
 
     @Override
+    public String getDescription() {
+        return description;
+    }
+
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    String description;
+    @Override
     public void setIdentifier(Identifier identifier) {
         this.identifier = identifier;
     }
