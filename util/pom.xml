@@ -5,7 +5,7 @@
     <parent>
         <artifactId>security-lib</artifactId>
         <groupId>edu.uiuc.ncsa.security</groupId>
-        <version>5.2-SNAPSHOT</version>
+        <version>5.2.8.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -97,7 +97,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8.2</version>
         </dependency>
         <dependency>
             <groupId>net.sf.json-lib</groupId>
@@ -130,19 +130,19 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>crypto</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>crypto</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.8</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
