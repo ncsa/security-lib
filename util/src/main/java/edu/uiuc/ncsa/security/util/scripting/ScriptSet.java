@@ -29,7 +29,9 @@ public class ScriptSet<V extends ScriptInterface> implements Iterable<V> {
      * @param value
      * @return
      */
-    public ScriptInterface get(String key, String value) {
+    public List<ScriptInterface> get(String key, String value) {
+        // CIL-1541 -- return ALL the scripts so they may be processed.
+        List<ScriptInterface> sss = new ArrayList<>();
         for (ScriptInterface s : scripts) {
             // if stored property a list, check and return first hit.
 
@@ -39,43 +41,18 @@ public class ScriptSet<V extends ScriptInterface> implements Iterable<V> {
                 // CIL-1301
                 if (key.equals(SRE_EXEC_PHASE)) {
                     ArrayList<String> list = s.getProperties().getArrayList(key);
-                    if(value.equals(ALL_PHASES)){ // if the phase is all, do it everywhere.
-                        // match any
-                        return s;
-                    }
-                    if (list.contains(value)) {
-                        // match specific phase
-                        return s;
-                    }
-                    if (value.startsWith(PRE_PREFIX) && list.contains(SRE_PRE_ALL)) {
-                        return s;
-                    }
-                    if (value.startsWith(POST_PREFIX) && list.contains(SRE_POST_ALL)) {
-                        return s;
-                    }
-                    return null; // no recognized phases. No such script
-                }
-                if (s.getProperties().isList(key)) {
-                    ArrayList<String> list = s.getProperties().getArrayList(key);
-                    if(list.contains(value)){
-                        return s;
-                    }
-/*
-                    for (String x : list) {
-                        if (x.equals(value)) {
-                            return s;
-                        }
-                    }
-*/
-                } else {
-                    //stored property is not a list, check the value directly.
-                    if (s.getProperties().getString(key).equals(value)) {
-                        return s;
+                    if (value.equals(ALL_PHASES)
+                            || (value.startsWith(PRE_PREFIX) && list.contains(SRE_PRE_ALL))
+                            || (value.startsWith(POST_PREFIX) && list.contains(SRE_POST_ALL))
+                            || list.contains(value)
+                            || s.getProperties().getString(key).equals(value)
+                    ) {
+                        sss.add(s);
                     }
                 }
             }
         }
-        return null;
+        return sss;
     }
 
     public boolean isEmpty() {

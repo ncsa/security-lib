@@ -60,7 +60,6 @@ public class ISO6429Terminal {
         int[] newPos = getCursor();
         setCursor(currentPos[0], currentPos[1]);
         return newPos;
-
 */
     }
 

@@ -531,6 +531,10 @@ public abstract class StoreCommands extends CommonCommands {
             return;
         }
         Identifiable x = findItem(inputLine);
+        if(x == null){
+            say("sorry, but that object was not found -- please check the id.");
+            return;
+        }
         XMLMap c = new XMLMap();
         getStore().getXMLConverter().toMap(x, c);
         try {
