@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import org.apache.http.HttpStatus;
 
@@ -163,7 +164,7 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
     @Override
     public void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
         try {
-               printAllParameters(httpServletRequest);
+           //    printAllParameters(httpServletRequest);
             if (doPing(httpServletRequest, httpServletResponse)) return;
             /*
             So we are clear on this... Tomcat will take any POST that has the body encoded as application/x-www-form-urlencoded,
@@ -312,13 +313,27 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
     }
 
     /**
-     * This will print all parameters to standard err. It is a low-level debugging tool
-     * and should never be used in production. It gives in effect a report on what is
-     * actually being passed in.
-     *
+     * This will print all parameters to standard err for this specific debugger during trace.
+     * It gives a report on what is actually being passed in.
+     * @param request
+     * @param debugger
+     */
+    protected void printAllParameters(HttpServletRequest request, MetaDebugUtil debugger) {
+        if(debugger.isEnabled() && debugger.getDebugLevel()==MetaDebugUtil.DEBUG_LEVEL_TRACE) {
+            debugger.trace(this, ":");
+            ServletDebugUtil.printAllParameters(this.getClass(), request, true);
+        }
+    }
+
+    /**
+     * Print all parameters to every request based on the global state of debugging.
+     * It is a low-level debugging tool
+     * and should never be used in production, since it will bloat the logs.
+     * It gives a report on what is actually being passed in.
      * @param request
      */
     protected void printAllParameters(HttpServletRequest request) {
-        ServletDebugUtil.printAllParameters(this.getClass(), request);
+        ServletDebugUtil.printAllParameters(this.getClass(), request, true);
     }
+
 }

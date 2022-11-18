@@ -9,6 +9,9 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
  * <p>Created by Jeff Gaynor<br>
  * on 4/11/22 at  1:18 PM
  */
+/* *****
+    Not used in this project, used extensively in OA4MP.
+   ***** */
 public class LockingCleanup<K, V> extends Cleanup<K, V> {
     public LockingCleanup(MyLoggingFacade logger, String name) {
         super(logger, name);
