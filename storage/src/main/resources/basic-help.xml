@@ -1,0 +1,241 @@
+<help>
+    <entry id="identifier">
+       <body>
+  <![CDATA[Every object (transaction, client, approval) has an identifier
+which is a standard URI. Tokens also have identifiers as well and
+unlike object identifiers, token ids will contain parameters. All
+generated identifiers will have a unique string in them. If you manually
+create an identifier (such as for a client) the only caveat is that
+it must be unique as a string in the current store.
+
+Manual ids
+----------
+If you create an id manually, you should avoid parameters and
+fragments, since these may be used by e.g., the versioning system.
+Mostly you should stick with a format like
+
+scheme:path
+
+E.g. localhost:test/ga4gh
+
+that is humanly readable and succinct. Don't forget you can add
+a description to any object.
+
+Token ids
+---------
+Token ids are overloaded. Note that you should probably not create
+a token id manually. Once created, a token id is treated as an
+immutable string. It may be parsed for timestamps and such,
+but the contract is that the exact string must match what is
+stored on the server and tokens are automatically deleted
+(aka "garbage collection") when expired. If you create token
+that does not conform to this, it will be ignored in garbage collection.
+
+Since ids generally have a unique string, a common shorthand is
+to use the last 5 of this as a nickname. For instance, if you had token
+
+https://localhost:9443/oauth2/5f025cc3452be217c9c95999a27ca3a6?type=authzGrant&ts=1668811290875&version=v2.0&lifetime=750000
+
+you might refer to it as 5f025. This is usually more than sufficient in
+practice to find it in the store using a regular expression.
+
+See also: versions
+  ]]>
+       </body>
+       <example>
+   <![CDATA[Some examples of generated ids
+
+1.   testScheme:oa4md,2018:/client_id/70e46ba17e8c4d00d30dd2345da83abe
+     This has a specific scheme, the path identifiers it and it has a unique string
+
+2.   https://localhost:9443/oauth2/f019e78e6307ca11c475eeeb61c3525?type=authzGrant&ts=1667918947236&version=v2.0&lifetime=750000
+     This identifies the server that created it, has a unique string and then the parameters
+     tell us the type, timestamp (creation time in ms) and the lifetime (also in ms).
+
+3.   cilogon:/client_id/399d7fq5e9500801bd0e02f803a2dab8
+
+Some examples of manually generated client ids
+
+ashigaru:oa4mp.oa2.fileStore
+localhost:test/ncsa
+prod:test/functor
+
+Each of these is unique in the store and is descriptive.
+   ]]>
+        </example>
+    </entry>
+    <entry id="description">
+       <body>
+  <![CDATA[Every object can have a description. Note that the description
+is intentionally really simple -- it is just a string. No format, no structure.
+No processing of any sort is done on it.
+
+If you want to get a synopsis of what the main topic is, you should read the
+"about" entry.
+  ]]>
+       </body>
+    </entry>
+    <entry id="versions">
+       <body>
+  <![CDATA[Every stored object can be versioned. This means that a complete
+copy of it is made by the system and stored with a managed id. For instance
+if you have a client with id
+
+oa4md,2018:/client_id/5adabf74ba28e4234ca6fa70f87f1ffe
+
+and list its versions you may get
+
+testScheme:oa4md,2018:/client_id/5adabf74ba28e4234ca6fa70f87f1ffe#version=0
+testScheme:oa4md,2018:/client_id/5adabf74ba28e4234ca6fa70f87f1ffe#version=1
+testScheme:oa4md,2018:/client_id/5adabf74ba28e4234ca6fa70f87f1ffe#version=2
+
+This means that there are 3 versions. Since they are chronological, that highest
+number is the most recent.
+  ]]>
+       </body>
+       <example>
+   <![CDATA[
+   ]]>
+        </example>
+    </entry>
+    <entry id="primary_key">
+       <body>
+  <![CDATA[The primary key for this object store is always denoted with
+a * (star) in the list_keys command.
+  ]]>
+       </body>
+       <example>
+   <![CDATA[If you list the keys for client approvals, you would see
+   
+approvals>list_keys
+approval_ts  approved  approver  client_id*  description  status
+
+which means that the client_id is the primary key for this store.
+   ]]>
+        </example>
+    </entry>
+<entry id="property">
+<body>
+<![CDATA[Objects have properties and these are what is stored about it.
+If an entry in this help is a property, then the following format is
+used to list it:
+Property: TYPE (default value)
+Description.
+
+Types:
+   Boolean : a value of true or false
+Identifier : A URL that is unique and usually of the form scheme:path
+      JSON : a JSON blob
+      List : [x0, x1,...]. Lists have elements all of a given type
+    String : Any set of characters. UTF-8 is supported
+ Timestamp : An ISO 8601 timestamp. Note that these us usually generated
+             and managed by the system
+       URL :  A URL.
+
+
+Defaults are:
+  Booleans :  true|false
+      JSON :  {} (empty) or the JSON blob
+      List :  [] (empty) or the list of elements
+   Strings :  "" (empty) or "characters"
+   Integer :  Any signed integer. All are longs (64 bit).
+       ANY : ** Never empty, system managed.
+             -- No value
+
+Note that as admin you can indeed change system managed properties, but
+that should only be done in exceptional cases.
+For instance, if you change the identifier, then the
+original version effectively ceases to exist, so every reference to the old
+identifier must be updated on the client side.
+
+note that if no value is specified, then listing the client will skip that
+property.
+]]>
+</body>
+<example>
+<![CDATA[E.g.#1
+
+Property: JSON ({})
+This property...
+
+This means that the entry for this keyword is a property, it must be JSON
+and the default is an empty JSON object.
+
+E.g. #2
+Property: Identifier (**)
+The unique....
+
+This means that this is a property of type identifier and must be present.
+For instance, the main identifier for this object always has an entry like this
+and the object does not exist without its unique id.
+
+E.g. #3
+Property: URL (--)
+This ...
+
+Means that this is a property, if present must be a URL but is undefined
+as its default.]]>
+</example>
+</entry>
+
+    <entry id="help">
+    <body>
+    <![CDATA[How to use help. Generally you may get help on a topic by
+1. Invoking
+  /help topic
+  at the command line.
+
+2. Commands have built in help. So if /help lists an entry as a "Command." then
+   you may get help by issuing
+
+command --help
+
+E.g.
+archive --help
+
+   The command should always know its help and should always be the most recent and
+   authoritative information available.
+
+3. You may always get a list of properties by invoking the list_keys command
+   and the full set of commands can be found by typing /commands
+
+4. In creating an object. If you are creating an object and filling in the
+   values, you may type "/help" (no quotes) at the prompt and print out the
+   help for that topic. E.g. here is a part of a session for creating an admin client.
+   in it, the user requests help for the id, by entering "/help", the help entry
+   is printed and the user is then prompted again:
+
+admins>create
+enter the id of the object you want to create or return for a random one >
+    Object created with identifier oa4mp:/adminClient/4cae958bbc281ac36ea44caee5814e6d/1669988296009
+edit [y/n]?y
+  Update the values. A return accepts the existing or default value in []'s
+enter the identifier[oa4mp:/adminClient/4cae958bbc281ac36ea44caee5814e6d/1669988296009]:/help
+Property: Identifier (**)
+The unique identifier for this administrative client.
+enter the identifier[oa4mp:/adminClient/4cae958bbc281ac36ea44caee5814e6d/1669988296009]:
+
+Note that this works at creation only.
+]]>
+    </body>
+    </entry>
+</help>
+
+    <!--
+ entry templates, without and with examples. These are not indented since
+ we need to control whitespace and our ever so helpful editor adds it when
+ any is detected, leading to bad output.
+
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+</entry>
+
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+
+</entry>
+          -->

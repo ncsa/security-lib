@@ -586,7 +586,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
      * @return
      * @throws Exception
      */
-    public boolean use(InputLine inputLine) throws Exception {
+    public boolean use(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             useHelp();
             return true;

@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.cli.editing.EditorEntry;
@@ -37,7 +38,7 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
  * on 5/20/13 at  3:22 PM
  */
 public abstract class StoreCommands extends CommonCommands {
-    public StoreCommands(MyLoggingFacade logger) {
+    public StoreCommands(MyLoggingFacade logger) throws Throwable {
         super(logger);
     }
 
@@ -62,14 +63,14 @@ public abstract class StoreCommands extends CommonCommands {
      * @param store
      */
 
-    protected StoreCommands(MyLoggingFacade logger, String defaultIndent, Store store) {
+    protected StoreCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
         super(logger);
         this.defaultIndent = defaultIndent;
         this.store = store;
         setSortable(new BasicSorter());
     }
 
-    public StoreCommands(MyLoggingFacade logger, Store store) {
+    public StoreCommands(MyLoggingFacade logger, Store store) throws Throwable {
         super(logger);
         setStore(store);
         setSortable(new BasicSorter());
@@ -350,6 +351,9 @@ public abstract class StoreCommands extends CommonCommands {
                 return;
             }
             if (storeRS) {
+                if (returnedAttributes == null) {
+                    returnedAttributes = getMapConverter().getKeys().allKeys(); // no attributes specified means get them all.
+                }
                 resultSets.put(rsName, new RSRecord(values, returnedAttributes));
                 say("got " + values.size() + " match" + (values.size() == 1 ? "." : "es."));
                 return;
@@ -482,7 +486,7 @@ public abstract class StoreCommands extends CommonCommands {
             int indexWidth = bigDecimal.intValue();
             say("             ".substring(0, indexWidth + 2) + formattedTable.get(0)); // print out headers
             for (int i = 1; i < formattedTable.size(); i++) {
-                say(StringUtils.RJustify(Integer.toString(i - 1), indexWidth) + ". " + formattedTable.get(i));
+                say(StringUtils.RJustify(Integer.toString(start + i - 1), indexWidth) + ". " + formattedTable.get(i));
             }
         }
         return false;
@@ -531,7 +535,7 @@ public abstract class StoreCommands extends CommonCommands {
             return;
         }
         Identifiable x = findItem(inputLine);
-        if(x == null){
+        if (x == null) {
             say("sorry, but that object was not found -- please check the id.");
             return;
         }
@@ -587,7 +591,14 @@ public abstract class StoreCommands extends CommonCommands {
     String LIST_END_DELIMITER = "]";
     String LIST_SEPARATOR = ",";
 
-    public void oldUpdate(InputLine inputLine) throws IOException {
+    /**
+     * Older version of update. Not nearly as full-featured but still useful, so keep
+     * it and in cases it is needed, just invoke it on behalf of the user.
+     *
+     * @param inputLine
+     * @throws IOException
+     */
+    protected void oldUpdate(InputLine inputLine) throws IOException {
         if (showHelp(inputLine)) {
             showUpdateHelp();
             return;
@@ -636,11 +647,11 @@ public abstract class StoreCommands extends CommonCommands {
     public boolean update(Identifiable identifiable) throws IOException {
 
         String newIdentifier = null;
-
+        SerializationKeys keys = getMapConverter().getKeys();
         info("Starting update for object with id = " + identifiable.getIdentifierString());
         say("Update the values. A return accepts the existing or default value in []'s");
 
-        newIdentifier = getInput("enter the identifier", identifiable.getIdentifierString());
+        newIdentifier = getPropertyHelp(keys.identifier(), "enter the identifier", identifiable.getIdentifierString());
         //sayi("Enter new "  + getMapConverter().getKeys().description() + ":");
 
         boolean removeCurrentObject = false;
@@ -649,8 +660,8 @@ public abstract class StoreCommands extends CommonCommands {
         // set file not found message.
         extraUpdates(identifiable);
         sayi("here is the complete updated object:");
-        String description = multiLineInput(null, getMapConverter().getKeys().description());
-        if(!StringUtils.isTrivial(description)){
+        String description = multiLinePropertyInput(keys.description(), null, getMapConverter().getKeys().description());
+        if (!StringUtils.isTrivial(description)) {
             identifiable.setDescription(description);
         }
         longFormat(identifiable);
@@ -1810,11 +1821,26 @@ public abstract class StoreCommands extends CommonCommands {
             printRS(inputLine, resultSets.get(name).rs, foundKeys, limits);
             return;
         }
-        if (inputLine.hasArg(RS_CLEAR_KEY)) {
-            resultSets = new HashMap<>();
-            say("all results cleared");
+        if (inputLine.hasArg(RS_REMOVE_KEY)) {
+            String name = inputLine.getNextArgFor(RS_REMOVE_KEY);
+            if (name.equals("*")) {
+                if (getInput("clear all results(y|n)?", "n").equals("y")) {
+                    resultSets = new HashMap<>();
+                    say("all results cleared");
+                } else {
+                    say("remove aborted.");
+                }
+            } else {
+                if (resultSets.containsKey(name)) {
+                    resultSets.remove(name);
+                    say("removed result set \"" + name + "\"");
+                } else {
+                    say("no such result set name \"" + name + "\"");
+                }
+            }
             return;
         }
+/*
         if (inputLine.hasArg(RS_REMOVE_KEY)) {
             inputLine.removeSwitch(RS_REMOVE_KEY);
             String name = inputLine.getLastArg();
@@ -1822,7 +1848,8 @@ public abstract class StoreCommands extends CommonCommands {
             say("result set named \"" + name + "\" has been removed");
             return;
         }
-        if (inputLine.hasArg(RS_LIST_KEY)) {
+*/
+        if (inputLine.hasArg(RS_LIST_INFO_KEY)) {
             if (resultSets.isEmpty()) {
                 return;
             }
@@ -1842,18 +1869,18 @@ public abstract class StoreCommands extends CommonCommands {
     public static String RS_SHOW_KEY = "-show";
     public static String RS_REMOVE_KEY = "-rm";
     public static String RS_CLEAR_KEY = "-clear";
-    public static String RS_LIST_KEY = "-list";
+    public static String RS_LIST_INFO_KEY = "-info";
 
     protected void showResultSetHelp() {
         sayi("rs flags [rs_name].");
-        sayi("Result set management. All of these except " + RS_CLEAR_KEY + " have the name of the result");
+        sayi("Result set management. All of these require the name of the result");
         sayi("set as the last argument.");
         sayi("If you save a result set using the " + SEARCH_RESULT_SET_NAME + " flag in the search");
         sayi("command, you can display it, here or remove it.");
         sayi("Other commands will allow for using the result set ");
-        sayi(RS_REMOVE_KEY + " remove the stored result set. This does not touch the entries.");
-        sayi(RS_LIST_KEY + " list store results sets");
-        sayi(RS_CLEAR_KEY + " clear all stored result sets.");
+//        sayi(RS_REMOVE_KEY + " remove the stored result set. This does not touch the entries.");
+        sayi(RS_LIST_INFO_KEY + " list information about the results sets, such as count and fields");
+        sayi(RS_REMOVE_KEY + " remove a set or if a * is given, clear all stored result sets.");
         sayi(RS_SHOW_KEY + " show the given result set. You may give an integer to show that number, a list of ");
         sayi("   two integers for the start and stop limits, or no value which shows the entire set.");
         sayi("The following switches are supported for the " + RS_SHOW_KEY + " command:");
@@ -1950,10 +1977,10 @@ public abstract class StoreCommands extends CommonCommands {
      */
     protected JSONObject inputJSON(JSONObject oldJSON, String key) throws IOException {
         String out;
-        if(oldJSON == null){
+        if (oldJSON == null) {
             out = multiLineInput(null, key);
-        }else {
-             out = multiLineInput(oldJSON.toString(1), key);
+        } else {
+            out = multiLineInput(oldJSON.toString(1), key);
         }
         if (out == null) {
             // do nothing
@@ -1979,10 +2006,32 @@ public abstract class StoreCommands extends CommonCommands {
         return oldJSON;
     }
 
+    protected String multiLinePropertyInput(String propertyName, String oldValue, String key) throws IOException {
+       boolean loopForever = true;
+       String inLine = null;
+       while(loopForever){
+           inLine = multiLineInput(oldValue, key);
+           if(inLine == null){
+               return inLine;
+           }
+           if(inLine.trim().equals("--help") || inLine.trim().equals("help")){
+               if(getHelpUtil() == null){
+                   say("no help for the topic \"" + propertyName + "\"");
+               }else {
+                   getHelpUtil().printHelp(new InputLine("/help", propertyName));
+               }
+           }else{
+               break;
+           }
+       }
+       return inLine;
+    }
+
     /**
      * For entering muli-line strings (includes JSON).
+     *
      * @param oldValue may be null if a new value
-     * @param key used for constructing prompts.
+     * @param key      used for constructing prompts.
      * @return
      * @throws IOException
      */
@@ -2122,7 +2171,7 @@ public abstract class StoreCommands extends CommonCommands {
 
         if (json == null) {
             // This handles every other value type...
-            String newValue = getInput("Enter new value for " + key + " ", currentValue);
+            String newValue = getPropertyHelp(key, "Enter new value for " + key + " ", currentValue);
             if (newValue.equals(currentValue)) {
                 return false;
             }
@@ -2521,7 +2570,7 @@ public abstract class StoreCommands extends CommonCommands {
 
 
     public void update(InputLine inputLine) throws IOException {
-       Identifiable identifiable = findItem(inputLine);
+        Identifiable identifiable = findItem(inputLine);
         if (showHelp(inputLine)) {
             showUpdateHelp();
             return;
@@ -2714,6 +2763,11 @@ public abstract class StoreCommands extends CommonCommands {
     protected void rmCleanup(Identifiable identifiable) {
     }
 
+
+    public void bootstrap() throws Throwable {
+        super.bootstrap();
+        getHelpUtil().load("/store-help.xml");
+    }
 }
 
 

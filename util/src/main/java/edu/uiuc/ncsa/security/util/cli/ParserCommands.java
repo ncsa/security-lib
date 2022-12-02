@@ -11,11 +11,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ *  This was the command line component for functors, which should not be used.
  * <p>Created by Jeff Gaynor<br>
  * on 9/25/18 at  10:51 AM
+ * @deprecated
  */
 public class ParserCommands extends CommonCommands {
-    public ParserCommands(MyLoggingFacade logger, JFunctorFactory functorFactory) {
+    public ParserCommands(MyLoggingFacade logger, JFunctorFactory functorFactory) throws Throwable{
         super(logger);
         this.functorFactory = functorFactory;
     }
@@ -23,6 +25,11 @@ public class ParserCommands extends CommonCommands {
     @Override
     public String getPrompt() {
         return "parser>";
+    }
+
+    @Override
+    public void bootstrap() throws Throwable {
+        // no op
     }
 
     File file;
@@ -187,4 +194,5 @@ public class ParserCommands extends CommonCommands {
         file = null; // adios...
         say("done!");
     }
+
 }

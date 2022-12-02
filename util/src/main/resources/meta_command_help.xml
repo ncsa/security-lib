@@ -1,0 +1,148 @@
+<html>
+    <entry id="metacommands">
+    <body>
+    <![CDATA[Metacommands are commands that are applied to the current component.
+For instance, as you type, a history of everything you type is created. This may
+be viewed, older commands can  be executed from this history, thj history
+may be saved and loaded. This is the structure around the component to allow
+for using that component. Another example is the // metacommand, which allows you
+to call up another component and issue a single command to it. This is quite useful
+at times, Metacommands are all prefixed with a /.
+
+As with regular commands, every one has built in help with the --help switch.]]>
+    </body>
+    </entry>
+    <entry id="//">
+    <body>
+    <![CDATA[Metacommand.
+Syntax:
+// component {command}
+
+Send a command to another component, or simply switch to another component
+if not command is given
+
+E.g.
+Using the admin component, you really need to find a single client whose id
+contains the string "caltech":
+
+admin>//clients search >client_id -r .*caltech.*
+0. ... (results)
+
+Compare this to not issuing the command:
+admin>//clients
+clients>
+
+This switches to the clients component. Issuing a /q will return you to the admin
+component.]]>
+    </body>
+    </entry>
+    <entry id="/commands">
+    <body>
+    <![CDATA[Metacommand.
+Search the current component and print out all of the commands available are.]]>
+    </body>
+    </entry>
+    <entry id="/?">
+    <body>
+    <![CDATA[Metacommand.
+Print summary of all meta command help.]]>
+    </body>
+    </entry>
+    <entry id="/q">
+    <body>
+    <![CDATA[Metacommand.
+Quit the current session. If you are in a component, you will be returned up a level. If you are at the
+top level, you will exit the CLI.
+
+See also: /exit]]>
+    </body>
+    </entry>
+    <entry id="/exit">
+    <body>
+    <![CDATA[Metacommand.
+Synonym for /q.
+
+See also: /q]]>
+    </body>
+    </entry>
+    <entry id="/trace">
+    <body>
+    <![CDATA[Metacommand.
+Toggle the trace facility or if no argument, query it.
+
+Trace is a facility that allows for very low level analysis of the operation
+of the CLI, including stack traces and verbosity. Users generally are not interested
+in this. It is mostly a tool for system developers.]]>
+    </body>
+    </entry>
+    <entry id="/c">
+    <body>
+    <![CDATA[Metacommand.
+Clear the command history.]]>
+    </body>
+    </entry>
+    <entry id="/l">
+    <body>
+    <![CDATA[Metacommand.
+Load a command history saved with /w.
+
+See also: /w, /h]]>
+    </body>
+    </entry>
+    <entry id="/w">
+    <body>
+    <![CDATA[Metacommand.
+Write the current command buffer to the given file. It may be reloaded later
+with the /l metacommand.
+
+    </body>
+    </entry>
+
+    <entry id="/h [index]">
+    <body>
+    <![CDATA[Metacommand.
+No argument - print the entire history or execute the command at the given index.
+
+Since the commands are number from 0 (most recent)
+
+/h 0
+
+repeats the last command.
+
+See also: /r]]>
+    </body>
+    </entry>
+    <entry id="/r">
+    <body>
+    <![CDATA[Metacommand.
+Repeat the last command.
+
+See also: /h]]>
+    </body>
+    </entry>
+    <entry id="/help">
+    <body>
+    <![CDATA[Metacommand.
+Run the help facility and print out the given topic. No argument means to print
+a list of all topics.]]>
+    </body>
+    </entry>
+
+
+</html>
+    <!--
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+</entry>
+
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+<example>
+<![CDATA[]]>
+</example>
+</entry>
+          -->

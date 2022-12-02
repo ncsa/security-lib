@@ -37,21 +37,24 @@ public class FormatUtil {
       */
 
     public static void formatList(InputLine inputLine, List<String> listOf) {
+        TreeSet<String> list;
+        list = new TreeSet<>();
+        list.addAll(listOf);
+         formatList(inputLine, list);
+    }
+    public static void formatList(InputLine inputLine, TreeSet<String> list) {
          if(inputLine.hasArg(HELP_SWITCH)){
              printFormatListHelp(new BasicIO(), inputLine);
              return;
          }
-         if (listOf.isEmpty()) {
+         if (list.isEmpty()) {
              return;
          }
-         if (listOf.size() == 1) {
-             say(listOf.get(0));
+         if (list.size() == 1) {
+             say(list.first());
              return;
          }
 
-         TreeSet<String> list;
-         list = new TreeSet<>();
-         list.addAll(listOf);
 
          Pattern pattern = null;
          if (inputLine.hasArg(REGEX_SWITCH)) {

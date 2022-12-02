@@ -38,7 +38,7 @@ public class SASCommands extends StoreCommands {
     SASEnvironment SASEnvironment;
 
 
-    protected SASCommands(MyLoggingFacade logger, SASEnvironment SASEnvironment) {
+    protected SASCommands(MyLoggingFacade logger, SASEnvironment SASEnvironment) throws Throwable{
         super(logger == null ? SASEnvironment.getMyLogger() : logger);
         this.SASEnvironment = SASEnvironment;
         setStore(SASEnvironment.getClientStore());
@@ -46,16 +46,16 @@ public class SASCommands extends StoreCommands {
 
     @Override
     public String getPrompt() {
-        return "sat>";
+        return "sas>";
     }
 
-    public SASCommands(MyLoggingFacade logger, Store store) {
+    public SASCommands(MyLoggingFacade logger, Store store) throws Throwable {
         super(logger, store);
     }
 
     @Override
     public String getName() {
-        return "sat";
+        return "sas";
     }
 
 
@@ -63,12 +63,12 @@ public class SASCommands extends StoreCommands {
     public void extraUpdates(Identifiable identifiable) throws IOException {
         ClientKeys keys = (ClientKeys) getMapConverter().getKeys();
         SATClient satClient = (SATClient) identifiable;
-        String newName = getInput("name of this client?", satClient.getName());
+        String newName = getPropertyHelp(keys.name(),"name of this client?", satClient.getName());
         if (!StringUtils.isTrivial(newName)) {
             satClient.setName(newName);
         }
         if (satClient.getPublicKey() == null) {
-            if (isOk(getInput("create new keys?", "n"))) {
+            if (isOk(getPropertyHelp(keys.publicKey(), "create new keys?", "n"))) {
                 KeyPair keyPair = KeyUtil.generateKeyPair();
                 say(KeyUtil.toPKCS1PEM(keyPair.getPrivate()));
                 satClient.setPublicKey(keyPair.getPublic());
@@ -146,7 +146,7 @@ public class SASCommands extends StoreCommands {
     public static String CONFIG_FILE_FLAG = "-cfg";
     public static String CONFIG_TAG_NAME = "sat";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Throwable {
         Vector<String> vector = new Vector<>();
         vector.add("dummy"); // Dummy zero-th arg.
         for (String arg : args) {

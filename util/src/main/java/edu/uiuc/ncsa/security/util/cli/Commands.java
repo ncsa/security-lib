@@ -24,4 +24,8 @@ public interface Commands extends Logable{
      */
     public String getPrompt();
     public void print_help(InputLine inputLine) throws Exception;
+
+    public void bootstrap() throws Throwable;
+
+    public HelpUtil getHelpUtil();
 }

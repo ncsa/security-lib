@@ -1,8 +1,7 @@
 package edu.uiuc.ncsa.security.util.cli;
 
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 
 import java.io.*;
@@ -42,6 +41,7 @@ public class CLIDriver {
     public static final String COMPONENT_COMMAND = "//"; // For handing off *IF* there is a component manager.
     public static final String LIST_ALL_METHODS_COMMAND = "/commands";
     public static final String TRACE_COMMAND = "/trace";
+    public static final String ONLINE_HELP_COMMAND = "/help";
 
     /*
     Added Environment support. This allows for having any extension od CommonCommands use the set_env call
@@ -113,6 +113,9 @@ public class CLIDriver {
     protected static final int TRACE_COMMAND_VALUE = 90;
     protected static final int COMPONENT_COMMAND_VALUE = 100;
 
+    public static final int ONLINE_HELP_COMMAND_VALUE = 110;
+
+
     // TODO - Add more CLI-level commands?
     // Might very well want to fold this into the standard flow rather than intercept it first.
     //  /i file = interpret all the commands in a file, i.e. run a script. No arg runs command buffer as batch file????
@@ -143,13 +146,16 @@ public class CLIDriver {
                 return TRACE_COMMAND_VALUE;
             case COMPONENT_COMMAND:
                 return COMPONENT_COMMAND_VALUE;
+            case ONLINE_HELP_COMMAND:
+                return ONLINE_HELP_COMMAND_VALUE;
+
         }
         return USER_DEFINED_COMMAND;
     }
 
     protected void printHelp() {
         String indent = "  ";
-        // This is help for the built in commands here
+        // This is help for the built-in commands here
         say("--General commands:");
         say(indent + EXIT_COMMAND + " or " + SHORT_EXIT_COMMAND + " = exit this component");
         say(indent + PRINT_HELP_COMMAND + " = print this help");
@@ -169,6 +175,7 @@ public class CLIDriver {
             say(indent + COMPONENT_COMMAND + " = execute a command from a specific component, without switching to that component.");
             say(indent + indent + "No arguments simply switch to that component, arguments are fed to the component and evaluated.");
         }
+        say(ONLINE_HELP_COMMAND + " topic = print help out on the given topic");
         say("E.g. #1");
         say(LOAD_BUFFER_COMMAND + "  /tmp/foo.txt would load the file \"/tmp/foo.txt\" in to the command history, replacing it");
         say("---");
@@ -192,7 +199,7 @@ public class CLIDriver {
         cmdLine = cmdLine.substring(REPEAT_LAST_COMMAND.length());
         if (0 < commandHistory.size()) {
             String current = commandHistory.get(0);
-            if(cmdLine.trim().length() == 0){
+            if (cmdLine.trim().length() == 0) {
                 return current;
             }
             current = current + " " + cmdLine;
@@ -224,17 +231,17 @@ public class CLIDriver {
             try {
                 int lineNo = Integer.parseInt(st.nextToken());
                 String rest = "";
-                while(st.hasMoreTokens()){
+                while (st.hasMoreTokens()) {
                     rest = rest + " " + st.nextToken();
                 }
 
                 // allow signed command history numbers. so /h -1 is ok.
-                lineNo = lineNo <0 ? (commandHistory.size() + lineNo): lineNo;
-                if(rest.trim().length() == 0){
+                lineNo = lineNo < 0 ? (commandHistory.size() + lineNo) : lineNo;
+                if (rest.trim().length() == 0) {
                     if (0 <= lineNo && lineNo < commandHistory.size()) {
                         return commandHistory.get(lineNo);
                     }
-                }else{
+                } else {
                     if (0 <= lineNo && lineNo < commandHistory.size()) {
                         String current = commandHistory.get(lineNo) + rest;
                         commandHistory.add(0, current);
@@ -343,6 +350,15 @@ public class CLIDriver {
         //commands[0].about(null);
         String cmdLine;
         String prompt = commands[0].getPrompt();
+        try {
+            getHelpUtil().load("/meta_command_help.xml");
+        } catch (Throwable e) {
+            if (isTraceOn()) {
+                e.printStackTrace();
+            }
+            say("Could not load help for the metacommands.");
+        }
+
         while (!isDone) {
             try {
                 //say2(prompt);
@@ -394,6 +410,10 @@ public class CLIDriver {
                     case LIST_ALL_METHODS_COMMAND_VALUE:
                         InputLine inputLine = new InputLine(CLT.tokenize(cmdLine));
                         listCLIMethods(inputLine);
+                        continue;
+                    case ONLINE_HELP_COMMAND_VALUE:
+                        inputLine = new InputLine(CLT.tokenize(cmdLine));
+                        doHelp(inputLine);
                         continue;
                     case TRACE_COMMAND_VALUE:
                         doTrace(cmdLine);
@@ -463,7 +483,7 @@ public class CLIDriver {
     boolean traceOn = false;
 
     private void doTrace(String cmdLine) {
-        if (cmdLine.equals(HELP_SWITCH)) {
+        if (cmdLine.contains(HELP_SWITCH)) {
             say(TRACE_COMMAND + " [on | off] Turn on or off low-level debugging for the client. Mostly for system programmers.");
             return;
         }
@@ -545,8 +565,58 @@ public class CLIDriver {
         return ABNORMAL_RC;// shouldn't Happen.
     }
 
+    public HelpUtil getHelpUtil() {
+        if (helpUtil == null) {
+            helpUtil = new HelpUtil();
+        }
+        return helpUtil;
+    }
 
+    public void setHelpUtil(HelpUtil helpUtil) {
+        this.helpUtil = helpUtil;
+    }
+
+    HelpUtil helpUtil = null;
+
+    protected void doHelp(InputLine inputLine) {
+        Commands[] commands = getCLICommands();
+        boolean helpPrinted = false;
+        if (commands.length == 0) {
+        } else {
+            // special case, no arguments so print out every topic
+            if(inputLine.getArgCount() == 0){
+                printHelpTopics(inputLine);
+                return;
+            }
+            if (getHelpUtil() != null) {
+                helpPrinted = getHelpUtil().printHelp(inputLine) || helpPrinted;
+            }
+            for (Commands command : commands) {
+                if (command.getHelpUtil() != null) {
+                    helpPrinted = command.getHelpUtil().printHelp(inputLine) || helpPrinted;
+                }
+            }
+            if (!helpPrinted) {
+                say("no help found for this topic");
+            }
+        }
+    }
+
+    protected void printHelpTopics(InputLine inputLine){
+        HelpUtil helpUtil1 = new HelpUtil();
+        if (getHelpUtil() != null) {
+            helpUtil1.getOnlineHelp().putAll(getHelpUtil().getOnlineHelp());
+        }
+        for (Commands command : commands) {
+            if (command.getHelpUtil() != null) {
+                helpUtil1.getOnlineHelp().putAll(command.getHelpUtil().getOnlineHelp());
+            }
+        }
+              helpUtil1.printHelp(inputLine);
+    }
     protected void listCLIMethods(InputLine inputLine) {
+        // trick is that even though this is made to list out all the methods, in practice
+        // there is never more than a single active Command object.
         String[] tempCCIN = CLIReflectionUtil.getCommandsNameList(getCLICommands());
         List<String> list = new ArrayList<>();
         for (String x : tempCCIN) {
@@ -606,5 +676,51 @@ public class CLIDriver {
 
     IOInterface ioInterface;
 
+    public static class CCC extends ConfigurableCommandsImpl {
+        public CCC(MyLoggingFacade logger) {
+            super(logger);
+        }
 
+        @Override
+        public String getPrompt() {
+            return "test>";
+        }
+
+        @Override
+        public void bootstrap() throws Throwable {
+
+        }
+
+        @Override
+        public HelpUtil getHelpUtil() {
+            return null;
+        }
+
+        @Override
+        public List<String> listComponents() {
+            return null;
+        }
+
+        @Override
+        public String getComponentName() {
+            return "test";
+        }
+
+        @Override
+        public ConfigurationLoader<? extends AbstractEnvironment> getLoader() {
+            return null;
+        }
+
+        @Override
+        public void useHelp() {
+
+        }
+    }
+
+    // Bone-headed for testing
+    public static void main(String[] args) {
+        CLIDriver cliDriver = new CLIDriver();
+        cliDriver.setCLICommands(new Commands[]{new CCC(null)});
+        cliDriver.start();
+    }
 }

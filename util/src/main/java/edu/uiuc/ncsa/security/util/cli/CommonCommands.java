@@ -40,8 +40,9 @@ public abstract class CommonCommands implements Commands {
     public static String BATCH_MODE_FLAG = "-batch";
 
 
-    protected CommonCommands(MyLoggingFacade logger) {
+    protected CommonCommands(MyLoggingFacade logger) throws Throwable {
         this.logger = logger;
+        bootstrap();
     }
 
     protected MyLoggingFacade logger;
@@ -160,6 +161,13 @@ public abstract class CommonCommands implements Commands {
     }
 
     /**
+     * Linefeed.
+     */
+    protected void say() {
+        say("");
+    }
+
+    /**
      * prints with the current indent and a linefeed.
      *
      * @param x
@@ -218,12 +226,31 @@ public abstract class CommonCommands implements Commands {
      * @return
      */
     protected String getInput(String prompt, String defaultValue) throws IOException {
-        //sayi2(prompt + "[" + (defaultValue == null ? "(null)" : defaultValue) + "]:");
-        //  sayi2(prompt + "[" + (defaultValue == null ? "(null)" : defaultValue) + "]:");
         String inLine = readline(prompt + "[" + (defaultValue == null ? "(null)" : defaultValue) + "]:");
         if (isEmpty(inLine)) {
             // assumption is that the default value is required
             return defaultValue; // no input. User hit a return
+        }
+        return inLine;
+    }
+
+    protected String getPropertyHelp(String propertyName, String prompt, String defaultValue) throws IOException {
+        boolean loopForever = true;
+        String inLine = null;
+        while (loopForever) {
+            inLine = getInput(prompt, defaultValue);
+            if(inLine == null){
+                return inLine; // If the property is not set, then the default value might be null.
+            }
+            if (inLine.trim().equals("--help") || inLine.trim().equals("/help")) {
+                if(getHelpUtil() == null) {
+                    say("no help for the topic \"" + propertyName + "\"");
+                }else{
+                    getHelpUtil().printHelp(new InputLine("/help", propertyName));
+                }
+            } else {
+                break;
+            }
         }
         return inLine;
     }
@@ -684,5 +711,24 @@ public abstract class CommonCommands implements Commands {
 
     protected JSONObject readJSON(String filename) throws Exception {
         return JSONObject.fromObject(readFile(filename));
+    }
+
+    public HelpUtil getHelpUtil() {
+        if (helpUtil == null) {
+            helpUtil = new HelpUtil();
+        }
+        return helpUtil;
+    }
+
+    public void setHelpUtil(HelpUtil helpUtil) {
+        this.helpUtil = helpUtil;
+    }
+
+    HelpUtil helpUtil = null;
+
+    @Override
+    public void bootstrap() throws Throwable {
+        getHelpUtil().load("/basic-help.xml");
+        getHelpUtil().load("/common_commands_help.xml");
     }
 }

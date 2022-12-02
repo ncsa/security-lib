@@ -7,6 +7,6 @@ import java.util.List;
  * on 2/22/21 at  6:19 AM
  */
 public interface ComponentManager {
-    boolean use(InputLine inputLine) throws Exception;
+    boolean use(InputLine inputLine) throws Throwable;
     List<String> listComponents();
 }

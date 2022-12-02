@@ -1,0 +1,167 @@
+<html>
+    <entry id="archive">
+    <body>
+    <![CDATA[Command.
+Create and manage a copy of an object. This is stored with a version number appended to the
+identifier.]]>
+    </body>
+    </entry>
+    <entry id="id">
+    <body>
+    <![CDATA[You may set an identifier for use in the current session and this will
+be used to reference any object.
+
+See also: clear_id, get_id]]>
+    </body>
+    </entry>
+    <entry id="decode">
+    <body>
+    <![CDATA[Command.
+Takes a string encoded in base 64 or base 32 and decodes it.
+
+See also: encode]]>
+    </body>
+    </entry>
+    <entry id="encode">
+    <body>
+    <![CDATA[Command.
+Takes a given string and encodes it into base 32 or 64 as per request.
+
+See also: decode]]>
+    </body>
+    </entry>
+    <entry id="deserialize">
+    <body>
+    <![CDATA[Command.
+Takes the stored XML version of the object and reads it into the current store.
+
+See also: serialize]]>
+    </body>
+    </entry>
+
+    <entry id="serialize">
+    <body>
+    <![CDATA[Command.
+Takes the current object and creates and XML version of it. This may be stored in a file
+or simply printed to the console.
+
+See also: deserialize]]>
+    </body>
+    </entry>
+
+    <entry id="copy">
+    <body>
+    <![CDATA[Command.
+Create a copy of an object, assigning it a new id.]]>
+    </body>
+    </entry>
+    <entry id="create">
+    <body>
+    <![CDATA[Command.
+Creates a new object in the store. You will then be prompted to fill in each attribute for the
+object in turn.]]>
+    </body>
+    </entry>
+    <entry id="edit">
+    <body>
+    <![CDATA[Command.
+Edit the current object's serialized form in an external editor (usually vim or nano).
+Exiting the editor updates the object.]]>
+    </body>
+    </entry>
+    <entry id="list_keys">
+    <body>
+    <![CDATA[Command.
+List the keys for all the properties of this object.]]>
+    </body>
+    </entry>
+    <entry id="ls">
+    <body>
+    <![CDATA[Command.
+List the current object or other objects.]]>
+    </body>
+    </entry>
+    <entry id="rename">
+    <body>
+    <![CDATA[Command.
+Change the id of the current object. Note that this should only be done with
+very good reason.
+
+See also: copy]]>
+    </body>
+    </entry>
+    <entry id="rm">
+    <body>
+    <![CDATA[Command.
+Either remove an object or remove a property from the current object.]]>
+    </body>
+    </entry>
+    <entry id="rs">
+    <body>
+    <![CDATA[Command.
+Result set management. This command allows for a variety of operations on result sets.
+
+See also: results]]>
+    </body>
+    </entry>
+    <entry id="results">
+    <body>
+    <![CDATA[Results are sets of output from a search that are named and may be
+queried separately. You create them in searches using the -rs name flag, e.g.
+
+admins> search >admin_id -r .*caltech.* -rs ligo
+
+would search (in the admins store) the property name admin_id for any entry including the string "calttech"
+and stash the results in a result set named "ligo". You may now use the rs command
+to navigate this result set. You may have as many result sets as you like.
+
+You may also restrict the results to a subset of properties with the -out flag.
+
+admins> search >admin_id -out [allow_qdl,name] -r .*caltech.* -rs qdl_check
+
+would search on the admin_id and the result set would have the two properties
+listed. Showing the result set then only has those.
+
+admins>rs -list foo
+  foo: 56 entries,  fields=[allow_qdl, name]
+
+admins> rs -show [11,17] foo
+    11. true  | Test admin client caltech-IGWN
+    12. true  | Test admin client caltech/LIGO
+    13. false | IGWN admin for VIRGO 1
+    14. true  | IGWN admin for VIRGO 2
+    15. true  | LIGO issuer UW Milwaukee
+    16. true  | LIGO issuer UW Madison
+
+shows the subset from index 11 in the list up to but not including index 17 (or
+the end of the list, whichever comes first).
+
+The -show flag also allows for displaying subsets but be warned that if you searched for
+a subset of properties, then only those are available. You may restrict to a subset of those,
+but cannot display properties you do not have.
+]]>
+    </body>
+    </entry>
+    <entry id="search">
+    <body>
+    <![CDATA[Command.
+Search the store, You may search on a given property and may do so in several
+ways. Consult the online help for this, in particular the --ex (note the double
+hyphen) option will print many examples.]]>
+    </body>
+    </entry>
+
+    <entry id="size">
+    <body>
+    <![CDATA[Command.
+The number of entries in the store.]]>
+    </body>
+    </entry>
+    <entry id="update">
+    <body>
+    <![CDATA[Command.
+A wide-ranging command that allows you to update an entire object, prompting you for
+each property, or update a specific property.]]>
+    </body>
+    </entry>
+</html>
