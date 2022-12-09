@@ -98,7 +98,7 @@ public abstract class StoreCommands extends CommonCommands {
 
     protected void showUpdateHelp() {
         say("update [" + KEY_FLAG + " key [" + VALUE_FLAG + " value | " + FILE_FLAG + " file_path " + JSON_FLAG + "]]" +
-                "[" + KEYS_FLAG + " array] [id | index]");
+                "[" + KEYS_FLAG + " array] [id | index] ");
         sayi("Usage: Update the properties of the object.");
         sayi("This has three modes. Just an id will prompt you for every value to update.");
         sayi("Alternately, you may either specify a single key + value OR you may specify an array of keys");
@@ -650,6 +650,7 @@ public abstract class StoreCommands extends CommonCommands {
         SerializationKeys keys = getMapConverter().getKeys();
         info("Starting update for object with id = " + identifiable.getIdentifierString());
         say("Update the values. A return accepts the existing or default value in []'s");
+        say("For properties you can type /help or --help and print out the online help for the topic.");
 
         newIdentifier = getPropertyHelp(keys.identifier(), "enter the identifier", identifiable.getIdentifierString());
         //sayi("Enter new "  + getMapConverter().getKeys().description() + ":");

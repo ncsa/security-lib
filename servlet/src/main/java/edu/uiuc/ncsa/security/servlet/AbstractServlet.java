@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.servlet;
 
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.MissingContentException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
@@ -194,13 +195,15 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
             if(rawContentType == null || rawContentType.isEmpty()){
                 httpServletResponse.setStatus(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
                 ServletDebugUtil.trace(this,"in POST, raw content empty, throwing exception");
-                throw new ServletException("Error: Missing content type for body of POST. Request rejected.");
+                throw new MissingContentException("Missing content type for body of POST. Request rejected.");
+           //     throw new ServletException("Error: Missing content type for body of POST. Request rejected.");
             }
 
             if (!checkContentType(rawContentType, "application/x-www-form-urlencoded" )) {
                 httpServletResponse.setStatus(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
                 ServletDebugUtil.trace(this,"in POST, did NOT get one, throwing exception");
-                throw new ServletException("Error: Unsupported encoding of \"" + httpServletRequest.getContentType() + "\" for body of POST. Request rejected.");
+                //throw new ServletException("Error: Unsupported encoding of \"" + httpServletRequest.getContentType() + "\" for body of POST. Request rejected.");
+                throw new MissingContentException("Error: Unsupported encoding of \"" + httpServletRequest.getContentType() + "\" for body of POST. Request rejected.");
             }
             ServletDebugUtil.trace(this,"encoding ok, starting doIt()");
 
