@@ -9,12 +9,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e2370508-a694-4084-b56a-b8e77c115dc1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/exceptions/MissingContentException.java" afterDir="false" />
+    <list default="true" id="e2370508-a694-4084-b56a-b8e77c115dc1" name="Changes" comment="CIL-1582">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/AbstractServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/AbstractServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/BasicExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/BasicExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/resources/store-help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/resources/store-help.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,7 +105,7 @@
       <recent name="edu.uiuc.ncsa.sat" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.CLIDriver">
+  <component name="RunManager" selected="JUnit.Test Suite">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -403,7 +400,10 @@
       <workItem from="1669639133058" duration="730000" />
       <workItem from="1669676810224" duration="23229000" />
       <workItem from="1669829483975" duration="28569000" />
-      <workItem from="1670253586663" duration="21486000" />
+      <workItem from="1670253586663" duration="24155000" />
+      <workItem from="1670851039593" duration="1921000" />
+      <workItem from="1672948027530" duration="30000" />
+      <workItem from="1672955536275" duration="2790000" />
     </task>
     <task id="LOCAL-00001" summary="CIL-627: everything updated. Basic refactor done.">
       <created>1659364398070</created>
@@ -503,7 +503,14 @@
       <option name="project" value="LOCAL" />
       <updated>1670017625670</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="CIL-1582">
+      <created>1670623465610</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1670623465610</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -526,7 +533,8 @@
     <MESSAGE value="Added long overdue description element to most stored things." />
     <MESSAGE value="CIL-1088" />
     <MESSAGE value="CIL-1354, CIL-1556, CIL-834. Online documentation in the CLI is now supported. A great deal of it to boot." />
-    <option name="LAST_COMMIT_MESSAGE" value="CIL-1354, CIL-1556, CIL-834. Online documentation in the CLI is now supported. A great deal of it to boot." />
+    <MESSAGE value="CIL-1582" />
+    <option name="LAST_COMMIT_MESSAGE" value="CIL-1582" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">

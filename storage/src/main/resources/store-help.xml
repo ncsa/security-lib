@@ -6,6 +6,14 @@ Create and manage a copy of an object. This is stored with a version number appe
 identifier.]]>
     </body>
     </entry>
+    <entry id="commands">
+    <body>
+    <![CDATA[A complete list of commands supported by this component.
+
+Syntax:
+/commands.]]>
+    </body>
+    </entry>
     <entry id="id">
     <body>
     <![CDATA[You may set an identifier for use in the current session and this will
@@ -38,7 +46,14 @@ Takes the stored XML version of the object and reads it into the current store.
 See also: serialize]]>
     </body>
     </entry>
+    <entry id="list_keys">
+    <body>
+    <![CDATA[A complete list of all keys supported by this component.
 
+Syntax:
+list_keys]]>
+    </body>
+    </entry>
     <entry id="serialize">
     <body>
     <![CDATA[Command.
@@ -164,4 +179,5 @@ A wide-ranging command that allows you to update an entire object, prompting you
 each property, or update a specific property.]]>
     </body>
     </entry>
+
 </html>
