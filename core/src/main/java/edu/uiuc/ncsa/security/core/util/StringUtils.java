@@ -135,6 +135,7 @@ public class StringUtils {
         testMap.put("mairzy", "doats");
         testMap.put("and does", "eat stoats");
         testMap.put("and little", "lambsey divey, A kiddle-dee divey too wouldn't you??");
+        testMap.put("latin", "Lorem ipsum dolor sit amet\nconsectetur adipiscing elit\nsed do eiusmod tempor incididunt ut labore\net dolore magna aliqua.\nUt enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ");
         testMap.put("now", new Date());
         List<String> formattedMap = formatMap(testMap,
                 null, // do not take a subset
@@ -143,6 +144,31 @@ public class StringUtils {
                 3,// indent the whole output 3 spaces from the left.
                 60 // The total display must fit within 60 chars.
         );
+        System.out.println("width = 60:");
+        for (String formattedLine : formattedMap) {
+            System.out.println(formattedLine);
+        }
+
+        formattedMap = formatMap(testMap,
+                null, // do not take a subset
+                false,// do not sort the keys
+                false, // do NOT split the values over several lines if needed
+                0,// indent the whole output 3 spaces from the left.
+                50 // The total display must fit within 50 chars.
+        );
+        System.out.println("width = 50:");
+        for (String formattedLine : formattedMap) {
+            System.out.println(formattedLine);
+        }
+
+        formattedMap = formatMap(testMap,
+                null, // do not take a subset
+                false,// do not sort the keys
+                true, // (inconsistent with width = -1 on purpose): split the values over several lines if needed
+                0,// indent the whole output 3 spaces from the left.
+                -1 // The total display is unlimited
+        );
+        System.out.println("width  = -1:");
         for (String formattedLine : formattedMap) {
             System.out.println(formattedLine);
         }
@@ -216,13 +242,17 @@ public class StringUtils {
      * <pre>
      *     abcdefg...
      * </pre>
-     *
+     * If width &lt; 0, then do not truncate.<br/>
+     * If ellipsis is null or empty, use the default {@link #ELLIPSIS}
      * @param x
      * @param width
      * @param ellipsis
      * @return
      */
     public static String truncate(String x, int width, String ellipsis) {
+        if(width < 0){
+            return x;
+        }
         if (x.length() <= width) {
             return x;
         }
@@ -473,7 +503,7 @@ public class StringUtils {
      * @param displayWidth The total width that this must fit in.
      * @return
      */
-    public static List<String> formatMap(Map<String, Object> map,
+    public static List<String> formatMap(Map map,
                                          List<String> keySubset,
                                          boolean sortKeys,
                                          boolean multiLine,
@@ -488,7 +518,15 @@ public class StringUtils {
             tMap = new HashMap<>();
         }
         if (keySubset == null || keySubset.isEmpty()) {
-            tMap.putAll(map);
+            try {
+                tMap.putAll(map);
+            }catch(ClassCastException cce){
+                // So the map has different types of keys (e.g., integer and string). Slow approach is to convert them
+               tMap.clear();
+               for(Object obj : map.keySet()){
+                   tMap.put(obj.toString(), map.get(obj));
+               }
+            }
         } else {
             // take only a subset
             for (String k : keySubset) {
@@ -498,18 +536,18 @@ public class StringUtils {
             }
         }
         int width = 0;
-        for (String key : tMap.keySet()) {
-            width = Math.max(width, key.length());
+        for (Object key : tMap.keySet()) {
+            width = Math.max(width, key.toString().length());
         }
         // Use the order of the tmap (so its sorted) but the XMLMap has information we need to get these.
-        for (String key : tMap.keySet()) {
+        for (Object key : tMap.keySet()) {
             //String v = map.getString(key);
-            Object rawValue = map.get(key);
+            Object rawValue = tMap.get(key);
             if (rawValue == null) {
                 continue;
             }
 
-            String v = map.get(key).toString();
+            String v = tMap.get(key).toString();
             if (!StringUtils.isTrivial(v)) {
                 if (rawValue instanceof JSON) {
                     v = ((JSON) rawValue).toString(1);
@@ -528,7 +566,7 @@ public class StringUtils {
                     }
 
                 }
-                outputList.add(formatMapEntry(key, v, indent, displayWidth, width, multiLine));
+                outputList.add(formatMapEntry(key.toString(), v, indent, displayWidth, width, multiLine));
             }
         }
         return outputList;
@@ -567,6 +605,10 @@ public class StringUtils {
                                         boolean multiLine) {
         // the given indent plus space for the " : " in the middle
         indentWidth = indentWidth + 3;
+        if(displayWidth < 0){
+            multiLine = false; // displayWidth =-1 means infinite width, so truncate is not possible.
+        }
+
         int realWidth = displayWidth - indentWidth;
         boolean shortLine = value.length() + leftColumWidth + 1 <= realWidth;
         if (multiLine) {
@@ -587,7 +629,27 @@ public class StringUtils {
             return stringBuffer.toString();
 
         }
-        return RJustify(key, leftColumWidth) + " : " + truncate(value.replace("\n", "").replace("\r", ""));
+        /* This strips out the new lines or the right hand tile does not stay in its bounds -- it adds new lines
+            So rather than a : b\nc\nd becoming
+             a :b
+                c
+                d
+             you'd get
+             a : b
+             c
+             d
+             Only way to fix it is to either have some sort of indent replacement for each linefeed \n + indents
+             which implies finding the line breaks and truncating each line??
+         */
+/*
+        if(multiLine){
+            String bbb = getBlanks(indentWidth + leftColumWidth + 3);
+            return RJustify(key,indentWidth + leftColumWidth) + " : " +
+                    truncate(value.replace("\n", "\n"+bbb).replace("\r", "\r"+bbb), realWidth);
+        }
+*/
+        return RJustify(key,indentWidth + leftColumWidth) + " : " +
+                truncate(value.replace("\n", "").replace("\r", ""), realWidth);
     }
 
     /**
