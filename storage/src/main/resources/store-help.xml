@@ -179,5 +179,7 @@ A wide-ranging command that allows you to update an entire object, prompting you
 each property, or update a specific property.]]>
     </body>
     </entry>
-
+    <entry id="version">
+    <body><![CDATA[The current version of OA4MP is 5.2-SNAPSHOT.]]></body>
+    </entry>
 </html>

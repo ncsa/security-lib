@@ -22,19 +22,9 @@
         <module name="website" />
         <module name="storage" />
         <module name="util" />
-        <module name="servlet" />
         <module name="sas-server" />
+        <module name="servlet" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="crypto" target="1.8" />
-      <module name="ncsa-qdl-gui" target="1.8" />
-    </bytecodeTargetLevel>
-  </component>
-  <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="crypto" options="-XDignore.symbol.file" />
-      <module name="util" options="" />
-    </option>
   </component>
 </project>

@@ -1,18 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ArtifactsWorkspaceSettings">
-    <artifacts-to-build>
-      <artifact name="sas-server:war exploded" />
-    </artifacts-to-build>
-  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e2370508-a694-4084-b56a-b8e77c115dc1" name="Changes" comment="CIL-1582">
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/unnamed.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/WebClientConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/WebClientConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/crypto/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crypto/src/main/java/edu/uiuc/ncsa/security/util/crypto/CertUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crypto/src/main/java/edu/uiuc/ncsa/security/util/crypto/CryptoException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crypto/src/main/java/edu/uiuc/ncsa/security/util/crypto/DecryptUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crypto/src/main/java/edu/uiuc/ncsa/security/util/crypto/InvalidCertRequestException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crypto/src/main/java/edu/uiuc/ncsa/security/util/crypto/KeyUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crypto/src/main/java/edu/uiuc/ncsa/security/util/crypto/MyPKCS10CertRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crypto/src/main/java/edu/uiuc/ncsa/security/util/crypto/PEMFormatUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crypto/src/main/resources/keys.jwk" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/crypto/src/main/resources/readme.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/src/main/java/edu/uiuc/ncsa/MyREPL.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/src/main/java/edu/uiuc/ncsa/demo/FullScreenTextGUITest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/src/main/java/edu/uiuc/ncsa/demo/GUIDemo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/src/main/java/edu/uiuc/ncsa/demo/HOCONDemo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/src/main/java/edu/uiuc/ncsa/demo/JLineTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/src/main/java/edu/uiuc/ncsa/jexer/JexerTilingWindowManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/src/main/java/edu/uiuc/ncsa/jexer/MinTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/src/main/java/edu/uiuc/ncsa/qdl/gui/LanternaIO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/src/main/java/edu/uiuc/ncsa/qdl/gui/LanternaScreenIO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/src/main/java/edu/uiuc/ncsa/qdl/gui/QDLGUIWorkspace.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/src/main/resources/hocon.config" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/src/main/resources/tokken.config" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/resources/store-help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/resources/store-help.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,46 +45,20 @@
   <component name="CodeInsightWorkspaceSettings">
     <option name="optimizeImportsOnTheFly" value="true" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="package-info" />
-        <option value="Interface" />
-        <option value="HTML File" />
-        <option value="Class" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="5.2.8" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="GitSEFilterConfiguration">
-    <file-type-list>
-      <filtered-out-file-type name="LOCAL_BRANCH" />
-      <filtered-out-file-type name="REMOTE_BRANCH" />
-      <filtered-out-file-type name="TAG" />
-      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
-    </file-type-list>
-  </component>
-  <component name="LogFilters">
-    <option name="FILTER_ERRORS" value="false" />
-    <option name="FILTER_WARNINGS" value="false" />
-    <option name="FILTER_INFO" value="true" />
-    <option name="FILTER_DEBUG" value="true" />
-    <option name="CUSTOM_FILTER" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectId" id="2Cl3vqqEjBbKMvx1mlswzsdgg3q" />
-  <component name="ProjectLevelVcsManager">
-    <ConfirmationsSetting value="2" id="Add" />
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="useMavenConfig" value="true" />
+      </MavenGeneralSettings>
+    </option>
   </component>
+  <component name="ProjectId" id="2L40iExtc4jFxuf0gN3ADT1vesV" />
   <component name="ProjectReloadState">
     <option name="STATE" value="0" />
   </component>
@@ -75,38 +72,22 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/security-lib/storage/src/main/resources&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propGUI&quot;
-  },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;mysql&quot;
-    ]
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
   }
 }</component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/storage/src/main/resources" />
-      <recent name="$PROJECT_DIR$/storage/src/main/resource" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/util/src/main/resources" />
-      <recent name="$PROJECT_DIR$/storage/src/main/resources" />
-    </key>
-    <key name="MoveInnerDialog.RECENTS_KEY">
-      <recent name="edu.uiuc.ncsa.sat" />
+      <recent name="$PROJECT_DIR$/sas-server/src/main" />
     </key>
   </component>
-  <component name="RunManager" selected="Tomcat Server.SAS Servlet">
+  <component name="RunManager">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -118,86 +99,8 @@
       <Host>localhost</Host>
       <Port>5050</Port>
     </configuration>
-    <configuration name="CLIDriver" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.cli.CLIDriver" />
-      <module name="util" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.util.cli.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="DecryptUtils" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="ALTERNATIVE_JRE_PATH" value="1.8_261" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.crypto.DecryptUtils" />
-      <module name="crypto" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.util.crypto.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Foo" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.storage.cli.Foo" />
-      <module name="storage" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.storage.cli.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="SAS Client" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.sas.webclient.Client" />
-      <module name="sas-server" />
-      <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/sas-test-config.xml -cli" />
-      <method v="2" />
-    </configuration>
-    <configuration name="StringUtils" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.util.StringUtils" />
-      <module name="core" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.core.util.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration default="true" type="Application" factoryName="Application">
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Test Suite" type="JUnit" factoryName="JUnit">
-      <module name="util" />
-      <option name="PACKAGE_NAME" value="edu.uiuc.ncsa.security.util" />
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.TestSuite" />
-      <option name="METHOD_NAME" value="" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="moduleWithDependencies" />
-      </option>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -213,140 +116,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Scratch" type="Java Scratch" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Scratch" />
-      <option name="SCRATCH_FILE_URL" value="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.java" />
-      <shortenClasspath name="NONE" />
-      <method v="2" />
-    </configuration>
-    <configuration name="Scratch" type="Java Scratch" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Scratch" />
-      <option name="SCRATCH_FILE_URL" value="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_1.java" />
-      <shortenClasspath name="NONE" />
-      <method v="2" />
-    </configuration>
-    <configuration name="build.sh" type="ShConfigurationType" temporary="true">
-      <option name="SCRIPT_TEXT" value="" />
-      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
-      <option name="SCRIPT_PATH" value="$PROJECT_DIR$/build.sh" />
-      <option name="SCRIPT_OPTIONS" value="" />
-      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
-      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
-      <option name="INTERPRETER_PATH" value="/bin/bash" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="EXECUTE_IN_TERMINAL" value="true" />
-      <option name="EXECUTE_SCRIPT_FILE" value="true" />
-      <envs />
-      <method v="2" />
-    </configuration>
-    <configuration name="SAS Servlet" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 9.0.65" ALTERNATIVE_JRE_ENABLED="false">
-      <option name="OPEN_IN_BROWSER_URL" value="https://localhost:9443/sas-server/" />
-      <option name="UPDATING_POLICY" value="restart-server" />
-      <deployment>
-        <artifact name="sas-server:war">
-          <settings>
-            <option name="CONTEXT_PATH" value="/sas-server" />
-          </settings>
-        </artifact>
-      </deployment>
-      <server-settings>
-        <option name="BASE_DIRECTORY_NAME" value="c52d1d57-ca7d-4848-8088-893b20c1b678" />
-      </server-settings>
-      <predefined_log_file enabled="true" id="Tomcat" />
-      <predefined_log_file enabled="true" id="Tomcat Catalina" />
-      <predefined_log_file id="Tomcat Manager" />
-      <predefined_log_file id="Tomcat Host Manager" />
-      <predefined_log_file id="Tomcat Localhost Access" />
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="41061" />
-      </RunnerSettings>
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Cover">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </SHUTDOWN>
-      </ConfigurationWrapper>
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </SHUTDOWN>
-      </ConfigurationWrapper>
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Profile">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </SHUTDOWN>
-      </ConfigurationWrapper>
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </SHUTDOWN>
-      </ConfigurationWrapper>
-      <method v="2">
-        <option name="Make" enabled="true" />
-        <option name="BuildArtifacts" enabled="true">
-          <artifact name="sas-server:war exploded" />
-        </option>
-      </method>
-    </configuration>
-    <list>
-      <item itemvalue="Application.SAS Client" />
-      <item itemvalue="Application.StringUtils" />
-      <item itemvalue="Application.CLIDriver" />
-      <item itemvalue="Application.Foo" />
-      <item itemvalue="Java Scratch.Scratch" />
-      <item itemvalue="JUnit.Test Suite" />
-      <item itemvalue="Shell Script.build.sh" />
-      <item itemvalue="Tomcat Server.SAS Servlet" />
-    </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Application.StringUtils" />
-        <item itemvalue="Application.CLIDriver" />
-        <item itemvalue="Application.Foo" />
-        <item itemvalue="Java Scratch.Scratch" />
-        <item itemvalue="Java Scratch.Scratch" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration" maxAnnotateRevisions="500">
@@ -368,226 +137,21 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="e2370508-a694-4084-b56a-b8e77c115dc1" name="Changes" comment="" />
-      <created>1659363578396</created>
+      <changelist id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="" />
+      <created>1675115175635</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1659363578396</updated>
-      <workItem from="1659363580704" duration="2164000" />
-      <workItem from="1659365755464" duration="68935000" />
-      <workItem from="1660164985441" duration="597000" />
-      <workItem from="1660328840743" duration="332000" />
-      <workItem from="1660562330685" duration="112887000" />
-      <workItem from="1661193711049" duration="9387000" />
-      <workItem from="1661205816439" duration="105000" />
-      <workItem from="1661253024897" duration="38909000" />
-      <workItem from="1661361698764" duration="7185000" />
-      <workItem from="1661375203351" duration="124782000" />
-      <workItem from="1662745938258" duration="6394000" />
-      <workItem from="1663010672212" duration="1882000" />
-      <workItem from="1663167806991" duration="18482000" />
-      <workItem from="1663776586778" duration="17000" />
-      <workItem from="1663793388419" duration="10000" />
-      <workItem from="1664401348915" duration="4382000" />
-      <workItem from="1665150951729" duration="2371000" />
-      <workItem from="1665158578362" duration="14851000" />
-      <workItem from="1665517402747" duration="11703000" />
-      <workItem from="1666011059516" duration="1736000" />
-      <workItem from="1666036676278" duration="23373000" />
-      <workItem from="1667827544362" duration="1955000" />
-      <workItem from="1667846749347" duration="10594000" />
-      <workItem from="1668686231656" duration="16901000" />
-      <workItem from="1669639133058" duration="730000" />
-      <workItem from="1669676810224" duration="23229000" />
-      <workItem from="1669829483975" duration="28569000" />
-      <workItem from="1670253586663" duration="24155000" />
-      <workItem from="1670851039593" duration="1921000" />
-      <workItem from="1672948027530" duration="30000" />
-      <workItem from="1672955536275" duration="2790000" />
-      <workItem from="1673269652668" duration="1975000" />
-      <workItem from="1673555537408" duration="19179000" />
+      <updated>1675115175635</updated>
+      <workItem from="1675115177546" duration="850000" />
+      <workItem from="1675441626189" duration="729000" />
     </task>
-    <task id="LOCAL-00001" summary="CIL-627: everything updated. Basic refactor done.">
-      <created>1659364398070</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1659364398070</updated>
-    </task>
-    <task id="LOCAL-00002" summary="Starting work on web site redo">
-      <created>1659385340445</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1659385340445</updated>
-    </task>
-    <task id="LOCAL-00003" summary="Getting documentation to work with new maven plugin versions">
-      <created>1659530586371</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1659530586371</updated>
-    </task>
-    <task id="LOCAL-00004" summary="Migrated old client management framework over into this module where it really ought to be. Might repurpose it. More updates in documentation.">
-      <created>1660941860427</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1660941860427</updated>
-    </task>
-    <task id="LOCAL-00005" summary="More refactoring.">
-      <created>1661357583808</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1661357583808</updated>
-    </task>
-    <task id="LOCAL-00006" summary="Rename of classes">
-      <created>1661375169418</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1661375169418</updated>
-    </task>
-    <task id="LOCAL-00007" summary="Rename of classes. Improved exception handling.">
-      <created>1661805670006</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1661805670006</updated>
-    </task>
-    <task id="LOCAL-00008" summary="Rename of classes. Improved exception handling.">
-      <created>1662157635220</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1662157635220</updated>
-    </task>
-    <task id="LOCAL-00009" summary="Changed paths for some file in testing to reflect recent refactoring.">
-      <created>1662764382877</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1662764382877</updated>
-    </task>
-    <task id="LOCAL-00010" summary="Getting ready for release">
-      <created>1663615610936</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1663615610936</updated>
-    </task>
-    <task id="LOCAL-00011" summary="Release 5.2.8">
-      <created>1663620494318</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1663620494318</updated>
-    </task>
-    <task id="LOCAL-00012" summary="Added long overdue description element to most stored things.">
-      <created>1665786787719</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1665786787719</updated>
-    </task>
-    <task id="LOCAL-00013" summary="CIL-1088">
-      <created>1668812901822</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1668812901822</updated>
-    </task>
-    <task id="LOCAL-00014" summary="CIL-1354, CIL-1556, CIL-834. Online documentation in the CLI is now supported. A great deal of it to boot.">
-      <created>1670017625670</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1670017625670</updated>
-    </task>
-    <task id="LOCAL-00015" summary="CIL-1582">
-      <created>1670623465610</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1670623465610</updated>
-    </task>
-    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
-  <component name="UnknownFeatures">
-    <option featureType="com.intellij.fileTypeFactory" implementationName="*.apt" />
-  </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="CIL-627: everything updated. Basic refactor done." />
-    <MESSAGE value="Starting work on web site redo" />
-    <MESSAGE value="Getting documentation to work with new maven plugin versions" />
-    <MESSAGE value="Migrated old client management framework over into this module where it really ought to be. Might repurpose it. More updates in documentation." />
-    <MESSAGE value="More refactoring." />
-    <MESSAGE value="Rename of classes" />
-    <MESSAGE value="Rename of classes. Improved exception handling." />
-    <MESSAGE value="Changed paths for some file in testing to reflect recent refactoring." />
-    <MESSAGE value="Getting ready for release" />
-    <MESSAGE value="Release 5.2.8" />
-    <MESSAGE value="Added long overdue description element to most stored things." />
-    <MESSAGE value="CIL-1088" />
-    <MESSAGE value="CIL-1354, CIL-1556, CIL-834. Online documentation in the CLI is now supported. A great deal of it to boot." />
-    <MESSAGE value="CIL-1582" />
-    <option name="LAST_COMMIT_MESSAGE" value="CIL-1582" />
+    <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/Client.java</url>
-          <line>129</line>
-          <option name="timeStamp" value="43" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>1255</line>
-          <option name="timeStamp" value="51" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/SASServlet.java</url>
-          <line>220</line>
-          <option name="timeStamp" value="74" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/response/ResponseSerializer.java</url>
-          <line>126</line>
-          <option name="timeStamp" value="78" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/Client.java</url>
-          <line>330</line>
-          <option name="timeStamp" value="79" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/SASServlet.java</url>
-          <line>205</line>
-          <option name="timeStamp" value="85" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/scripting/ScriptSet.java</url>
-          <line>42</line>
-          <option name="timeStamp" value="86" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$APPLICATION_CONFIG_DIR$/scratches/scratch_1.java</url>
-          <line>30</line>
-          <option name="timeStamp" value="87" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java</url>
-          <line>586</line>
-          <option name="timeStamp" value="97" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>
