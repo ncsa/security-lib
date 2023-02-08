@@ -51,10 +51,10 @@ public class ConfigUtil {
         MultiConfigurations configurations2 = getConfigurations2(fileName, cfgTagName);
         Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
         List<ConfigurationNode> nodes = configurations2.getNamedConfig(cfgName);
-        if(nodes.isEmpty()){
+        if (nodes.isEmpty()) {
             return null;
         }
-        if(1 < nodes.size()){
+        if (1 < nodes.size()) {
             throw new ConfigurationException("Multiple configurations named " + cfgName + " found in file " + fileName);
         }
         return nodes.get(0); // There is one exactly. Return it.
@@ -66,6 +66,7 @@ public class ConfigUtil {
         configurations2.ingestConfig(xmlConfiguration, cfgTagName);
         return configurations2;
     }
+
     /**
      * This takes a configuration and looks in it for a given name for the tag. Called by {@link #findConfiguration(String, String, String)}.
      *
@@ -87,6 +88,12 @@ public class ConfigUtil {
 
     public static final String UNITS_SECONDS = "s";
     public static final String UNITS_SECONDS_LONG = "sec";
+    public static final String UNITS_MINUTES = "min";
+    public static final String UNITS_MINUTES_LONG = "mins";
+    public static final String UNITS_HOURS = "hr";
+    public static final String UNITS_HOURS_LONG = "hrs";
+    public static final String UNITS_DAYS = "day";
+    public static final String UNITS_DAYS_LONG = "days";
     public static final String UNITS_MILLISECONDS = "ms";
 
     /**
@@ -99,16 +106,16 @@ public class ConfigUtil {
      * </pre>
      * Using this assumes that the default is milliseconds for the field. If you need
      * to set the default for the field as seconds, use {@link ConfigUtil#getValueSecsOrMillis(String, boolean)}.
+     *
      * @param x
      * @return
      */
     public static Long getValueSecsOrMillis(String x) {
-            return getValueSecsOrMillis(x, false);
+        return getValueSecsOrMillis(x, false);
     }
 
     /**
-     *
-     * @param x un-parsed number
+     * @param x         un-parsed number
      * @param isSeconds no units means it is seconds (true) or milliseconds (false)
      * @return
      */
@@ -116,28 +123,68 @@ public class ConfigUtil {
         if (isTrivial(x)) {
             return null;
         }
+        // CIL-1629, allow for other time units
+        TimeThingy timeThingy = createTimeThingy(x, isSeconds);
+
+        long rawValue = Long.parseLong(timeThingy.rawValue.trim()); // blanks make it blow up, FYI...
+        return rawValue * timeThingy.unitMultiplier;
+
+    }
+
+    public static class TimeThingy {
+        long unitMultiplier;
+        String rawValue;
+
+        public TimeThingy(long unitMultiplier, String rawValue) {
+            this.unitMultiplier = unitMultiplier;
+            this.rawValue = rawValue;
+        }
+    }
+
+    protected static TimeThingy createTimeThingy(String x, boolean isSeconds) {
         x = x.trim();
-        if(x.endsWith(".")){
+        if (x.endsWith(".")) {
             // allows for "100 sec." or "100000 ms."
             x = x.substring(0, x.length() - 1);
         }
         // do in order of length of units or collisions happen.
-        long unitMultiplier = isSeconds?1000L:1L;  // sets default if no override
-        if(x.endsWith(UNITS_SECONDS_LONG)){
-            unitMultiplier = 1000L;
-            x = x.substring(0,x.length() - UNITS_SECONDS_LONG.length());
-        }
         if (x.endsWith(UNITS_MILLISECONDS)) {
-            unitMultiplier = 1L;
-            x = x.substring(0, x.length() - UNITS_MILLISECONDS.length());
+            return new TimeThingy(1L, x.substring(0, x.length() - UNITS_MILLISECONDS.length()));
         }
+        if (x.endsWith(UNITS_SECONDS_LONG)) {
+            return new TimeThingy(1000L, x.substring(0, x.length() - UNITS_SECONDS_LONG.length()));
+        }
+        if (x.endsWith(UNITS_MINUTES)) {
+            return new TimeThingy(1000L * 60L, x.substring(0, x.length() - UNITS_MINUTES.length()));
+        }
+        if (x.endsWith(UNITS_MINUTES_LONG)) {
+            return new TimeThingy(1000L * 60L, x.substring(0, x.length() - UNITS_MINUTES_LONG.length()));
+        }
+        if (x.endsWith(UNITS_HOURS)) {
+            return new TimeThingy(1000L * 3600L, x.substring(0, x.length() - UNITS_HOURS.length()));
+        }
+        if (x.endsWith(UNITS_HOURS_LONG)) {
+            return new TimeThingy(1000L * 3600L, x.substring(0, x.length() - UNITS_HOURS_LONG.length()));
+        }
+        if (x.endsWith(UNITS_DAYS)) {
+            return new TimeThingy(1000L * 3600L * 24, x.substring(0, x.length() - UNITS_DAYS.length()));
+        }
+        if (x.endsWith(UNITS_DAYS_LONG)) {
+            return new TimeThingy(1000L * 3600L * 24, x.substring(0, x.length() - UNITS_DAYS_LONG.length()));
+        }
+        // do seconds last since plural times (e.g. hrs) get flagged with this test and everything
+        // is interpeted as seconds otherwise.
         if (x.endsWith(UNITS_SECONDS)) {
-            unitMultiplier = 1000L;
-            x = x.substring(0, x.length() - UNITS_SECONDS.length());
+            return new TimeThingy(1000L, x.substring(0, x.length() - UNITS_SECONDS.length()));
         }
-        long rawValue = Long.parseLong(x.trim()); // blanks make it blow up, FYI...
-        return rawValue * unitMultiplier;
+        return new TimeThingy(isSeconds ? 1000L : 1L, x); // nothing to do, it's already to go, just need to know if default is seconds.
 
     }
 
+    public static void main(String[] args) {
+        String[] values = new String[]{"1000", "300 sec", "1000 ms", "2 hrs", "1hr", "1day", "2 days", "20 min"};
+        for (String value : values) {
+            System.out.println(value + "= " + getValueSecsOrMillis(value) + " in ms.");
+        }
+    }
 }
