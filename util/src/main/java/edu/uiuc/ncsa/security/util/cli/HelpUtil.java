@@ -42,6 +42,11 @@ public class HelpUtil {
         this.onlineExamples = onlineExamples;
     }
 
+    /**
+     * This is a mop with key being the topic, value being the alternative, e.g.
+     * has_value vs. ∈ in QDL.
+     * @return
+     */
     public DoubleHashMap<String, String> getAltLookup() {
         return altLookup;
     }
@@ -51,6 +56,7 @@ public class HelpUtil {
     }
 
     Map<String, String> onlineExamples = new HashMap<>();
+
     DoubleHashMap<String, String> altLookup = new DoubleHashMap<>();
     public static final String ONLINE_HELP_EXAMPLE_FLAG = "-ex";
     public static final String ONLINE_HELP_COMMAND = "online";
@@ -192,6 +198,11 @@ public class HelpUtil {
         return true;
     }
 
+    /**
+     * Use this to get an example for a topic. It returns null if no such example.
+     * @param text
+     * @return
+     */
     public String getHelpTopicExample(String text) {
         String[] names = resolveRealHelpName(text);
         if (names == null) {
@@ -203,6 +214,11 @@ public class HelpUtil {
         return null;
     }
 
+    /**
+     * Use this to get help for a topic. It returns null if no such topic.
+     * @param text
+     * @return
+     */
     public String getHelpTopic(String text) {
         String[] names = resolveRealHelpName(text);
         if (names == null) {

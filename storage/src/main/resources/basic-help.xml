@@ -46,7 +46,7 @@ See also: versions
    <![CDATA[Some examples of generated ids
 
 1.   testScheme:oa4md,2018:/client_id/70e46ba17e8c4d00d30dd2345da83abe
-     This has a specific scheme, the path identifiers it and it has a unique string
+     This has a specific scheme, the path identifiers it, and it has a unique string
 
 2.   https://localhost:9443/oauth2/f019e78e6307ca11c475eeeb61c3525?type=authzGrant&ts=1667918947236&version=v2.0&lifetime=750000
      This identifies the server that created it, has a unique string and then the parameters
