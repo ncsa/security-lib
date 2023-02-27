@@ -1,11 +1,8 @@
 package edu.uiuc.ncsa.security.util.help;
 
-import edu.uiuc.ncsa.security.core.util.FileUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.cli.HelpUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import net.sf.json.JSON;
-import net.sf.json.xml.XMLSerializer;
 
 import java.io.*;
 import java.util.*;
@@ -43,18 +40,8 @@ public class MarkdownConverter {
             return;
         }
         markdownConverter.convert();
-        xmlToJSON();
     }
-    public static void xmlToJSON() throws Throwable {
-        String f = "/home/ncsa/dev/ncsa-git/security-lib/storage/src/main/resources/basic-help.xml";
-        String f2 = "/home/ncsa/dev/csd/config/server-oa2.xml";
-        String f3 = "/home/ncsa/dev/ncsa-git/qdl/language/src/main/resources/xml/planes.xml";
-        String xml = FileUtil.readFileAsString(f3);
 
-        XMLSerializer xmlSerializer = new XMLSerializer();
-        JSON json = xmlSerializer.read(xml);         
-        System.out.println(json.toString(2));
-    }
     protected List<String> toList(String x) {
         if (x == null) {
             return null;
@@ -214,6 +201,10 @@ public class MarkdownConverter {
         say("      is assumed to be the input file");
         say();
         say("Entries are sorted and minimially formatted.");
+        say("E.g.");
+        say("java " + MarkdownConverter.class.getCanonicalName() + " -in \"/home/ncsa/dev/ncsa-git/security-lib/storage/src/main/resources/basic-help.xml:/home/ncsa/dev/ncsa-git/security-lib/storage/src/main/resources/store-help.xml\" -v ");
+        say("");
+        say("");
     }
 
     public HelpUtil getHelpUtil() {
