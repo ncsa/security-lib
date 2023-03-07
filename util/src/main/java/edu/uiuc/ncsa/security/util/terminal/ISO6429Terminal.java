@@ -315,6 +315,9 @@ public class ISO6429Terminal {
             // is because ^c is intercepted by the OS which sends a SigTerm.
             // Java processes the SigTerm and will let you add a shutdown hook
             // (e.g. below) but you cannot stop the JVM from exiting.
+            // FYI since the JVM is multi-threaded, there is zero promise that
+            // anything in the shutdown hook actually works. About the best you can
+            // do is print a message saying you are shutting down.
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {

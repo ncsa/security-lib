@@ -2738,8 +2738,8 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     protected void showRMHelp() {
-        say("rm [" + KEY_FLAG + " | " + KEYS_FLAG + " list] id");
-        sayi("Usage: Remove a property from this the object with the given value.");
+        say("rm [" + KEY_FLAG + " | " + KEYS_FLAG + " lst] id");
+        sayi("Usage: remove an object or removes a property (or list of them) from an object.");
         sayi("If you supply a list, all of the properties in the list will be removed");
         sayi("No list of keys means to remove the entire object from the store (!)");
         showKeyShorthandHelp();
