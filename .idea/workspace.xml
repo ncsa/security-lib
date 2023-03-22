@@ -6,8 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/terminal/ISO6429Terminal.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/terminal/ISO6429Terminal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -193,7 +192,8 @@
       <workItem from="1675861515655" duration="2899000" />
       <workItem from="1675970279502" duration="60432000" />
       <workItem from="1677181827216" duration="15141000" />
-      <workItem from="1678199029674" duration="6252000" />
+      <workItem from="1678199029674" duration="33906000" />
+      <workItem from="1679055506928" duration="12775000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -216,7 +216,14 @@
       <option name="project" value="LOCAL" />
       <updated>1676675162077</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Fixed JeffSpeak in some documentation. It can now be reliably read by most mid-sized primates.">
+      <created>1678230107707</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1678230107707</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -227,7 +234,8 @@
     <MESSAGE value="Removed a ton of old, unused code. Added version info to online help." />
     <MESSAGE value="CIL-1629" />
     <MESSAGE value="Markdown converter so online documentation in the CLI can be turned into markdown in CILogon's github documentation." />
-    <option name="LAST_COMMIT_MESSAGE" value="Markdown converter so online documentation in the CLI can be turned into markdown in CILogon's github documentation." />
+    <MESSAGE value="Fixed JeffSpeak in some documentation. It can now be reliably read by most mid-sized primates." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed JeffSpeak in some documentation. It can now be reliably read by most mid-sized primates." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
 </project>

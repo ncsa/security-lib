@@ -49,11 +49,12 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         System.out.println(x);
     }
 
-    protected void sayv(String x){
-        if(isVerbose()){
+    protected void sayv(String x) {
+        if (isVerbose()) {
             say(x);
         }
     }
+
     public String getConfigName() {
         return configName;
     }
@@ -85,6 +86,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
             sayv(m);
             return;
         }
+
         if (inputLine.hasArg(LIST_CFGS)) {
             listConfigs(inputLine);
             // no way to return a value and have it findable with introspection (since cignature would change).
@@ -150,6 +152,9 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
             say("Sorry but \"" + target.getAbsolutePath() + "\" is not a file.");
             return;
         }
+
+
+
         String component = getComponentName();
         XMLConfiguration xmlConfiguration = Configurations.getConfiguration(target);
         ConfigurationNode rootNode = xmlConfiguration.getRoot();
@@ -260,11 +265,11 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         // All errors loading the environment are benign.
         File f = new File(path);
         if (!f.exists()) {
-            if(verbose)say("Cannot read environment file \"" + path + "\"");
+            if (verbose) say("Cannot read environment file \"" + path + "\"");
             return;
         }
         if (!f.isFile()) {
-            if(verbose)say("\"" + path + "\" is not  file and cannot be read to set the environment.");
+            if (verbose) say("\"" + path + "\" is not  file and cannot be read to set the environment.");
             return;
         }
         String allLines = "";
@@ -278,7 +283,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
             }
             bf.close();
         } catch (Throwable t) {
-            if(verbose)say("Error loading environment: \"" + t.getMessage() + "\"");
+            if (verbose) say("Error loading environment: \"" + t.getMessage() + "\"");
             if (isVerbose()) {
                 t.printStackTrace();
             }
@@ -304,7 +309,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
             if (isVerbose()) {
                 t.printStackTrace();
             }
-            if(verbose)say("Could not parse envirnoment file.");
+            if (verbose) say("Could not parse envirnoment file.");
         }
         currentEnvFile = path;
     }
