@@ -158,6 +158,118 @@ public class MailUtil implements Logable {
         return sendMessage(subjectTemplate, messageTemplate, replacements, null);
     }
 
+    // CIL-1069 fix. Create thread to send message in the background since
+    // latency is high and makes the server sluggish.
+    // To test: start OA4MP and register a client. An email should be set to personal account.
+    public class MailSenderThread extends Thread {
+        String subjectTemplate;
+        String messageTemplate;
+        Map replacements;
+        String newRecipients;
+
+
+        public MailSenderThread(String subjectTemplate,
+                                String messageTemplate,
+                                Map replacements,
+                                String newRecipients) {
+            this.subjectTemplate = subjectTemplate;
+            this.messageTemplate = messageTemplate;
+            this.replacements = replacements;
+            this.newRecipients = newRecipients;
+        }
+
+        @Override
+        public void run() {
+            Transport tr = null;
+
+            InternetAddress[] recipients = getMailEnvironment().recipients;
+
+            if (!StringUtils.isTrivial(newRecipients)) {
+                try {
+                    getMailEnvironment().parseRecipients(newRecipients);
+                } catch (AddressException addressException) {
+                    if (DebugUtil.isEnabled()) {
+                        addressException.printStackTrace();
+                    }
+                    warn("The requested list of recipients \"" + newRecipients + "\" could not be parsed.\n" +
+                            "error message reads \"" + addressException.getMessage() + "\"\n" +
+                            "Did you use the right separator \"" + MailUtil.ADDRESS_SEPARATOR + "\" between addresses?\n" +
+                            "Using default addresses.");
+                }
+            }
+            try {
+
+                info("Preparing to send mail notification");
+
+                Properties props = new Properties();
+                if (getMailEnvironment().isDebugOn()) {
+                    props.put("mail.debug", "true");
+                }
+                String protocol;
+                int defaultPort = getMailEnvironment().port;
+                if (getMailEnvironment().useSSL) {
+                    protocol = "smtps";
+                    if (getMailEnvironment().starttls) {
+                        props.put("mail.smtp.starttls.enable", "true"); // fix for gmail, mostly. .
+                    }
+                    defaultPort = defaultPort == -1 ? 465 : defaultPort;
+                } else {
+                    protocol = "smtp";
+                    defaultPort = defaultPort == -1 ? 25 : defaultPort;
+                }
+                debug("preparing message with protocol=" + protocol + " on server=" + getMailEnvironment().server);
+                props.put("mail.transport.protocol", protocol);
+                props.put("mail." + protocol + ".host", getMailEnvironment().server);
+                if (protocol.equals("smtp") && getMailEnvironment().from == null) {
+                    props.put("mail." + protocol + ".auth", "false");
+
+                } else {
+                    debug("Using authorization for user " + getMailEnvironment().from);
+                    props.put("mail." + protocol + ".auth", "true");
+                }
+                Session session = getSession(props);
+                tr = session.getTransport(protocol);
+                tr.connect(getMailEnvironment().server,
+                        defaultPort,
+                        getMailEnvironment().from == null ? null : getMailEnvironment().from.toString(),
+                        getMailEnvironment().password);
+                Message message = new MimeMessage(session);
+                message.setFrom(getMailEnvironment().from);
+
+                message.setRecipients(Message.RecipientType.TO, recipients);
+                if (replacements != null) {
+                    message.setSubject(TemplateUtil.replaceAll(subjectTemplate, replacements));
+                    message.setContent(TemplateUtil.replaceAll(messageTemplate, replacements), "text/plain");
+                    if (replacements.containsKey("reply-to")) {
+                        InternetAddress address = new InternetAddress((String) replacements.get("reply-to"));
+                        message.setReplyTo(new Address[]{address});
+                    }
+                }
+                tr.sendMessage(message, recipients);
+                info("Mail notification sent to " + Arrays.toString(recipients));
+            } catch (Throwable throwable) {
+                info("got exception sending message:");
+                if (replacements != null) {
+                    for (Object key : replacements.keySet()) {
+                        info("(" + key + "," + replacements.get(key.toString()) + ")");
+                    }
+                }
+                if (DebugUtil.isEnabled()) {
+                    throwable.printStackTrace();
+                }
+                error("Sending mail failed. Continuing & message reads \"" + throwable.getMessage() + "\"");
+                //throw new GeneralException("Error", throwable);
+            } finally {
+                if (tr != null) {
+                    try {
+                        tr.close();
+                    } catch (MessagingException e) {
+                        throw new GeneralException("Error: could not close java mail transport", e);
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * This allows for sending with a specific subject and message template. This is useful for
@@ -174,10 +286,27 @@ public class MailUtil implements Logable {
                                             String messageTemplate,
                                             Map replacements,
                                             String newRecipients) {
-       // CIL-1225 (Both tomcat and the servlet have the mail jar), CIL-1308 (nobody has the mail jar)
         if (!isEnabled()) {
             return true;
         }
+
+        // return OLDsendMessage(subjectTemplate, messageTemplate, replacements, newRecipients);
+        return NEWsendMessage(subjectTemplate, messageTemplate, replacements, newRecipients);
+    }
+
+    synchronized public boolean NEWsendMessage(String subjectTemplate,
+                                               String messageTemplate,
+                                               Map replacements,
+                                               String newRecipients) {
+        MailSenderThread mst = this.new MailSenderThread(subjectTemplate,messageTemplate,replacements,newRecipients);
+        mst.start();
+        return true;
+    }
+    synchronized public boolean OLDsendMessage(String subjectTemplate,
+                                               String messageTemplate,
+                                               Map replacements,
+                                               String newRecipients) {
+        // CIL-1225 (Both tomcat and the servlet have the mail jar), CIL-1308 (nobody has the mail jar)
         Transport tr = null;
 
         InternetAddress[] recipients = getMailEnvironment().recipients;
@@ -253,7 +382,7 @@ public class MailUtil implements Logable {
                     info("(" + key + "," + replacements.get(key.toString()) + ")");
                 }
             }
-            if(DebugUtil.isEnabled()) {
+            if (DebugUtil.isEnabled()) {
                 throwable.printStackTrace();
             }
             error("Sending mail failed. Continuing & message reads \"" + throwable.getMessage() + "\"");

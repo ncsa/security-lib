@@ -1776,6 +1776,10 @@ public abstract class StoreCommands extends CommonCommands {
             return;
         }
         if (inputLine.hasArg(RS_SHOW_KEY)) {
+            // The syntax is
+            // -show name | index [start,stop]
+            // so this takes a bit of special handling. Basically, everything at the end
+            // of the line gets parsed in special cases.
             String name = inputLine.getLastArg();
             inputLine.removeArgAt(inputLine.getArgCount());
             int count = -1;
