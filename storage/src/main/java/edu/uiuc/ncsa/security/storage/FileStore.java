@@ -5,8 +5,8 @@ import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.cache.SimpleEntryImpl;
-import edu.uiuc.ncsa.security.core.exceptions.*;
 import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
+import edu.uiuc.ncsa.security.core.exceptions.*;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
@@ -41,7 +41,7 @@ import java.util.*;
  * <p>Created by Jeff Gaynor<br>
  * on 11/3/11 at  1:54 PM
  */
-public abstract class FileStore<V extends Identifiable> extends IndexedStreamStore<V> {
+public abstract class FileStore<V extends Identifiable> extends IndexedStreamStore<V>  {
 
     /**
      * Since administrators can and have inadvertently changed directory or file permissions while
@@ -113,9 +113,10 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         this.removeEmptyFiles = removeEmptyFiles;
     }
 
-     public MapConverter getMapConverter(){
+    public MapConverter getMapConverter() {
         return converter;
-     }
+    }
+
     /**
      * Accepts a directory for both the index and data and creates the subdirectories.
      *
@@ -307,9 +308,9 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
 
     @Override
     public void save(V t) {
-        if(t.isReadOnly()){
-           throw  new IllegalAccessException(t.getIdentifierString() + " is read only");
-           }
+        if (t.isReadOnly()) {
+            throw new IllegalAccessException(t.getIdentifierString() + " is read only");
+        }
         realSave(false, t);
     }
 
@@ -411,6 +412,13 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         return containsKey(t.getIdentifierString());
     }
 
+
+    /**
+     * This updates the last accessed listener
+     *
+     * @param key
+     * @return
+     */
     public V get(Object key) {
         return (V) loadByIdentifier(key.toString());
     }
@@ -427,12 +435,13 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
     /**
      * Terribly inefficient. Terribly. However, the assumption is that a file store is small
      * rather than large. For larger numbers of entries, use a database.
+     *
      * @param objects
      * @return
      */
     @Override
     public boolean remove(List<Identifiable> objects) {
-        for(Identifiable identifiable : objects){
+        for (Identifiable identifiable : objects) {
             delete(identifiable.getIdentifierString());
         }
         return true;
@@ -530,18 +539,19 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
                 key,
                 condition,
                 isRegEx,
-                attr,null,null,null);    }
+                attr, null, null, null);
+    }
 
     @Override
     public List<V> search(String key, String condition, boolean isRegEx, List<String> attr, String dateField, Date before, Date after) {
-      return GenericStoreUtils.search(this,
-              key,
-              condition,
-              isRegEx,
-              attr,
-              dateField,
-              before,
-              after);
+        return GenericStoreUtils.search(this,
+                key,
+                condition,
+                isRegEx,
+                attr,
+                dateField,
+                before,
+                after);
     }
 
     @Override

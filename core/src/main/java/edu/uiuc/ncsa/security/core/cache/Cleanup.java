@@ -5,13 +5,8 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
@@ -33,24 +28,10 @@ import java.util.*;
  * <p>Created by Jeff Gaynor<br>
  * on 7/12/11 at  11:39 AM
  */
-public class Cleanup<K, V> extends Thread {
+public class Cleanup<K, V> extends MyThread {
     public Cleanup(MyLoggingFacade logger, String name) {
-        super(name);
-        this.logger = logger;
+        super(name, logger);
     }
-
-    // only enable this if there is a very serious issue since the amount of output will skyrocket.
-    boolean deepDebug = false;
-
-    public boolean isTestMode() {
-        return testMode;
-    }
-
-    public void setTestMode(boolean testMode) {
-        this.testMode = testMode;
-    }
-
-    boolean testMode = false;
 
     public boolean isEnabledLocking() {
         return enabledLocking;
@@ -63,7 +44,17 @@ public class Cleanup<K, V> extends Thread {
     boolean enabledLocking = true;
     public static Identifier lockID = BasicIdentifier.newID("gc:lock");
 
+    /**
+     * Log the results of this. Override this if you need more detailed output.
+     * It takes the list of removed entries. Actual writing to the log is done
+     * with the call {@link #info(String)}.
+     *
+     * @param removed
+     */
 
+    public void info(List<V> removed) {
+        info("removed:" + removed.size() + ", remaining:" + getMap().size());
+    }
     Store store;
 
 
@@ -145,32 +136,6 @@ public class Cleanup<K, V> extends Thread {
     }
 
 
-    MyLoggingFacade logger;
-    public long cleanupInterval = 60000L;
-
-    /**
-     * The amount of time, in milliseconds, to wait between attempts to age the cache.
-     *
-     * @return
-     */
-    public long getCleanupInterval() {
-        return cleanupInterval;
-    }
-
-    public void setCleanupInterval(long cleanupInterval) {
-        this.cleanupInterval = cleanupInterval;
-    }
-
-    public Collection<LocalTime> getAlarms() {
-        return alarms;
-    }
-
-    public void setAlarms(Collection<LocalTime> alarms) {
-        this.alarms = alarms;
-    }
-
-    Collection<LocalTime> alarms = null;
-
     public Map<K, V> getMap() {
         return map;
     }
@@ -180,27 +145,6 @@ public class Cleanup<K, V> extends Thread {
     }
 
     Map<K, V> map;
-
-    /**
-     * Is this thread set to stop?
-     *
-     * @return
-     */
-    public boolean isStopThread() {
-        return stopThread;
-    }
-
-    /**
-     * Sets the flag to stop this thread. The next time the thread wakes up after this is enabled, the thread will exit.
-     * This allows for a clean shutdown of caching.
-     *
-     * @param stopThread
-     */
-    public void setStopThread(boolean stopThread) {
-        this.stopThread = stopThread;
-    }
-
-    volatile boolean stopThread = false;
 
 
     public void addRetentionPolicy(RetentionPolicy retentionPolicy) {
@@ -224,78 +168,6 @@ public class Cleanup<K, V> extends Thread {
 
     LinkedList<RetentionPolicy> retentionPolicies;
 
-    protected void info(String x) {
-        if(logger == null){
-            DebugUtil.info(this, x);
-            return;
-        }
-        logger.info(x);
-    }
-
-
-    protected void warn(String x) {
-        if(logger == null){
-            DebugUtil.warn(this, x);
-            return;
-        }
-        logger.warn(x);
-    }
-
-    /**
-     * Log the results of this. Override this if you need more detailed output.
-     * It takes the list of removed entries. Actual writing to the log is done
-     * with the call {@link #info(String)}.
-     *
-     * @param removed
-     */
-
-    public void info(List<V> removed) {
-        info("removed:" + removed.size() + ", remaining:" + getMap().size());
-    }
-
-    protected void debug(String x) {
-        DebugUtil.trace(deepDebug, this, x);
-    }
-
-
-    protected void debug(String x, Throwable t) {
-        DebugUtil.trace(deepDebug, this, x, t);
-    }
-
-    protected long getNextSleepInterval() {
-        /*
-        Note that this asssumes that the alarms are in a sorted collection -- such as
-        a TreeSet.
-         */
-        if (getAlarms() == null || getAlarms().isEmpty()) {
-            return getCleanupInterval(); // always set
-        }
-
-        LocalDate today = LocalDate.now();
-        // trick is that there is no canonical ordering to the alarms, they may be repeated
-        // or they may not be distinct for other reasons. Our task here is to find the smallest
-        // positive one
-        long nextAlarm = -1L;
-        for (LocalTime lt : getAlarms()) {
-            ZonedDateTime zonedDateTime = ZonedDateTime.of(today, lt, ZoneId.systemDefault());
-            long nextInterval = zonedDateTime.toEpochSecond() * 1000L - System.currentTimeMillis();
-            if(0 < nextInterval) {
-                if(nextAlarm < 0){
-                      nextAlarm = nextInterval;
-                }else{
-                    // don't check ones in the past
-                    nextAlarm = Math.min(nextAlarm, nextInterval);
-                }
-            }
-        }
-        if(nextAlarm <= 0L){ // nothing was found
-            //So look in the next day
-            LocalDate tomorrow = today.plusDays(1);
-            ZonedDateTime zonedDateTime = ZonedDateTime.of(tomorrow, getAlarms().iterator().next(), ZoneId.systemDefault());
-            nextAlarm = zonedDateTime.toEpochSecond()*1000 - System.currentTimeMillis();
-        }
-        return nextAlarm;
-    }
 
     @Override
     public void run() {

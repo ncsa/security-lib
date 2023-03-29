@@ -4,7 +4,7 @@ package edu.uiuc.ncsa.security.core.ipc;
 import edu.uiuc.ncsa.security.core.Identifiable;
 
 /**
- * An bean for Inter-Process Communication. This lets the various threads and servlets track information so that
+ * A bean for Inter-Process Communication. This lets the various threads and servlets track information so that
  * exceptions can be propagated between them, This tracks pending transactions that are
  * initiated by the authorized servlet. This waits for a transaction to
  * be completed or to intercept any errors that might occur during execution.
