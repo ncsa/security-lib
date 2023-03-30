@@ -21,14 +21,19 @@ public class MonitoredConverter<V extends Monitored> extends MapConverter<V> {
     public V fromMap(ConversionMap<String, Object> map, V client) {
         V v = super.fromMap(map, client);
         v.setIdentifier(map.getIdentifier(getKeys().identifier()));
-        if (map.containsKey(getKeys().creationTS())) {
+        if (map.containsKey(getKeys().creationTS()) && null!=map.get(getKeys().creationTS())) {
             v.setCreationTS(map.getDate(getKeys().creationTS()));
         }
-        if (map.containsKey(getKeys().lastModifiedTS())) {
+        if (map.containsKey(getKeys().lastModifiedTS()) && null!= map.get(getKeys().lastModifiedTS())) {
             v.setLastModifiedTS(map.getDate(getKeys().lastModifiedTS()));
         }
-        if (map.containsKey(getKeys().lastAccessed())) {
-            v.setLastAccessed(new Date(map.getLong(getKeys().lastAccessed())));
+        if (map.containsKey(getKeys().lastAccessed()) && null != map.get(getKeys().lastAccessed())) {
+            long lll = map.getLong(getKeys().lastAccessed());
+            if(0 < lll) {
+                // Finally. Only turn it into a date if there is really something there.
+                // Various databases return various trivial garbage
+                v.setLastAccessed(new Date(lll));
+            }
         }
         return v;
     }

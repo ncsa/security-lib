@@ -1349,7 +1349,14 @@ public abstract class StoreCommands extends CommonCommands {
         if (getStore() instanceof ListeningStoreInterface) {
             MonitoredKeys keys = (MonitoredKeys) getMapConverter().getKeys();
             if (map.containsKey(keys.lastAccessed())) {
-                map.put(keys.lastAccessed(), new Date(map.getLong(keys.lastAccessed())));
+                long la = map.getLong(keys.lastAccessed());
+                // only display if it has been initialized. 0 is default = no value.
+                if(la <= 0) {
+                    map.remove(keys.lastAccessed());
+                }else{
+
+                    map.put(keys.lastAccessed(), new Date(la));
+                }
             }
         }
         List<String> outputList = StringUtils.formatMap(map,
