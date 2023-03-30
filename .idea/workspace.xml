@@ -4,23 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="CIL-1069, send mail messages in a background thread.">
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cache/MyThread.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/AbstractListeningStore.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/ListeningStoreInterface.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/data/Monitored.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/data/MonitoredConverter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/data/MonitoredKeys.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/events/IDMap.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/events/LastAccessedEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/events/LastAccessedEventListener.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/events/LastAccessedThread.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/events/package-info.java" afterDir="false" />
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cache/Cleanup.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cache/Cleanup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/ipc/IPCBean.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/ipc/IPCBean.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/FileStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/FileStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/MemoryStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/MemoryStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/AbstractListeningStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/AbstractListeningStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/ListeningStoreInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/ListeningStoreInterface.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/data/Monitored.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/data/Monitored.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/data/MonitoredConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/data/MonitoredConverter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/data/MonitoredKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/data/MonitoredKeys.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/events/IDMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/events/IDMap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/events/LastAccessedEventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/events/LastAccessedEventListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/events/LastAccessedThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/events/LastAccessedThread.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -217,7 +211,7 @@
       <workItem from="1677181827216" duration="15141000" />
       <workItem from="1678199029674" duration="33906000" />
       <workItem from="1679055506928" duration="12823000" />
-      <workItem from="1679610823007" duration="51201000" />
+      <workItem from="1679610823007" duration="65905000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -261,7 +255,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679955751291</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="CIL-1677 First cut">
+      <created>1680122935851</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1680122935851</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -275,7 +276,8 @@
     <MESSAGE value="Fixed JeffSpeak in some documentation. It can now be reliably read by most mid-sized primates." />
     <MESSAGE value="Tweaked the commands." />
     <MESSAGE value="CIL-1069, send mail messages in a background thread." />
-    <option name="LAST_COMMIT_MESSAGE" value="CIL-1069, send mail messages in a background thread." />
+    <MESSAGE value="CIL-1677 First cut" />
+    <option name="LAST_COMMIT_MESSAGE" value="CIL-1677 First cut" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
 </project>

@@ -19,7 +19,15 @@ public interface ListeningStoreInterface<V extends Identifiable> {
 
     void addLastAccessedEventListener(LastAccessedEventListener lastAccessedEventListener);
 
-    void fireLastAccessedEvent(Identifier identifier);
+    void fireLastAccessedEvent(ListeningStoreInterface store, Identifier identifier);
 
     void lastAccessUpdate(IDMap idMap);
+
+    /**
+     * Generally this is enabled, except in things like the CLI where you do not want
+     * to monitor access to clients or whatever.
+     * @return
+     */
+     boolean isMonitorEnabled();
+    void  setMonitorEnabled(boolean x);
 }

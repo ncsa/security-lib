@@ -8,8 +8,10 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.util.*;
+import edu.uiuc.ncsa.security.storage.ListeningStoreInterface;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import edu.uiuc.ncsa.security.storage.data.MonitoredKeys;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.util.cli.*;
@@ -64,15 +66,17 @@ public abstract class StoreCommands extends CommonCommands {
      */
 
     protected StoreCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
-        super(logger);
+        this(logger, store);
         this.defaultIndent = defaultIndent;
-        this.store = store;
         setSortable(new BasicSorter());
     }
 
     public StoreCommands(MyLoggingFacade logger, Store store) throws Throwable {
-        super(logger);
+        this(logger);
         setStore(store);
+        if (store instanceof ListeningStoreInterface) {
+            ((ListeningStoreInterface) store).setMonitorEnabled(false); // do not fire monitor event in CLI!
+        }
         setSortable(new BasicSorter());
     }
 
@@ -946,7 +950,11 @@ public abstract class StoreCommands extends CommonCommands {
             say("warning: no identifier set");
             return;
         }
+
         say("Identifier set to " + id);
+        if (!getStore().containsKey(id)) {
+            say("warning: unknown id ");
+        }
     }
 
     private void showSetIDHElp() {
@@ -1335,6 +1343,15 @@ public abstract class StoreCommands extends CommonCommands {
     protected int longFormat(Identifiable identifiable, List<String> keySubset, boolean isVerbose) {
         XMLMap map = new XMLMap();
         getStore().getXMLConverter().toMap(identifiable, map);
+        // CIL1677 fallout we must store last_accessed as a long so we can do comparisons
+        // across various types of stores, but we *really* want this to display as a date.
+        // So, we just convert it here for display purposes.
+        if (getStore() instanceof ListeningStoreInterface) {
+            MonitoredKeys keys = (MonitoredKeys) getMapConverter().getKeys();
+            if (map.containsKey(keys.lastAccessed())) {
+                map.put(keys.lastAccessed(), new Date(map.getLong(keys.lastAccessed())));
+            }
+        }
         List<String> outputList = StringUtils.formatMap(map,
                 keySubset,
                 true,
@@ -2012,24 +2029,24 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     protected String multiLinePropertyInput(String propertyName, String oldValue, String key) throws IOException {
-       boolean loopForever = true;
-       String inLine = null;
-       while(loopForever){
-           inLine = multiLineInput(oldValue, key);
-           if(inLine == null){
-               return inLine;
-           }
-           if(inLine.trim().equals("--help") || inLine.trim().equals("help")){
-               if(getHelpUtil() == null){
-                   say("no help for the topic \"" + propertyName + "\"");
-               }else {
-                   getHelpUtil().printHelp(new InputLine("/help", propertyName));
-               }
-           }else{
-               break;
-           }
-       }
-       return inLine;
+        boolean loopForever = true;
+        String inLine = null;
+        while (loopForever) {
+            inLine = multiLineInput(oldValue, key);
+            if (inLine == null) {
+                return inLine;
+            }
+            if (inLine.trim().equals("--help") || inLine.trim().equals("help")) {
+                if (getHelpUtil() == null) {
+                    say("no help for the topic \"" + propertyName + "\"");
+                } else {
+                    getHelpUtil().printHelp(new InputLine("/help", propertyName));
+                }
+            } else {
+                break;
+            }
+        }
+        return inLine;
     }
 
     /**

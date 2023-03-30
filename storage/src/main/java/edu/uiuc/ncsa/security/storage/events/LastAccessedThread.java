@@ -22,16 +22,17 @@ public class LastAccessedThread extends MyThread {
 
 
     protected void updateStore() {
-        for (UUID uuid : lael.getIdsByStoreMap().keySet()) {
-            IDMap idMap = lael.getIdsByStoreMap().get(uuid);
-            if (!lael.getStoreMap().containsKey(uuid)) {
+        Map<UUID, IDMap> map = lael.getIdsByStoreMap();
+        Map<UUID, ListeningStoreInterface> stores = lael.getStoreMap();
+        lael.clear(); // so we don't get concurrent mod exceptions
+        for (UUID uuid : map.keySet()) {
+            IDMap idMap = map.get(uuid);
+            if (!map.containsKey(uuid)) {
                 throw new NFWException("error: the store with id \"" + uuid + "\" is not recognized.");
             }
 
             // Every event in this map has the same store stashed in it.
-            //if()
-            ListeningStoreInterface store = lael.getStoreMap().get(uuid);
-            store.lastAccessUpdate(idMap);
+            stores.get(uuid).lastAccessUpdate(idMap);
         }
     }
 

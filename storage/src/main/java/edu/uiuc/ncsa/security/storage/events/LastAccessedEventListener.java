@@ -11,7 +11,7 @@ import java.util.UUID;
  * on 3/28/23 at  4:39 PM
  */
 public class LastAccessedEventListener {
-    public void itemAccessed(LastAccessedEvent lastAccessedEvent){
+    public void itemAccessed(LastAccessedEvent lastAccessedEvent) {
         storeMap.put(lastAccessedEvent.getUUID(), lastAccessedEvent.getStore());
 
         // ensures that we have a map of store.id.event
@@ -36,8 +36,9 @@ public class LastAccessedEventListener {
 
     Map<UUID, IDMap> idsByStoreMap = new HashMap<>();
     Map<UUID, ListeningStoreInterface> storeMap = new HashMap<>();
-      public void clear(){
-          idsByStoreMap = new HashMap<>();
-                              storeMap = new HashMap<>();
-      }
+
+    public void clear() {
+        idsByStoreMap = new HashMap<>();
+        storeMap = new HashMap<>();
+    }
 }

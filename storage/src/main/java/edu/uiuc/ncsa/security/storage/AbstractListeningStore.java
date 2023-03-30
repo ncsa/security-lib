@@ -44,8 +44,11 @@ public  class AbstractListeningStore<V extends Identifiable> implements Listenin
                 getLastAccessedEventListeners().add(lastAccessedEventListener);
     }
     @Override
-    public void fireLastAccessedEvent(Identifier identifier){
-        LastAccessedEvent lastAccessedEvent = new LastAccessedEvent(this, identifier, new Date());
+    public void fireLastAccessedEvent(ListeningStoreInterface store, Identifier identifier){
+        if(!isMonitorEnabled()){
+            return;
+        }
+        LastAccessedEvent lastAccessedEvent = new LastAccessedEvent(store, identifier, new Date());
         for(LastAccessedEventListener lastAccessedEventListener:getLastAccessedEventListeners()){
             lastAccessedEventListener.itemAccessed(lastAccessedEvent);
         }
@@ -53,8 +56,19 @@ public  class AbstractListeningStore<V extends Identifiable> implements Listenin
 
 
     @Override
-    public void lastAccessUpdate(IDMap idMap){
+    public void lastAccessUpdate( IDMap idMap){
         // no op-- override.
     }
 
+    @Override
+    public boolean isMonitorEnabled() {
+        return monitorEnabled;
+    }
+
+    @Override
+    public void setMonitorEnabled(boolean monitorEnabled) {
+        this.monitorEnabled = monitorEnabled;
+    }
+
+    boolean monitorEnabled = true;
 }
