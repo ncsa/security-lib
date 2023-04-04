@@ -1000,15 +1000,18 @@ public abstract class StoreCommands extends CommonCommands {
 
         Identifier localID = null;
         int index = -1;
-        if (inputLine.getLastArg().startsWith("/")) {
-            localID = BasicIdentifier.newID(inputLine.getLastArg().substring(1));
-        } else {
-            try {
-                index = Integer.parseInt(inputLine.getLastArg());
-            } catch (Throwable t) {
-                // rock on
+        try {
+            index = Integer.parseInt(inputLine.getLastArg());
+        } catch (Throwable t) {
+            // rock on
+            /* If it starts with a / remove that. otherwise just try to turn non-integers into an id.*/
+            if (inputLine.getLastArg().startsWith("/")) {
+                localID = BasicIdentifier.newID(inputLine.getLastArg().substring(1));
+            } else {
+                localID = BasicIdentifier.newID(inputLine.getLastArg());
             }
         }
+
         if (localID == null) {
             if (index != -1) {
                 if (allEntries == null || allEntries.isEmpty()) {
@@ -1023,14 +1026,6 @@ public abstract class StoreCommands extends CommonCommands {
         if (hasId()) {
             return (Identifiable) getStore().get(id);
         }
-
-/*
-        if (inputLine.size() <= 1) {
-            return null;
-        }
-*/
-
-
         return null;
     }
 
@@ -1351,9 +1346,9 @@ public abstract class StoreCommands extends CommonCommands {
             if (map.containsKey(keys.lastAccessed())) {
                 long la = map.getLong(keys.lastAccessed());
                 // only display if it has been initialized. 0 is default = no value.
-                if(la <= 0) {
+                if (la <= 0) {
                     map.remove(keys.lastAccessed());
-                }else{
+                } else {
 
                     map.put(keys.lastAccessed(), new Date(la));
                 }
