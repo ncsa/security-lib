@@ -8,9 +8,10 @@ WEBSITE_ROOT=$NCSA_ROOT/docs
 
 
 cd $NCSA_ROOT
-mvn javadoc:javadoc
+mvn javadoc:aggregate
 cd $NCSA_ROOT/website
 mvn clean site
 # Note the source directory in the next command has no apidocs subdirectory, so this overlays
 # without overwriting.
-cp -r $NCSA_ROOT/website/target/site/* $WEBSITE_ROOT
+cp -r $NCSA_ROOT/website/target/site/* $WEBSITE_ROOT # copy maven site
+cp -r $NCSA_ROOT/target/site/* $WEBSITE_ROOT   # copy javadoc in toto

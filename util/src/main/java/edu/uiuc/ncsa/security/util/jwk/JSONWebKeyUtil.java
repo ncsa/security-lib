@@ -1,7 +1,9 @@
 package edu.uiuc.ncsa.security.util.jwk;
 
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.pkcs.MyKeyUtil;
+import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
@@ -85,9 +87,29 @@ public class JSONWebKeyUtil {
      * @return
      */
     public static JSONWebKeys fromJSON(String x) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        JSONObject json = (JSONObject) JSONSerializer.toJSON(x);
+        return fromJSON(JSONSerializer.toJSON(x));
+    }
 
-        JSONArray array = json.getJSONArray(KEYS);
+    /**
+     * Takes either a standard JSON object of keys: {"keys":[...]} or a single
+     * key and turns it in a set of web keys
+     *
+     * @param json
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
+     */
+    public static JSONWebKeys fromJSON(JSON json) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        JSONArray array;
+        if (json.isArray()) {
+            array = (JSONArray) json;
+        } else {
+            JSONObject jsonObject = (JSONObject) json;
+            if (!jsonObject.containsKey(KEYS)) {
+                throw new IllegalArgumentException("No keys found");
+            }
+            array = jsonObject.getJSONArray(KEYS);
+        }
         JSONWebKeys keys = new JSONWebKeys(null);
         for (int i = 0; i < array.size(); i++) {
             JSONObject key = array.getJSONObject(i);
@@ -243,6 +265,9 @@ public class JSONWebKeyUtil {
 
     /**
      * Create a new  {@link JSONWebKey} from a key pair. This creates a new random id too.
+     * This defaults to an algorithm of RS256. Remember that the algorithm is intended to show
+     * which algorithm consumers of this key expect, but has zero bearing on the key structure itself.
+     * If you want a different algorithm, such as RS384 or RS512, just change it.
      *
      * @param keyPair
      * @return
@@ -309,16 +334,21 @@ public class JSONWebKeyUtil {
     public static JSONWebKeys makePublic(JSONWebKeys keys) {
         JSONWebKeys newKeys = new JSONWebKeys(keys.getDefaultKeyID());
         for (String key : keys.keySet()) {
-            try {
-                JSONWebKey newKey = keys.get(key).clone();
-                newKey.privateKey = null;
-                newKeys.put(newKey);
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
+                newKeys.put(makePublic(keys.get(key)));
         }
         // now we have a clone with no private keys, we need to c
         return newKeys;
+    }
+    public static JSONWebKey  makePublic(JSONWebKey key)  {
+        JSONWebKey newKey = null;
+        try {
+            newKey = key.clone();
+            newKey.privateKey = null;
+            return newKey;
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+            throw new NFWException("cloning not supporting on JSON web keys");
+        }
     }
 
 

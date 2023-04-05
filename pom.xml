@@ -152,7 +152,9 @@
                  <groupId>org.apache.maven.plugins</groupId>
                  <artifactId>maven-javadoc-plugin</artifactId>
                  <version>3.4.0</version>
-
+                  <configuration>
+                      <outputDirectory>${project.build.directory}/docs/apidocs</outputDirectory>
+                  </configuration>
                  <reportSets>
                    <reportSet>
                      <id>aggregate</id>
