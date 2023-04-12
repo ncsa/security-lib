@@ -57,22 +57,22 @@
              <scope>compile</scope>
          </dependency>
      </dependencies>
-    <build>
+<!--    <build>
         <plugins>
             <plugin>
                  <groupId>org.apache.maven.plugins</groupId>
                  <artifactId>maven-javadoc-plugin</artifactId>
                  <version>3.4.0</version>
                  <configuration>
-                     <!--<aggregate>true</aggregate>-->
+                     &lt;!&ndash;<aggregate>true</aggregate>&ndash;&gt;
                      <includeDependencySources>false</includeDependencySources>
                      <dependencySourceIncludes>
-                         <dependencySourceInclude>edu.uiuc.ncsa.qdl.*</dependencySourceInclude>
+                         <dependencySourceInclude>edu.uiuc.ncsa.*</dependencySourceInclude>
                      </dependencySourceIncludes>
                  </configuration>
              </plugin>
 
         </plugins>
-    </build>
+    </build>-->
 
 </project>

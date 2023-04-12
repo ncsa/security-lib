@@ -48,18 +48,18 @@
      </dependencies>
     <build>
         <plugins>
-            <plugin>
+    <!--        <plugin>
                  <groupId>org.apache.maven.plugins</groupId>
                  <artifactId>maven-javadoc-plugin</artifactId>
                  <version>3.4.0</version>
                  <configuration>
-                     <!--<aggregate>true</aggregate>-->
+                     &lt;!&ndash;<aggregate>true</aggregate>&ndash;&gt;
                      <includeDependencySources>false</includeDependencySources>
                      <dependencySourceIncludes>
-                         <dependencySourceInclude>edu.uiuc.ncsa.qdl.*</dependencySourceInclude>
+                         <dependencySourceInclude>edu.uiuc.ncsa.*</dependencySourceInclude>
                      </dependencySourceIncludes>
                  </configuration>
-             </plugin>
+             </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

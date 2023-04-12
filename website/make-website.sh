@@ -8,7 +8,7 @@ WEBSITE_ROOT=$NCSA_ROOT/docs
 
 
 cd $NCSA_ROOT
-mvn javadoc:aggregate
+mvn clean javadoc:aggregate
 cd $NCSA_ROOT/website
 mvn clean site
 # Note the source directory in the next command has no apidocs subdirectory, so this overlays

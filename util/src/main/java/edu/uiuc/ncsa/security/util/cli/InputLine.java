@@ -318,7 +318,7 @@ public class InputLine {
         try {
             return Integer.parseInt(getArg(index));
         } catch (NumberFormatException nfx) {
-            throw new ArgumentNotFoundException("Error: the argument /" + getArg(index) + "/ cannot be parsed. Did you forget the object index?");
+            throw new ArgumentNotFoundException("Error: the argument \"" + getArg(index) + "\" cannot be parsed. Did you forget the object index?");
         }
     }
 
@@ -326,7 +326,7 @@ public class InputLine {
         try {
             return Integer.parseInt(getNextArgFor(key));
         } catch (NumberFormatException nfx) {
-            throw new ArgumentNotFoundException("Error: the argument /" + getNextArgFor(key) + "/ cannot be parsed. Did you forget the object index?");
+            throw new ArgumentNotFoundException("Error: the argument \"" + getNextArgFor(key) + "\" cannot be parsed. Did you forget the object index?");
         }
     }
 

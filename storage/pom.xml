@@ -36,20 +36,20 @@
         </dependency>
     </dependencies>
     <build>
-        <plugins>
+<!--        <plugins>
             <plugin>
                  <groupId>org.apache.maven.plugins</groupId>
                  <artifactId>maven-javadoc-plugin</artifactId>
                  <version>3.4.0</version>
                  <configuration>
-                     <!--<aggregate>true</aggregate>-->
+                     &lt;!&ndash;<aggregate>true</aggregate>&ndash;&gt;
                      <includeDependencySources>false</includeDependencySources>
                      <dependencySourceIncludes>
                          <dependencySourceInclude>edu.uiuc.ncsa.qdl.*</dependencySourceInclude>
                      </dependencySourceIncludes>
                  </configuration>
              </plugin>
-        </plugins>
+        </plugins>-->
         <resources>
             <resource>
                 <directory>${basedir}/src/main/resources</directory>

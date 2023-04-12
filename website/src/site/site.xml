@@ -22,16 +22,17 @@
 
   <body>
     <links>
-      <item name="Apache" href="http://www.apache.org/" />
-      <item name="Maven" href="https://maven.apache.org/"/>
+      <item name="CILogon" href="https://www.cilogon.org/" />
+      <item name="OA4MP" href="https://ncsa.github.io/oa4mp/"/>
+      <item name="QDL" href="https://ncsa.github.io/qdl/"/>
     </links>
 
-    <menu name="Examples">
+<!--    <menu name="Examples">
       <item name="APT Format" href="format.html"/>
       <item name="FAQ" href="faq.html"/>
       <item name="Markdown Example" href="markdown.html"/>
       <item name="Markdown with Velocity Example" href="markdown-velocity.html"/>
-    </menu>
+    </menu>-->
 
     <menu ref="reports" />
   </body>
