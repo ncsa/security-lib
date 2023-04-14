@@ -5,33 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/skin/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/it/sample/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/it/sample/src/site/apt/index.apt.vm" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/it/sample/src/site/site.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/it/sample/verify.groovy" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/it/settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/META-INF/maven/site-macros.vm" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/META-INF/maven/site.vm" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/META-INF/maven/skin.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/.~lock.sec-lib-logo.odg#" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/external.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/icon_error_sml.gif" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/icon_info_sml.gif" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/icon_success_sml.gif" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/icon_warning_sml.gif" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/ncsa-logo-sm-2.gif" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/ncsa-logo-sm.gif" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/newwindow.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/sec-lib-logo-sm-1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/sec-lib-logo-sm-2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/sec-lib-logo.odg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/css/images/sec-lib-logo.xcf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/css/print.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/css/sec-lib-base.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/skin/src/main/resources/css/sec-lib-theme.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/allclasses-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/allclasses-index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/allclasses.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/allclasses.html" afterDir="false" />
@@ -979,21 +952,6 @@
       <change beforePath="$PROJECT_DIR$/docs/apidocs/package-search-index.zip" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/package-search-index.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/serialized-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/serialized-form.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/type-search-index.zip" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/type-search-index.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/dependencies.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/dependencies.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/dependency-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/dependency-info.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/distribution-management.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/distribution-management.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/faq.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/faq.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/format.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/format.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/markdown-velocity.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/markdown-velocity.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/markdown.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/markdown.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/plugin-management.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/plugin-management.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/plugins.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/plugins.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/project-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/project-info.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/summary.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/apt/format.apt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/site.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/site.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -1203,7 +1161,7 @@
       <workItem from="1680790018667" duration="6923000" />
       <workItem from="1680830032986" duration="2620000" />
       <workItem from="1680876242129" duration="1990000" />
-      <workItem from="1681139678867" duration="34616000" />
+      <workItem from="1681139678867" duration="35825000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -1310,7 +1268,14 @@
       <option name="project" value="LOCAL" />
       <updated>1681420832000</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Website created.">
+      <created>1681508422488</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1681508422488</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1335,7 +1300,9 @@
     <MESSAGE value="Twiddling website" />
     <MESSAGE value="Updating build for making the website, plus general build cleanup." />
     <MESSAGE value="documents updated" />
-    <option name="LAST_COMMIT_MESSAGE" value="documents updated" />
+    <MESSAGE value="Website created." />
+    <MESSAGE value="Test of scripts that build everything." />
+    <option name="LAST_COMMIT_MESSAGE" value="Test of scripts that build everything." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
 </project>
