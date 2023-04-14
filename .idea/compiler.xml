@@ -20,10 +20,11 @@
         <outputRelativeToContentRoot value="true" />
         <module name="core" />
         <module name="website" />
-        <module name="storage" />
         <module name="util" />
         <module name="sas-server" />
         <module name="servlet" />
+        <module name="skin" />
+        <module name="storage" />
       </profile>
     </annotationProcessing>
   </component>

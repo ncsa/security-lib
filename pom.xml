@@ -50,6 +50,7 @@
         <module>servlet</module>
         <module>storage</module>
         <module>sas-server</module>
+        <module>skin</module>
     </modules>
     <build>
         <plugins>
@@ -112,7 +113,7 @@
                             </configuration>
                         </plugin>-->
 
-            <plugin>
+<!--            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.4.0</version>
@@ -125,11 +126,19 @@
                         <phase>site</phase>
                     </execution>
                 </executions>
+            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.5.0</version>
+<!--                <configuration>
+                    <includeDependencySources>true</includeDependencySources>
+                </configuration>-->
             </plugin>
         </plugins>
 
     </build>
-    <distributionManagement>
+<!--    <distributionManagement>
         <repository>
             <id>sonatype-nexus-staging</id>
             <name>sonatype</name>
@@ -142,8 +151,8 @@
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
             <uniqueVersion>false</uniqueVersion>
         </snapshotRepository>
-    </distributionManagement>
-    <reporting>
+    </distributionManagement>-->
+  <!--  <reporting>
            <plugins>
                <plugin>
                    <groupId>org.apache.maven.plugins</groupId>
@@ -169,5 +178,5 @@
                    </reportSets>
                </plugin>
            </plugins>
-       </reporting>
+       </reporting>-->
 </project>

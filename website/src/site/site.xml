@@ -4,36 +4,29 @@
   xmlns="http://maven.apache.org/DECORATION/1.8.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 http://maven.apache.org/xsd/decoration-1.8.0.xsd">
   <bannerLeft>
-    <name>${artifactId}</name>
-    <src>https://maven.apache.org/images/apache-maven-project.png</src>
-    <href>https://www.apache.org/</href>
+      <name>NCSA</name>
+      <src>css/images/ncsa-logo-sm-2.gif</src>
+      <href>http://www.ncsa.illinois.edu/</href>
   </bannerLeft>
-
   <bannerRight>
-    <src>https://maven.apache.org/images/maven-logo-black-on-white.png</src>
-    <href>https://maven.apache.org/</href>
+      <name>Sec-Lib</name>
+      <src>css/images/sec-lib-logo-sm-1.png</src>
+      <href>https://ncsa.github.io/oa4mp/</href>
   </bannerRight>
+  <version position="right"/>
 
   <skin>
-    <groupId>org.apache.maven.skins</groupId>
-    <artifactId>maven-fluido-skin</artifactId>
-    <version>1.7</version>
+    <groupId>edu.uiuc.ncsa.security.skin</groupId>
+    <artifactId>skin</artifactId>
+    <version>5.3-SNAPSHOT</version>
   </skin>
 
   <body>
-    <links>
-      <item name="CILogon" href="https://www.cilogon.org/" />
-      <item name="OA4MP" href="https://ncsa.github.io/oa4mp/"/>
-      <item name="QDL" href="https://ncsa.github.io/qdl/"/>
-    </links>
-
-<!--    <menu name="Examples">
-      <item name="APT Format" href="format.html"/>
-      <item name="FAQ" href="faq.html"/>
-      <item name="Markdown Example" href="markdown.html"/>
-      <item name="Markdown with Velocity Example" href="markdown-velocity.html"/>
-    </menu>-->
-
-    <menu ref="reports" />
+      <menu name="Related Projects">
+        <item name="CILogon" href="https://www.cilogon.org/" />
+        <item name="OA4MP" href="https://ncsa.github.io/oa4mp/"/>
+        <item name="QDL" href="https://ncsa.github.io/qdl/"/>
+      </menu>
+      <menu ref="reports"/>
   </body>
 </project>
