@@ -1,0 +1,907 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="9fdd0c4a-20be-4be4-802c-6391237ac776" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeInsightWorkspaceSettings">
+    <option name="optimizeImportsOnTheFly" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="5.2.5" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="ProjectId" id="24CIXuNSUgM0ZlMdhKwpDajsOFw" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="autoscrollToSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
+    <option name="showModules" value="false" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DatabaseDriversLRU" value="mysql" />
+    <property name="GoToClass.includeLibraries" value="false" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="MemberChooser.showClasses" value="true" />
+    <property name="MemberChooser.sorted" value="false" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File" value="JSON&#10;JAVA&#10;QDL" />
+    <property name="jdk.selected.JAVA_MODULE" value="11.0.8" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.6877193" />
+    <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveMembersDialog.RECENTS_KEY">
+      <recent name="AbstractState" />
+    </key>
+    <key name="ExtractSuperBase.RECENT_KEYS">
+      <recent name="edu.uiuc.ncsa.qdl.variables" />
+    </key>
+    <key name="MoveInnerDialog.RECENTS_KEY">
+      <recent name="edu.uiuc.ncsa.qdl.expressions" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="edu.uiuc.ncsa.security.util.crypto" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Shell Script.build.sh">
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <module />
+      <method />
+    </configuration>
+    <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
+      <Host>localhost</Host>
+      <Port>5050</Port>
+    </configuration>
+    <configuration name="AnotherJSONUtil" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.qdl.scripting.AnotherJSONUtil" />
+      <module name="ncsa-qdl" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.qdl.scripting.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BasicIdentifier" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.util.BasicIdentifier" />
+      <module name="ncsa-security-core" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.core.util.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EncryptionUtil" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.pkcs.EncryptionUtil" />
+      <module name="ncsa-security-util" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.util.pkcs.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="QDL basic" type="Application" factoryName="Application">
+      <option name="ALTERNATIVE_JRE_PATH" value="1.8_261" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.qdl.workspace.QDLWorkspace" />
+      <module name="ncsa-qdl" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="QDL default" type="Application" factoryName="Application" singleton="false">
+      <option name="ALTERNATIVE_JRE_PATH" value="1.8_261" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.qdl.workspace.QDLWorkspace" />
+      <module name="ncsa-qdl" />
+      <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/qdl-cfg.xml -name default" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TokenImpl" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.delegation.token.impl.TokenImpl" />
+      <module name="ncsa-security-delegation-common" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.delegation.token.impl.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Generic test suite" type="JUnit" factoryName="JUnit">
+      <module name="ncsa-security-util" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="ALTERNATIVE_JRE_PATH" value="1.8_261" />
+      <option name="PACKAGE_NAME" value="edu.uiuc.ncsa.security.util" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.TestSuite" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="QDL test suite" type="JUnit" factoryName="JUnit" singleton="false">
+      <module name="ncsa-qdl" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="ALTERNATIVE_JRE_PATH" value="1.8_261" />
+      <option name="PACKAGE_NAME" value="edu.uiuc.ncsa.qdl" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.qdl.TestSuite" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea -DtestClipboard=&quot;true&quot;" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="build.sh" type="ShConfigurationType" temporary="true">
+      <option name="SCRIPT_TEXT" value="" />
+      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+      <option name="SCRIPT_PATH" value="$PROJECT_DIR$/build.sh" />
+      <option name="SCRIPT_OPTIONS" value="" />
+      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+      <option name="INTERPRETER_PATH" value="/bin/bash" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="EXECUTE_IN_TERMINAL" value="true" />
+      <option name="EXECUTE_SCRIPT_FILE" value="true" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Application.QDL basic" />
+      <item itemvalue="Application.QDL default" />
+      <item itemvalue="Application.AnotherJSONUtil" />
+      <item itemvalue="Application.TokenImpl" />
+      <item itemvalue="Application.BasicIdentifier" />
+      <item itemvalue="Application.EncryptionUtil" />
+      <item itemvalue="JUnit.Generic test suite" />
+      <item itemvalue="JUnit.QDL test suite" />
+      <item itemvalue="Shell Script.build.sh" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Shell Script.build.sh" />
+        <item itemvalue="Application.EncryptionUtil" />
+        <item itemvalue="Application.AnotherJSONUtil" />
+        <item itemvalue="Application.BasicIdentifier" />
+        <item itemvalue="Application.TokenImpl" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration" maxAnnotateRevisions="500">
+    <option name="USER" value="" />
+    <option name="PASSWORD" value="" />
+    <option name="mySSHConnectionTimeout" value="30000" />
+    <option name="mySSHReadTimeout" value="30000" />
+    <option name="LAST_MERGED_REVISION" />
+    <option name="MERGE_DRY_RUN" value="false" />
+    <option name="MERGE_DIFF_USE_ANCESTRY" value="true" />
+    <option name="UPDATE_LOCK_ON_DEMAND" value="false" />
+    <option name="IGNORE_SPACES_IN_MERGE" value="false" />
+    <option name="DETECT_NESTED_COPIES" value="true" />
+    <option name="CHECK_NESTED_FOR_QUICK_MERGE" value="false" />
+    <option name="IGNORE_SPACES_IN_ANNOTATE" value="true" />
+    <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
+    <option name="FORCE_UPDATE" value="false" />
+    <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9fdd0c4a-20be-4be4-802c-6391237ac776" name="Changes" comment="" />
+      <created>1643128193687</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1643128193687</updated>
+      <workItem from="1643128194695" duration="59555000" />
+      <workItem from="1643653881354" duration="174764000" />
+      <workItem from="1644426689974" duration="261804000" />
+      <workItem from="1645877064036" duration="87041000" />
+      <workItem from="1646422087368" duration="19344000" />
+      <workItem from="1646686655216" duration="6025000" />
+      <workItem from="1646749807463" duration="39522000" />
+      <workItem from="1647268498901" duration="123334000" />
+      <workItem from="1648057660714" duration="104000" />
+      <workItem from="1648057789620" duration="97915000" />
+      <workItem from="1648869336699" duration="334601000" />
+      <workItem from="1650491699361" duration="53607000" />
+      <workItem from="1650665769242" duration="18204000" />
+      <workItem from="1651060948726" duration="119000" />
+      <workItem from="1651061088412" duration="61657000" />
+      <workItem from="1651315019933" duration="9475000" />
+      <workItem from="1651464283717" duration="19535000" />
+      <workItem from="1651529135624" duration="23120000" />
+      <workItem from="1651676221549" duration="9264000" />
+      <workItem from="1651752493231" duration="141024000" />
+      <workItem from="1652285981311" duration="68453000" />
+      <workItem from="1652762263064" duration="39163000" />
+      <workItem from="1653994124526" duration="21810000" />
+      <workItem from="1654177670128" duration="182838000" />
+      <workItem from="1655479255685" duration="180000" />
+      <workItem from="1655481367850" duration="82776000" />
+      <workItem from="1656102048014" duration="2154000" />
+      <workItem from="1656329291545" duration="145229000" />
+      <workItem from="1657036740699" duration="14713000" />
+      <workItem from="1657148182434" duration="3071000" />
+      <workItem from="1657219175950" duration="22357000" />
+      <workItem from="1657367916250" duration="51858000" />
+      <workItem from="1657836927458" duration="8823000" />
+      <workItem from="1657916006897" duration="708000" />
+      <workItem from="1658058926515" duration="102827000" />
+      <workItem from="1658874491296" duration="11959000" />
+      <workItem from="1658959110047" duration="42000" />
+      <workItem from="1659041298452" duration="6151000" />
+      <workItem from="1659104532033" duration="5938000" />
+      <workItem from="1659352300026" duration="1989000" />
+      <workItem from="1659354746273" duration="5390000" />
+    </task>
+    <task id="LOCAL-00034" summary="More set support tests. Found lots of cruft in the documents. re-ran the parser build.">
+      <created>1649456519966</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1649456519966</updated>
+    </task>
+    <task id="LOCAL-00035" summary="Found and solved an edge case with lexical tokens in the parser.">
+      <created>1649593602232</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1649593602232</updated>
+    </task>
+    <task id="LOCAL-00036" summary="Updated unit tests, added locking to cleanup threads. Rough count of QDL unit tests puts it at about 1875, in addition to many many for OA4MP. Lots of documentation upgrades/revisions. Parser regenerated.">
+      <created>1649714228775</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1649714228775</updated>
+    </task>
+    <task id="LOCAL-00037" summary="Cleanup can now be disabled. Found and fixed another issue with the parser -- with regression tests.">
+      <created>1649883689095</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1649883689095</updated>
+    </task>
+    <task id="LOCAL-00038" summary="Wide-ranging house cleaning. Most all of this boils down to rectifying insufficient error messages in cases that a wrong argument, wrong number of arguments etc. were used. Now it gives much much better feedback on the type of error. Re-ran the parsers to make sure everything was rebuilt with the latest version of ANTLR, since that has a few bug fixes that possibly (though very unlikely) could affect us. &#10;&#10;Mostly getting ducks in a row before 5.2.6.">
+      <created>1650300003972</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1650300003972</updated>
+    </task>
+    <task id="LOCAL-00039" summary="Some more cleanup. Haad to reorder execution of a few methods.">
+      <created>1650307201520</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1650307201520</updated>
+    </task>
+    <task id="LOCAL-00040" summary="Removed some very dead code. Tweaked listing.">
+      <created>1650318550286</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1650318550286</updated>
+    </task>
+    <task id="LOCAL-00041" summary="Finally reproduced really annoying terminal bug and fixed it. Also found one edge case for null arguments that was not handled.">
+      <created>1650404979530</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1650404979530</updated>
+    </task>
+    <task id="LOCAL-00042" summary="More pruning. Twiddled exceptions to give better messages">
+      <created>1650491904008</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1650491904008</updated>
+    </task>
+    <task id="LOCAL-00043" summary="More house cleaning and pruning. Added more tests for sets and beefed up serialization test so it is not haphazard. Added a complete set of server mode regression tests.">
+      <created>1650572242252</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1650572242252</updated>
+    </task>
+    <task id="LOCAL-00044" summary="Cut out a ton of dead code and useless comments. Found edge case in parser, so re-ran ANTLR build. test included in case of regression.">
+      <created>1650578887007</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1650578887007</updated>
+    </task>
+    <task id="LOCAL-00045" summary="Changed order of operations, so yet another parser rebuild. Changed some formatting, tweaked a few tests. Updated manuals.">
+      <created>1650648751894</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1650648751900</updated>
+    </task>
+    <task id="LOCAL-00046" summary="Removed extra character from parser. Changed MailUtil so it won't barf out stack traces for everything.">
+      <created>1650715234106</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1650715234107</updated>
+    </task>
+    <task id="LOCAL-00047" summary="CIL-1268. Added tracking original state so certain errors can be backed out of generally across all components. No internal server errors, e.g., should ever invalidated tokens.">
+      <created>1650802911542</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1650802911542</updated>
+    </task>
+    <task id="LOCAL-00048" summary="Far-reaching upgrade to error handling. Now pretty much every error in QDL can report its source code location. Waited until 5.2.6 was out the door (&quot;just in case&quot;) since this impacts all error handling. This will make debugging scripts a lot nicer. Seems to just work. :) :)">
+      <created>1651076965637</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1651076965637</updated>
+    </task>
+    <task id="LOCAL-00049" summary="Weirdly enjoyable day of reworking documentation and examples. Very useful,normally very dull.">
+      <created>1651184467932</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1651184467932</updated>
+    </task>
+    <task id="LOCAL-00050" summary="removed a bunch of extra whitespace from help. Added better error messages in JWT singing utility in case the wrong keys are found (indicating usually that the wrong VO is being used by the client).">
+      <created>1651529954960</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1651529954961</updated>
+    </task>
+    <task id="LOCAL-00051" summary="Help changes, fixed an edge case with parsing of empty statements. Added line reading for files.">
+      <created>1651701040326</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1651701040327</updated>
+    </task>
+    <task id="LOCAL-00052" summary="Added module for databse access and revised some tests.">
+      <created>1651782143532</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1651782143533</updated>
+    </task>
+    <task id="LOCAL-00053" summary="Renamed a couple of classes to be far more descriptive.">
+      <created>1651834941382</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1651834941382</updated>
+    </task>
+    <task id="LOCAL-00054" summary="Rewrote list processing in QDL. This originally used TreeSet in certain places -- the slowest possible Java Collection. It became clear that those components were among actually the most frequently used in practice. TreeSet was almost compeltely replaced with ArrayList -- the fastest Java Collection. Speed increase by 25% right off the bat in unit tests from 17 seconds to 13 seconds.">
+      <created>1652014049741</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1652014049741</updated>
+    </task>
+    <task id="LOCAL-00055" summary="Last bit of housekeeping in QDL before turning my attention fully to CIL-1081 and delegation. Wanted to add some regression tests and check a few edge cases so this can be unattended for the next bit.">
+      <created>1652108288842</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1652108288842</updated>
+    </task>
+    <task id="LOCAL-00056" summary="New documentation did not get added to git. Adding it.">
+      <created>1652198546319</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1652198546319</updated>
+    </task>
+    <task id="LOCAL-00057" summary="Housekeeping and performance in QDL. Changed to much faster indexing options. Renamed a class.">
+      <created>1652392559702</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1652392559703</updated>
+    </task>
+    <task id="LOCAL-00058" summary="Minor changes (convenience method to remove boilerplate that was proliferating).">
+      <created>1652481208221</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1652481208222</updated>
+    </task>
+    <task id="LOCAL-00059" summary="Spplit up and renamed a QDL function that was being too overloaded for its own good.">
+      <created>1652532919118</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1652532919118</updated>
+    </task>
+    <task id="LOCAL-00060" summary="Check in before travel.">
+      <created>1653338875073</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1653338875073</updated>
+    </task>
+    <task id="LOCAL-00061" summary="CIL-1296, CIL-1301, CIL-1302">
+      <created>1654288676536</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1654288676537</updated>
+    </task>
+    <task id="LOCAL-00062" summary="Removed redundant functions. Added a new operator for &lt;&lt; (mostly syntactic sugar).">
+      <created>1654637372338</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1654637372338</updated>
+    </task>
+    <task id="LOCAL-00063" summary="Changed a delimiter. Hopefully improved logging messages by making them more succinct.">
+      <created>1655417801917</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1655417801917</updated>
+    </task>
+    <task id="LOCAL-00064" summary="Clean up. Added small tweak to a JSON utility.">
+      <created>1656104336011</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1656104336013</updated>
+    </task>
+    <task id="LOCAL-00065" summary="Refactoring that was loooong overdue and looks far worse than it is: This simply renamed a widely used class and uses delegation now (has_a not is_a relationship) for it.">
+      <created>1656360190224</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1656360190225</updated>
+    </task>
+    <task id="LOCAL-00066" summary="Added extraction (a utility). Test included. Cleaned up some cruft in the parser.">
+      <created>1656714164554</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1656714164554</updated>
+    </task>
+    <task id="LOCAL-00067" summary="Added extraction operator with documentation and tests.">
+      <created>1657035271235</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1657035271236</updated>
+    </task>
+    <task id="LOCAL-00068" summary="Updated help mostly.">
+      <created>1657571623842</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1657571623842</updated>
+    </task>
+    <task id="LOCAL-00069" summary="More documentation updates. Improved part of QDL IDE so it makes logical sense and not just ad hoc. Fixed some formatting issues.">
+      <created>1657655737403</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1657655737403</updated>
+    </task>
+    <task id="LOCAL-00070" summary="Managed to delete large block of help. Restoring.">
+      <created>1657712509514</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1657712509514</updated>
+    </task>
+    <task id="LOCAL-00071" summary="Pre-travel checkin">
+      <created>1657808972644</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1657808972644</updated>
+    </task>
+    <task id="LOCAL-00072" summary="tracked down an edge case">
+      <created>1658181657232</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1658181657234</updated>
+    </task>
+    <task id="LOCAL-00073" summary="More improvements and documentation. Added lots of tests for new extraction operator.">
+      <created>1658269102580</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1658269102580</updated>
+    </task>
+    <task id="LOCAL-00074" summary="Found one (hopefully last!!) edge case and added a test.">
+      <created>1658352549967</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1658352549967</updated>
+    </task>
+    <task id="LOCAL-00075" summary="Last couple of tests, removed a ton of print statements for debugging.">
+      <created>1658421983235</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1658421983235</updated>
+    </task>
+    <task id="LOCAL-00076" summary="Migrate to Java 11, maven module restructure, remove OAuth 1.0a code.">
+      <created>1658787575133</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1658787575134</updated>
+    </task>
+    <task id="LOCAL-00077" summary="CIL-627: Build is now done with Java 17 targeting Java 11 output. This allows for completely updating all Maven plugins.">
+      <created>1658866165434</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1658866165434</updated>
+    </task>
+    <task id="LOCAL-00078" summary="Drivers updated. Several drivers were stuck at lower levels since they required java 9 or above. These can now be updated.">
+      <created>1658873746055</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1658873746055</updated>
+    </task>
+    <task id="LOCAL-00079" summary="Added build.sh. Preparing for major restructuring.">
+      <created>1658944907690</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1658944907691</updated>
+    </task>
+    <task id="LOCAL-00080" summary="QDL has been moved to its own project. Deleting it from the security libraries.">
+      <created>1658945185751</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1658945185751</updated>
+    </task>
+    <task id="LOCAL-00081" summary="Preparing for next phase of CIL-627">
+      <created>1659103592650</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1659103592650</updated>
+    </task>
+    <task id="LOCAL-00082" summary="CIL-627 Part I.">
+      <created>1659363399492</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1659363399493</updated>
+    </task>
+    <option name="localTasksCounter" value="83" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.mdl" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="8bc00f32-3c35-4d64-bdfe-51b56942c27c">
+          <value>
+            <State>
+              <option name="SHOW_ONLY_AFFECTED_CHANGES" value="true" />
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                  <entry key="structure">
+                    <value>
+                      <list>
+                        <option value="dir:/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="8bc00f32-3c35-4d64-bdfe-51b56942c27c" value="TOOL_WINDOW" />
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Minor changes (convenience method to remove boilerplate that was proliferating)." />
+    <MESSAGE value="Spplit up and renamed a QDL function that was being too overloaded for its own good." />
+    <MESSAGE value="Check in before travel." />
+    <MESSAGE value="CIL-1296, CIL-1301, CIL-1302" />
+    <MESSAGE value="Removed redundant functions. Added a new operator for &lt;&lt; (mostly syntactic sugar)." />
+    <MESSAGE value="Changed a delimiter. Hopefully improved logging messages by making them more succinct." />
+    <MESSAGE value="Clean up. Added small tweak to a JSON utility." />
+    <MESSAGE value="Refactoring that was loooong overdue and looks far worse than it is: This simply renamed a widely used class and uses delegation now (has_a not is_a relationship) for it." />
+    <MESSAGE value="Added extraction (a utility). Test included. Cleaned up some cruft in the parser." />
+    <MESSAGE value="Added extraction operator with documentation and tests." />
+    <MESSAGE value="Updated help mostly." />
+    <MESSAGE value="More documentation updates. Improved part of QDL IDE so it makes logical sense and not just ad hoc. Fixed some formatting issues." />
+    <MESSAGE value="Managed to delete large block of help. Restoring." />
+    <MESSAGE value="Pre-travel checkin" />
+    <MESSAGE value="tracked down an edge case" />
+    <MESSAGE value="More improvements and documentation. Added lots of tests for new extraction operator." />
+    <MESSAGE value="Found one (hopefully last!!) edge case and added a test." />
+    <MESSAGE value="Last couple of tests, removed a ton of print statements for debugging." />
+    <MESSAGE value="Migrate to Java 11, maven module restructure, remove OAuth 1.0a code." />
+    <MESSAGE value="CIL-627: Build is now done with Java 17 targeting Java 11 output. This allows for completely updating all Maven plugins." />
+    <MESSAGE value="Drivers updated. Several drivers were stuck at lower levels since they required java 9 or above. These can now be updated." />
+    <MESSAGE value="Added build.sh. Preparing for major restructuring." />
+    <MESSAGE value="QDL has been moved to its own project. Deleting it from the security libraries." />
+    <MESSAGE value="Preparing for next phase of CIL-627" />
+    <MESSAGE value="CIL-627 Part I." />
+    <option name="LAST_COMMIT_MESSAGE" value="CIL-627 Part I." />
+    <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLConfigurationLoaderUtils.java</url>
+          <line>221</line>
+          <option name="timeStamp" value="93" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
+          <line>4139</line>
+          <option name="timeStamp" value="121" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/functions/FTable.java</url>
+          <line>262</line>
+          <option name="timeStamp" value="179" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/xml/XMLSerializationState.java</url>
+          <line>79</line>
+          <option name="timeStamp" value="218" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/state/VariableState.java</url>
+          <line>218</line>
+          <option name="timeStamp" value="232" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/cli/InputLine.java</url>
+          <line>212</line>
+          <option name="timeStamp" value="307" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/OpEvaluator.java</url>
+          <line>547</line>
+          <option name="timeStamp" value="349" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/QDLSetNode.java</url>
+          <line>73</line>
+          <option name="timeStamp" value="503" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/OpEvaluator.java</url>
+          <line>1251</line>
+          <option name="timeStamp" value="509" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/scripting/Scripts.java</url>
+          <line>138</line>
+          <option name="timeStamp" value="547" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/scripting/Scripts.java</url>
+          <line>86</line>
+          <option name="timeStamp" value="548" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/configuration/provider/HierarchicalConfigProvider.java</url>
+          <line>68</line>
+          <option name="timeStamp" value="556" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/QDLList.java</url>
+          <line>1048</line>
+          <option name="timeStamp" value="577" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/SparseEntry.java</url>
+          <line>41</line>
+          <option name="timeStamp" value="605" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/QDLList.java</url>
+          <line>423</line>
+          <option name="timeStamp" value="612" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/QDLList.java</url>
+          <line>41</line>
+          <option name="timeStamp" value="697" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/scripting/AnotherJSONUtil.java</url>
+          <line>233</line>
+          <option name="timeStamp" value="723" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/MathEvaluator.java</url>
+          <line>276</line>
+          <option name="timeStamp" value="749" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/ANode2.java</url>
+          <line>153</line>
+          <option name="timeStamp" value="765" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/TMathEvaluator.java</url>
+          <line>374</line>
+          <option name="timeStamp" value="771" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/QDLStem.java</url>
+          <line>142</line>
+          <option name="timeStamp" value="774" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/QDLStem.java</url>
+          <line>865</line>
+          <option name="timeStamp" value="860" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/scripting/AnotherJSONUtil.java</url>
+          <line>134</line>
+          <option name="timeStamp" value="861" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/state/FunctionState.java</url>
+          <line>350</line>
+          <option name="timeStamp" value="862" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
+          <line>3726</line>
+          <option name="timeStamp" value="867" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
+          <line>1161</line>
+          <option name="timeStamp" value="868" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
+          <line>1076</line>
+          <option name="timeStamp" value="869" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/BufferManager.java</url>
+          <line>359</line>
+          <option name="timeStamp" value="873" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="edu.uiuc.ncsa.qdl.functions.FR_WithState" memberName="state" />
+        <PinnedItemInfo parentTag="edu.uiuc.ncsa.qdl.state.SymbolStack" memberName="addedTables" />
+        <PinnedItemInfo parentTag="edu.uiuc.ncsa.qdl.expressions.ModuleExpression" memberName="tokenPosition" />
+        <PinnedItemInfo parentTag="edu.uiuc.ncsa.qdl.state.State" memberName="symbolStack" />
+      </pinned-members>
+    </pin-to-top-manager>
+  </component>
+</project>

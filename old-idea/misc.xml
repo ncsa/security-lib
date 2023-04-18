@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CCaseConfig">
+    <option name="checkoutReserved" value="false" />
+    <option name="markExternalChangeAsUpToDate" value="true" />
+    <option name="checkInUseHijack" value="true" />
+    <option name="useUcmModel" value="true" />
+    <option name="synchOutside" value="false" />
+    <option name="isHistoryResticted" value="true" />
+    <option name="useIdenticalSwitch" value="true" />
+    <option name="synchActivitiesOnRefresh" value="true" />
+    <option name="lastScr" value="" />
+    <option name="scrTextFileName" value="" />
+    <option name="historyRevisionsNumber" value="4" />
+  </component>
+  <component name="ClearCaseSharedConfig">
+    <option name="myUseUcmModel" value="true" />
+  </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="IdProvider" IDEtalkID="215A14033C971CCE717D28767B12EEA0" />
+  <component name="JavadocGenerationManager">
+    <option name="OTHER_OPTIONS" value="" />
+  </component>
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/pom.xml" />
+      </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/ncsa-qdl-website/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-qdl/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-common/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/pom.xml" />
+        <option value="$PROJECT_DIR$/ncsa-security-delegation/pom.xml" />
+        <option value="$PROJECT_DIR$/untitled/pom.xml" />
+      </set>
+    </option>
+  </component>
+  <component name="ModuleEditorState">
+    <option name="LAST_EDITED_MODULE_NAME" />
+    <option name="LAST_EDITED_TAB_NAME" />
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="11.0.8" project-jdk-type="JavaSDK" />
+</project>

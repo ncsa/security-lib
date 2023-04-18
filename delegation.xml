@@ -1,0 +1,4 @@
+Apr 17, 2023 9:30:19 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: NCSA Delegation:Logging to file delegation.xml
+Apr 17, 2023 9:30:19 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: NCSA Delegation:SAS Configuration loader version: 5.3-SNAPSHOT startup on Mon Apr 17 09:30:19 CDT 2023
