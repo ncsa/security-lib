@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>The CLI (Command Line Interface)</title>
+    <!--#include virtual="../head.html" -->
+</head>
+
+<body class="composite">
+<!--#include virtual="../header.html"-->
+<h2>Overview</h2>
+<p>Sec-Lib  has a CLI (Command Line Interface) package that allows you to create
+character based command line access to pretty much anything you need. One major
+application is access to a <a href="https://ncsa.github.io/security-lib/apidocs/edu/uiuc/ncsa/security/core/Store.html">store</a>.
+There is a driver for the CLI that has Commands (an interface). The contract is that if a command has
+a specific signature, it will be treated as a command and calls to it at the prompt will be dispatched.
+In this way, it is really easy to create a fully functional CLI for any project with all the bells and
+whistles. A supremely useful implementation is accessing a store. </p>
+<h2>Meta-Commands</h2>
+<p>These are commands that are prefixed with a / and control how the CLI itself operates.</p>
+<ul>
+    <li>/? - list help for the meta commands</li>
+    <li>/help <i>topic</i> - show help for a topic</li>
+    <li>/h - show the history </li>
+</ul>
+<h2>Help!</h2>
+<h3>Online Command Help</h3>
+<p>If you are looking for how to add help to your own system, look at <a href="help.html">adding help</a></p>
+<p>Every command supports online help. If you are running the CLI then issue</p>
+<pre>
+    >command --help
+</pre>
+<p>And a great deal of help will be printed. Online help is</p>
+<h3>Online help for properties etc.</h3>
+<p>A help facility for properties and such is available. This is accessed with</p>
+<pre>
+    /help topic
+</pre>
+<p>For instance, each object may have multiple properties and they should be described
+using this facility.</p>
+<h3>The Environment</h3>
+<p>
+    By environment we mean a set of keys and values that may be used as a pre-processor.
+    You set them and access them with ${key} which is replaced by the value. This happens
+    before any other processing of the commands and is a very useful labor saving device.
+    You may set, store, load, etc. these. You do <i>not</i> have to use them, but in many
+    cases where there is a limited functionality of the command line itself (such as no
+    clipboard operations), this can be a very useful tool indeed.
+</p>
+<ul>
+    <li>clear_env</li>
+    <li>get_env</li>
+    <li>print_env</li>
+    <li>read_env</li>
+    <li>save_env</li>
+    <li>set_env</li>
+</ul>
+<h3>Serialization of objects.</h3>
+<p>To serialize an object means to turn it into (in this case) a small XML document.
+These may be treated like any other document and edited, stored, shared. They may then
+be imported or deserialized into the store. A common use is to exchange items between
+stores, or to serialize an object, edit it then restore it.</p>
+<ul>
+    <li>deserialize</li>
+    <li>serialize</li>
+</ul>
+<h3>CRUD Operations on objects.</h3>
+<ul>
+    <li>copy</li>
+    <li>create</li>
+    <li>list_keys</li>
+    <li>ls</li>
+    <li>rename</li>
+    <li>rm</li>
+    <li>update</li>
+</ul>
+<h3>Working with a single object</h3>
+<p>You may set an identifier which is then used for all subsequent operations. </p>
+<ul>
+    <li>clear_id -- erase the current default identifier.</li>
+    <li>get_id -- print the current identifier if set.</li>
+    <li>edit -- edit the current object with the identifier</li>
+    <li>set_id -- set the current default identifier</li>
+</ul>
+<h3>Archiving objects.</h3>
+<p>Objects may be archived in the store and restored. This is done by making a
+complete copy of the object and saving it with an overloaded identifier.
+This is quite useful if you are making changes to an object, but may need to
+back out of them, or just to have a an audit trail (archive an object before updating it).</p>
+<ul>
+    <li>archive</li>
+</ul>
+<h3>Searching</h3>
+<ul>
+    <li>rs</li>
+    <li>search</li>
+
+</ul>
+<h3>Scripting, Batch files</h3>
+<p>Batch processing, i.e., writing a rudimentary script of commands you would type
+in and executing it, is supported. For more complex operations, you may need to
+use something like a bash or QDL script, but a wide variety of cases can be handled.</p>
+<ul>
+    <li>echo -- echo the argument to this command. </li>
+    <li>set_output_on -- toggel output. Of off, then no output of any sort is created.</li>
+    <li>set_verbose_on -- if on, then the system gets a lot chattier about what it is doing.</li>
+</ul>
+<h3>Miscellaneous Commands.</h3>
+<ul>
+    <li>print_help -- print generic help</li>
+    <li>size -- show the size of the store, i.e., the number of entries</li>
+    <li>version --print out the version string for store commands</li>
+</ul>
+<!--#include virtual="../footer.html" -->
+</body>
+</html>

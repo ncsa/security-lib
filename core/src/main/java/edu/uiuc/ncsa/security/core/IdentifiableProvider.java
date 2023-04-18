@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.core;
 
 import javax.inject.Provider;
 /**
+ * Interface for a class that is to create an identifier.
  * <p>Created by Jeff Gaynor<br>
  * on 11/4/13 at  12:56 PM
  */

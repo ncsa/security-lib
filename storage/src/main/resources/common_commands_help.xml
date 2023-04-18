@@ -1,3 +1,10 @@
+<!DOCTYPE html [
+        <!ELEMENT html (entry)*>
+        <!ELEMENT entry (body)*>
+        <!ATTLIST entry
+                id CDATA #REQUIRED>
+        <!ELEMENT body (#PCDATA)>
+        ]>
 <html>
     <entry id="clear_env">
     <body>

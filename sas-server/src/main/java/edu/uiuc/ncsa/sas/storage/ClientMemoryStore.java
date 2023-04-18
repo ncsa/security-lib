@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.sas.storage;
 
-import edu.uiuc.ncsa.sas.satclient.SATClient;
+import edu.uiuc.ncsa.sas.client.SASClient;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
@@ -11,7 +11,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 8/22/22 at  2:09 PM
  */
-public class ClientMemoryStore<V extends SATClient> extends MemoryStore<V> implements SASClientStore<V> {
+public class ClientMemoryStore<V extends SASClient> extends MemoryStore<V> implements SASClientStore<V> {
     public ClientMemoryStore(IdentifiableProvider<V> identifiableProvider) {
         super(identifiableProvider);
     }

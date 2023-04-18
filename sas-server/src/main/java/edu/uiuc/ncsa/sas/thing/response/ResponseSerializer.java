@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.sas.thing.response;
 
 import edu.uiuc.ncsa.sas.SASConstants;
-import edu.uiuc.ncsa.sas.SASEnvironment;
 import edu.uiuc.ncsa.sas.SessionRecord;
 import edu.uiuc.ncsa.sas.exceptions.EncryptionException;
 import edu.uiuc.ncsa.security.util.crypto.DecryptUtils;
@@ -22,15 +21,15 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * on 8/16/22 at  6:26 AM
  */
 public class ResponseSerializer implements SASConstants {
-    public SASEnvironment getSATE() {
-        return sate;
+/*    public SASEnvironment getSATE() {
+        return sase;
     }
 
     public void setSATE(SASEnvironment sate) {
-        this.sate = sate;
-    }
+        this.sase = sate;
+    }*/
 
-    SASEnvironment sate;
+  //  SASEnvironment sase;
 
     /**
      * Symmetric key encode. Returned string is base 64 encoded byte array.
@@ -119,7 +118,7 @@ public class ResponseSerializer implements SASConstants {
             pw.println(sEncrypt(sessionRecord.sKey, array.getJSONObject(0).toString(1)));
         } else {
             JSONObject json = new JSONObject();
-            json.put(SASConstants.KEYS_SAT, array.toString(1));
+            json.put(SASConstants.KEYS_SAS, array.toString(1));
             pw.println(sEncrypt(sessionRecord.sKey, json.toString(1)));
         }
         // Final thing to do -- update the new key if there is one

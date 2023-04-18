@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.sas;
 
-import edu.uiuc.ncsa.sas.satclient.ClientProvider;
-import edu.uiuc.ncsa.sas.satclient.SATClient;
+import edu.uiuc.ncsa.sas.client.ClientProvider;
+import edu.uiuc.ncsa.sas.client.SASClient;
 import edu.uiuc.ncsa.sas.loader.SASExceptionHandler;
 import edu.uiuc.ncsa.sas.thing.action.*;
 import edu.uiuc.ncsa.sas.thing.response.*;
@@ -36,14 +36,14 @@ public class SASServlet extends AbstractServlet {
     public void loadEnvironment() throws IOException {
         setEnvironment(getConfigurationLoader().load());
         try {
-            JSONWebKeys jsonWebKeys = JSONWebKeyUtil.fromJSON(new File("/home/ncsa/dev/ncsa-git/security-lib/crypto/src/main/resources/keys.jwk"));
+            JSONWebKeys jsonWebKeys = JSONWebKeyUtil.fromJSON(new File("/home/ncsa/dev/csd/config/sas/keys.jwk"));
             jsonWebKeys.setDefaultKeyID("2D700DF531E09B455B9E74D018F9A133"); // for testing!
         } catch (Throwable t) {
             t.printStackTrace();
         }
     }
 
-    protected SASEnvironment getSATE() {
+    protected SASEnvironment getSASE() {
         return (SASEnvironment) getEnvironment();
     }
 
@@ -64,7 +64,7 @@ public class SASServlet extends AbstractServlet {
         // have to figure out the public key size.
         int totalBytes = ((RSAPublicKey) sessionRecord.client.getPublicKey()).getModulus().bitLength() / 8;
         LogonResponse logonResponse = new LogonResponse(logonAction, sessionID, new byte[]{32, 64});
-        // Take the total bytes (limited by RSA key size), remove the response size withoout key,
+        // Take the total bytes (limited by RSA key size), remove the response size without key,
         // estimate key. The 3/4 accounts for the amount of space lost to base 64 encoding.
         //    System.out.println(getClass().getCanonicalName() + " stats:")
         //    System.out.println(getClass().getCanonicalName() + " total bytes:" + totalBytes);
@@ -119,7 +119,7 @@ public class SASServlet extends AbstractServlet {
         };
     }
 
-    protected LogoffResponse doLogoff(SATClient client, LogoffAction logoffAction, HttpServletResponse response, SessionRecord sessionRecord, String message) throws IOException {
+    protected LogoffResponse doLogoff(SASClient client, LogoffAction logoffAction, HttpServletResponse response, SessionRecord sessionRecord, String message) throws IOException {
         LogoffResponse logoffResponse = new LogoffResponse(logoffAction, message);
         //getSATE().getResponseSerializer().serialize(logoffResponse, response, sessionRecord);
         sessions.remove(sessionRecord.sessionID);
@@ -158,15 +158,15 @@ public class SASServlet extends AbstractServlet {
         }
 
 
-        SATClient client = null;
+        SASClient client = null;
         if (clientID != null) {
             if (!ClientProvider.isClientID(clientID.getUri().toString())) {
                 throw new UnknownClientException("unknown client \"" + clientID + "\"");
             }
-            if (!getSATE().getClientStore().containsKey(clientID)) {
+            if (!getSASE().getClientStore().containsKey(clientID)) {
                 throw new UnknownClientException("unknown client \"" + clientID + "\"");
             }
-            client = getSATE().getClientStore().get(clientID);
+            client = getSASE().getClientStore().get(clientID);
   /*          doLogon(client, httpServletResponse);
             return;*/
         }
@@ -183,9 +183,9 @@ public class SASServlet extends AbstractServlet {
         try {
             List<Action> actions;
             if (isLogon) {
-                actions = getSATE().getRequestDeserializer().rsaDeserialize(sessionRecord, httpServletRequest);
+                actions = getSASE().getRequestDeserializer().rsaDeserialize(sessionRecord, httpServletRequest);
             } else {
-                actions = getSATE().getRequestDeserializer().sDeserialize(sessionRecord, httpServletRequest);
+                actions = getSASE().getRequestDeserializer().sDeserialize(sessionRecord, httpServletRequest);
             }
             List<Response> responses = new ArrayList<>();
 
@@ -209,7 +209,7 @@ public class SASServlet extends AbstractServlet {
                 responses.add(response);
             }
             sessionRecord.lastAccessed = new Date();
-            getSATE().getResponseSerializer().serialize(responses, httpServletResponse, sessionRecord);
+            getSASE().getResponseSerializer().serialize(responses, httpServletResponse, sessionRecord);
 
         } catch (Throwable t) {
             handleException(t, httpServletRequest, httpServletResponse, sessionRecord);
@@ -217,7 +217,7 @@ public class SASServlet extends AbstractServlet {
 
     }
 
-    protected Response doNewKey(SATClient client, NewKeyAction newKeyAction, HttpServletResponse httpServletResponse, SessionRecord sessionRecord) {
+    protected Response doNewKey(SASClient client, NewKeyAction newKeyAction, HttpServletResponse httpServletResponse, SessionRecord sessionRecord) {
         SecureRandom secureRandom = new SecureRandom();
         byte[] key = new byte[newKeyAction.getSize()];
         secureRandom.nextBytes(key);

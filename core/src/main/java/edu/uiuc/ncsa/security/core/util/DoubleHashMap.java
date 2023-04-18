@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-/** A hashmap with two way lookup. This maintains a second hashmap that has the
+/** A hashmap with two-way lookup. This maintains a second hashmap that has the
  * keys reversed. Access these elements with {@link #getByValue(Object)}.
  * There are some caveats. For one thing, this assumes that there
  * is a one to one correspondence between keys and values so

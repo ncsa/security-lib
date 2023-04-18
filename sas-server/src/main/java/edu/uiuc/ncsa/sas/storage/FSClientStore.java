@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.sas.storage;
 
-import edu.uiuc.ncsa.sas.satclient.SATClient;
+import edu.uiuc.ncsa.sas.client.SASClient;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.storage.FileStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
@@ -12,7 +12,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 8/22/22 at  2:10 PM
  */
-public class FSClientStore<V extends SATClient> extends FileStore<V> implements SASClientStore<V> {
+public class FSClientStore<V extends SASClient> extends FileStore<V> implements SASClientStore<V> {
     public FSClientStore(File storeDirectory, File indexDirectory, IdentifiableProvider<V> identifiableProvider, MapConverter<V> converter, boolean removeEmptyFiles) {
         super(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles);
     }

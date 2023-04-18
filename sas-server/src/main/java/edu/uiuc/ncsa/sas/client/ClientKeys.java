@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.sas.satclient;
+package edu.uiuc.ncsa.sas.client;
 
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 

@@ -5,8 +5,9 @@ import edu.uiuc.ncsa.security.core.Logable;
 import java.util.Map;
 
 /**
- * Basic environment. This contains all of the configuration and configured
- * factories that the an application needs. This permits different environments to operate simultaneously if there
+ * Basic runtime environment. Generally, you read a configuration with one of the configuration
+ * utilities then create an instance of this. This contains all the configuration and configured
+ * factories that the application needs. This permits different environments to operate simultaneously if there
  * are, for instance, multiple services running.
  * <p>Created by Jeff Gaynor<br>
  * on Nov 5, 2010 at  10:17:04 AM

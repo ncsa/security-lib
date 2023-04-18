@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 import java.util.StringTokenizer;
 
 /**
+ * Utility for looking up a host. Mostly a facade to make life easier.
  * <p>Created by Jeff Gaynor<br>
  * on 10/22/13 at  11:48 AM
  */

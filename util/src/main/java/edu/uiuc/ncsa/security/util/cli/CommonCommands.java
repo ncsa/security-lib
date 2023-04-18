@@ -129,7 +129,7 @@ public abstract class CommonCommands implements Commands {
     }
 
     @Override
-    public void print_help(InputLine inputLine) throws Exception {
+    public void print_help() throws Exception {
         say("All commands have detailed help by typing:");
         say("command --help");
         say("--Environment commands: these control variables managed by this component");

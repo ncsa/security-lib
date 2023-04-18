@@ -1,12 +1,13 @@
 package edu.uiuc.ncsa.sas;
 
 /**
+ * Constants for the Subject-Action Service.
  * <p>Created by Jeff Gaynor<br>
  * on 8/15/22 at  8:36 AM
  */
 public interface SASConstants {
     // Keys for things in JSON
-    public static final String KEYS_SAT = "sat";
+    public static final String KEYS_SAS = "sas";
     public static final String KEYS_TYPE = "type";
     public static final String KEYS_SUBJECT = "subject";
     public static final String KEYS_STATE = "state";
@@ -33,7 +34,7 @@ public interface SASConstants {
     public static final String RESPONSE_STATUS = "status";
     public static final String RESPONSE_CONTENT = "content";
     public static final String RESPONSE_PROMPT = "prompt";
-    public static final String RESPONSE_SESSION_ID = "session_id";
+    public static final String RESPONSE_SESSION_ID = "sas_session_id";  // See note below on HEADER_SESSION_ID
     public static final String RESPONSE_SYMMETRIC_KEY = "s_key";
     public static final String RESPONSE_MESSAGE = "message";
     public static final String RESPONSE_TYPE_ERROR = "error";
@@ -53,6 +54,8 @@ public interface SASConstants {
     public static final String CLIENT_ID_HEAD = "sas:client/";
 
     // Header seesion ID. Used in every other request after logon.
+    // NOTE that Session-id is a reserved header for HTTP, so ours has to
+    // be named something else.
     public static final String HEADER_SESSION_ID = "sas-session-id";
 
 }

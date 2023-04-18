@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.sas.satclient;
+package edu.uiuc.ncsa.sas.client;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
@@ -13,7 +13,7 @@ import net.sf.json.JSONObject;
  * <p>Created by Jeff Gaynor<br>
  * on 8/15/22 at  9:38 AM
  */
-public class ClientConverter<V extends SATClient> extends MapConverter<V> {
+public class ClientConverter<V extends SASClient> extends MapConverter<V> {
     @Override
     public ClientKeys getKeys() {
         return (ClientKeys) super.getKeys();

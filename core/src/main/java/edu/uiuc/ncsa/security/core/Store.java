@@ -1,18 +1,22 @@
 package edu.uiuc.ncsa.security.core;
 
+import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
+
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Interface for stores. This models a specific case, where there is a primary key, so that this is
+ * Interface for stores. This models a specific case, where there is a primary key, which
+ * can be represented with an {@link Identifier} so that this is
  * logically also a map. Each row corresponds to (usually) one java object. What the map interface
  * lacks is concepts for CRUD (create, retrieve, update, delete) and this interface adds those.
  * <h3>Usage</h3>
  * A very large number of practical database programming issues fall into this case and
  * the interfaces and basic classes in this package make setting up and managing them
- * extremely simple.
+ * extremely simple. This interface comes with a variety of basic implementations, such
+ * as an in-memory store, a file store (which emulates having an index on disk) as well
+ * as support for SQL databases.
  * <p>Created by Jeff Gaynor<br>
  * on Mar 12, 2010 at  10:21:39 AM
  */
@@ -29,7 +33,8 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
     public V create();
 
     /**
-     * Update an existing object.
+     * Update an existing object. An {@link UnregisteredObjectException} is thrown if the object has not been saved
+     * first.
      *
      * @param value
      */

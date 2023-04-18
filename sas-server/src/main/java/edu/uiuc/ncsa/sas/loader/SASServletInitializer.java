@@ -2,10 +2,10 @@ package edu.uiuc.ncsa.sas.loader;
 
 import edu.uiuc.ncsa.sas.SASConstants;
 import edu.uiuc.ncsa.sas.SASEnvironment;
-import edu.uiuc.ncsa.sas.satclient.ClientConverter;
-import edu.uiuc.ncsa.sas.satclient.ClientKeys;
-import edu.uiuc.ncsa.sas.satclient.ClientProvider;
-import edu.uiuc.ncsa.sas.satclient.SATClient;
+import edu.uiuc.ncsa.sas.client.ClientConverter;
+import edu.uiuc.ncsa.sas.client.ClientKeys;
+import edu.uiuc.ncsa.sas.client.ClientProvider;
+import edu.uiuc.ncsa.sas.client.SASClient;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;
@@ -54,11 +54,11 @@ public class SASServletInitializer implements Initialization {
         } catch (Throwable t) {
             t.printStackTrace();
         }
-        Store<SATClient> clientStore = new MemoryStore<SATClient>(new ClientProvider()) {
+        Store<SASClient> clientStore = new MemoryStore<SASClient>(new ClientProvider()) {
             ClientConverter clientConverter;
 
             @Override
-            public XMLConverter<SATClient> getXMLConverter() {
+            public XMLConverter<SASClient> getXMLConverter() {
                 if (clientConverter == null) {
                     clientConverter = new ClientConverter(new ClientKeys(), new ClientProvider());
                 }
@@ -66,13 +66,13 @@ public class SASServletInitializer implements Initialization {
             }
 
             @Override
-            public List<SATClient> getMostRecent(int n, List<String> attributes) {
+            public List<SASClient> getMostRecent(int n, List<String> attributes) {
                 return null;
             }
         };
-        SATClient client = new SATClient(testClientID);
+        SASClient client = new SASClient(testClientID);
         client.setPublicKey(jsonWebKeys.getDefault().publicKey);
-        client.setName("Debug client for SAT");
+        client.setName("Debug client for SAS");
         clientStore.put(client.getIdentifier(), client);
         getEnvironment().setClientStore(clientStore);
     }

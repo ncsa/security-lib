@@ -96,7 +96,7 @@ public class InputLine {
      * @return
      */
     public String[] argsToStringArray() {
-        String[] out = null;
+        String[] out;
         if (parsedInput != null && !parsedInput.isEmpty()) {
             out = new String[parsedInput.size() - 1];
             // first pass tells whether to put a blank between arguments. The zero-th
@@ -104,6 +104,8 @@ public class InputLine {
             for (int i = 1; i < parsedInput.size(); i++) {
                 out[i - 1] = parsedInput.get(i);
             }
+        }else{
+            return new String[0]; // do not return a null, just an empty array.
         }
         return out;
     }

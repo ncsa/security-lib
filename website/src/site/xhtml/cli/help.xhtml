@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Adding Help To Your CLI</title>
+    <!--#include virtual="../head.html" -->
+</head>
+
+<body class="composite">
+<!--#include virtual="../header.html"-->
+<h2>Adding help to an application.</h2>
+<p>Help can be added quite simply. If you create a help file (very simple XML) and
+register it with your CLI, you can supply your users with online help and examples. Here
+is the DTD for the help file:</p>
+<pre>
+    &lt;!DOCTYPE help [
+            &lt;!ELEMENT help (entry)*&gt;
+            &lt;!ELEMENT entry (body|example)*&gt;
+            &lt;!ATTLIST entry
+                    alt CDATA #IMPLIED
+                    id CDATA #REQUIRED&gt;
+            &lt;!ELEMENT body (example|entry)*&gt;
+            &lt;!ELEMENT example (#PCDATA)&gt;
+            ]&gt;
+</pre>
+<p>If you add a help entry, you set the id (this is the user enters to see the entry)
+and a main entry. If you add an example element, the user will be able to display
+examples. Sample help document:</p>
+<pre>
+    &lt;?xml version='1.0' encoding='utf-8'?&gt;
+    &lt;help&gt;
+        &lt;entry id="abs"&gt;
+            &lt;body&gt;
+     &lt;![CDATA[abs(arg) - find the absolute value of a number or stem.]]&gt;
+            &lt;/body&gt;
+            &lt;example&gt;
+    &lt;![CDATA[abs(-2) yields 2.]]&gt;
+            &lt;/example&gt;
+        &lt;/entry&gt;
+    &lt;/help&gt;
+</pre>
+<p>You may have as many help entries as you like. Examples are optional.</p>
+<h3>Loading help in your application.</h3>
+<p>
+    Since there is built in help, you just need to
+</p>
+<ul>
+    <li>Create your help file in the src/main/resources directory</li>
+    <li>In the constructor to your Command class, issue a call to the HelpUtil to load it, e.g. if you have
+        extended the StoreCommands class, there is a method called bootstrap that will load the standard
+        help for stores. You want to call super, then add yours. Note that my-help.xml must reside in the
+        resources directory.
+    <pre>
+        public void bootstrap() throws Throwable {
+            super.bootstrap();
+            getHelpUtil().load("/my-help.xml");
+        }
+    </pre></li>
+</ul>
+<p>
+    The net result is that your help is not available with the /help command. Note that if you make
+    the id of the help more than one word, users will have to put quotes around it to find it.
+</p>
+
+<!--#include virtual="../footer.html" -->
+</body>
+</html>

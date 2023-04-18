@@ -8,9 +8,12 @@ import java.util.regex.Pattern;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
 
-/**   Utility to do base 64 or base 32 encoding of strings.
+/**
+ * Utility to do base 64 or base 32 encoding of strings.
  * Read the specs for <a href="https://datatracker.ietf.org/doc/html/rfc4648">base 32</a>
- * 
+ * <p>
+ *     This also provides methods to test if a given string is base 32 or base 64 encoded.
+ * </p>
  * <p>Created by Jeff Gaynor<br>
  * on 10/21/21 at  4:06 PM
  */

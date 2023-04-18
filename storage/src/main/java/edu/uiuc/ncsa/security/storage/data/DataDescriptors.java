@@ -12,7 +12,7 @@ import java.util.TreeSet;
  * described must be carefully followed. This sorts all the columns alphabetically
  * and strictly follows this canonical ordering for all subsequent operations.
  * You need merely make a relationship between a column name and a {@link java.sql.Types}
- * value. Logically this is a {@link java.util.TreeSet}.
+ * value. Logically this is a {@link java.util.TreeSet}.  Very useful and very convenient.
  * <p>Created by Jeff Gaynor<br>
  * on 8/30/11 at  2:50 PM
  */

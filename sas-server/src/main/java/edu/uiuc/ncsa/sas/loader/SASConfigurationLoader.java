@@ -2,10 +2,10 @@ package edu.uiuc.ncsa.sas.loader;
 
 import edu.uiuc.ncsa.sas.thing.action.ActionDeserializer;
 import edu.uiuc.ncsa.sas.SASEnvironment;
-import edu.uiuc.ncsa.sas.satclient.ClientConverter;
-import edu.uiuc.ncsa.sas.satclient.ClientKeys;
-import edu.uiuc.ncsa.sas.satclient.ClientProvider;
-import edu.uiuc.ncsa.sas.satclient.SATClient;
+import edu.uiuc.ncsa.sas.client.ClientConverter;
+import edu.uiuc.ncsa.sas.client.ClientKeys;
+import edu.uiuc.ncsa.sas.client.ClientProvider;
+import edu.uiuc.ncsa.sas.client.SASClient;
 import edu.uiuc.ncsa.sas.storage.ClientMemoryStore;
 import edu.uiuc.ncsa.sas.storage.SASClientStore;
 import edu.uiuc.ncsa.sas.storage.SASClientStoreProvider;
@@ -43,7 +43,7 @@ public class SASConfigurationLoader<T extends SASEnvironment> extends DBConfigLo
     @Override
     public T createInstance() {
         return (T) new SASEnvironment(loggerProvider.get(),
-                (Store<? extends SATClient>) getCSP().get(),
+                (Store<? extends SASClient>) getCSP().get(),
                 new ActionDeserializer(),
                 new ResponseSerializer());
 
@@ -64,7 +64,7 @@ public class SASConfigurationLoader<T extends SASEnvironment> extends DBConfigLo
 
     @Override
     public String getVersionString() {
-        return "SAT Configuration loader version: " + VERSION_NUMBER;
+        return "SAS Configuration loader version: " + VERSION_NUMBER;
     }
 
     SASClientStoreProvider csp;

@@ -3,7 +3,8 @@ package edu.uiuc.ncsa.security.core.util;
 import java.util.BitSet;
 
 /**
- * A utility for certain operations on {@link BitSet}.
+ * A utility for certain operations on {@link BitSet}. This is used in places for some
+ * crytographic operations.
  * <p>Created by Jeff Gaynor<br>
  * on 3/20/20 at  10:00 AM
  */

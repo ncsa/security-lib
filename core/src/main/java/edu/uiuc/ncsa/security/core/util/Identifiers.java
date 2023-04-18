@@ -8,7 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Utilities for Identifiers, such as creating unique identifiers.
+ * Utilities for Identifiers, such as creating various URIs that can be
+ * fed to the {@link edu.uiuc.ncsa.security.core.Identifier} class. the classic form
+ * is
+ * <pre>
+ *     caput:/ranom_hex_string/timestamp_milliseconds
+ * </pre>
  * <p>Created by Jeff Gaynor<br>
  * on 4/10/12 at  11:56 AM
  */
@@ -58,6 +63,16 @@ public class Identifiers {
         return bi.toString(16); // 16 refers to the base.
     }
 
+    /**
+     * This creates an identifier of the form
+     * <pre>
+     *     caput + / + hex_string + / + tail
+     * </pre>
+     * If tail has a trailing / it will be removed.
+     * @param caput
+     * @param tail
+     * @return
+     */
     public static URI uniqueIdentifier(String caput, String tail) {
         String h = "";
         if (caput != null) {
@@ -76,7 +91,10 @@ public class Identifiers {
      * <pre>
      *     caput/id?param1=&amp;param2=...
      * </pre>
-     *
+     * E.g.
+     * <pre>
+     *     https://foo.bar/oauth2/5c6c24e951a5a965f5303b7207b2a90b?type=accessToken&ts=1681817646409&version=v2.0&lifetime=1000000
+     * </pre>
      * @param caput
      * @param component
      * @param version
@@ -140,7 +158,14 @@ public class Identifiers {
         return out;
     }
 
+    /**
+     * Just a demo of this class
+     * @param args
+     */
     public static void main(String[] args) {
+        System.out.println("Two arguments:");
+        System.out.println(uniqueIdentifier("https://foo.bar/oauth2/", "arf"));
+        System.out.println("Four arguments:");
         System.out.println(uniqueIdentifier("https://foo.bar/oauth2/", "accessToken", VERSION_2_0_TAG, 1000000L));
     }
 

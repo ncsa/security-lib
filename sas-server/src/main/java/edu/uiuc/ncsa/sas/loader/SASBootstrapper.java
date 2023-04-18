@@ -13,13 +13,13 @@ import javax.servlet.ServletContext;
  * on 8/15/22 at  4:04 PM
  */
 public class SASBootstrapper extends Bootstrapper {
-    public static final String SAT_CONFIG_FILE_KEY = "sat:server.config.file";
-    public static final String SAT_CONFIG_NAME_KEY = "sat:server.config.name";
-    public static final String SAT_CONFIG_TAG = "sat";
+    public static final String SAS_CONFIG_FILE_KEY = "sas:server.config.file";
+    public static final String SAS_CONFIG_NAME_KEY = "sas:server.config.name";
+    public static final String SAS_CONFIG_TAG = "sas";
 
 
     protected ConfigurationNode getNode(ServletContext servletContext) throws Exception {
-        return ServletConfigUtil.findConfigurationNode(servletContext, SAT_CONFIG_FILE_KEY, SAT_CONFIG_NAME_KEY, SAT_CONFIG_TAG);
+        return ServletConfigUtil.findConfigurationNode(servletContext, SAS_CONFIG_FILE_KEY, SAS_CONFIG_NAME_KEY, SAS_CONFIG_TAG);
     }
 
     @Override

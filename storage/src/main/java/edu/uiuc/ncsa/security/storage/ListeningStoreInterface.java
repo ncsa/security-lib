@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
+ * Part of the event mechanism for tracking the last access time of store objects.
  * <p>Created by Jeff Gaynor<br>
  * on 3/29/23 at  7:19 AM
  */

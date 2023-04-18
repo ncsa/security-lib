@@ -17,6 +17,7 @@ do most all of the grunt work in setting up databases and object creation for yo
 <ol>
     <li>Make your object implement the {@link edu.uiuc.ncsa.security.core.Identifiable} interface. This gives a
         way to track objects by unique identifier. This identifier should be the primary key for your database.
+        FYI: A standard uuid can be used as an identifer, just pass it as a string.
     </li>
     <li>Make a class that extends {@link edu.uiuc.ncsa.security.storage.sql.Table} (or implements
         {@link edu.uiuc.ncsa.security.storage.sql.TableInterface}, which is a bit harder). Assuming you

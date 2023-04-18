@@ -23,7 +23,7 @@ public interface Commands extends Logable{
      * @return java.lang.String
      */
     public String getPrompt();
-    public void print_help(InputLine inputLine) throws Exception;
+    public void print_help() throws Exception;  // replaced by CLI Driver /help facility which is much better.
 
     public void bootstrap() throws Throwable;
 

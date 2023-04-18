@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.sas.thing;
 
 /**
- * Top-level "thing" (analog of Java Object) for the SAT server.
+ * Top-level "thing" (analog of Java Object) for the SAS server.
  * <p>Created by Jeff Gaynor<br>
  * on 8/15/22 at  8:34 AM
  */

@@ -11,6 +11,10 @@
 
     <artifactId>sas-server</artifactId>
     <name>Secure API Service</name>
+    <!-- Uncomment the next line to test locally. Normally this should be packaged as a
+         jar so that extensions (e.g. QDL) can use it. If you need to run it locally
+         barebones for debugging. build it as a war and deploy it. Note that you must
+         revert back and rebuild for projects to get the changes.-->
     <!--<packaging>war</packaging>-->
 
     <properties>

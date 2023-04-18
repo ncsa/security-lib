@@ -1270,8 +1270,8 @@ public abstract class StoreCommands extends CommonCommands {
 
 
     @Override
-    public void print_help(InputLine inputLine) throws Exception {
-        super.print_help(inputLine);
+    public void print_help() throws Exception {
+        super.print_help();
         say("--Serialization commands: Reading and writing objects.");
         sayi("deserialize = read the object from a file");
         sayi("serialize = write an object to a file");
@@ -2792,6 +2792,7 @@ public abstract class StoreCommands extends CommonCommands {
         super.bootstrap();
         getHelpUtil().load("/store-help.xml");
     }
+
 }
 
 

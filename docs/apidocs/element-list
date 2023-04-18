@@ -1,8 +1,8 @@
 edu.uiuc.ncsa.sas
 edu.uiuc.ncsa.sas.admin
+edu.uiuc.ncsa.sas.client
 edu.uiuc.ncsa.sas.exceptions
 edu.uiuc.ncsa.sas.loader
-edu.uiuc.ncsa.sas.satclient
 edu.uiuc.ncsa.sas.storage
 edu.uiuc.ncsa.sas.thing
 edu.uiuc.ncsa.sas.thing.action

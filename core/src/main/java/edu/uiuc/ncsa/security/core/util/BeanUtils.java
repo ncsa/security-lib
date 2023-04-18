@@ -49,20 +49,24 @@ public class BeanUtils {
     }
 
     /**
-     * Very basic checks that all objects should do as part of their equals methods. So
-     * <PRE>
+     * Very basic checks that all objects should do as part of their equals methods.
+     * Checks null-ity of the an object  and if the second is an instance of the first.
+     * <pre>
      * public boolean equals(fnord){
      * if(!BeanUtils.checkBasic(this, fnord)) return false;
      * // Rock on feel free to cast too
      * }
+     * </pre>
      *
      * @param obj1
      * @param obj2
      * @return
      */
     public static boolean checkBasic(Object obj1, Object obj2) {
-        if (obj1 == obj2) return true;
+        if(obj1 == null && obj2 == null) return true;
+        if (obj1 == null) return false; // one is null, the other isn't
         if (obj2 == null) return false;
+        if (obj1 == obj2) return true;
         if (!obj1.getClass().isAssignableFrom(obj2.getClass())) return false;
         return true;
     }

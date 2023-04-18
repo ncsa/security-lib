@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.sas;
 
-import edu.uiuc.ncsa.sas.satclient.SATClient;
+import edu.uiuc.ncsa.sas.client.SASClient;
 import edu.uiuc.ncsa.security.util.cli.Message;
 
 import java.util.Date;
@@ -12,12 +12,12 @@ import java.util.UUID;
  */
 public class SessionRecord {
 
-    public SessionRecord(SATClient client, Executable executable) {
+    public SessionRecord(SASClient client, Executable executable) {
         this.client = client;
         this.executable = executable;
     }
 
-    public SATClient client;
+    public SASClient client;
     public Executable executable;
     public Date createTS = new Date();
     public Date lastAccessed = new Date();

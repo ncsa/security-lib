@@ -354,7 +354,7 @@ public class Client extends ServiceClient implements SASConstants {
         }
         LogonAction logonAction = new LogonAction();
         JSONObject top = new JSONObject();
-        top.put(KEYS_SAT, logonAction.serialize());
+        top.put(KEYS_SAS, logonAction.serialize());
         String raw = doPost(RSAEncrypt(top.toString()), identifier.toString(), "");
         String jj = RSADecrypt(raw);
         List<Response> responseList = responseDeserializer.deserialize(jj);
@@ -485,7 +485,7 @@ public class Client extends ServiceClient implements SASConstants {
 
     public Response doPost(Action action, boolean rsaEncrypt) throws Throwable {
         JSONObject top = new JSONObject();
-        top.put(KEYS_SAT, action.serialize());
+        top.put(KEYS_SAS, action.serialize());
         String raw = doPost(top.toString(), rsaEncrypt);
         String jj;
         if (rsaEncrypt) {

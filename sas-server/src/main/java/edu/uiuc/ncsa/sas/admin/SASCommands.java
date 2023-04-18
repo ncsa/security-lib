@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.sas.admin;
 
 import edu.uiuc.ncsa.sas.SASEnvironment;
-import edu.uiuc.ncsa.sas.satclient.ClientKeys;
-import edu.uiuc.ncsa.sas.satclient.SATClient;
+import edu.uiuc.ncsa.sas.client.ClientKeys;
+import edu.uiuc.ncsa.sas.client.SASClient;
 import edu.uiuc.ncsa.sas.loader.SASConfigurationLoader;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
@@ -62,16 +62,16 @@ public class SASCommands extends StoreCommands {
     @Override
     public void extraUpdates(Identifiable identifiable) throws IOException {
         ClientKeys keys = (ClientKeys) getMapConverter().getKeys();
-        SATClient satClient = (SATClient) identifiable;
-        String newName = getPropertyHelp(keys.name(),"name of this client?", satClient.getName());
+        SASClient SASClient = (SASClient) identifiable;
+        String newName = getPropertyHelp(keys.name(),"name of this client?", SASClient.getName());
         if (!StringUtils.isTrivial(newName)) {
-            satClient.setName(newName);
+            SASClient.setName(newName);
         }
-        if (satClient.getPublicKey() == null) {
+        if (SASClient.getPublicKey() == null) {
             if (isOk(getPropertyHelp(keys.publicKey(), "create new keys?", "n"))) {
                 KeyPair keyPair = KeyUtil.generateKeyPair();
                 say(KeyUtil.toPKCS1PEM(keyPair.getPrivate()));
-                satClient.setPublicKey(keyPair.getPublic());
+                SASClient.setPublicKey(keyPair.getPublic());
             } else {
                 if (isOk(getInput("specify PKCS 8 file (y/n)?", "n"))) {
                     String f = getInput("enter file path", "");
@@ -79,7 +79,7 @@ public class SASCommands extends StoreCommands {
                         say("no file entered, aborted.");
                     } else {
                         try {
-                            satClient.setPublicKey(KeyUtil.fromX509PEM(new FileReader(f)));
+                            SASClient.setPublicKey(KeyUtil.fromX509PEM(new FileReader(f)));
                         } catch (Exception e) {
                             say("uh-oh, that didn't work:" + e.getMessage());
                             if (isVerbose()) {
@@ -92,10 +92,10 @@ public class SASCommands extends StoreCommands {
         }
         if (isOk(getInput("Enter a new public key? (y/n)", "y"))) {
             String oldKey = null;
-            if (satClient.getPublicKey() == null) {
+            if (SASClient.getPublicKey() == null) {
                 oldKey = null;
             } else {
-                oldKey = KeyUtil.toX509PEM(satClient.getPublicKey());
+                oldKey = KeyUtil.toX509PEM(SASClient.getPublicKey());
             }
             String newKey = multiLineInput(oldKey, keys.publicKey());
             if (newKey == null) {
@@ -103,14 +103,14 @@ public class SASCommands extends StoreCommands {
             } else {
                 if (newKey.length() == 1) {
                     // clear it
-                    satClient.setPublicKey(null);
+                    SASClient.setPublicKey(null);
                 } else {
                     if (-1 == newKey.indexOf("{")) {
-                        satClient.setPublicKey(KeyUtil.fromX509PEM(newKey));
+                        SASClient.setPublicKey(KeyUtil.fromX509PEM(newKey));
                     } else {
                         // JWK
                         try {
-                            satClient.setPublicKey(JSONWebKeyUtil.getJsonWebKey(newKey).publicKey);
+                            SASClient.setPublicKey(JSONWebKeyUtil.getJsonWebKey(newKey).publicKey);
                         } catch (Throwable t) {
                             say("Could not process public key:" + t.getMessage());
                         }
@@ -131,7 +131,7 @@ public class SASCommands extends StoreCommands {
 
     @Override
     protected String format(Identifiable identifiable) {
-        SATClient client = (SATClient) identifiable;
+        SASClient client = (SASClient) identifiable;
         String rc = "";
 
         String name = (client.getName() == null ? "no name" : client.getName());
@@ -144,7 +144,7 @@ public class SASCommands extends StoreCommands {
 
     public static String CONFIG_NAME_FLAG = "-name";
     public static String CONFIG_FILE_FLAG = "-cfg";
-    public static String CONFIG_TAG_NAME = "sat";
+    public static String CONFIG_TAG_NAME = "sas";
 
     public static void main(String[] args) throws Throwable {
         Vector<String> vector = new Vector<>();

@@ -7,6 +7,8 @@ import net.sf.json.JSONSerializer;
 import java.util.*;
 
 /**
+ * A very heavily used class. This centralizes many idioms about strings, plus
+ * it has a lot of simplified formatting utilities.
  * <p>Created by Jeff Gaynor<br>
  * on 4/23/20 at  6:34 AM
  */
@@ -76,7 +78,8 @@ public class StringUtils {
     }
 
     /**
-     * Some quick tests for this class.
+     * Some quick tests for this class. Used for development, debugging or just run it if you are curious
+     * and look at the output.
      *
      * @param args
      */
@@ -115,6 +118,7 @@ public class StringUtils {
 
     private static void tests() {
         // Colon is so we can tell where the end of the strings are.
+        System.out.println("Some examples of text justification, truncation");
         System.out.println(justify("abc", 10, JUSTIFY_RIGHT) + ":");
         System.out.println(RJustify("abc", 10) + ":");
         System.out.println(justify("abc", 10, JUSTIFY_LEFT) + ":");
@@ -156,7 +160,7 @@ public class StringUtils {
                 0,// indent the whole output 3 spaces from the left.
                 50 // The total display must fit within 50 chars.
         );
-        System.out.println("width = 50:");
+        System.out.println("repeat with width = 50:");
         for (String formattedLine : formattedMap) {
             System.out.println(formattedLine);
         }
@@ -168,7 +172,7 @@ public class StringUtils {
                 0,// indent the whole output 3 spaces from the left.
                 -1 // The total display is unlimited
         );
-        System.out.println("width  = -1:");
+        System.out.println("repeat with width  = -1:");
         for (String formattedLine : formattedMap) {
             System.out.println(formattedLine);
         }

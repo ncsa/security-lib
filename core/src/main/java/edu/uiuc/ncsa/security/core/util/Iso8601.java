@@ -48,15 +48,9 @@ import java.util.TimeZone;
 
 /**
  *
- * Note: This is taken from the old defunct  Tupelo project at the NCSA. The handling of
- * dates was very hard to get right and rather than introduce a dependency on
- * that (very large) project,
- * it was deemed easier to simply re-use the code here, with appropriate
- * legal notice.
- *
  * This class provides some utilities for creating and parsing ISO 8601 dates.
  * It dates way back to Java 2 or so and should probably be replaced by java.time
- * classes in  introduced in Java 8.
+ * classes in  introduced in Java 8. It is very widely used in Sec-Lib and other projects.
  * <H3>Commentary</H3>
  * This has a few things that need to be mentioned. As per contract
  * <br>date to string conversions always only return a date in UTC, i.e., ending with a "Z"
@@ -67,7 +61,7 @@ import java.util.TimeZone;
  * change but string comparisons might fail. For instance, a date in one timezone will in general not
  * be equal as a formatted string to another in a different timezone, but might be completely identical as
  * date objects.<br><br>
- * <b>Important technical note:</b> There is a "feature" in java's SimpleDateFormat class. In particular,
+ * <b>Important technical note:</b> There is a "feature" in java's {@link SimpleDateFormat} class. In particular,
  * fractions of seconds are handled in an unintiutive way so that errors were being consistently introduced. The method
  * <code>fixSeconds</code> fixes this and there are regression tests to catch this now as well.
  *
@@ -209,11 +203,20 @@ public class Iso8601 {
         return c;
     }
 
+    /**
+     * Create a new Calendar
+     * @return
+     */
     protected static Calendar mintCalendar() {
         Calendar c = Calendar.getInstance();
         c.setTimeZone(TimeZone.getTimeZone("UTC"));
         return c;
     }
+
+    /**
+     * demo of this class
+     * @param args
+     */
     public static void main(String[] args){
         try {
             TimeZone tz = TimeZone.getDefault();

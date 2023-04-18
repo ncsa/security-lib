@@ -26,6 +26,8 @@ The NCSA CSD's library of very useful utilities.
  * util - Various utilities that support configuration (XML), an easy to extend command line interface,
    mail, native java cursor addressing, add email notifications to things
 
+ * {{{./cli/index.html}Command Line Interface}} Creating a command line interface.
+
 Javadocs
 
     *{{{./apidocs/index.html}Javadoc}}

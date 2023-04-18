@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A class that converts between objects and maps. You must supply some key.
+ * A class that converts between objects and maps. You must supply the {@link SerializationKeys}.
  * <p>Created by Jeff Gaynor<br>
  * on 4/13/12 at  11:38 AM
  */

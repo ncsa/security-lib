@@ -315,7 +315,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
     }
 
     @Override
-    public void print_help(InputLine inputLine) throws Exception {
+    public void print_help() throws Exception {
         say("Need to write help.");
     }
 

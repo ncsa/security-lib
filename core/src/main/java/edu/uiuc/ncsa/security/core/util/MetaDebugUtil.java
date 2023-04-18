@@ -7,6 +7,17 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * <p>Very useful debugging class.  This is much like logging with various levels of
+ * debugging available, but this prints to std err, not std out. The idea is
+ * that you can stick debug notices everywhere and turn it off and on as needed.</p>
+ * <p>What is the advantage to logging? In many cases code is running in some service
+ * that has logging, say, piped to the system log. (Common approach for Tomcat
+ * running under Apache). This means that the log might be simply enormous and
+ * processing it looking for your 3 debug statements is hard or very slow.
+ * (Think active production server with literally hundreds of entries being generated
+ * every second.) These debug statements
+ * get sent to standard error, so it is easy to turn it on for a bit, pick them up,
+ * then turn debugging back off.</p>
  * <p>Created by Jeff Gaynor<br>
  * on 10/23/20 at  2:54 PM
  */

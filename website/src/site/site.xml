@@ -22,10 +22,13 @@
   </skin>
 
   <body>
+
       <menu name="Related Projects">
         <item name="CILogon" href="https://www.cilogon.org/" />
         <item name="OA4MP" href="https://ncsa.github.io/oa4mp/"/>
         <item name="QDL" href="https://ncsa.github.io/qdl/"/>
+        <item name="Store commands" href="store_commands/index.html"/>
+        <item name="CLI" href="cli/index.html"/>
       </menu>
       <menu ref="reports"/>
   </body>

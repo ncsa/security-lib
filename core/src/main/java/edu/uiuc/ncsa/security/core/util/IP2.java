@@ -5,7 +5,8 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import java.net.URI;
 
 /**
- * An identifier provider for OAuth 2 tokens.
+ * An identifier provider for OAuth 2 tokens. This is used heavily in <i>e.g.</i>,
+ * <a href="https://www.oa4mp.org">OA4MP</a>.
  * <p>Created by Jeff Gaynor<br>
  * on 11/29/20 at  7:41 AM
  */

@@ -68,7 +68,7 @@ public class ActionDeserializer implements SASConstants {
         try {
             JSONObject jsonObject = JSONObject.fromObject(DecryptUtils.decryptPublic(sessionRecord.client.getPublicKey(), payload));
 
-            return toAction(jsonObject.getJSONObject(SASConstants.KEYS_SAT));
+            return toAction(jsonObject.getJSONObject(SASConstants.KEYS_SAS));
         } catch (GeneralSecurityException | UnsupportedEncodingException gsx) {
             throw new EncryptionException("Unable to decrypt:" + gsx.getMessage(), gsx);
         }
@@ -94,7 +94,7 @@ public class ActionDeserializer implements SASConstants {
      * @return
      */
     public List<Action> toActions(JSONObject jsonObject) {
-        JSON json = jsonObject.getJSONObject(KEYS_SAT);
+        JSON json = jsonObject.getJSONObject(KEYS_SAS);
         List<Action> actions = new ArrayList<>();
         if (json.isArray()) {
             JSONArray array = (JSONArray) json;

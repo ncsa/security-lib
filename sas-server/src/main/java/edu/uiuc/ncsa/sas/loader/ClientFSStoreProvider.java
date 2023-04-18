@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.sas.loader;
 
-import edu.uiuc.ncsa.sas.satclient.SATClient;
+import edu.uiuc.ncsa.sas.client.SASClient;
 import edu.uiuc.ncsa.sas.storage.FSClientStore;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
@@ -17,13 +17,13 @@ import java.io.File;
  * on 8/22/22 at  2:25 PM
  */
 public class ClientFSStoreProvider<T extends FileStore> extends FSProvider<T> {
-    public ClientFSStoreProvider(ConfigurationNode config,  MapConverter converter, Provider<? extends SATClient> clientProvider) {
+    public ClientFSStoreProvider(ConfigurationNode config,  MapConverter converter, Provider<? extends SASClient> clientProvider) {
         super(config, StorageConfigurationTags.FILE_STORE, "clients", converter);
         this.clientProvider= clientProvider;
 
     }
 
-    Provider<? extends SATClient> clientProvider;
+    Provider<? extends SASClient> clientProvider;
 
     @Override
     protected T produce(File dataPath, File indexPath, boolean removeEmptyFiles) {

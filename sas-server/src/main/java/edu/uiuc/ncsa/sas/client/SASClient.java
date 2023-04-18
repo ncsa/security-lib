@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.sas.satclient;
+package edu.uiuc.ncsa.sas.client;
 
 import edu.uiuc.ncsa.security.core.DateComparable;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -12,8 +12,8 @@ import java.util.Date;
  * <p>Created by Jeff Gaynor<br>
  * on 8/15/22 at  8:43 AM
  */
-public class SATClient extends IdentifiableImpl implements DateComparable {
-    public SATClient(Identifier identifier) {
+public class SASClient extends IdentifiableImpl implements DateComparable {
+    public SASClient(Identifier identifier) {
         super(identifier);
     }
 

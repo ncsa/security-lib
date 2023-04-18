@@ -7,7 +7,8 @@ import java.net.URI;
 import java.util.UUID;
 
 /**
- * Simple implementation of an identifier.
+ * Simple implementation of an identifier. This also has a couple of factory methods for
+ * creating identifiers.
  * <p>Created by Jeff Gaynor<br>
  * on 4/3/12 at  3:41 PM
  */
@@ -39,11 +40,21 @@ public class BasicIdentifier implements Identifier {
         }
     }
 
+    /**
+     * Create a new identifier from a given string.
+     * @param id
+     * @return
+     */
     public static Identifier newID(String id) {
         if (id == null) return null;
         return new BasicIdentifier(id);
     }
 
+    /**
+     * Create a new identifier from a given URI.
+     * @param uri
+     * @return
+     */
     public static Identifier newID(URI uri) {
         if (uri == null) return null;
         return new BasicIdentifier(uri);
