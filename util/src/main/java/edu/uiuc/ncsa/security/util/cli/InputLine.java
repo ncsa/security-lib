@@ -16,7 +16,29 @@ import java.util.*;
 public class InputLine {
     public static final String DELIMITER = " "; // what's between commands
 
-    public InputLine(Vector v) {
+    /**
+     * Ancient constructor. This class precedes the arrival of parameterized classes in Java
+     * and there are any number of applications that still instantiate it with a {@link Vector},
+     * so this has to stay. Better to use the more modern constructor {@link #InputLine(List)}.
+     * @param v
+     */
+/*    public InputLine(Vector v) {
+        parsedInput = v;
+        originalLine = "";
+        boolean isFirstPass = true;
+        for (Object obj : v) {
+            originalLine = originalLine + (isFirstPass ? "" : DELIMITER) + obj;
+            if (isFirstPass) {
+                isFirstPass = false;
+            }
+        }
+    }*/
+
+    /**
+     * Better constructor with a parameter.
+     * @param v
+     */
+    public InputLine(List<String> v) {
         parsedInput = v;
         originalLine = "";
         boolean isFirstPass = true;

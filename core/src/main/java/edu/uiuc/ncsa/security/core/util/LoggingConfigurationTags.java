@@ -33,6 +33,7 @@ public interface LoggingConfigurationTags extends ConfigurationTags {
      * Enable debugging.
      */
     public static final String DEBUG_ENABLED = "debug";
+    public static final String LOG_LEVEL = "logLevel";
     /**
      * Append to existing log files on start or overwrite.
      */
@@ -43,4 +44,9 @@ public interface LoggingConfigurationTags extends ConfigurationTags {
      * so only use it if you need it.
      */
     public static final String DISABLE_LOG4J = "disableLog4j";
+    public static final String LOG_LEVEL_OFF = "off";
+    public static final String LOG_LEVEL_TRACE = "trace";
+    public static final String LOG_LEVEL_INFO = "info";
+    public static final String LOG_LEVEL_WARN = "warn";
+    public static final String LOG_LEVEL_ERROR = "error";
 }

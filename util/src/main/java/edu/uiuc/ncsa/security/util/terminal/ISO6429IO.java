@@ -8,7 +8,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -106,21 +105,21 @@ public class ISO6429IO implements IOInterface {
         int currentCol0 = -1;
         int startCol = 0;
         print(prompt);
-        debug("Command buffering is " + (isBufferingOn() ? "ON" : "OFF"));
+   //     debug("Command buffering is " + (isBufferingOn() ? "ON" : "OFF"));
         if (isQueueEmpty()) {
-            debug("queue empty");
+     //       debug("queue empty");
             startCol = terminal.getCursorCol();
             currentCol0 = startCol;
             commandBuffer.add(0, currentLine); // push it on the stack
         } else {
-            debug("queue not empty:" + queue.size() + " entries");
+       //     debug("queue not empty:" + queue.size() + " entries");
 
             String x = queue.get(0);
 
             queue.remove(0);
             if (isQueueEmpty()) {
                 // no null termination=? partial line
-                debug("partial line:\"" + x + "\"");
+         //       debug("partial line:\"" + x + "\"");
                 currentLine.append(x);
 
                 print(x);
@@ -133,7 +132,7 @@ public class ISO6429IO implements IOInterface {
                     queue.remove(0); // empty Q so no false positives
                     // This denotes that the current line ended with a CR/LF so return it.
                 }
-                debug("full line:\"" + x + "\"");
+             //   debug("full line:\"" + x + "\"");
 
                 println(x);
                 return x;
@@ -150,7 +149,7 @@ public class ISO6429IO implements IOInterface {
         boolean pasteModeOn = false;
         while (keepLooping) {
             KeyStroke keyStroke = terminal.getCharacter();
-            debug("reading keystroke: " + keyStroke);
+       //     debug("reading keystroke: " + keyStroke);
             switch (keyStroke.getKeyType()) {
                 case ControlC:
                     // Intercept, do nothing.
@@ -158,7 +157,7 @@ public class ISO6429IO implements IOInterface {
                 case Character:
 
                     int position = currentCol0 - startCol;
-                    debug("in char, pos = " + position);
+         //           debug("in char, pos = " + position);
                     char character = keyStroke.getCharacter();
                     if (position < 0) {
                         position = 0;
@@ -166,17 +165,17 @@ public class ISO6429IO implements IOInterface {
                     if (currentLine.length() < position) {
                         position = currentLine.length() - 1;
                     }
-                    debug("inserting char " + character);
+           //         debug("inserting char " + character);
                     currentLine.insert(position, character);
-                    debug("preprint length = " + currentLine.length() + " position =" + position + " cursor=" + terminal.getCursorCol() + " my cursor=" + currentCol0);
+             //       debug("preprint length = " + currentLine.length() + " position =" + position + " cursor=" + terminal.getCursorCol() + " my cursor=" + currentCol0);
 
                     print(currentLine.substring(position));
                     currentCol0++; // increment the cursor position.
 
-                    debug("postprint length = " + currentLine.length() + " position =" + position + " cursor=" + terminal.getCursorCol() + " my cursor=" + currentCol0);
+               //     debug("postprint length = " + currentLine.length() + " position =" + position + " cursor=" + terminal.getCursorCol() + " my cursor=" + currentCol0);
                     terminal.setCursorCol(currentCol0);
                     if (currentCol0 % width == 0) {
-                        debug("adding CR/LF");
+                 //       debug("adding CR/LF");
                         // insert new line so it wraps. This  moves cursor to start of line  + a line feed .
                         print("\r\n");
                     }
@@ -202,12 +201,12 @@ public class ISO6429IO implements IOInterface {
                     }
                     pasteModeOn = !pasteModeOn;
                     if (pasteModeOn) {
-                        debug("paste mode ON");
+  //                      debug("paste mode ON");
                         terminal.setBold(false);
                         terminal.setColor(32);
                         println("<paste mode on. ^v pastes from clipboard, ^p toggles paste mode>");
                     } else {
-                        debug("paste mode OFF");
+    //                    debug("paste mode OFF");
 
                         flush();
                         println("\n<paste mode off>");
@@ -353,7 +352,7 @@ public class ISO6429IO implements IOInterface {
                     }
                     break;
                 case ClipboardPaste:
-                    debug("Got paste, pasting");
+      //              debug("Got paste, pasting");
 
                     try {
                         java.awt.Toolkit toolKit = java.awt.Toolkit.getDefaultToolkit();
@@ -362,7 +361,7 @@ public class ISO6429IO implements IOInterface {
 
                         String[] lines = result.split("\n");
                         boolean hasCR = result.endsWith("\n");
-                        debug("got " + lines.length + " lines:" + Arrays.toString(lines));
+        //                debug("got " + lines.length + " lines:" + Arrays.toString(lines));
                         if (lines.length <= 1) {
                             // check for paste, no new line ==> insert text.
                             position = currentCol0 - startCol;
@@ -383,7 +382,7 @@ public class ISO6429IO implements IOInterface {
                                 queue.add(line);
                             }
                             if (hasCR) {
-                                debug("Adding null termination");
+          //                      debug("Adding null termination");
                                 queue.add(null); // marker! Paste may be null terminated => last line ended with a CR/LF
                             }
                             info("got from clipboard:" + result);
@@ -399,7 +398,7 @@ public class ISO6429IO implements IOInterface {
                     }
                     break;
                 case Unknown:
-                    debug("unknown=" + keyStroke);
+            //        debug("unknown=" + keyStroke);
                     print(keyStroke.getCsi().rawCommand); // pass it back if we don't know what it is
                     break;
             }

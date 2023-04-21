@@ -9,8 +9,11 @@ import java.util.Date;
 /**
  * <p>Very useful debugging class.  This is much like logging with various levels of
  * debugging available, but this prints to std err, not std out. The idea is
- * that you can stick debug notices everywhere and turn it off and on as needed.</p>
- * <p>What is the advantage to logging? In many cases code is running in some service
+ * that you can stick debug notices everywhere and turn it off and on as needed.
+ * Giving a second debug-only system that is not loggged. In many cases you do
+ * not want debug information going to a log (such as if the log might be public and
+ * there is sensitive information). This lets you stick view it separately.</p>
+ * <p>What other advantage to a debug system? In many cases code is running in some service
  * that has logging, say, piped to the system log. (Common approach for Tomcat
  * running under Apache). This means that the log might be simply enormous and
  * processing it looking for your 3 debug statements is hard or very slow.
@@ -33,7 +36,7 @@ public class MetaDebugUtil implements DebugConstants, Serializable {
     boolean printTS = false;
 
 
-    protected  String toLabel(int level) {
+    public static  String toLabel(int level) {
         if (level == DEBUG_LEVEL_OFF) return "";
         if (level == DEBUG_LEVEL_INFO) return DEBUG_LEVEL_INFO_LABEL;
         if (level == DEBUG_LEVEL_WARN) return DEBUG_LEVEL_WARN_LABEL;
@@ -45,14 +48,14 @@ public class MetaDebugUtil implements DebugConstants, Serializable {
     }
 
     /**
-     * Do a case insensitive check for equality of a given label and one of the pre-defined (target) labels.
+     * Do a case-insensitive check for equality of a given label and one of the pre-defined (target) labels.
      *
      * @param targetLabel
      * @param givenLabel
      * @return
      */
-    protected  boolean checkLevelAndLabel(String targetLabel, String givenLabel) {
-        return targetLabel.toLowerCase().equals(givenLabel.toLowerCase());
+    protected static boolean checkLevelAndLabel(String targetLabel, String givenLabel) {
+        return targetLabel.equalsIgnoreCase(givenLabel);
     }
 
     /**
@@ -64,7 +67,7 @@ public class MetaDebugUtil implements DebugConstants, Serializable {
         setDebugLevel(toLevel(label));
     }
 
-    protected  int toLevel(String label) {
+    public static  int toLevel(String label) {
         if (checkLevelAndLabel(DEBUG_LEVEL_OFF_LABEL, label)) return DEBUG_LEVEL_OFF;
         if (checkLevelAndLabel(DEBUG_LEVEL_INFO_LABEL, label)) return DEBUG_LEVEL_INFO;
         if (checkLevelAndLabel(DEBUG_LEVEL_WARN_LABEL, label)) return DEBUG_LEVEL_WARN;
@@ -101,7 +104,8 @@ public class MetaDebugUtil implements DebugConstants, Serializable {
 
     public  void printIt(int level, Class callingClass, String message) {
         // Standard logging format is date host service: message
-        if (level <= getDebugLevel()) {
+        //if (level <= getDebugLevel()) {
+        if ( getDebugLevel() <= level) {
             if(host == null || host.isEmpty()) {
                 printIt((isPrintTS()?Iso8601.date2String(new Date()):"") + " " + callingClass.getSimpleName() + " " + toLabel(level) + ": " + message);
             }else{
@@ -123,7 +127,7 @@ public class MetaDebugUtil implements DebugConstants, Serializable {
      */
     public  void printIt(int level, Class callingClass, String message, Throwable throwable) {
 
-        if (DEBUG_LEVEL_ERROR <= level && level <= getDebugLevel()) {
+        if (DEBUG_LEVEL_ERROR == level && level == getDebugLevel()) {
             if (throwable == null) {
                 printIt("     =====>> (NO STACKTRACE AVAILABLE)");
             } else {

@@ -26,7 +26,10 @@ public class BasicExceptionHandler implements ExceptionHandler {
     }
 
     @Override
-    public void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public void handleException(ExceptionHandlerThingie exceptionHandlerThingie) throws IOException, ServletException {
+        Throwable t = exceptionHandlerThingie.throwable;
+        HttpServletRequest request = exceptionHandlerThingie.request;
+        HttpServletResponse response = exceptionHandlerThingie.response;
         if (t instanceof NFWException) {
             // Make SURE this gets logged some place else too in case it's hard to find.
             DebugUtil.severe(this, "internal exception encountered", t);

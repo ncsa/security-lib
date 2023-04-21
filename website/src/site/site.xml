@@ -25,8 +25,10 @@
 
       <menu name="Related Projects">
         <item name="CILogon" href="https://www.cilogon.org/" />
-        <item name="OA4MP" href="https://ncsa.github.io/oa4mp/"/>
-        <item name="QDL" href="https://ncsa.github.io/qdl/"/>
+        <item name="CILogon Java" href="https://cilogon.github.io/cilogon-java/" />
+        <item name="OA4MP" href="https://oa4mp.org/"/>
+        <item name="QDL" href="https://qdl-lang.org/"/>
+        <item name="Crypt8" href="https://ncsa.github.io/crypto-java8/"/>
         <item name="Store commands" href="store_commands/index.html"/>
         <item name="CLI" href="cli/index.html"/>
       </menu>

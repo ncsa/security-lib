@@ -96,7 +96,7 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
                         1000000,
                         true,
                         false,
-                        true);
+                        MyLoggingFacade.DEFAULT_LOG_LEVEL);
             }
         } else {
             loggerProvider = new MyLoggerProvider(logger);

@@ -14,6 +14,7 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.logging.Level;
 
 /**
  * Basic class for writing command line tools. This allows for verbose, debug and help options automatically.
@@ -389,7 +390,9 @@ public abstract class CLITool implements Logable {
     public MyLoggingFacade getMyLogger() {
 
         if (logger == null) {
-            LoggerProvider loggerProvider = new LoggerProvider(getLogfileName(), "cli logger", 1, 1000000, true, isDebugOn(), true);
+            LoggerProvider loggerProvider = new LoggerProvider(getLogfileName(),
+                    "cli logger", 1, 1000000,
+                    true, true,  isDebugOn()? Level.FINEST:MyLoggingFacade.DEFAULT_LOG_LEVEL);
             logger = loggerProvider.get();
         }
         return logger;

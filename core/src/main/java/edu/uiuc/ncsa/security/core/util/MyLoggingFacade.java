@@ -11,6 +11,19 @@ import java.util.logging.Logger;
  * on Nov 9, 2010 at  10:59:40 AM
  */
 public class MyLoggingFacade implements Logable {
+   public static final Level DEFAULT_LOG_LEVEL = Level.INFO;
+
+    public Level getLogLevel() {
+        return logLevel;
+    }
+
+    public void setLogLevel(Level logLevel) {
+        this.logLevel = logLevel;
+        getLogger().setLevel(logLevel);
+    }
+
+    Level logLevel = DEFAULT_LOG_LEVEL;
+
     public String getHost() {
         return host;
     }
@@ -20,7 +33,8 @@ public class MyLoggingFacade implements Logable {
     }
 
     String host = null;
-    public boolean hasHost(){
+
+    public boolean hasHost() {
         return host != null;
     }
     // This implements Logable so it is easier to pass implementing classes through to it.
@@ -44,7 +58,6 @@ public class MyLoggingFacade implements Logable {
     This should be set to false when ready to release and true during development. It lets you turn on/off debug logging
     for everything at once.
      */
-    boolean debugOn = false;
 
 
     public String getClassName() {
@@ -67,20 +80,21 @@ public class MyLoggingFacade implements Logable {
      */
 
     public boolean isDebugOn() {
-        return debugOn;
+        return logLevel.equals(Level.FINEST);
     }
 
     public void setDebugOn(boolean debugOn) {
-        this.debugOn = debugOn;
-        if(logger == null){
+
+        if (logger == null) {
             return; // in bootstrapping, this might not be quite settable.
         }
-        if( debugOn){
-            logger.setLevel(Level.FINEST);
-        }else{
-            logger.setLevel(Level.INFO);
-
+        if (debugOn) {
+            logLevel = Level.FINEST;
+        } else {
+            logLevel = DEFAULT_LOG_LEVEL;
         }
+        logger.setLevel(logLevel);
+
     }
 
     java.util.logging.Logger logger;
@@ -88,19 +102,20 @@ public class MyLoggingFacade implements Logable {
     public java.util.logging.Logger getLogger() {
         if (logger == null) {
             logger = java.util.logging.Logger.getLogger(getClassName());
-            if(isDebugOn()){
-                logger.setLevel(Level.FINEST);
+            if (isDebugOn()) {
+                logger.setLevel(DEFAULT_LOG_LEVEL);
             }
         }
         return logger;
     }
 
-      protected String msg(String x){
-        if(hasHost()) {
-            return host  + " " + getClassName() + ":" + x;
+    protected String msg(String x) {
+        if (hasHost()) {
+            return host + " " + getClassName() + ":" + x;
         }
-          return getClassName() + ":" + x;
-      }
+        return getClassName() + ":" + x;
+    }
+
     /**
      * If debug is set on, print the string with the classname and date. Otherwise, do not print debug
      * messages. This allows you to switch debug prints on and off throughout your code via configuration.
@@ -108,9 +123,7 @@ public class MyLoggingFacade implements Logable {
      * @param x
      */
     public void debug(String x) {
-        if (isDebugOn()) {
             getLogger().finest(msg(x));
-        }
     }
 
     public void info(String x) {

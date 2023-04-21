@@ -64,6 +64,7 @@ public class Client extends ServiceClient implements SASConstants {
 
     public static final String FLAG_EDIT = "-edit";
     public static final String FLAG_CONFIG = "-cfg"; // name of config file
+    public static final String FLAG_NEW = "-new"; // create a new configuration file
     public static final String FLAG_HELP = "--help"; // help
     public static final String FLAG_VERBOSE = "-v"; // help
 
@@ -120,13 +121,58 @@ public class Client extends ServiceClient implements SASConstants {
          -type is type.
          -new
      */
-    protected static void createConfig(String filename) throws IOException {
+
+    /**
+     * Create a new configuration file on the fly
+     *
+     * @param filename file to create (if null, user is prompted)
+     * @return filename, either original or the one the user gave.
+     * @throws IOException
+     */
+    public static String createConfig(String filename, boolean isNew) throws IOException {
+        if (StringUtils.isTrivial(filename)) {
+            if (!isNew) {
+                say("no file to edit.");
+                return null;
+            }
+            filename = getInput("Enter the fully qualified file you wish to create:");
+        }
+        File f = new File(filename);
+
         XMLMap xmlMap = new XMLMap();
+        if (f.exists()) {
+            if (!f.canWrite()) {
+                say("Sorry, but you do not have permissions to write to \"" + f.getAbsolutePath() + "\"");
+                return null;
+            }
+            xmlMap.fromXML(new FileInputStream(f));
+        }
+        if (xmlMap.isEmpty()) {
+            newConfigFile(xmlMap);
+        } else {
+            editConfigFile(xmlMap);
+        }
+
+
+        if (f.exists()) {
+            if (!"y".equals(getInput("overwrite " + f.getAbsolutePath() + "?"))) {
+                say("save aborted. exiting...");
+            }
+        }
+        FileOutputStream fileOutputStream = new FileOutputStream(f);
+        xmlMap.toXML(fileOutputStream);
+        fileOutputStream.flush();
+        fileOutputStream.close();
+        say("done!");
+        return filename; // pass back what was created.
+    }
+
+    protected static void newConfigFile(XMLMap xmlMap) throws IOException {
         xmlMap.put(CONFIG_CLIENT_ID, getInput("enter client id"));
         say("enter private key, PKCS 8 or a single JWK");
         String x = multiLineInput("", CONFIG_PRIVATE_KEY);
         xmlMap.put(CONFIG_PRIVATE_KEY, x.trim()); // If a JWK, any leading blanks will cause JSON library to fail.
-        xmlMap.put(CONFIG_HOST, getInput("enter server address"));
+        xmlMap.put(CONFIG_HOST, getInput("enter host address"));
 
         if ("y".equals(getInput("enter ssl configuration (y/n)?"))) {
             xmlMap.put(CONFIG_TR_FILE, getInput("enter path to trust root file"));
@@ -134,25 +180,48 @@ public class Client extends ServiceClient implements SASConstants {
             xmlMap.put(CONFIG_TR_TYPE, getInput("enter trust root store type, e.g. JKS"));
             xmlMap.put(CONFIG_TR_DN, getInput("enter trust root store cert DN"));
         }
+    }
 
-        if (StringUtils.isTrivial(filename)) {
-            filename = getInput("enter file name");
-            File f = new File(filename);
-            if (f.exists()) {
-                if (!"y".equals(getInput("overwrite " + f.getAbsolutePath() + "?"))) {
-                    say("save aborted. exiting...");
-                }
+    protected static void editConfigFile(XMLMap xmlMap) throws IOException {
+        updateItem(xmlMap, CONFIG_CLIENT_ID);
+        updateItem(xmlMap, CONFIG_HOST);
+
+        String oldJSON = "";
+        if (xmlMap.containsKey(CONFIG_PRIVATE_KEY)) {
+            if ("y".equals(getInput("Update private key(y/n/)?"))) {
+                oldJSON = xmlMap.getString(CONFIG_PRIVATE_KEY);
             }
-            FileOutputStream fileOutputStream = new FileOutputStream(f);
-            xmlMap.toXML(fileOutputStream);
-            fileOutputStream.flush();
-            fileOutputStream.close();
-            say("done!");
+        } else {
+            if ("y".equals(getInput("Enter private key(y/n/)?"))) {
+                say("enter private key, PKCS 8 or a single JWK");
+                String x = multiLineInput(oldJSON, CONFIG_PRIVATE_KEY);
+                xmlMap.put(CONFIG_PRIVATE_KEY, x.trim()); // If a JWK, any leading blanks will cause JSON library to fail.
+            }
+        }
+        updateItem(xmlMap, CONFIG_TR_FILE);
+        updateItem(xmlMap, CONFIG_TR_PASSWORD);
+        updateItem(xmlMap, CONFIG_TR_TYPE);
+        updateItem(xmlMap, CONFIG_TR_DN);
+    }
+
+    protected static void updateItem(XMLMap xmlMap, String key) {
+        String oldValue = xmlMap.getString(key);
+        String prompt = key + " ";
+        if (oldValue != null) {
+            prompt = prompt + "\"" + oldValue + "\"";
+
+        }
+        prompt = prompt + ":";
+        String resp = getInput(prompt);
+        if (StringUtils.isTrivial(resp)) {
+            // keep old value
+        } else {
+            xmlMap.put(key, resp);
         }
     }
 
     /**
-     * Create a new instance of this client. The arguyments are
+     * Create a new instance of this client. The arguments are
      * <ul>
      *     <li>-cfg - path to the config file</li>
      *     <li>-v - verbose. Be yacky (mostly for debugging the client itself</li>
@@ -165,7 +234,7 @@ public class Client extends ServiceClient implements SASConstants {
      */
     public static Client newInstance(InputLine inputLine) throws Throwable {
         boolean isVerbose = inputLine.hasArg(FLAG_VERBOSE);
-        if (inputLine.hasArg(FLAG_EDIT)) {
+       /* if (inputLine.hasArg(FLAG_EDIT)) {
             if (inputLine.hasArg(FLAG_CONFIG)) {
                 File f = new File(inputLine.getNextArgFor(FLAG_CONFIG));
                 if (!f.exists()) {
@@ -176,7 +245,7 @@ public class Client extends ServiceClient implements SASConstants {
                 }
             }
 
-        }
+        }*/
         if (!inputLine.hasArg(FLAG_CONFIG)) {
             say("No configuration. exiting...");
         }
@@ -237,10 +306,47 @@ public class Client extends ServiceClient implements SASConstants {
             showHelp();
             return;
         }
-        Client client = newInstance(inputLine);
-        if (inputLine.hasArg("-cli")) {
-            client.cli();
+        boolean newOrEdit = false;
+        String filename = null;
+        if (inputLine.hasArg(FLAG_EDIT)) {
+            newOrEdit = true;
+            if (inputLine.hasNextArgFor(FLAG_EDIT)) {
+                filename = inputLine.getNextArgFor(FLAG_EDIT);
+            } else {
+
+            }
+            if (filename == null || filename.startsWith("-")) {
+                say("you  must supply a file name to edit it.");
+                return;
+            }
+            createConfig(filename, false);
         }
+        if (inputLine.hasArg(FLAG_NEW)) {
+            if (!newOrEdit) {
+                newOrEdit = true;
+                if (inputLine.hasNextArgFor(FLAG_NEW)) {
+                    filename = inputLine.getNextArgFor(FLAG_NEW);
+                    if (filename.startsWith("-")) {
+                        filename = null; // not a file name, discard
+                    }
+                }
+                filename = createConfig(filename, true);
+            }
+        }
+
+        if (newOrEdit) {
+            if (filename == null) {
+                return;
+            }
+            if (getInput("Did you want to run this now?(y/n)").equals("n")) {
+                return;
+            }
+            // so they want to run this.
+            inputLine = new InputLine("dummy", FLAG_CONFIG, filename);
+        }
+
+        Client client = newInstance(inputLine); // get the configuration, confiure the client
+        client.cli(); // start it.
     }
 
     public XMLMap getConfig() {
@@ -347,9 +453,11 @@ public class Client extends ServiceClient implements SASConstants {
     public Response doLogon() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, InvalidKeySpecException, IOException, BadPaddingException, InvalidKeyException {
         return doLogon(BasicIdentifier.newID(getConfig().getString(CONFIG_CLIENT_ID)));
     }
-   boolean loggedOn = false;
+
+    boolean loggedOn = false;
+
     public Response doLogon(Identifier identifier) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, InvalidKeySpecException, IOException, BadPaddingException, InvalidKeyException {
-        if(loggedOn){
+        if (loggedOn) {
             return null;
         }
         LogonAction logonAction = new LogonAction();
@@ -380,13 +488,15 @@ public class Client extends ServiceClient implements SASConstants {
     /**
      * Call this for an arbitrary {@link Action}. It will call the SAS  and return the
      * response.
+     *
      * @param action
      * @return
      * @throws Throwable
      */
-    public Response execute(Action action) throws Throwable{
+    public Response execute(Action action) throws Throwable {
         return doPost(action);
     }
+
     public Response doInvoke(String name, JSONArray args) throws Throwable {
         InvokeAction invokeAction = new InvokeAction();
         invokeAction.setName(name);

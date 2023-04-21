@@ -17,6 +17,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * Basic implementation of Commands. This supports loading configurations.
@@ -335,9 +336,11 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         LoggerProvider loggerProvider = null;
         if (hasOption(LOG_FILE_OPTION, LOG_FILE_LONG_OPTION)) {
             // create the logger for this
-            loggerProvider = new LoggerProvider(getLogfileName(), "cli logger", 1, 1000000, false, true, true);
+            loggerProvider = new LoggerProvider(getLogfileName(), "cli logger", 1
+                    , 1000000,  true, true, Level.INFO);
         } else {
-            loggerProvider = new LoggerProvider("log.xml", "cli logger", 1, 1000000, false, true, true);
+            loggerProvider = new LoggerProvider("log.xml", "cli logger", 1,
+                    1000000,  true, true, Level.FINEST);
         }
         logger = loggerProvider.get();
 
@@ -512,7 +515,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
     public MyLoggingFacade getMyLogger() {
         if (logger == null) {
             //  LoggerProvider loggerProvider = new LoggerProvider(getLogfileName(), "cli logger", 1, 1000000, isDebugOn(), true);
-            LoggerProvider loggerProvider = new LoggerProvider("log.xml", "cli logger", 1, 1000000, false, true, true);
+            LoggerProvider loggerProvider = new LoggerProvider("log.xml", "cli logger", 1, 1000000,  true, true, Level.INFO);
             logger = loggerProvider.get();
         }
         return logger;

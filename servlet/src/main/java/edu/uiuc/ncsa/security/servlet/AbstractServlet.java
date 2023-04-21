@@ -95,7 +95,7 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
     }
 
     public void error(String x, Throwable t) {
-        getMyLogger().error(x,t);
+        getMyLogger().error(x, t);
     }
 
     public void info(String x) {
@@ -108,30 +108,6 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
 
     MyLoggingFacade myLogger;
 
-    /**
-     * One stop shopping for exception handling. All thrown exceptions are intercepted and run through this.
-     * Depending on their type they are wrapped or passed along. You can change this behavior if you need to.
-     * <p>Note that all runtime exceptions, IOExceptions and ServletExceptions are not modified,
-     * so if you over-ride this and throw one of those exceptions you will not get extra cruft.
-     * <p>Also, a response is passed along. This may be used in over-rides, but is not used in the
-     * basic implementation. If it is null, it should be ignored.</p>
-     *
-     * @param t
-     * @param request
-     * @param response
-     * @throws IOException
-     * @throws ServletException
-     */
-    protected void handleException(Throwable t,
-                                   HttpServletRequest request,
-                                   HttpServletResponse response) throws IOException, ServletException {
-        if(t instanceof NFWException) {
-            error("INTERNAL ERROR: " + (t.getMessage() == null ? "(no message)" : t.getMessage()), t); // log it appropriately
-        }
-        // ok, if it is a strange error, print a stack if you need to.
-        getExceptionHandler().handleException(t, request, response);
-    }
-
     public ExceptionHandler getExceptionHandler() {
         if (exceptionHandler == null) {
             warn("Warning: no Exception Handler set, using basic exception handling only!");
@@ -140,32 +116,56 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
         return exceptionHandler;
     }
 
+    /**
+     * One stop shopping for exception handling. All thrown exceptions are intercepted and run through this.
+     * Depending on their type they are wrapped or passed along. You can change this behavior if you need to.
+     * <p>Note that all runtime exceptions, IOExceptions and ServletExceptions are not modified,
+     * so if you over-ride this and throw one of those exceptions you will not get extra cruft.
+     * <p>Also, a response is passed along. This may be used in over-rides, but is not used in the
+     * basic implementation. If it is null, it should be ignored.</p>
+     *
+     * @param exceptionHandlerThingie
+     * @throws IOException
+     * @throws ServletException
+     */
+    protected void handleException(ExceptionHandlerThingie exceptionHandlerThingie) throws IOException, ServletException {
+        //
+        Throwable t = exceptionHandlerThingie.throwable;
+        if (t instanceof NFWException) {
+            error("INTERNAL ERROR: " + (t.getMessage() == null ? "(no message)" : t.getMessage()), t); // log it appropriately
+        }
+        // ok, if it is a strange error, print a stack if you need to.
+        getExceptionHandler().handleException(exceptionHandlerThingie);
+    }
+
     public void setExceptionHandler(ExceptionHandler exceptionHandler) {
         this.exceptionHandler = exceptionHandler;
     }
 
     ExceptionHandler exceptionHandler;
-    protected boolean checkContentType(String rawContentType, String contentType){
-        ServletDebugUtil.trace(this,"checking content type = "+ rawContentType);
 
-           // As per the spec, https://tools.ietf.org/html/rfc7231#section-3.1.1.1
-           // there may be several things in the content type (such as the charset, boundary, etc.) all separated
-           // by semicolons. Split it up and check that one of them is the correct type.
-           StringTokenizer tokenizer = new StringTokenizer(rawContentType, ";");
-           boolean gotOne = false;
-           while(tokenizer.hasMoreTokens()){
-               String foo = tokenizer.nextToken().trim();
-               ServletDebugUtil.trace(this,"checking encoding, next = " + foo);
-               gotOne = gotOne || foo.equals(contentType);
-               ServletDebugUtil.trace(this,"checking encoding, gotOne = " + gotOne);
-           }
-           return gotOne;
+    protected boolean checkContentType(String rawContentType, String contentType) {
+        ServletDebugUtil.trace(this, "checking content type = " + rawContentType);
+
+        // As per the spec, https://tools.ietf.org/html/rfc7231#section-3.1.1.1
+        // there may be several things in the content type (such as the charset, boundary, etc.) all separated
+        // by semicolons. Split it up and check that one of them is the correct type.
+        StringTokenizer tokenizer = new StringTokenizer(rawContentType, ";");
+        boolean gotOne = false;
+        while (tokenizer.hasMoreTokens()) {
+            String foo = tokenizer.nextToken().trim();
+            ServletDebugUtil.trace(this, "checking encoding, next = " + foo);
+            gotOne = gotOne || foo.equals(contentType);
+            ServletDebugUtil.trace(this, "checking encoding, gotOne = " + gotOne);
+        }
+        return gotOne;
 
     }
+
     @Override
     public void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
         try {
-           //    printAllParameters(httpServletRequest);
+            //    printAllParameters(httpServletRequest);
             if (doPing(httpServletRequest, httpServletResponse)) return;
             /*
             So we are clear on this... Tomcat will take any POST that has the body encoded as application/x-www-form-urlencoded,
@@ -190,27 +190,27 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
             IN point of fact if a request comes that is in an unsupported type, we should reject it like so:
               Fixes CIL-517
              */
-           String rawContentType = httpServletRequest.getContentType();
-           ServletDebugUtil.trace(this,"in POST, raw content = "+ rawContentType);
-            if(rawContentType == null || rawContentType.isEmpty()){
+            String rawContentType = httpServletRequest.getContentType();
+            ServletDebugUtil.trace(this, "in POST, raw content = " + rawContentType);
+            if (rawContentType == null || rawContentType.isEmpty()) {
                 httpServletResponse.setStatus(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
-                ServletDebugUtil.trace(this,"in POST, raw content empty, throwing exception");
+                ServletDebugUtil.trace(this, "in POST, raw content empty, throwing exception");
                 throw new MissingContentException("Missing content type for body of POST. Request rejected.");
-           //     throw new ServletException("Error: Missing content type for body of POST. Request rejected.");
+                //     throw new ServletException("Error: Missing content type for body of POST. Request rejected.");
             }
 
-            if (!checkContentType(rawContentType, "application/x-www-form-urlencoded" )) {
+            if (!checkContentType(rawContentType, "application/x-www-form-urlencoded")) {
                 httpServletResponse.setStatus(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
-                ServletDebugUtil.trace(this,"in POST, did NOT get one, throwing exception");
+                ServletDebugUtil.trace(this, "in POST, did NOT get one, throwing exception");
                 //throw new ServletException("Error: Unsupported encoding of \"" + httpServletRequest.getContentType() + "\" for body of POST. Request rejected.");
                 throw new MissingContentException("Error: Unsupported encoding of \"" + httpServletRequest.getContentType() + "\" for body of POST. Request rejected.");
             }
-            ServletDebugUtil.trace(this,"encoding ok, starting doIt()");
+            ServletDebugUtil.trace(this, "encoding ok, starting doIt()");
 
             doIt(httpServletRequest, httpServletResponse);
         } catch (Throwable t) {
-     //       t.printStackTrace();
-            handleException(t, httpServletRequest, httpServletResponse);
+            //       t.printStackTrace();
+            handleException(new ExceptionHandlerThingie(t, httpServletRequest, httpServletResponse));
         }
     }
 
@@ -221,7 +221,7 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
             if (doPing(httpServletRequest, httpServletResponse)) return;
             doIt(httpServletRequest, httpServletResponse);
         } catch (Throwable t) {
-            handleException(t, httpServletRequest, httpServletResponse);
+            handleException(new ExceptionHandlerThingie(t, httpServletRequest, httpServletResponse));
         }
     }
 
@@ -318,11 +318,12 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
     /**
      * This will print all parameters to standard err for this specific debugger during trace.
      * It gives a report on what is actually being passed in.
+     *
      * @param request
      * @param debugger
      */
     protected void printAllParameters(HttpServletRequest request, MetaDebugUtil debugger) {
-        if(debugger.isEnabled() && debugger.getDebugLevel()==MetaDebugUtil.DEBUG_LEVEL_TRACE) {
+        if (debugger.isEnabled() && debugger.getDebugLevel() == MetaDebugUtil.DEBUG_LEVEL_TRACE) {
             debugger.trace(this, ":");
             ServletDebugUtil.printAllParameters(this.getClass(), request, true);
         }
@@ -333,10 +334,49 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
      * It is a low-level debugging tool
      * and should never be used in production, since it will bloat the logs.
      * It gives a report on what is actually being passed in.
+     *
      * @param request
      */
     protected void printAllParameters(HttpServletRequest request) {
         ServletDebugUtil.printAllParameters(this.getClass(), request, true);
     }
 
+    protected static final String[] IP_HEADERS = {
+            "X-Forwarded-For",
+            "Proxy-Client-IP",
+            "WL-Proxy-Client-IP",
+            "HTTP_X_FORWARDED_FOR",
+            "HTTP_X_FORWARDED",
+            "HTTP_X_CLUSTER_CLIENT_IP",
+            "HTTP_CLIENT_IP",
+            "HTTP_FORWARDED_FOR",
+            "HTTP_FORWARDED",
+            "HTTP_VIA",
+            "REMOTE_ADDR"};
+
+    /**
+     * Make a valiant effort to get the IP address in the request.
+     *
+     * @param request
+     * @return
+     */
+    public static String getRequestIPAddress(HttpServletRequest request) {
+        for (String header : IP_HEADERS) {
+            String ip = request.getHeader(header);
+            if (ip != null && ip.length() != 0 && !"unknown".equalsIgnoreCase(ip)) {
+                return ip;
+            }
+        }
+
+        return request.getRemoteAddr();
+    }
+
+    /**
+     * For log messages that state a request from a servlet was ok. Some clients require
+     * positive reporting for the number of successful calls too, so this can be used for that.
+     * @param request
+     */
+    public  void logOK(HttpServletRequest request) {
+        getMyLogger().info(getClass().getSimpleName() + " <" + getRequestIPAddress(request) + ">: request ok"  );
+    }
 }

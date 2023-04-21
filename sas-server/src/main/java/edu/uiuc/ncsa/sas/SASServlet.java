@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
+import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.util.cli.IOInterface;
 import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
@@ -137,7 +138,7 @@ public class SASServlet extends AbstractServlet {
             doIt(httpServletRequest, httpServletResponse);
         } catch (Throwable e) {
             e.printStackTrace();
-            handleException(e, httpServletRequest, httpServletResponse);
+            handleException(new SASExceptionHandlerThingie(e, httpServletRequest, httpServletResponse, null));
         }
     }
 
@@ -212,7 +213,7 @@ public class SASServlet extends AbstractServlet {
             getSASE().getResponseSerializer().serialize(responses, httpServletResponse, sessionRecord);
 
         } catch (Throwable t) {
-            handleException(t, httpServletRequest, httpServletResponse, sessionRecord);
+            handleException(new SASExceptionHandlerThingie(t, httpServletRequest, httpServletResponse, sessionRecord));
         }
 
     }
@@ -254,20 +255,28 @@ public class SASServlet extends AbstractServlet {
     }
 
 
-    protected void handleException(Throwable t,
-                                   HttpServletRequest request,
-                                   HttpServletResponse response,
-                                   SessionRecord sessionRecord) throws IOException, ServletException {
+    protected void handleException(ExceptionHandlerThingie xh) throws IOException, ServletException {
+        Throwable t = xh.throwable;
         if (t instanceof NFWException) {
             error("INTERNAL ERROR: " + (t.getMessage() == null ? "(no message)" : t.getMessage()), t); // log it appropriately
         }
         // ok, if it is a strange error, print a stack if you need to.
-        if (sessionRecord == null) {
-            getExceptionHandler().handleException(t, request, response);
-        }
-        getExceptionHandler().handleException(t, request, response, sessionRecord);
-    }
 
+        getExceptionHandler().handleException((SASExceptionHandlerThingie) xh);
+    }
+    public static class SASExceptionHandlerThingie extends ExceptionHandlerThingie{
+        public SASExceptionHandlerThingie(Throwable throwable,
+                                          HttpServletRequest request,
+                                          HttpServletResponse response,
+                                          SessionRecord sessionRecord) {
+            super(throwable, request, response);
+            this.sessionRecord = sessionRecord;
+        }
+        public boolean hasSessionRecord(){
+            return sessionRecord != null;
+        }
+        public SessionRecord sessionRecord;
+    }
     @Override
     public SASExceptionHandler getExceptionHandler() {
         return (SASExceptionHandler) super.getExceptionHandler();

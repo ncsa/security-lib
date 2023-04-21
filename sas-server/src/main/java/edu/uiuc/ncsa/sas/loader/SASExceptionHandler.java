@@ -1,13 +1,12 @@
 package edu.uiuc.ncsa.sas.loader;
 
 import edu.uiuc.ncsa.sas.SASEnvironment;
-import edu.uiuc.ncsa.sas.SessionRecord;
+import edu.uiuc.ncsa.sas.SASServlet;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
+import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -28,14 +27,12 @@ public class SASExceptionHandler implements ExceptionHandler {
 
     SASEnvironment sate;
     @Override
-    public void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-           t.printStackTrace();
+    public void handleException(ExceptionHandlerThingie exceptionHandlerThingie) throws IOException, ServletException {
+        SASServlet.SASExceptionHandlerThingie sasXH = (SASServlet.SASExceptionHandlerThingie)exceptionHandlerThingie;
+        if(sasXH.hasSessionRecord()){
+            sate.getResponseSerializer().serialize(sasXH.throwable, sasXH.response, sasXH.sessionRecord);
+        }else{
+            exceptionHandlerThingie.throwable.printStackTrace();
+        }
     }
-    public void handleException(Throwable t,
-                                HttpServletRequest request,
-                                HttpServletResponse response,
-                                SessionRecord sessionRecord) throws IOException, ServletException {
-        sate.getResponseSerializer().serialize(t, response,sessionRecord);
-    }
-
 }

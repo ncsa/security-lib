@@ -39,7 +39,7 @@
     <faq id="cli">
       <question>What is the CLI package?</question>
       <answer>CLI - Command Line Interface. This is a set of tools that lets you create
-      command line interfaces to </answer>
+      command line interfaces to darned near anything.</answer>
     </faq>
   </part>
 </faqs>

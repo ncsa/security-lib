@@ -7,6 +7,7 @@ import javax.inject.Provider;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.FileHandler;
+import java.util.logging.Level;
 import java.util.logging.SimpleFormatter;
 
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.getFirstAttribute;
@@ -22,31 +23,34 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
     }
 
     String logFile = null;
-    boolean debugOn = false;
     String loggerName = null;
     int fileCount = -1;
     int maxFileSize = -1;
     boolean appendOn = true;
+
+    Level logLevel = Level.INFO; // default
     boolean disableLog4j = true;
+
     public String getLoggerName() {
         return loggerName;
     }
 
+    int level;
 
     public LoggerProvider(String logFile,
                           String loggerName,
                           int fileCount,
                           int maxFileSize,
                           boolean disableLog4j,
-                          boolean debugOn,
-                          boolean appendOn) {
-        this.debugOn = debugOn;
+                          boolean appendOn,
+                          Level logLevel) {
         this.logFile = logFile;
         this.loggerName = loggerName;
         this.appendOn = appendOn;
         this.fileCount = fileCount;
         this.maxFileSize = maxFileSize;
         this.disableLog4j = disableLog4j;
+        this.logLevel = logLevel;
     }
 
     public LoggerProvider(ConfigurationNode configurationNode) {
@@ -59,11 +63,53 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
         if (configurationNode == null) return;
         logFile = getFirstAttribute(configurationNode, LOG_FILE_NAME);
         loggerName = getFirstAttribute(configurationNode, LOGGER_NAME);
+        String rawDebug = getFirstAttribute(configurationNode, DEBUG_ENABLED);
+        String rawLogLevel = getFirstAttribute(configurationNode, LOG_LEVEL);
+        if (rawDebug == null) {
+            if (rawLogLevel == null) {
+                logLevel = Level.INFO;
+            } else {
+                rawLogLevel = rawLogLevel.toLowerCase();
+                switch (rawLogLevel) {
+                    case LOG_LEVEL_OFF:
+                        logLevel = Level.OFF;
+                        break;
+                    case LOG_LEVEL_TRACE:
+                        logLevel = Level.FINEST;
+                        break;
+                    case LOG_LEVEL_INFO:
+                        logLevel = Level.INFO;
+                        break;
+                    case LOG_LEVEL_ERROR:
+                        logLevel = Level.SEVERE;
+                        break;
+                    case LOG_LEVEL_WARN:
+                        logLevel = Level.WARNING;
+                        break;
+                    default:
+                        logLevel = MyLoggingFacade.DEFAULT_LOG_LEVEL;
+                        break;
+                }
+            }
+        } else {
+            try {
+                boolean debugOn = Boolean.parseBoolean(rawDebug);
+                if (debugOn) {
+                    logLevel = Level.FINEST;
+                } else {
+                    logLevel = MyLoggingFacade.DEFAULT_LOG_LEVEL;
+                }
+            } catch (Throwable tttt) {
+                logLevel = MyLoggingFacade.DEFAULT_LOG_LEVEL;
+            }
+        }
         try {
-            debugOn = Boolean.parseBoolean(getFirstAttribute(configurationNode, DEBUG_ENABLED));
+            if (Boolean.parseBoolean(getFirstAttribute(configurationNode, DEBUG_ENABLED))) {
+                logLevel = Level.FINEST;
+            }
         } catch (Exception x) {
             // do nothing
-            debugOn = false;
+            logLevel = Level.INFO;
         }
         try {
             fileCount = Integer.parseInt(getFirstAttribute(configurationNode, LOG_FILE_COUNT));
@@ -80,9 +126,9 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
         } catch (Exception e) {
             appendOn = true;
         }
-        try{
+        try {
             disableLog4j = Boolean.parseBoolean(getFirstAttribute(configurationNode, DISABLE_LOG4J));
-        }catch(Exception e){
+        } catch (Exception e) {
             disableLog4j = false;
         }
 
@@ -105,9 +151,11 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
                 Configurations.killLog4J();
             }
             if (loggerName == null) {
-                loggerName = "OAuth for MyProxy";
+                loggerName = "oa4mp";
             }
             logger = new MyLoggingFacade(loggerName);
+            //  logger = java.util.logging.Logger.getLogger(MyLoggingFacade.class.getCanonicalName());
+            logger.setLogLevel(logLevel);
             logFileName = null;
             if (logFile != null) {
                 FileHandler fileHandler = null;
@@ -131,7 +179,6 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
                     logger.info("Warning: could not setup logging to file. Message:\"" + e.getMessage() + "\". Logging to console. Processing will continue.");
                     logger.info("You probably should configure logging explicitly.");
                 }
-                logger.setDebugOn(debugOn);
             }
         }
         return logger;

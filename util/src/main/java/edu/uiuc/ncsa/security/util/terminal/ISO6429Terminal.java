@@ -103,7 +103,7 @@ public class ISO6429Terminal {
     }
 
     public int[] getCursor() throws IOException {
-        debug("getting cursor");
+   //     debug("getting cursor");
 /*        IntConsumer intConsumer = new IntConsumer() {
             @Override
             public void accept(int value) {
@@ -119,14 +119,14 @@ public class ISO6429Terminal {
         getCommandPS().flush();
         KeyStroke keyStroke = getCharacter(); // read the response
         if (keyStroke.csi == null) {
-            debug(" got cursor for null");
+  //          debug(" got cursor for null");
             return new int[]{-1, -1};
         }
         if (keyStroke.getCsi().parameters.length == 1) {
-            debug(" got cursor with 1 arg");
+    //        debug(" got cursor with 1 arg");
             return new int[]{1, keyStroke.getCsi().parameters[0]};
         }
-        debug(" got cursor");
+   //     debug(" got cursor");
 
         return keyStroke.getCsi().parameters;
 
@@ -169,7 +169,7 @@ public class ISO6429Terminal {
 
     protected KeyStroke getCharacter() throws IOException {
         int x = reader.read();
-        debug("  > 1st char =" + x);
+     //   debug("  > 1st char =" + x);
         CSI csi;
         // returned number is exactly a control char
         switch (x) {
@@ -214,13 +214,13 @@ public class ISO6429Terminal {
                 // There has to be a better way to pick up on this...
                 csi = new CSI();
                 csi.rawCommand = String.valueOf((char) 27);
-                debug("returning escape");
+    //            debug("returning escape");
 
                 return new KeyStroke(KeyType.Escape, csi);
             }
             // start of standard escape sequence.
             int y = reader.read();
-            debug("  > 2nd char =" + y);
+    //        debug("  > 2nd char =" + y);
 
             // handle ALT char remappings first
             // These are of the form 'ESC char' and are case sensitive
@@ -239,7 +239,7 @@ public class ISO6429Terminal {
                     // If the user types in something strange, just ignore it.
                     return new KeyStroke((char) ' ');
                 }
-                debug(" Got CSI=" + csi);
+     //           debug(" Got CSI=" + csi);
                 // start of escape [ sequence, so called CSI = "Control Sequence Introducer"
                 switch (csi.op) {
                     case 'A':
@@ -286,7 +286,7 @@ public class ISO6429Terminal {
             return new KeyStroke(KeyType.Escape, csi);
         }
 
-        debug(" returning char");
+      //  debug(" returning char");
         return new KeyStroke((char) x);
     }
 
@@ -375,12 +375,12 @@ public class ISO6429Terminal {
     }
 
     protected CSI getCSI() throws IOException {
-        debug("In getCSI()");
+    //    debug("In getCSI()");
         CSI csi = new CSI();
         String raw = "\033[";
         StringBuilder parameterBytes = new StringBuilder();
         int x = reader.read();
-        debug("csi x = " + x);
+   //     debug("csi x = " + x);
         // 0x30–0x3F
         while (0x30 <= x && x <= 0x3F) {
             parameterBytes.append((char) x);
@@ -428,7 +428,7 @@ public class ISO6429Terminal {
         csi.intermediateCommands = intermediateBytes.toString();
         // so there should be a single final byte in this range:
         // 0x40–0x7E
-        debug("after read x = " + x);
+    //    debug("after read x = " + x);
         if (!(0x40 <= x && x <= 0x7E)) {
             // not a final byte.
             throw new IllegalArgumentException("error: Unknown CSI terminator");
