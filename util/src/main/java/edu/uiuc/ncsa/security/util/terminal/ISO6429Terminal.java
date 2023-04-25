@@ -150,8 +150,8 @@ public class ISO6429Terminal {
         //    return getCharPS();
 
         if (cps == null) {
-            //  cps = System.out;
-            cps = System.err;
+              cps = System.out;
+            //cps = System.err;
         }
         return cps;
 

@@ -93,7 +93,7 @@ public class WebClientConfig {
     File file = null;
 
     public static void main(String[] args) throws Throwable {
-        JFrame frame = new JFrame("QDL Terminal");
+        JFrame frame = new JFrame("SAS Client configuration utility");
         WebClientConfig webClientConfig = new WebClientConfig();
         if (0 < args.length) {
             webClientConfig.file = new File(args[0]);

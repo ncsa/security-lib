@@ -1,4 +1,12 @@
-Apr 17, 2023 9:30:19 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
-INFO: NCSA Delegation:Logging to file delegation.xml
-Apr 17, 2023 9:30:19 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
-INFO: NCSA Delegation:SAS Configuration loader version: 5.3-SNAPSHOT startup on Mon Apr 17 09:30:19 CDT 2023
+Apr 25, 2023 3:56:20 PM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: NCSA Delegation:Logging to file /home/ncsa/dev/ncsa-git/security-lib/delegation.xml
+Apr 25, 2023 3:56:20 PM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: NCSA Delegation:SAS Configuration loader version: 5.3-SNAPSHOT startup on Tue Apr 25 15:56:20 CDT 2023
+Apr 25, 2023 3:57:40 PM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: NCSA Delegation:Created object SASClient with identifier sas:client/5cdc27b5-4bc2-43ba-9745-544c33b50a14/1682456260462
+Apr 25, 2023 3:57:44 PM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: NCSA Delegation:Starting update for object with id = sas:client/5cdc27b5-4bc2-43ba-9745-544c33b50a14/1682456260462
+Apr 25, 2023 3:58:28 PM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: NCSA Delegation:User terminated updates for object with id sas:client/5cdc27b5-4bc2-43ba-9745-544c33b50a14/1682456260462
+Apr 25, 2023 3:58:28 PM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
+INFO: NCSA Delegation:Updated object SASClient with identifier sas:client/5cdc27b5-4bc2-43ba-9745-544c33b50a14/1682456260462

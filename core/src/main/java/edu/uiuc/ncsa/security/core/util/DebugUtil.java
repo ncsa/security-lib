@@ -131,6 +131,13 @@ public class DebugUtil implements DebugConstants{
     }
 
 
+    public static void info(String message) {
+        getInstance().info( message);
+    }
+    public static void info(String title, String message) {
+        getInstance().info(title, message);
+    }
+
     public static void info(Class callingClass, String message) {
         getInstance().info(callingClass, message);
     }
@@ -139,6 +146,12 @@ public class DebugUtil implements DebugConstants{
         getInstance().info(obj.getClass(), message);
     }
 
+    public static void warn(String message) {
+        getInstance().warn(message);
+    }
+    public static void warn(String title, String message) {
+        getInstance().warn(title, message);
+    }
     public static void warn(Class callingClass, String message) {
         getInstance().warn(callingClass, message);
     }
@@ -147,6 +160,12 @@ public class DebugUtil implements DebugConstants{
         getInstance().warn(obj, message);
     }
 
+    public static void error(String message, Throwable t) {
+        getInstance().error(message,t);
+    }
+    public static void error(String title, String message, Throwable t) {
+        getInstance().error(title,message,t);
+    }
     public static void error(Object obj, String message, Throwable t) {
         getInstance().error(obj,message,t);
     }
@@ -161,6 +180,14 @@ public class DebugUtil implements DebugConstants{
 
     public static void error(Object obj, String message) {
         getInstance().error(obj, message);
+    }
+
+    public static void severe(String message, Throwable t) {
+        getInstance().severe(message, t);
+    }
+
+    public static void severe(String title, String message, Throwable t) {
+        getInstance().severe(title, message, t);
     }
 
     public static void severe(Object obj, String message, Throwable t) {
@@ -179,6 +206,15 @@ public class DebugUtil implements DebugConstants{
               getInstance().severe(obj, message);
     }
 
+    public static void trace(String message) {
+        getInstance().trace(message);
+    }
+    public static void trace(String message, Throwable t) {
+        getInstance().trace(message, t);
+    }
+    public static void trace(String title, String message, Throwable t) {
+        getInstance().trace(title, message, t);
+    }
     public static void trace(Object obj, String message, Throwable t) {
         getInstance().trace(obj, message, t);
     }

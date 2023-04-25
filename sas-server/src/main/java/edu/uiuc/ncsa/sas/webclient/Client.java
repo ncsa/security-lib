@@ -29,9 +29,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.*;
 import java.net.URI;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -66,7 +64,8 @@ public class Client extends ServiceClient implements SASConstants {
     public static final String FLAG_CONFIG = "-cfg"; // name of config file
     public static final String FLAG_NEW = "-new"; // create a new configuration file
     public static final String FLAG_HELP = "--help"; // help
-    public static final String FLAG_VERBOSE = "-v"; // help
+    public static final String FLAG_VERBOSE = "-v"; // verbosity
+    public static final String FLAG_PRINT_PUBLIC_KEY = "-print_key"; //
 
     public static final String CONFIG_CLIENT_ID = "client_id";
     public static final String CONFIG_PRIVATE_KEY = "private_key";
@@ -169,9 +168,45 @@ public class Client extends ServiceClient implements SASConstants {
 
     protected static void newConfigFile(XMLMap xmlMap) throws IOException {
         xmlMap.put(CONFIG_CLIENT_ID, getInput("enter client id"));
-        say("enter private key, PKCS 8 or a single JWK");
-        String x = multiLineInput("", CONFIG_PRIVATE_KEY);
-        xmlMap.put(CONFIG_PRIVATE_KEY, x.trim()); // If a JWK, any leading blanks will cause JSON library to fail.
+        boolean gotKeys = false;
+        if ("y".equalsIgnoreCase(getInput("Create a new public private key pair?(y/n)"))) {
+            KeyPair keyPair = KeyUtil.generateKeyPair();
+            String keyAsString = null;
+            boolean bail = false;
+            boolean keepLooping = true;
+            while(keepLooping){
+                String type = getInput("Did you want JWK or PKCS8 format?(j/p/q)");
+                    switch (type) {
+                        case "j":
+                            JSONWebKey jwk = JSONWebKeyUtil.create(keyPair);
+                            keyAsString = JSONWebKeyUtil.toJSON(jwk).toString(1);
+                            keepLooping = false; gotKeys = true;
+                            break;
+                        case "p":
+                            keyAsString = KeyUtil.toPKCS8PEM(keyPair.getPrivate());
+                            keepLooping = false; gotKeys = true;
+                            case "q":
+                            bail = true; // don't do anything here.
+                            keepLooping = false;
+                        default:
+                            keepLooping = "y".equalsIgnoreCase(getInput("I didn't understand that. Try again?(y/n)"));
+                    }
+            }
+            if(keyAsString != null && !bail) {
+                xmlMap.put(CONFIG_PRIVATE_KEY, keyAsString); // If a JWK, any leading blanks will cause JSON library to fail.
+                say("key created.");
+            }
+
+        }
+        if(!gotKeys){
+            if("y".equalsIgnoreCase(getInput("Did you want to paste in a key?(y/n)"))){
+                say("enter private key, PKCS 8 or a single JWK");
+                String x = multiLineInput("", CONFIG_PRIVATE_KEY);
+                xmlMap.put(CONFIG_PRIVATE_KEY, x.trim()); // If a JWK, any leading blanks will cause JSON library to fail.
+            }else{
+                say("no keys added");
+            }
+        }
         xmlMap.put(CONFIG_HOST, getInput("enter host address"));
 
         if ("y".equals(getInput("enter ssl configuration (y/n)?"))) {
@@ -278,13 +313,18 @@ public class Client extends ServiceClient implements SASConstants {
         Client client = new Client(URI.create(config.getString(CONFIG_HOST)), sslConfiguration);
         client.setConfig(config);
         String rawKey = config.getString(CONFIG_PRIVATE_KEY);
-        PrivateKey privateKey = null;
+        KeyPair keyPair;
+         PrivateKey privateKey = null;
+         PublicKey publicKey = null;
         try {
-            privateKey = KeyUtil.fromPKCS1PEM(rawKey);
+            keyPair = KeyUtil.keyPairFromPKCS1(rawKey);
+            privateKey = keyPair.getPrivate();
+            publicKey = keyPair.getPublic();
         } catch (Throwable t) {
             JSONWebKey jwk = JSONWebKeyUtil.getJsonWebKey(rawKey);
             if (jwk != null) {
                 privateKey = jwk.privateKey;
+                publicKey = jwk.publicKey;
             }
         }
         if (privateKey == null) {
@@ -292,9 +332,18 @@ public class Client extends ServiceClient implements SASConstants {
             return null;
         }
         client.setPrivateKey(privateKey);
+        client.setPublicKey(publicKey);
         return client;
     }
+    public PublicKey getPublicKey() {
+        return publicKey;
+    }
 
+    public void setPublicKey(PublicKey publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    PublicKey publicKey;
     public static void main(String[] args) throws Throwable {
         Vector<String> vector = new Vector<>();
         vector.add("dummy"); // Dummy zero-th arg.
@@ -346,6 +395,19 @@ public class Client extends ServiceClient implements SASConstants {
         }
 
         Client client = newInstance(inputLine); // get the configuration, confiure the client
+        if(inputLine.hasArg(FLAG_PRINT_PUBLIC_KEY)){
+            switch (inputLine.getNextArgFor(FLAG_PRINT_PUBLIC_KEY).toLowerCase()){
+                case "jwk":
+                   KeyPair keyPair = new KeyPair(client.getPublicKey(), client.getPrivateKey());
+                   JSONWebKey jwk = JSONWebKeyUtil.create(keyPair);
+                   say("public key in JWK format:\n" + JSONWebKeyUtil.toJSON(JSONWebKeyUtil.makePublic(jwk)).toString(1));
+                   break;
+                default:
+                case "pkcs":
+                    say("public key in PKCS 5 format:\n" +  KeyUtil.toX509PEM(client.getPublicKey()));
+            }
+            return;
+        }
         client.cli(); // start it.
     }
 
@@ -445,9 +507,11 @@ public class Client extends ServiceClient implements SASConstants {
         say(FLAG_EDIT + " edit existing file or update current ");
         say(FLAG_HELP + " display this help message ");
         say(FLAG_VERBOSE + " print more output about functioning of this. Mostly for debugging.");
+        say(FLAG_PRINT_PUBLIC_KEY + " print the public key then exit. Arguments are jwk for JSON web key or pkcs for PKCS 5 format.");
         say("If you simply supply the " + FLAG_EDIT + " flag, you will be prompted to create a new configuration file.");
     }
 
+    // /home/ncsa/dev/csd/config/sas/sas-test-config.xml
     UUID sessionID;
 
     public Response doLogon() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, InvalidKeySpecException, IOException, BadPaddingException, InvalidKeyException {

@@ -31,6 +31,7 @@ public interface DebugConstants {
      * can be seen. Note that this may be extremely verbose.
      */
     int DEBUG_LEVEL_TRACE = 1;
+    int DEBUG_LEVEL_UNKNOWN = -100;
 
     String DEBUG_LEVEL_OFF_LABEL = "off";
     String DEBUG_LEVEL_ERROR_LABEL = "error";
