@@ -31,6 +31,7 @@
         <item name="Crypt8" href="https://ncsa.github.io/crypto-java8/"/>
         <item name="Store commands" href="store_commands/index.html"/>
         <item name="CLI" href="cli/index.html"/>
+        <item name="SAS Reference" href="pdf/SAS-protocol.pdf"/>
       </menu>
       <menu ref="reports"/>
   </body>

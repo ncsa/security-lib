@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.sas;
 
 import edu.uiuc.ncsa.sas.client.ClientProvider;
 import edu.uiuc.ncsa.sas.client.SASClient;
+import edu.uiuc.ncsa.sas.example.EchoExecutable;
 import edu.uiuc.ncsa.sas.loader.SASExceptionHandler;
 import edu.uiuc.ncsa.sas.thing.action.*;
 import edu.uiuc.ncsa.sas.thing.response.*;
@@ -12,7 +13,6 @@ import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
-import edu.uiuc.ncsa.security.util.cli.IOInterface;
 import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
@@ -84,40 +84,8 @@ public class SASServlet extends AbstractServlet {
         return logonResponse;
     }
 
-    protected Executable createExecutable() {
-        return new Executable() {
-            @Override
-            public Response execute(Action action) {
-                StringBuilder output;
-                switch (action.getType()) {
-                    case SASConstants.ACTION_EXECUTE:
-                        ExecuteAction executeAction = (ExecuteAction) action;
-                        getIO().println("test: execute(" + executeAction.getArg() + ")");
-                        break;
-                    case SASConstants.ACTION_INVOKE:
-                        InvokeAction invokeAction = (InvokeAction) action;
-                        getIO().println("test: " + invokeAction.getName() + "(" + invokeAction.getArgs() + ")");
-                        break;
-                    default:
-                        getIO().println("test exec, got action:" + action.getType());
-                }
-                output = ((StringIO) getIO()).getOutput();
-                return new OutputResponse(action, output.toString());
-
-            }
-
-            IOInterface ioInterface = new StringIO("");
-
-            @Override
-            public IOInterface getIO() {
-                return ioInterface;
-            }
-
-            @Override
-            public void setIO(IOInterface io) {
-                ioInterface = io;
-            }
-        };
+    public Executable createExecutable() {
+        return new EchoExecutable();   // Just to demo this. Write your own and override.
     }
 
     protected LogoffResponse doLogoff(SASClient client, LogoffAction logoffAction, HttpServletResponse response, SessionRecord sessionRecord, String message) throws IOException {
@@ -264,7 +232,8 @@ public class SASServlet extends AbstractServlet {
 
         getExceptionHandler().handleException((SASExceptionHandlerThingie) xh);
     }
-    public static class SASExceptionHandlerThingie extends ExceptionHandlerThingie{
+
+    public static class SASExceptionHandlerThingie extends ExceptionHandlerThingie {
         public SASExceptionHandlerThingie(Throwable throwable,
                                           HttpServletRequest request,
                                           HttpServletResponse response,
@@ -272,11 +241,14 @@ public class SASServlet extends AbstractServlet {
             super(throwable, request, response);
             this.sessionRecord = sessionRecord;
         }
-        public boolean hasSessionRecord(){
+
+        public boolean hasSessionRecord() {
             return sessionRecord != null;
         }
+
         public SessionRecord sessionRecord;
     }
+
     @Override
     public SASExceptionHandler getExceptionHandler() {
         return (SASExceptionHandler) super.getExceptionHandler();

@@ -5,6 +5,13 @@ export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 NCSA_ROOT=/home/ncsa/dev/ncsa-git/security-lib
 # Output of everything goes to WEBSITE_ROOT
 WEBSITE_ROOT=$NCSA_ROOT/docs
+cd $WEBSITE_ROOT/pdf
+
+echo "converting docs to PDF"
+
+lowriter --headless --convert-to pdf ~/dev/ncsa-git/security-lib/sas-server/src/main/docs/SAS-protocol.odt
+echo "done converting PDFs"
+
 
 
 cd $NCSA_ROOT
