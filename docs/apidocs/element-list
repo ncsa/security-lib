@@ -30,6 +30,7 @@ edu.uiuc.ncsa.security.storage.sql.internals
 edu.uiuc.ncsa.security.storage.sql.mariadb
 edu.uiuc.ncsa.security.storage.sql.mysql
 edu.uiuc.ncsa.security.storage.sql.postgres
+edu.uiuc.ncsa.security.storage.uuc
 edu.uiuc.ncsa.security.util.cli
 edu.uiuc.ncsa.security.util.cli.editing
 edu.uiuc.ncsa.security.util.cli.json_edit
