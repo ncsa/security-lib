@@ -43,7 +43,7 @@ public class MultiConfigurations {
     Same with duplicate named configurations.
      */
     public void ingestConfig(XMLConfiguration cfg,
-                             String topNodeTag // the tag of elements to look at, e.g. service
+                             String topNodeTag // the tag of elements to look at, e.g. service, client, qdl
     ) {
 
         List list = cfg.configurationsAt(topNodeTag);
@@ -56,7 +56,6 @@ public class MultiConfigurations {
             }
             if (allNodes.containsKey(name)) {
                 throw new MyConfigurationException("Duplicated name \"" + name + "\"  Configuration load is aborted.");
-
             }
             allNodes.put(name, cn.getRootNode());
             String alias = Configurations.getFirstAttribute(cn.getRootNode(), ALIAS_TAG);
@@ -85,6 +84,7 @@ public class MultiConfigurations {
      * and no config should do that, but it is unavoidable. Therefore, this will return all the nodes
      * with the given name and generally the calling program should either throw an exception if there
      * is more than one or have some strategy for dealing with multiples.
+     *
      * @param cfgName
      * @return
      */
@@ -93,14 +93,12 @@ public class MultiConfigurations {
         // Get the list of names to return
         if (!getInheritanceEngine().isResolutionsRun()) {
             throw new MyConfigurationException("No configurations have been resolved.. Configuration load is aborted.");
-
         }
 
         if (!getInheritanceEngine().getResolvedOverrides().containsKey(cfgName)) {
             throw new MyConfigurationException("Configuration \"" + cfgName + "\" not found. Configuration load is aborted.");
         }
 
-        List<String> nodeNames = new ArrayList<>();
         InheritanceList inheritanceList = getInheritanceEngine().getResolvedOverrides().get(cfgName);
         List<ConfigurationNode> nodes = new ArrayList<>();
 
@@ -108,7 +106,6 @@ public class MultiConfigurations {
             nodes.add(allNodes.get(x));
         }
         return nodes;
-
     }
 
 
@@ -121,14 +118,18 @@ public class MultiConfigurations {
      * <br/><br/>
      * E.g. a list of
      * <pre>
-     * ; A ; B ; C
+     * ;A;B;C
      * </pre>
-     * means ; is the delimiter.
+     * means ; is the delimiter. You only need to put the delimeter first
+     * if it is not a blank, so "A B C" is fine. Different delimeter let you have
+     * embedded blanks etc. E.g. ";mairzy doats;and dozey;daots! and"
+     * parses as "mairzey doats", "and dozey", "doats! and"
+     *
      * @param rawList
      * @return
      */
 
-    protected  List<String> splitParentList(String rawList) {
+    protected List<String> splitParentList(String rawList) {
         List<String> output = new ArrayList<>();
         if (isTrivial(rawList)) {
             return output;
@@ -190,16 +191,17 @@ public class MultiConfigurations {
      * returns the kitchen sink. This is the equivalent of glomming together all of
      * the like-named nodes into one big virtual node. This also gets other nodes in the configuration
      * too so if there are multiple ones in any configuration, they are added in as well.
-     *
+     * <p>
      * Sometimes this is necessary.
+     *
      * @param nodes
      * @param name
      * @return
      */
-    public  List<ConfigurationNode> getAllNodes(List<ConfigurationNode> nodes, String name) {
+    public List<ConfigurationNode> getAllNodes(List<ConfigurationNode> nodes, String name) {
         List<ConfigurationNode> returnedNodes = new ArrayList<>();
-        if(nodes.isEmpty()) return returnedNodes;
-        for(ConfigurationNode node : nodes){
+        if (nodes.isEmpty()) return returnedNodes;
+        for (ConfigurationNode node : nodes) {
             List list = node.getChildren(name);
             if (!list.isEmpty()) {
                 returnedNodes.addAll(list);
@@ -208,6 +210,7 @@ public class MultiConfigurations {
         }
         return returnedNodes;
     }
+
     /**
      * Convenience method for getting the value of a single node, i.e. the contents, so
      * <br><br>
@@ -233,7 +236,8 @@ public class MultiConfigurations {
      * Convenience method for getting the value of a single node, i.e. the contents, so
      * <br><br>
      * &lt;foo&gt;value&lt;/foo&gt;<br><br> would have name equal to 'foo' and return the
-     * string 'value'. Returns a null if no such value is found.
+     * string 'value'. Returns a null if no such value is found.  This is also clever enough
+     * to pull things out of CDATA nodes.
      *
      * @param nodes
      * @param name
@@ -241,12 +245,14 @@ public class MultiConfigurations {
      */
 
     public String getNodeContents(List<ConfigurationNode> nodes, String name) {
-        return getNodeContents(nodes,name, null);
+        return getNodeContents(nodes, name, null);
     }
 
     /**
      * Finds the first attribute with the given name and then converts to boolean.
-     * If the conversion fails, the default is returned.
+     * If the conversion fails, the default is returned. This supports values of
+     * true, false, on, off.
+     *
      * @param nodes
      * @param attrib
      * @param defaultValue
@@ -255,11 +261,49 @@ public class MultiConfigurations {
     public boolean getFirstBooleanValue(List<ConfigurationNode> nodes, String attrib, boolean defaultValue) {
         if (nodes.isEmpty()) return defaultValue;
         try {
-            String x = getFirstAttribute(nodes, attrib);
-            if(isTrivial(x)){return defaultValue;} //  Null argument returns false.
-            return Boolean.parseBoolean(x);
-        } catch (Throwable t) {
+            return getFirstBooleanValue(nodes, attrib);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return defaultValue;
+        }
+    }
 
+    /**
+     * Get the first attribute and return a boolean. Note that this supports values of
+     * true, false, on and off. If no such value is found, an exception is raised.
+     *
+     * @param nodes
+     * @param attrib
+     * @return
+     */
+    public boolean getFirstBooleanValue(List<ConfigurationNode> nodes, String attrib) {
+        if (nodes.isEmpty()) throw new IllegalArgumentException("no such node " + attrib);
+        String x = getFirstAttribute(nodes, attrib);
+        if (isTrivial(x)) {
+            throw new IllegalArgumentException("no value for " + attrib);
+        }
+        if (x.equalsIgnoreCase("true") || x.equalsIgnoreCase("on")) return true;
+        if (x.equalsIgnoreCase("false") || x.equalsIgnoreCase("off")) return false;
+        throw new IllegalArgumentException("illegal boolean value \"" + x + "\" for attribute " + attrib);
+    }
+
+    public long getFirstLongValue(List<ConfigurationNode> nodes, String attrib) {
+        if (nodes.isEmpty()) throw new IllegalArgumentException("no such node " + attrib);
+        String x = getFirstAttribute(nodes, attrib);
+        if (isTrivial(x)) {
+            throw new IllegalArgumentException("no value for " + attrib);
+        }
+        try{
+            return Long.parseLong(x);
+        }catch(NumberFormatException nfx){
+             throw new IllegalArgumentException("Could not parse \"" + x + "\" as a long for " + attrib);
+        }
+    }
+
+    public long getFirstLongValue(List<ConfigurationNode> nodes, String attrib, long defaultValue) {
+        if (nodes.isEmpty()) return defaultValue;
+        try{
+            return getFirstLongValue(nodes, attrib);
+        }catch(IllegalArgumentException nfx){
         }
         return defaultValue;
     }

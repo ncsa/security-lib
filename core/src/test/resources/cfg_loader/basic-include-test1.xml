@@ -1,0 +1,7 @@
+<!--
+      Most minimal configuration. test includes for multiple inheritance engine.
+-->
+<config>
+    <service name="B"  extends="Y"/>  <!--   B Y -->
+    <service name="Y"/>
+</config>

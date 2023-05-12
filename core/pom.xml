@@ -48,33 +48,20 @@
      </dependencies>
     <build>
         <plugins>
-    <!--        <plugin>
-                 <groupId>org.apache.maven.plugins</groupId>
-                 <artifactId>maven-javadoc-plugin</artifactId>
-                 <version>3.4.0</version>
-                 <configuration>
-                     &lt;!&ndash;<aggregate>true</aggregate>&ndash;&gt;
-                     <includeDependencySources>false</includeDependencySources>
-                     <dependencySourceIncludes>
-                         <dependencySourceInclude>edu.uiuc.ncsa.*</dependencySourceInclude>
-                     </dependencySourceIncludes>
-                 </configuration>
-             </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M7</version>
                 <configuration>
-                    <excludes>
-                        <exclude>**/*Test.java</exclude>
-                    </excludes>
                     <includes>
-                        <include>**/*Suite.java</include>
+                        <include>**/*Test.java</include>
                     </includes>
+<!--                    <includes>
+                        <include>**/*Suite.java</include>
+                    </includes>-->
                   <!--  <forkMode>perTest</forkMode>-->
                     <forkCount>1</forkCount>
                     <reuseForks>false</reuseForks>
-
                 </configuration>
             </plugin>
             <plugin>

@@ -1,0 +1,17 @@
+<!--
+     Inlcudes that require resolution. This includes a file with the extension.
+-->
+<config>
+    <service name="Q"  extends="X"/>  <!--   Q X gets X from include-->
+    <file include="/home/ncsa/dev/ncsa-git/security-lib/core/src/test/resources/cfg_loader/override-in-alias-test.xml"/>
+</config>
+
+<!--
+   <config>
+       <service name="A" extends="B"/>  A C X
+       <service name="B" alias="C"/>       C X
+       <service name="C" extends="X"/>  C X
+
+       <service name="X"/>
+   </config>
+-->

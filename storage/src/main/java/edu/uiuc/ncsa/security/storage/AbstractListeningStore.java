@@ -12,9 +12,11 @@ import java.util.List;
 import java.util.UUID;
 
 /**
+ *
  * <p>Created by Jeff Gaynor<br>
  * on 3/29/23 at  6:22 AM
  */
+// Should be renamed to something like LastAccessedStoreFacade
 public  class AbstractListeningStore<V extends Identifiable> implements ListeningStoreInterface<V> {
 
     @Override

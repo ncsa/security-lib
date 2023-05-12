@@ -23,7 +23,7 @@ public class ConfigUtil {
     /**
      * Finds the configuration in an XML file, given the filename, name of the configuration
      * (or null if you want to use the only one there) and the top node tag
-     * (E.g. "client" or "server").
+     * (E.g. "client" or "server").  This only permits single inheritance.
      *
      * @param fileName
      * @param configName
@@ -47,6 +47,14 @@ public class ConfigUtil {
 
     }
 
+    /**
+     * Entry point for multiple-inheritance.
+     * @param fileName
+     * @param cfgName
+     * @param cfgTagName
+     * @return
+     * @throws ConfigurationException
+     */
     public static ConfigurationNode findMultiNode(String fileName, String cfgName, String cfgTagName) throws ConfigurationException {
         MultiConfigurations configurations2 = getConfigurations2(fileName, cfgTagName);
         Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();

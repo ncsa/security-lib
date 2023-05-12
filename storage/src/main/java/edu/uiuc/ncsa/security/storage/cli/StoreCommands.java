@@ -1004,7 +1004,8 @@ public abstract class StoreCommands extends CommonCommands {
             index = Integer.parseInt(inputLine.getLastArg());
         } catch (Throwable t) {
             // rock on
-            /* If it starts with a / remove that. otherwise just try to turn non-integers into an id.*/
+            // Fixes https://github.com/ncsa/security-lib/issues/18
+            // If it starts with a / remove that. otherwise just try to turn non-integers into an id.
             if (inputLine.getLastArg().startsWith("/")) {
                 localID = BasicIdentifier.newID(inputLine.getLastArg().substring(1));
             } else {

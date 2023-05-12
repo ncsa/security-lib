@@ -33,7 +33,7 @@ public class MultipleInheritanceEngine {
 
     boolean resolutionsRun = false;
 
-    public static boolean DEBUG_ON = false; // This has to be set internally for deep debugging
+    public static boolean DEBUG_ON = false; // This has to be set internally for deep debugging. Lots of output!
     public InheritanceMap getAtomicNodes() {
         return atomicNodes;
     }

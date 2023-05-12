@@ -43,3 +43,10 @@ Should hold for elements as well, so
 </config>
 
  Referencing A.mynode returns the element with contents "node A"
+
+ Tests
+ -----
+ There are two sets of tests. The directory cfg_loader contains the basic tests for resolving inheritance
+ (so that X extends Y is correct) but the actual tests for attributes and elements are in the directory
+ cfg_inheritance. Inheritance is by element, so you cannot easily override a single property inside
+ an element. This may change.

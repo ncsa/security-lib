@@ -234,6 +234,31 @@ public class Configurations {
      }
 
     /**
+     * Return the first long value of an attribute. Must have the default value specified. There is no
+     * promise as to what "first value" means thanks to the XML spec., so effectively you should restrict
+     * your XML to have at most one such value.
+     * @param node
+     * @param attrib
+     * @param defaultValue
+     * @return
+     */
+     public static long getFirstLongValue(ConfigurationNode node, String attrib, long defaultValue){
+         if (node == null) return defaultValue;
+         try {
+             String x = getFirstAttribute(node, attrib);
+             if (isTrivial(x)) {
+                 return defaultValue;
+             } //  Null argument returns false.
+             return Long.parseLong(x);
+         } catch (Throwable t) {
+
+         }
+         return defaultValue;
+     }
+
+
+
+    /**
      * Return the default value if none is found.
      *
      * @param node

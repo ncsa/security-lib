@@ -12,26 +12,31 @@ import java.util.Map;
 /**
  * This uses configuration files to test this, since that is the easiest way to get these plus
  * it gives yet other tests for configurations.
- *
+ * <p>
  * Also, if you need to, {@link edu.uiuc.ncsa.security.core.inheritance.MultipleInheritanceEngine} DEBUG_ON
  * can be enabled manually for deep debugging, which will print a report after resolution.
  * <p>Created by Jeff Gaynor<br>
  * on 1/19/12 at  10:49 AM
  */
+/*
+  Running this -- it is run in OA4MP and QDL in their builds as a regression test too.
+ */
 public class MultipleInheritanceTest extends AbstractInheritanceTest {
     protected String path = "/home/ncsa/dev/ncsa-git/security-lib/core/src/test/resources/cfg_loader/";
 
 
-   void verbose(String x){
-       if( MultipleInheritanceEngine.DEBUG_ON){
-          System.out.println(x);
-       }
-   }
+    void verbose(String x) {
+        if (MultipleInheritanceEngine.DEBUG_ON) {
+            System.out.println(x);
+        }
+    }
+
     /**
      * The huge and messy test for this that shows how everything works. This is probably the
      * first thing to break if the code is changed since there are a ton of resolutions
      * as well as aliases in strange places and such. The aim is to show that the system can handle more
      * than minimalist examples and keep its state straight.
+     *
      * @throws Exception
      */
     @Test
@@ -59,9 +64,9 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
         testInheritanceList(ro, "C", new String[]{"W", "Z", "T"});
         testInheritanceList(ro, "R", new String[]{"R", "W", "Q"});
         testInheritanceList(ro, "U", new String[]{"U", "R", "W", "Q"});
-        listOfNames= new String[]{"A","D","E","X"};
+        listOfNames = new String[]{"A", "D", "E", "X"};
         iList = new String[]{"T", "U", "R", "W", "Q", "P"};
-        for(String v :listOfNames){
+        for (String v : listOfNames) {
             testInheritanceList(ro, v, iList);
         }
         assert configurations2.getNamedConfig("A").size() == 6;
@@ -81,16 +86,32 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
         }
     }
 
-    @Test
-    public void testOverrideInAlias() throws Exception {
-        verbose("testOverrideInAlias:");
+    public void testBasicInclude() throws Exception {
+        verbose("test basic includes:");
 
-        String fileName = path + "override-in-alias-test.xml";
+        String fileName = path + "basic-include-test.xml";
         MultiConfigurations configurations2 = getConfigurations2(fileName);
+        Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
+        assert ro.size() == 4 : "Expected 4 resolved elements, got " + ro.size();
+        assert ro.containsKey("A") : "Missing A element";
+        assert ro.containsKey("B") : "Missing B element";
+        List<String> elements = ro.get("A").getElements();
+
+        assert elements.size() == 2;
+        assert elements.get(0).equals("A");
+        assert elements.get(1).equals("X");
+
+        elements = ro.get("B").getElements();
+        assert elements.size() == 2;
+        assert elements.get(0).equals("B");
+        assert elements.get(1).equals("Y");
+
+    }
+    protected void checkOverridesInAlias(MultiConfigurations configurations2, int size) throws Exception{
         Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
 
         //   resolvedOverrides:{A=[A, C, X], B=[C, X], C=[C, X], X=[X]}
-        assert ro.size() == 4 : "Expected 4 resolved elements, got " + ro.size();
+        assert ro.size() == size : "Expected 4 resolved elements, got " + ro.size();
         assert ro.containsKey("A") : "Missing A element";
         List<String> elements = ro.get("A").getElements();
 
@@ -119,6 +140,35 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
         assert elements.size() == 1;
         assert elements.get(0).equals("X");
 
+    }
+    @Test
+    public void testOverrideInAlias() throws Exception {
+        verbose("testOverrideInAlias:");
+        String fileName = path + "override-in-alias-test.xml";
+        MultiConfigurations configurations2 = getConfigurations2(fileName);
+        checkOverridesInAlias(configurations2, 4); // should have 4 elements at the top.
+    }
+
+    /**
+     * This test includes a file and extends one of the configurations in that file.
+     * It includes the override in alias test, so that is rechecked here to make
+     * sure the include works.
+     * @throws Exception
+     */
+    @Test
+    public void testSingleInclude() throws Exception {
+        verbose("testSingleInclude:");
+        String fileName = path + "single-include-test.xml";
+        MultiConfigurations configurations2 = getConfigurations2(fileName);
+        checkOverridesInAlias(configurations2, 5);  // regression, make sure that all imported, 5 elements at top
+        // check that the extension worked
+        Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
+        assert ro.containsKey("Q") : "Missing Q element";
+        List<String> elements = ro.get("Q").getElements();
+
+        assert elements.size() == 2;
+        assert elements.get(0).equals("Q");
+        assert elements.get(1).equals("X");
     }
 
     /**
@@ -196,7 +246,6 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
         assert ro.get("X").getElements().get(0).equals("X");
 
     }
-
 
 
     @Test

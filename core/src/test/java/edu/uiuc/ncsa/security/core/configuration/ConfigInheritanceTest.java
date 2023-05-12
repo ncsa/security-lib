@@ -20,7 +20,7 @@ public class ConfigInheritanceTest extends AbstractInheritanceTest {
         }
     }
     /**
-     * Shows that overriding an configuration replaces an attribute
+     * Shows that overriding a configuration replaces an attribute
      *
      * @throws Exception
      */

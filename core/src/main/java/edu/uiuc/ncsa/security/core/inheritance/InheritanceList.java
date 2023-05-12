@@ -29,6 +29,11 @@ public class InheritanceList implements Iterable<String> {
         return elements.spliterator();
     }
 
+    /**
+     * Gets the overridden elements for this item. Zero-th element is always the top-level,
+     * so if the inheritance sequence is A=[A, C, X] then this has 3 elements, A, C and X.
+     * @return
+     */
     public ArrayList<String> getElements() {
         return elements;
     }

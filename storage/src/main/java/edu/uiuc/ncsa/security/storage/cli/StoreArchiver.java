@@ -57,7 +57,8 @@ public class StoreArchiver {
     static public String ARCHIVE_VERSION_SEPARATOR_TAG = "=";
 
     /**
-     * Given a version id (of form URI#version=number), return the number.
+     * Given a version id (of form URI#version=number), return the number. If the item is not versioned
+     * this returns a -1.
      *
      * @param id
      * @return
@@ -73,6 +74,15 @@ public class StoreArchiver {
         } catch (NumberFormatException nfx) {
             return -1L;
         }
+    }
+
+    /**
+     * Boolean to test if the ID represents a versioned item. Used in OA4MP.
+     * @param id
+     * @return
+     */
+    public boolean isVersion(Identifier id){
+         return -1L != getVersionNumber(id);
     }
 
     /**
@@ -106,11 +116,13 @@ public class StoreArchiver {
         return BasicIdentifier.newID(uri);
     }
 
+
     public static void main(String[] args) {
         StoreArchiver storeArchiver = new StoreArchiver(null);
         Identifier id = storeArchiver.createVersionedID(new BasicIdentifier("uri:test/foo"), 1L);
         System.out.println(id);
         System.out.println(storeArchiver.createVersionedID(new BasicIdentifier("uri:test/foo?boo=woof#fragment=foo"), 2L));
+        // no version means the next function returns -1:
         System.out.println(storeArchiver.getVersionNumber(new BasicIdentifier("uri:new")));
         System.out.println(storeArchiver.getVersionNumber(id));
         ;
