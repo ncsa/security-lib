@@ -997,19 +997,26 @@ public abstract class StoreCommands extends CommonCommands {
         // first case is one in which this does not apply since there is no argument.
         // Second case is to try and interpret the last argument as an index or id.
         // First look for overrides to local id
-
         Identifier localID = null;
         int index = -1;
-        try {
-            index = Integer.parseInt(inputLine.getLastArg());
-        } catch (Throwable t) {
-            // rock on
-            // Fixes https://github.com/ncsa/security-lib/issues/18
-            // If it starts with a / remove that. otherwise just try to turn non-integers into an id.
-            if (inputLine.getLastArg().startsWith("/")) {
-                localID = BasicIdentifier.newID(inputLine.getLastArg().substring(1));
-            } else {
-                localID = BasicIdentifier.newID(inputLine.getLastArg());
+        if(hasID()){
+            localID = getID();
+        }else{
+            try {
+                index = Integer.parseInt(inputLine.getLastArg());
+            } catch (Throwable t) {
+                // rock on
+                // Fixes https://github.com/ncsa/security-lib/issues/18
+                // If it starts with a / remove that. otherwise just try to turn non-integers into an id.
+                if (inputLine.getLastArg().startsWith("/")) {
+                    localID = BasicIdentifier.newID(inputLine.getLastArg().substring(1));
+                } else {
+                    localID = BasicIdentifier.newID(inputLine.getLastArg());
+                    if(!localID.getUri().isAbsolute()){
+                        say(localID.getUri() + " is not a valid identifier");
+                        return null;
+                    }
+                }
             }
         }
 
