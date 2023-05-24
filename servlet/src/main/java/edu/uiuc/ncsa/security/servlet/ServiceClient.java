@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.Pool;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
 import edu.uiuc.ncsa.security.util.ssl.VerifyingHTTPClientFactory;
+import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -293,6 +294,14 @@ public class ServiceClient {
         return doBearerRequest(httpRequestBase, token, false);
     }
 
+    /**
+     * Do the request. The response will be the response of the server if there was a success.
+     * Otherwise, the response will be (a) constructed if not JSON or (b) the JSON if the server response
+     * is a JSON payload. It is becoming de facto standaard to return JSON as part of the error so we should
+     * just send that along.
+     * @param httpRequestBase
+     * @return
+     */
     protected String doRequest(HttpRequestBase httpRequestBase) {
         HttpClient client = clientPool.pop();
         HttpResponse response = null;
@@ -323,9 +332,16 @@ public class ServiceClient {
             if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                 // If there was a proper error thrown on the server then we should be able to parse the contents of the
                 // response.
-
-                ServiceClientHTTPException xx = new ServiceClientHTTPException("Error contacting server with code of  " +
-                        response.getStatusLine().getStatusCode() + ":\n" + URLDecoder.decode(x, "UTF-8"));
+                String err = URLDecoder.decode(x, "UTF-8");
+                ServiceClientHTTPException xx;
+                try{
+                    JSONObject jjj = JSONObject.fromObject(err);
+                    xx = new ServiceClientHTTPException(jjj.toString()); // if it's a JSON object return that
+                }catch(Throwable t){
+                    // Not a JSON object. Construct an error.
+                    xx = new ServiceClientHTTPException("Error contacting server with code of  " +
+                           response.getStatusLine().getStatusCode() + ":\n" + err);
+                }
                 xx.setContent(x);
                 xx.setStatus(response.getStatusLine().getStatusCode());
                 clientPool.destroy(client);
