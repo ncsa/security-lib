@@ -157,6 +157,23 @@ public class ServiceClient {
         return doGet(convertToStringRequest(host().toString(), m));
     }
 
+    /**
+     * Does a POST using only the map. This is useful if there are other authentication methods
+     * used that are encoded as parameters (e.g. RFC 7523).
+     *
+     * @param m
+     * @return
+     */
+    public String doPost(Map m) {
+        HttpPost post = new HttpPost(host().toString());
+        List<NameValuePair> params = getNameValuePairs(m);
+        try {
+            post.setEntity(new UrlEncodedFormEntity(params));
+        } catch (UnsupportedEncodingException e) {
+            throw new GeneralException("error encoding form \"" + e.getMessage() + "\"", e);
+        }
+        return doRequest(post);
+    }
 
     public static String convertToStringRequest(String host, String[][] args) {
         //String getString = host().toString();
@@ -203,7 +220,6 @@ public class ServiceClient {
 
         return doRequest(post, id, secret);
     }
-
 
 
     /**
@@ -265,7 +281,7 @@ public class ServiceClient {
      * If the token is not already base 64 or 32 encoded, option flag to do so.
      *
      * @param httpRequestBase
-     * @param token -- the bearer token
+     * @param token           -- the bearer token
      * @param base64Encode
      * @return
      */
@@ -297,8 +313,9 @@ public class ServiceClient {
     /**
      * Do the request. The response will be the response of the server if there was a success.
      * Otherwise, the response will be (a) constructed if not JSON or (b) the JSON if the server response
-     * is a JSON payload. It is becoming de facto standaard to return JSON as part of the error so we should
+     * is a JSON payload. It is becoming de facto standard to return JSON as part of the error, so we should
      * just send that along.
+     *
      * @param httpRequestBase
      * @return
      */
@@ -334,13 +351,13 @@ public class ServiceClient {
                 // response.
                 String err = URLDecoder.decode(x, "UTF-8");
                 ServiceClientHTTPException xx;
-                try{
+                try {
                     JSONObject jjj = JSONObject.fromObject(err);
                     xx = new ServiceClientHTTPException(jjj.toString()); // if it's a JSON object return that
-                }catch(Throwable t){
+                } catch (Throwable t) {
                     // Not a JSON object. Construct an error.
                     xx = new ServiceClientHTTPException("Error contacting server with code of  " +
-                           response.getStatusLine().getStatusCode() + ":\n" + err);
+                            response.getStatusLine().getStatusCode() + ":\n" + err);
                 }
                 xx.setContent(x);
                 xx.setStatus(response.getStatusLine().getStatusCode());
@@ -365,6 +382,5 @@ public class ServiceClient {
         HttpGet httpGet = new HttpGet(requestString);
         return doRequest(httpGet);
     }
-
 
 }
