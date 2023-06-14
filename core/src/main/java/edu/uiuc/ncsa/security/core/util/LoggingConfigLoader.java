@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -71,6 +72,15 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
     public LoggingConfigLoader(String defaultFile,
                                String defaultName,
                                ConfigurationNode node, MyLoggingFacade logger) {
+        // https://github.com/ncsa/oa4mp/issues/106 Check that this node is not null ==> bad config file
+        // Don't blow up with an NPE, just exit gracefully.
+        if (node == null) {
+            if(DebugUtil.isEnabled()){
+                System.out.println("No logging configured. Using default.");
+            }
+           this.myLogger = new MyLoggingFacade(Logger.getLogger("default"));
+            return;
+        }
         this.cn = node;
         if (defaultFile != null && !defaultFile.isEmpty()) {
             File d = new File(defaultFile);
@@ -90,8 +100,8 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
             if (currentNode != null) {
                 loggerProvider = new LoggerProvider(currentNode);
             } else {
-                loggerProvider = new LoggerProvider(defaultFile == null ? "delegation.xml" : defaultFile,
-                        defaultName == null ? "NCSA Delegation" : defaultName,
+                loggerProvider = new LoggerProvider(defaultFile == null ? "log.xml" : defaultFile,
+                        defaultName == null ? "default logging" : defaultName,
                         1,
                         1000000,
                         true,
