@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -245,7 +246,14 @@ public class ServiceClient {
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         for (String key : parameters.keySet()) {
             if (parameters.get(key) != null) {
-                params.add(new BasicNameValuePair(key, parameters.get(key).toString()));
+
+                if(parameters.get(key) instanceof Collection){
+                    for(Object obj : (Collection)parameters.get(key)) {
+                        params.add(new BasicNameValuePair(key, obj.toString()));
+                    }
+                }else {
+                    params.add(new BasicNameValuePair(key, parameters.get(key).toString()));
+                }
             }
         }
         return params;

@@ -70,8 +70,8 @@ public class MetaDebugUtil implements DebugConstants, Serializable {
     public static String DEFAULT_TITLE = "(un-named)";
 
     public static String toLabel(int level) {
-        switch (level){
-            case  DEBUG_LEVEL_OFF:
+        switch (level) {
+            case DEBUG_LEVEL_OFF:
                 return DEBUG_LEVEL_OFF_LABEL;
             case DEBUG_LEVEL_INFO:
                 return DEBUG_LEVEL_INFO_LABEL;
@@ -256,13 +256,15 @@ public class MetaDebugUtil implements DebugConstants, Serializable {
     public void error(String message, Throwable t) {
         error(getTitle(), message, t);
     }
+
     public void error(String message) {
-         error(getTitle(), message);
-     }
+        error(getTitle(), message);
+    }
 
     public void error(String title, String message) {
         printIt(DEBUG_LEVEL_ERROR, title, message);
     }
+
     public void error(String title, String message, Throwable t) {
         printIt(DEBUG_LEVEL_ERROR, title, message, t);
     }
@@ -348,15 +350,17 @@ public class MetaDebugUtil implements DebugConstants, Serializable {
         printIt(DEBUG_LEVEL_TRACE, title, message);
 
     }
+
     public void trace(Object obj, String message) {
         trace(obj.getClass().getSimpleName(), message);
         //trace(obj.getClass().getSimpleName(), message); // Don't use -- java turns this into a recursive call for trace(Object, message)
         //printIt(DEBUG_LEVEL_TRACE, (obj instanceof String)?((String)obj):obj.getClass().getSimpleName(), message);
     }
 
-    public boolean hasHost(){
-        return host!=null;
+    public boolean hasHost() {
+        return host != null;
     }
+
     public String getHost() {
         return host;
     }
@@ -380,21 +384,38 @@ public class MetaDebugUtil implements DebugConstants, Serializable {
 
     public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("level", getDebugLevel());
-        jsonObject.put("print_ts", isPrintTS());
+        jsonObject.put(JSON_LEVEL, getDebugLevel());
+        jsonObject.put(JSON_TS_ON, isPrintTS());
         if (title != null) {
-            jsonObject.put("title", title);
+            jsonObject.put(JSON_TITLE, title);
         }
-        jsonObject.put("enabled", isEnabled());
+        jsonObject.put(JSON_ENABLED, isEnabled());
+        if(!StringUtils.isTrivial(getHost())) {
+            jsonObject.put(JSON_HOST, getHost());
+        }
+        if(!StringUtils.isTrivial(getDelimiter())){
+            jsonObject.put(JSON_DELIMITER, getDelimiter());
+        }
         return jsonObject;
     }
 
     public void fromJSON(JSONObject json) {
-        setDebugLevel(json.getInt("level"));
-        setPrintTS(json.getBoolean("print_ts"));
-        if (json.containsKey("title")) {
-            setTitle(json.getString("title"));
+        setDebugLevel(json.getInt(JSON_LEVEL));
+        setPrintTS(json.getBoolean(JSON_TS_ON));
+        setDelimiter(json.getString(JSON_DELIMITER));
+        if (json.containsKey(JSON_TITLE) && !StringUtils.isTrivial(json.getString(JSON_TITLE))) {
+            setTitle(json.getString(JSON_TITLE));
         }
-        setIsEnabled(json.getBoolean("enabled"));
+        setIsEnabled(json.getBoolean(JSON_ENABLED));
+        if(json.containsKey(JSON_HOST) && !StringUtils.isTrivial(json.getString(JSON_HOST)))
+        setHost(json.getString(JSON_HOST));
     }
+
+    public static final String JSON_LEVEL = "level";
+    public static final String JSON_DELIMITER = "delimiter";
+    public static final String JSON_TS_ON = "ts_on";
+    public static final String JSON_TITLE = "title";
+    public static final String JSON_ENABLED = "enabled";
+    public static final String JSON_HOST = "host";
+
 }

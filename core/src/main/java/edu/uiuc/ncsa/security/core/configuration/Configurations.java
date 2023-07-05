@@ -324,8 +324,5 @@ public class Configurations {
             }
         }
         throw new MyConfigurationException("Configuration \"" + configName + "\" not found");
-
     }
-
-
 }

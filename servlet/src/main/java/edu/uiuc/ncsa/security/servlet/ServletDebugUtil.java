@@ -26,9 +26,15 @@ public class ServletDebugUtil extends DebugUtil {
             reqUrl += "?" + queryString;
         }
         printIt("\nParameters for\n" + klasse.getSimpleName() + " at " + (new Date()));
-        printIt("HTTP method=" + request.getMethod());
+        printIt(" Request URL:" + request.getRequestURL());
+        printIt(" Request URI:" + request.getRequestURI());
+        printIt(" HTTP method:" + request.getMethod());
         printIt("Query String:\"" + queryString + "\"");
-        printIt("Request parameters for " + reqUrl + "");
+        printIt("   Path info:\"" + request.getPathInfo() + "\"");
+        printIt(" Remote host:\"" + request.getRemoteHost() + "\"");
+        printIt(" Remote addr:\"" + request.getRemoteAddr() + "\"");
+        printIt(" Remote user:\"" + request.getRemoteUser() + "\"");
+        printIt("     Headers:");
         if (request.getParameterMap() == null || request.getParameterMap().isEmpty()) {
             printIt("  (none)");
         } else {

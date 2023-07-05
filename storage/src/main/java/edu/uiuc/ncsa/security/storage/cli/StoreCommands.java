@@ -1464,7 +1464,8 @@ public abstract class StoreCommands extends CommonCommands {
         say(blanks + "(+-HH:mm) then your current timezone is used.");
         say(blanks + "To search on a date range (i.e. between two times) specify both your");
         say(blanks + "before and after dates. Date searches are inclusive of the dates.");
-        say("----");
+        say(blanks + "For SQL stores you may search booleans as 1 (true) or 0 false.");
+        say(blanks + "E.g.\n> search >can_substitute 1\nwould search the can_substitute property for true values.");        say("----");
         say("Other supported options");
         showCommandLineSwitchesHelp();
         showKeyShorthandHelp();

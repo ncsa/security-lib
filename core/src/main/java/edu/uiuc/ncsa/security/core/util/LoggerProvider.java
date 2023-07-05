@@ -151,7 +151,7 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
                 Configurations.killLog4J();
             }
             if (loggerName == null) {
-                loggerName = "oa4mp";
+                loggerName = "NCSA-sec-lib";
             }
             logger = new MyLoggingFacade(loggerName);
             //  logger = java.util.logging.Logger.getLogger(MyLoggingFacade.class.getCanonicalName());
