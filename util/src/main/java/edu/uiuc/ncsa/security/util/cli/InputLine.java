@@ -499,6 +499,15 @@ public class InputLine {
     String LIST_END_DELIMITER = "]";
     String LIST_SEPARATOR = ",";
 
+    /**
+     * Read an argument as a list. The format is
+     * <pre>
+     *     -key [a,b,...]
+     * </pre>
+     * Embedded commas are not allowed between list elements. Elements have whitespace trimmed.
+     * @param flag
+     * @return
+     */
     public List<String> getArgList(String flag) {
         List<String> list = new ArrayList<>();
         String rawLine = getOriginalLine();
@@ -529,10 +538,36 @@ public class InputLine {
         return list;
     }
 
+    /**
+     * Checks if the given flag's argument is a list.
+     * @param flag
+     * @return
+     */
+    public boolean hasArgList(String flag){
+        List<String> list = new ArrayList<>();
+         String rawLine = getOriginalLine();
+
+         if (rawLine == null || rawLine.isEmpty()) {
+             return false;
+         }
+         int ndx = rawLine.indexOf(flag);
+         int nextSwitch = rawLine.indexOf("-",ndx+1);
+         int startListIndex = rawLine.indexOf(LIST_START_DELIMITER, ndx);
+         if((-1 < nextSwitch) && (nextSwitch < startListIndex)){
+             // -1 for next switch means this is the last argument
+             // -1 < nextSwitch means that there is another switch with a list, like
+             // foo -zero -one [a,b,c]
+             // We don't want a request for -zero to just return the next list.
+             return false;
+         }
+         return true;
+    }
     public static void main(String[] args) {
         InputLine inputLine = new InputLine("foo -zero -one [2,3,4] -arf blarf -woof -two [abc,  def, g] -fnord 3455.34665 -three [  a,b,   c]");
 
         System.out.println(inputLine.getArgList("-zero")); // should be empty
+        System.out.println(inputLine.hasArgList("-arf")); // should be empty
+        System.out.println(inputLine.hasArg("-one"));
         System.out.println(inputLine.getArgList("-one"));
         System.out.println(inputLine.getArgList("-two"));
         System.out.println(inputLine.getArgList("-three"));

@@ -842,7 +842,22 @@ public abstract class StoreCommands extends CommonCommands {
         }
     }
 
-    protected void create() throws IOException {
+    /**
+     * A way to short-circuit the create. This allows for setting properties. If this returns a true,
+     * then the {@link #create()} will continue.
+     * The magic number is undefined and allows implementations to pass along a value to differentiate cases.
+     * @param identifiable
+     * @param  magicNumber
+     * @return
+     */
+    protected Identifiable additionalCreation(Identifiable identifiable, int magicNumber){
+        return identifiable;
+    }
+    protected Identifiable  create() throws IOException {
+         return create(DEFAULT_MAGIC_NUMBER);
+    }
+    public static final int DEFAULT_MAGIC_NUMBER = 0;
+    protected Identifiable  create(int magicNumber) throws IOException {
         boolean tryAgain = true;
         Identifier id = null;
         Identifiable c = null;
@@ -869,7 +884,8 @@ public abstract class StoreCommands extends CommonCommands {
             }
             c.setIdentifier(id);
         }
-        getStore().save(c);
+        c = additionalCreation(c,magicNumber);
+        //getStore().save(c);
         info("Created object " + c.getClass().getSimpleName() + " with identifier " + c.getIdentifierString());
         sayi("Object created with identifier " + c.getIdentifierString());
         //sayi2("edit [y/n]?");
@@ -880,6 +896,7 @@ public abstract class StoreCommands extends CommonCommands {
         }
         getStore().save(c);
         clearEntries();
+        return c;
     }
 
 

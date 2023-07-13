@@ -9,8 +9,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Fix Github OA4MP 106">
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/InputLine.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/InputLine.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,7 +35,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="5.2.9.0" />
+        <entry key="$PROJECT_DIR$" value="5.3.2" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -111,7 +113,7 @@
       <recent name="edu.uiuc.ncsa.security.storage.events" />
     </key>
   </component>
-  <component name="RunManager" selected="Tomcat Server.SAS Servlet">
+  <component name="RunManager" selected="Application.InputLine">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -137,13 +139,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="SASCommands" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.sas.admin.SASCommands" />
-      <module name="sas-server" />
-      <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/sas/sat.xml -name default" />
+    <configuration name="InputLine" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.cli.InputLine" />
+      <module name="util" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.sas.admin.*" />
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.util.cli.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -151,12 +153,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="StoreArchiver" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.storage.cli.StoreArchiver" />
-      <module name="storage" />
+    <configuration name="SASCommands" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.sas.admin.SASCommands" />
+      <module name="sas-server" />
+      <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/sas/sat.xml -name default" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.storage.cli.*" />
+          <option name="PATTERN" value="edu.uiuc.ncsa.sas.admin.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -304,7 +307,7 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Application.StoreArchiver" />
+      <item itemvalue="Application.InputLine" />
       <item itemvalue="Application.WebClientConfig" />
       <item itemvalue="Application.Client" />
       <item itemvalue="Application.SASCommands" />
@@ -313,7 +316,7 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.StoreArchiver" />
+        <item itemvalue="Application.InputLine" />
         <item itemvalue="JUnit.MultipleInheritanceTest" />
         <item itemvalue="Application.SASCommands" />
         <item itemvalue="Application.Client" />
@@ -387,7 +390,10 @@
       <workItem from="1688219231364" duration="1022000" />
       <workItem from="1688419959253" duration="253000" />
       <workItem from="1688420264299" duration="17688000" />
-      <workItem from="1688816718070" duration="3903000" />
+      <workItem from="1688816718070" duration="8112000" />
+      <workItem from="1689023058666" duration="600000" />
+      <workItem from="1689173064754" duration="2479000" />
+      <workItem from="1689258639446" duration="5364000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -606,7 +612,28 @@
       <option name="project" value="LOCAL" />
       <updated>1688595126151</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Last checkin before rolling release">
+      <created>1689001862769</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1689001862769</updated>
+    </task>
+    <task id="LOCAL-00033" summary="5.3.2 release">
+      <created>1689002745275</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1689002745275</updated>
+    </task>
+    <task id="LOCAL-00034" summary="5.3.2 release">
+      <created>1689002861321</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1689002861321</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -616,8 +643,6 @@
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Fixed JeffSpeak in some documentation. It can now be reliably read by most mid-sized primates." />
-    <MESSAGE value="Tweaked the commands." />
     <MESSAGE value="CIL-1069, send mail messages in a background thread." />
     <MESSAGE value="CIL-1677 First cut" />
     <MESSAGE value="CIL-1677 Redux, updates to CLI(formatting and such)" />
@@ -641,7 +666,9 @@
     <MESSAGE value="RFC 7523 support https://github.com/ncsa/oa4mp/issues/101" />
     <MESSAGE value="Checkin before travel. Error if null node rather than an NPE." />
     <MESSAGE value="Fix Github OA4MP 106" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix Github OA4MP 106" />
+    <MESSAGE value="Last checkin before rolling release" />
+    <MESSAGE value="5.3.2 release" />
+    <option name="LAST_COMMIT_MESSAGE" value="5.3.2 release" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
