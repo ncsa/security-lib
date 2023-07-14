@@ -60,7 +60,7 @@ public class SASCommands extends StoreCommands {
 
 
     @Override
-    public void extraUpdates(Identifiable identifiable) throws IOException {
+    public void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException {
         ClientKeys keys = (ClientKeys) getMapConverter().getKeys();
         SASClient SASClient = (SASClient) identifiable;
         String newName = getPropertyHelp(keys.name(),"name of this client?", SASClient.getName());

@@ -553,6 +553,9 @@ public class InputLine {
          int ndx = rawLine.indexOf(flag);
          int nextSwitch = rawLine.indexOf("-",ndx+1);
          int startListIndex = rawLine.indexOf(LIST_START_DELIMITER, ndx);
+         if(startListIndex == -1){
+             return false; // end of story -- no lists anywhere.
+         }
          if((-1 < nextSwitch) && (nextSwitch < startListIndex)){
              // -1 for next switch means this is the last argument
              // -1 < nextSwitch means that there is another switch with a list, like

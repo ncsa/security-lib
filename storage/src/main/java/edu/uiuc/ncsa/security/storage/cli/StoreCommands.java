@@ -649,6 +649,20 @@ public abstract class StoreCommands extends CommonCommands {
      * @return returns true if the passed object needs to be saved, false otherwise.
      */
     public boolean update(Identifiable identifiable) throws IOException {
+        return update(identifiable, true, DEFAULT_MAGIC_NUMBER);
+    }
+
+    /**
+     * Update the object. doSave if true means to prompt the user to save it (usually what you want).
+     * The magic number is for when you are over-riding this with some specific tweak.
+     *
+     * @param identifiable
+     * @param doSave
+     * @param magicNumber
+     * @return
+     * @throws IOException
+     */
+    public boolean update(Identifiable identifiable, boolean doSave, int magicNumber) throws IOException {
 
         String newIdentifier = null;
         SerializationKeys keys = getMapConverter().getKeys();
@@ -659,39 +673,45 @@ public abstract class StoreCommands extends CommonCommands {
         newIdentifier = getPropertyHelp(keys.identifier(), "enter the identifier", identifiable.getIdentifierString());
         //sayi("Enter new "  + getMapConverter().getKeys().description() + ":");
 
+        // if they change the identifier for this, prompt to see if they want to delete
+        // the original one.
         boolean removeCurrentObject = false;
         Identifier oldID = identifiable.getIdentifier();
 
         // set file not found message.
-        extraUpdates(identifiable);
-        sayi("here is the complete updated object:");
-        String description = multiLinePropertyInput(keys.description(), null, getMapConverter().getKeys().description());
-        if (!StringUtils.isTrivial(description)) {
-            identifiable.setDescription(description);
+        extraUpdates(identifiable, magicNumber);
+        if (isOk(readline("enter a description [y/n]?"))) {
+            String description = multiLinePropertyInput(keys.description(), null, getMapConverter().getKeys().description());
+            if (!StringUtils.isTrivial(description)) {
+                identifiable.setDescription(description);
+            }
         }
+        say("here is the complete object:");
         longFormat(identifiable);
         if (!newIdentifier.equals(identifiable.getIdentifierString())) {
             //  sayi2(" remove client with id=\"" + client.getIdentifier() + "\" [y/n]? ");
             removeCurrentObject = isOk(readline(" remove object with id=\"" + identifiable.getIdentifier() + "\" [y/n]? "));
             identifiable.setIdentifier(BasicIdentifier.newID(newIdentifier));
         }
-        //  sayi2("save [y/n]?");
-        if (isOk(readline("save [y/n]?"))) {
-            //getStore().save(client);
-            if (removeCurrentObject) {
-                info("removing object with id = " + oldID);
-                getStore().remove(identifiable.getIdentifier());
-                sayi("object with id " + oldID + " removed. Be sure to save any changes.");
+        if (doSave) {
+            if (isOk(readline("save [y/n]?"))) {
+                //getStore().save(client);
+                if (removeCurrentObject) {
+                    info("removing object with id = " + oldID);
+                    getStore().remove(identifiable.getIdentifier());
+                    sayi("object with id " + oldID + " removed. Be sure to save any changes.");
+                }
+                getStore().save(identifiable);
+                sayi("object updated.");
+
+                info("Object with id " + identifiable.getIdentifierString() + " saving...");
+
+                return true;
             }
-            getStore().save(identifiable);
-            sayi("object updated.");
-
-            info("Object with id " + identifiable.getIdentifierString() + " saving...");
-
-            return true;
+            sayi("object not updated, losing changes...");
+            info("User terminated updates for object with id " + identifiable.getIdentifierString());
+            return false;
         }
-        sayi("object not updated, losing changes...");
-        info("User terminated updates for object with id " + identifiable.getIdentifierString());
         return false;
     }
 
@@ -703,8 +723,9 @@ public abstract class StoreCommands extends CommonCommands {
      * to be queried and saved.
      *
      * @param identifiable
+     * @param magicNumber
      */
-    public abstract void extraUpdates(Identifiable identifiable) throws IOException;
+    public abstract void extraUpdates(Identifiable identifiable, int magicNumber) throws IOException;
 
     /**
      * In listing operations, take the {@link Identifiable} argument and make a string version that a
@@ -799,102 +820,103 @@ public abstract class StoreCommands extends CommonCommands {
 
 
     /**
-     * Creates a new item. The argument is
+     * Creates a new item. The optional argument is the new identifier.
      *
      * @param inputLine
      */
     public void create(InputLine inputLine) throws IOException {
-        if (showHelp(inputLine)) {
-            showCreateHelp();
-            return;
-        }
-        Identifier id = null;
-        if (1 == inputLine.size()) {
-            create();
-            clearEntries(); //make sure the internal list is now updated with this.
-            return;
-        }
-        // for the case where an identifier is supplied explicitly.
-        if (1 < inputLine.size()) {
-            try {
-                id = BasicIdentifier.newID(inputLine.getArg(1));
-                if (getStore().containsKey(id)) {
-                    throw new IllegalArgumentException("Error: The identifier \"" + id + "\" already has an entry in this store.");
-                }
-
-            } catch (Throwable t) {
-                say("Identifier is not a valid URI, request rejected");
-                return;
-            }
-
-            Identifiable x = getStore().create();
-            x.setIdentifier(id);
-            getStore().save(x);
-            info("Created and saved " + x.getClass().getSimpleName() + " with id " + x.getIdentifierString());
-            say("Created object with id \"" + x.getIdentifier() + "\"");
-            //sayi2("edit [y/n]?");
-            if (isOk(readline("edit [y/n]?"))) {
-                update(x);
-                info("updated object with id " + x.getIdentifierString());
-            }
-            getStore().save(x);
-            clearEntries();
-        }
+        actualCreate(inputLine, DEFAULT_MAGIC_NUMBER);
     }
 
     /**
-     * A way to short-circuit the create. This allows for setting properties. If this returns a true,
-     * then the {@link #create()} will continue.
-     * The magic number is undefined and allows implementations to pass along a value to differentiate cases.
-     * @param identifiable
-     * @param  magicNumber
+     * does the actual creation and returns the created object. If you override {@link #create(InputLine)},
+     * this is what does the actual work.
+     *
+     * @param inputLine
+     * @param magicNumber
+     * @return
+     * @throws IOException
+     */
+    protected Identifiable actualCreate(InputLine inputLine, int magicNumber) throws IOException {
+        if (showHelp(inputLine)) {
+            showCreateHelp();
+            return null;
+        }
+        Identifier id = null;
+        Identifiable x = getStore().create();
+        x = setIDFromInputLine(x, inputLine);
+        if (x == null) {
+            say("Identifier is not a valid URI, cannot create object.");
+            return null;
+        }
+        return create(x, magicNumber);
+    }
+
+    /**
+     * if the user specified the new identifier on the command line, peel it off and use it.
+     *
+     * @param x
+     * @param inputLine
      * @return
      */
-    protected Identifiable additionalCreation(Identifiable identifiable, int magicNumber){
+    protected Identifiable setIDFromInputLine(Identifiable x, InputLine inputLine) {
+        if (1 < inputLine.size()) {
+            try {
+                Identifier id = BasicIdentifier.newID(inputLine.getArg(1));
+                if (getStore().containsKey(id)) {
+                    throw new IllegalArgumentException("Error: The identifier \"" + id + "\" already has an entry in this store.");
+                }
+                x.setIdentifier(id);
+            } catch (Throwable t) {
+                return null;
+            }
+        }
+        return x;
+    }
+
+    /**
+     * How to customize different objects this command processor creates (e.g.
+     * creating ersatz clients as a special case with a flag). These are invoked right
+     * after creation, but before the object is saved, so you can just set properties
+     * or prompt the user for specific properties. Note that if the user elects to
+     * {@link #update(Identifiable)} the properties, then in the course of that
+     * {@link #extraUpdates(Identifiable, int)} will be invoked, so that is another
+     * location for the user to get prompted for properties.
+     *
+     * @param identifiable
+     * @param magicNumber
+     * @return
+     */
+    protected Identifiable preCreation(Identifiable identifiable, int magicNumber) {
         return identifiable;
     }
-    protected Identifiable  create() throws IOException {
-         return create(DEFAULT_MAGIC_NUMBER);
+
+
+    protected Identifiable create(Identifiable identifiable) throws IOException {
+        return create(identifiable, DEFAULT_MAGIC_NUMBER);
     }
+
+    /**
+     * This is the system default (only one defined, equals zero). use another number so you can specify cases for
+     * overrides. This way your commands can work with slightly different types of objects
+     * (such as ersatz or service clients) and be able to disambiguate without having some more
+     * complex system in the API to do it. Specify any non-zero magic numbers in your commands and use those.
+     */
     public static final int DEFAULT_MAGIC_NUMBER = 0;
-    protected Identifiable  create(int magicNumber) throws IOException {
-        boolean tryAgain = true;
+
+    protected Identifiable create(Identifiable c, int magicNumber) throws IOException {
         Identifier id = null;
-        Identifiable c = null;
-        while (tryAgain) {
-            //  sayi2("enter the id of the object you want to create or return for a random one >");
-            String inLine = readline("enter the id of the object you want to create or return for a random one >");
-            if (!isEmpty(inLine)) {
-                try {
-                    id = BasicIdentifier.newID(inLine);
-                    tryAgain = false;
-                } catch (Throwable t) {
-                    //  sayi2("That is not a valid uri. Try again (y/n)? ");
-                    tryAgain = isOk(readline("That is not a valid uri. Try again (y/n)? "));
-                }
-            } else {
-                tryAgain = false;
-            }
-        } // end input loop.
-        c = createNew();
-
-        if (id != null) {
-            if (getStore().containsKey(id)) {
-                throw new IllegalArgumentException("Error: the identifier \"" + id + "\" is already in use.");
-            }
-            c.setIdentifier(id);
-        }
-        c = additionalCreation(c,magicNumber);
-        //getStore().save(c);
+        c = preCreation(c, magicNumber);
         info("Created object " + c.getClass().getSimpleName() + " with identifier " + c.getIdentifierString());
-        sayi("Object created with identifier " + c.getIdentifierString());
-        //sayi2("edit [y/n]?");
-        if (isOk(readline("edit [y/n]?"))) {
-            update(c);
-            info("Updated object " + c.getClass().getSimpleName() + " with identifier " + c.getIdentifierString());
-
+        if (isOk(readline("object created, edit [y/n]?"))) {
+            update(c, false, magicNumber);
         }
-        getStore().save(c);
+        if (isOk(readline("save [y/n]?"))) {
+            getStore().save(c);
+            say("updates saved");
+        } else {
+            say("updates not saved");
+        }
         clearEntries();
         return c;
     }
@@ -947,12 +969,24 @@ public abstract class StoreCommands extends CommonCommands {
         int index = -1;
         try {
             index = Integer.parseInt(rawID);
+            if (0 <= index && allEntries.size() < index) {
+                setID(allEntries.get(index).getIdentifier());
+            } else {
+                say("warning: no such index");
+                return;
+            }
         } catch (NumberFormatException nfx) {
+            if (rawID.startsWith("/")) {
+                rawID = rawID.substring(1);
+            }
+            setID(BasicIdentifier.newID(rawID));
+            if (!getStore().containsKey(getID())) {
+                say("warning: unknown id ");
+            }
             // alles ok...
         }
-        if (index == -1 && !rawID.startsWith("/")) {
-            inputLine.setLastArg("/" + rawID);
-        }
+        // Identifier set, check that if it exists.
+/*
         Identifiable thingy = findItem(inputLine);
         if (thingy != null) {
             rawID = thingy.getIdentifierString();
@@ -963,15 +997,14 @@ public abstract class StoreCommands extends CommonCommands {
             }
         }
         id = BasicIdentifier.newID(rawID);
+*/
         if (id == null) {
             say("warning: no identifier set");
             return;
         }
 
         say("Identifier set to " + id);
-        if (!getStore().containsKey(id)) {
-            say("warning: unknown id ");
-        }
+
     }
 
     private void showSetIDHElp() {
@@ -1006,6 +1039,8 @@ public abstract class StoreCommands extends CommonCommands {
 
     /**
      * Resolves the first argument of a command line into either a unique identifier
+     * The contract is that <b>IF</b> there is an ID set (with {@link #set_id(InputLine)})
+     * then use that. Otherwise, take the last argument of the input line and try to find that.
      *
      * @param inputLine
      * @return
@@ -1016,11 +1051,18 @@ public abstract class StoreCommands extends CommonCommands {
         // First look for overrides to local id
         Identifier localID = null;
         int index = -1;
-        if(hasID()){
+        if (hasID()) {
             localID = getID();
-        }else{
+        } else {
             try {
                 index = Integer.parseInt(inputLine.getLastArg());
+                if (allEntries == null || allEntries.isEmpty()) {
+                    loadAllEntries(); // just in case...
+                }
+                if(index<0 || allEntries.size() < index){
+                    return null;
+                }
+                return allEntries.get(index);
             } catch (Throwable t) {
                 // rock on
                 // Fixes https://github.com/ncsa/security-lib/issues/18
@@ -1029,7 +1071,7 @@ public abstract class StoreCommands extends CommonCommands {
                     localID = BasicIdentifier.newID(inputLine.getLastArg().substring(1));
                 } else {
                     localID = BasicIdentifier.newID(inputLine.getLastArg());
-                    if(!localID.getUri().isAbsolute()){
+                    if (!localID.getUri().isAbsolute()) {
                         say(localID.getUri() + " is not a valid identifier");
                         return null;
                     }
@@ -1037,20 +1079,10 @@ public abstract class StoreCommands extends CommonCommands {
             }
         }
 
-        if (localID == null) {
-            if (index != -1) {
-                if (allEntries == null || allEntries.isEmpty()) {
-                    loadAllEntries(); // just in case...
-                }
-                return allEntries.get(index);
-            }
-        } else {
+        if (localID != null) {
             return (Identifiable) getStore().get(localID);
         }
 
-        if (hasId()) {
-            return (Identifiable) getStore().get(id);
-        }
         return null;
     }
 
@@ -1482,7 +1514,8 @@ public abstract class StoreCommands extends CommonCommands {
         say(blanks + "To search on a date range (i.e. between two times) specify both your");
         say(blanks + "before and after dates. Date searches are inclusive of the dates.");
         say(blanks + "For SQL stores you may search booleans as 1 (true) or 0 false.");
-        say(blanks + "E.g.\n> search >can_substitute 1\nwould search the can_substitute property for true values.");        say("----");
+        say(blanks + "E.g.\n> search >can_substitute 1\nwould search the can_substitute property for true values.");
+        say("----");
         say("Other supported options");
         showCommandLineSwitchesHelp();
         showKeyShorthandHelp();
