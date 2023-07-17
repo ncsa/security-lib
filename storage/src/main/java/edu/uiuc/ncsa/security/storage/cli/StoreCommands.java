@@ -862,7 +862,7 @@ public abstract class StoreCommands extends CommonCommands {
     protected Identifiable setIDFromInputLine(Identifiable x, InputLine inputLine) {
         if (1 < inputLine.size()) {
             try {
-                Identifier id = BasicIdentifier.newID(inputLine.getArg(1));
+                Identifier id = BasicIdentifier.newID(inputLine.getLastArg());
                 if (getStore().containsKey(id)) {
                     throw new IllegalArgumentException("Error: The identifier \"" + id + "\" already has an entry in this store.");
                 }

@@ -67,6 +67,14 @@ public class IdentifiableImpl implements Identifiable, Cloneable {
     }
 
     boolean readOnly = false; //default
+
+    /**
+     * If this client is read only. That means any attempt to save it or update it
+     * will throw an exception. This is used specifically if a client has prototypes
+     * that have been resolved. The resolved client should never be saved (since that would
+     * overwrite its actual definition).  
+     * @return
+     */
     @Override
     public boolean isReadOnly() {
         return readOnly;
