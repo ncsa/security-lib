@@ -23,6 +23,11 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
     }
 
     String logFile = null;
+
+    public void setLoggerName(String loggerName) {
+        this.loggerName = loggerName;
+    }
+
     String loggerName = null;
     int fileCount = -1;
     int maxFileSize = -1;

@@ -34,7 +34,7 @@ public class ServletDebugUtil extends DebugUtil {
         printIt(" Remote host:\"" + request.getRemoteHost() + "\"");
         printIt(" Remote addr:\"" + request.getRemoteAddr() + "\"");
         printIt(" Remote user:\"" + request.getRemoteUser() + "\"");
-        printIt("     Headers:");
+        printIt("  Parameters:");
         if (request.getParameterMap() == null || request.getParameterMap().isEmpty()) {
             printIt("  (none)");
         } else {

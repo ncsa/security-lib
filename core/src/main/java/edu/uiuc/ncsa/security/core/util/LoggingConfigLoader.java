@@ -26,6 +26,15 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
     public abstract String getVersionString();
 
     protected ConfigurationNode cn;
+
+    public Provider<MyLoggingFacade> getLoggerProvider() {
+        return loggerProvider;
+    }
+
+    public void setLoggerProvider(Provider<MyLoggingFacade> loggerProvider) {
+        this.loggerProvider = loggerProvider;
+    }
+
     protected Provider<MyLoggingFacade> loggerProvider;
     protected MyLoggingFacade myLogger = null;
 
