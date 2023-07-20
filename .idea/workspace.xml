@@ -9,12 +9,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/LoggerProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/LoggerProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/LoggingConfigLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/LoggingConfigLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServletDebugUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServletDebugUtil.java" afterDir="false" />
-    </list>
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -397,7 +392,7 @@
       <workItem from="1689258639446" duration="5463000" />
       <workItem from="1689334846903" duration="15960000" />
       <workItem from="1689635084617" duration="599000" />
-      <workItem from="1689680145882" duration="6984000" />
+      <workItem from="1689680145882" duration="7618000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -651,7 +646,14 @@
       <option name="project" value="LOCAL" />
       <updated>1689371538625</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="5.3.4 checkin.">
+      <created>1689879793530</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1689879793530</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -661,7 +663,6 @@
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="CIL-1677 Redux, updates to CLI(formatting and such)" />
     <MESSAGE value="Snapshot version bumped to 5.3" />
     <MESSAGE value="Made CLI not care about escaping ids in certain contexts." />
     <MESSAGE value="Updating website after maven improvements." />
@@ -686,7 +687,8 @@
     <MESSAGE value="5.3.2 release" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/108" />
     <MESSAGE value="Tweak several small things for CLI. In particular, finding objects is now streamlined and object creation is too." />
-    <option name="LAST_COMMIT_MESSAGE" value="Tweak several small things for CLI. In particular, finding objects is now streamlined and object creation is too." />
+    <MESSAGE value="5.3.4 checkin." />
+    <option name="LAST_COMMIT_MESSAGE" value="5.3.4 checkin." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
