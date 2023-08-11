@@ -234,6 +234,16 @@ public abstract class CommonCommands implements Commands {
         return inLine;
     }
 
+    /**
+     * Use this to get a property and also allow for getting help. This is just {@link #getInput(String, String)}
+     * but with the optional lookup of help for the propertyName if the user enters --help or /help. It will then
+     * re-prompt for the input.
+     * @param propertyName
+     * @param prompt
+     * @param defaultValue
+     * @return
+     * @throws IOException
+     */
     protected String getPropertyHelp(String propertyName, String prompt, String defaultValue) throws IOException {
         boolean loopForever = true;
         String inLine = null;

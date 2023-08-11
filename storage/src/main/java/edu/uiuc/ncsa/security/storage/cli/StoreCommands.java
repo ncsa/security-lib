@@ -680,7 +680,7 @@ public abstract class StoreCommands extends CommonCommands {
 
         // set file not found message.
         extraUpdates(identifiable, magicNumber);
-        if (isOk(readline("enter a description [y/n]?"))) {
+        if (isOk(readline("enter a description (y/n)?[n]"))) {
             String description = multiLinePropertyInput(keys.description(), null, getMapConverter().getKeys().description());
             if (!StringUtils.isTrivial(description)) {
                 identifiable.setDescription(description);
@@ -694,7 +694,7 @@ public abstract class StoreCommands extends CommonCommands {
             identifiable.setIdentifier(BasicIdentifier.newID(newIdentifier));
         }
         if (doSave) {
-            if (isOk(readline("save [y/n]?"))) {
+            if (isOk(readline("save (y/n)?[n]"))) {
                 //getStore().save(client);
                 if (removeCurrentObject) {
                     info("removing object with id = " + oldID);
@@ -908,14 +908,15 @@ public abstract class StoreCommands extends CommonCommands {
         Identifier id = null;
         c = preCreation(c, magicNumber);
         info("Created object " + c.getClass().getSimpleName() + " with identifier " + c.getIdentifierString());
-        if (isOk(readline("object created, edit [y/n]?"))) {
+        if (isOk(readline("object created, edit (y/n)?"))) {
             update(c, false, magicNumber);
         }
-        if (isOk(readline("save [y/n]?"))) {
+        if (isOk(readline("save (y/n)?"))) {
             getStore().save(c);
             say("updates saved");
         } else {
             say("updates not saved");
+            c = null;
         }
         clearEntries();
         return c;

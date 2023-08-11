@@ -54,12 +54,6 @@ public class MyLoggingFacade implements Logable {
     }
 
 
-    /*
-    This should be set to false when ready to release and true during development. It lets you turn on/off debug logging
-    for everything at once.
-     */
-
-
     public String getClassName() {
         return className;
     }
