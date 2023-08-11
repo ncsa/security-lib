@@ -680,7 +680,7 @@ public abstract class StoreCommands extends CommonCommands {
 
         // set file not found message.
         extraUpdates(identifiable, magicNumber);
-        if (isOk(readline("enter a description (y/n)?[n]"))) {
+        if (getPropertyHelp(keys.description(), "enter a description (y/n)?", "n").equalsIgnoreCase("y")) {
             String description = multiLinePropertyInput(keys.description(), null, getMapConverter().getKeys().description());
             if (!StringUtils.isTrivial(description)) {
                 identifiable.setDescription(description);

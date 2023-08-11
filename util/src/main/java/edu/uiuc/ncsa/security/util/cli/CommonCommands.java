@@ -238,6 +238,7 @@ public abstract class CommonCommands implements Commands {
      * Use this to get a property and also allow for getting help. This is just {@link #getInput(String, String)}
      * but with the optional lookup of help for the propertyName if the user enters --help or /help. It will then
      * re-prompt for the input.
+     *
      * @param propertyName
      * @param prompt
      * @param defaultValue
@@ -249,14 +250,21 @@ public abstract class CommonCommands implements Commands {
         String inLine = null;
         while (loopForever) {
             inLine = getInput(prompt, defaultValue);
-            if(inLine == null){
+            if (inLine == null) {
                 return inLine; // If the property is not set, then the default value might be null.
             }
-            if (inLine.trim().equals("--help") || inLine.trim().equals("/help")) {
-                if(getHelpUtil() == null) {
-                    say("no help for the topic \"" + propertyName + "\"");
-                }else{
-                    getHelpUtil().printHelp(new InputLine("/help", propertyName));
+            String trimmedLine = inLine.trim();
+            if (trimmedLine.startsWith("--help") || trimmedLine.startsWith("/help")) {
+                InputLine inputLine = new InputLine(inLine);
+                // make sure they are really prompting for help! we don't want to make it impossible to
+                // enter something like /help_foo. We have two options to get around collisions.
+                if (inputLine.getCommand().equals("--help") || inputLine.getCommand().equals("/help")) {
+                    inputLine.appendArg(propertyName);
+                    say("-----");
+                   if(! getHelpUtil().printHelp(inputLine)){
+                       say("  no help for topic \"" + propertyName + "\"");
+                   }
+                    say("-----");
                 }
             } else {
                 break;

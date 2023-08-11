@@ -172,7 +172,9 @@ public class HelpUtil {
         String[] names = resolveRealHelpName(name);
 
 
-        if (names != null) {
+        if (names == null) {
+            return false; // nothing to show
+        }else{
             String realName = names[0];
             if (doOnlineExample) {
                 String x = getHelpTopicExample(realName);
