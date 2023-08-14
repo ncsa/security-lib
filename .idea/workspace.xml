@@ -11,9 +11,9 @@
   <component name="ChangeListManager">
     <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CommonCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CommonCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/HelpUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/HelpUtil.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -401,7 +401,7 @@
       <workItem from="1689943807953" duration="4148000" />
       <workItem from="1690287968405" duration="4286000" />
       <workItem from="1690568335159" duration="3609000" />
-      <workItem from="1691423941141" duration="10729000" />
+      <workItem from="1691423941141" duration="17531000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -683,7 +683,14 @@
       <option name="project" value="LOCAL" />
       <updated>1691788754258</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary="Had a blindingly good idea for printing the online help.  https://jira.ncsa.illinois.edu/browse/CIL-1815">
+      <created>1691793931384</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1691793931384</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -693,7 +700,6 @@
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Made CLI not care about escaping ids in certain contexts." />
     <MESSAGE value="Updating website after maven improvements." />
     <MESSAGE value="checkin before travel." />
     <MESSAGE value="Twiddling website" />
@@ -718,7 +724,8 @@
     <MESSAGE value="Tweak several small things for CLI. In particular, finding objects is now streamlined and object creation is too." />
     <MESSAGE value="5.3.4 checkin." />
     <MESSAGE value="updates to support https://jira.ncsa.illinois.edu/browse/CIL-1815" />
-    <option name="LAST_COMMIT_MESSAGE" value="updates to support https://jira.ncsa.illinois.edu/browse/CIL-1815" />
+    <MESSAGE value="Had a blindingly good idea for printing the online help.  https://jira.ncsa.illinois.edu/browse/CIL-1815" />
+    <option name="LAST_COMMIT_MESSAGE" value="Had a blindingly good idea for printing the online help.  https://jira.ncsa.illinois.edu/browse/CIL-1815" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">

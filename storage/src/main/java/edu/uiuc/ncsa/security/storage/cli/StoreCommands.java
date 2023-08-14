@@ -356,7 +356,7 @@ public abstract class StoreCommands extends CommonCommands {
             }
             if (storeRS) {
                 if (returnedAttributes == null) {
-                    returnedAttributes = getMapConverter().getKeys().allKeys(); // no attributes specified means get them all.
+                    returnedAttributes = getSerializationKeys().allKeys(); // no attributes specified means get them all.
                 }
                 resultSets.put(rsName, new RSRecord(values, returnedAttributes));
                 say("got " + values.size() + " match" + (values.size() == 1 ? "." : "es."));
@@ -665,27 +665,20 @@ public abstract class StoreCommands extends CommonCommands {
     public boolean update(Identifiable identifiable, boolean doSave, int magicNumber) throws IOException {
 
         String newIdentifier = null;
-        SerializationKeys keys = getMapConverter().getKeys();
+        SerializationKeys keys = getSerializationKeys();
         info("Starting update for object with id = " + identifiable.getIdentifierString());
         say("Update the values. A return accepts the existing or default value in []'s");
         say("For properties you can type /help or --help and print out the online help for the topic.");
 
         newIdentifier = getPropertyHelp(keys.identifier(), "enter the identifier", identifiable.getIdentifierString());
-        //sayi("Enter new "  + getMapConverter().getKeys().description() + ":");
 
         // if they change the identifier for this, prompt to see if they want to delete
         // the original one.
         boolean removeCurrentObject = false;
         Identifier oldID = identifiable.getIdentifier();
 
-        // set file not found message.
+        identifiable.setDescription(getPropertyHelp(keys.description(), "enter description", identifiable.getDescription()));
         extraUpdates(identifiable, magicNumber);
-        if (getPropertyHelp(keys.description(), "enter a description (y/n)?", "n").equalsIgnoreCase("y")) {
-            String description = multiLinePropertyInput(keys.description(), null, getMapConverter().getKeys().description());
-            if (!StringUtils.isTrivial(description)) {
-                identifiable.setDescription(description);
-            }
-        }
         say("here is the complete object:");
         longFormat(identifiable);
         if (!newIdentifier.equals(identifiable.getIdentifierString())) {
@@ -829,6 +822,27 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     /**
+     * Wraps the store create method. This can be overridden in certain cases (e.g. creating users)
+     * where special handling is needed.
+     * @return
+     */
+    protected Identifiable createEntry(int magicNumber){
+        return getStore().create();
+    }
+
+    SerializationKeys serializationKeys = null;
+
+    /**
+     * Get the serialization keys for the main store.
+     * @return
+     */
+    protected SerializationKeys getSerializationKeys(){
+        if(serializationKeys == null){
+            serializationKeys =  getMapConverter().getKeys();
+        }
+        return serializationKeys;
+    }
+    /**
      * does the actual creation and returns the created object. If you override {@link #create(InputLine)},
      * this is what does the actual work.
      *
@@ -843,7 +857,7 @@ public abstract class StoreCommands extends CommonCommands {
             return null;
         }
         Identifier id = null;
-        Identifiable x = getStore().create();
+        Identifiable x = createEntry(magicNumber);
         x = setIDFromInputLine(x, inputLine);
         if (x == null) {
             say("Identifier is not a valid URI, cannot create object.");
@@ -1400,7 +1414,7 @@ public abstract class StoreCommands extends CommonCommands {
         // across various types of stores, but we *really* want this to display as a date.
         // So, we just convert it here for display purposes.
         if (getStore() instanceof ListeningStoreInterface) {
-            MonitoredKeys keys = (MonitoredKeys) getMapConverter().getKeys();
+            MonitoredKeys keys = (MonitoredKeys) getSerializationKeys();
             if (map.containsKey(keys.lastAccessed())) {
                 long la = map.getLong(keys.lastAccessed());
                 // only display if it has been initialized. 0 is default = no value.
@@ -1580,7 +1594,7 @@ public abstract class StoreCommands extends CommonCommands {
             return null;
         }
 
-        if (getMapConverter().getKeys().allKeys().contains(keyArg)) {
+        if (getSerializationKeys().allKeys().contains(keyArg)) {
             return keyArg;
         }
         return null;

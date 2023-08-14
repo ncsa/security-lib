@@ -226,13 +226,17 @@ public abstract class CommonCommands implements Commands {
      * @return
      */
     protected String getInput(String prompt, String defaultValue) throws IOException {
-        String inLine = readline(prompt + "[" + (defaultValue == null ? "(null)" : defaultValue) + "]:");
+        String inLine = readline(prompt + "[" + (defaultValue == null ? "(" + DEFAULT_NULL_VALUE_PLACEHOLDER + ")" : defaultValue) + "]:");
         if (isEmpty(inLine)) {
             // assumption is that the default value is required
             return defaultValue; // no input. User hit a return
         }
         return inLine;
     }
+
+    // If a null valus is passted toa  prompt, replace it with this so the user knows the value is not
+    // the string "null" or some such.
+    protected static String DEFAULT_NULL_VALUE_PLACEHOLDER = "--";
 
     /**
      * Use this to get a property and also allow for getting help. This is just {@link #getInput(String, String)}
@@ -248,6 +252,14 @@ public abstract class CommonCommands implements Commands {
     protected String getPropertyHelp(String propertyName, String prompt, String defaultValue) throws IOException {
         boolean loopForever = true;
         String inLine = null;
+        boolean hasNullDefault = (defaultValue == null);
+        if(hasNullDefault){
+                      defaultValue = DEFAULT_NULL_VALUE_PLACEHOLDER;
+        }else{
+            if(defaultValue.equals(DEFAULT_NULL_VALUE_PLACEHOLDER)){
+                defaultValue = "\"" + DEFAULT_NULL_VALUE_PLACEHOLDER + "\""; // try to dismabiguate the case where the actual value is --
+            }
+        }
         while (loopForever) {
             inLine = getInput(prompt, defaultValue);
             if (inLine == null) {
@@ -269,6 +281,9 @@ public abstract class CommonCommands implements Commands {
             } else {
                 break;
             }
+        }
+        if(hasNullDefault && inLine.equals(DEFAULT_NULL_VALUE_PLACEHOLDER)){
+            return null;
         }
         return inLine;
     }
