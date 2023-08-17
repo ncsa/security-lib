@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.cli;
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.DoubleHashMap;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.w3c.dom.CharacterData;
@@ -260,7 +261,7 @@ public class HelpUtil {
 
     public static void main(String[] args) throws Throwable {
         // Example of a very large, full-featured help file that works. Testing only.
-        File f = new File("/home/ncsa/dev/ncsa-git/qdl/language/src/main/resources/func_help.xml");
+        File f = new File(DebugUtil.getDevPath() + "/qdl/language/src/main/resources/func_help.xml");
         FileInputStream fis = new FileInputStream(f);
         HelpUtil helpUtil = new HelpUtil();
         helpUtil.load(fis);

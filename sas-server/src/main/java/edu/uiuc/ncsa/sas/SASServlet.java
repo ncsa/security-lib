@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
@@ -37,7 +38,8 @@ public class SASServlet extends AbstractServlet {
     public void loadEnvironment() throws IOException {
         setEnvironment(getConfigurationLoader().load());
         try {
-            JSONWebKeys jsonWebKeys = JSONWebKeyUtil.fromJSON(new File("/home/ncsa/dev/csd/config/sas/keys.jwk"));
+            // keys.jwk contains the set of keys for this service.
+            JSONWebKeys jsonWebKeys = JSONWebKeyUtil.fromJSON(new File(DebugUtil.getConfigPath() + "/sas/keys.jwk"));
             jsonWebKeys.setDefaultKeyID("2D700DF531E09B455B9E74D018F9A133"); // for testing!
         } catch (Throwable t) {
             t.printStackTrace();

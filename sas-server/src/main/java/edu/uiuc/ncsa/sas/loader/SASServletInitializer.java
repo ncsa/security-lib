@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandler;
 import edu.uiuc.ncsa.security.servlet.Initialization;
@@ -46,7 +47,7 @@ public class SASServletInitializer implements Initialization {
       */
     protected void setupDebug() {
         JSONWebKeys jsonWebKeys = null;
-        String keyPath = "/home/ncsa/dev/ncsa-git/security-lib/crypto/src/main/resources/keys.jwk";
+        String keyPath = DebugUtil.getDevPath() + "/security-lib/crypto/src/main/resources/keys.jwk";
         String keyID = "2D700DF531E09B455B9E74D018F9A133";
         try {
             jsonWebKeys = JSONWebKeyUtil.fromJSON(new File(keyPath));

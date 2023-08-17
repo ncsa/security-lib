@@ -25,7 +25,6 @@ public class ParserUtil {
             if(0 < args.length){
                     testFile = new File(args[0]);
             }
-           // testFile = new File("/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/main/resources/test1.cmd");
             if(testFile == null || !testFile.exists()){
                 System.out.println("Sorry, but the file you specified does not exist.");
                 System.out.println("  This program takes a fully qualified path to a command file, which will be executed.");

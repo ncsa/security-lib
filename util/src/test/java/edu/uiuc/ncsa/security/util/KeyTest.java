@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util;
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.pkcs.MyKeyUtil;
 
 import java.io.FileReader;
@@ -20,8 +21,8 @@ public class KeyTest extends TestBase{
      * @throws Exception
      */
     public void testOpenSSL() throws Exception{
-        Reader privateFR = new FileReader("/home/ncsa/dev/ncsa-git/security-lib/util/src/test/resources/openssl-private.pem");
-        Reader publicFR = new FileReader("/home/ncsa/dev/ncsa-git/security-lib/util/src/test/resources/openssl-public.pem");
+        Reader privateFR = new FileReader(DebugUtil.getDevPath() + "/security-lib/util/src/test/resources/openssl-private.pem");
+        Reader publicFR = new FileReader(DebugUtil.getDevPath() + "/security-lib/util/src/test/resources/openssl-public.pem");
         PrivateKey privateKey = fromPKCS1PEM(privateFR);
         PublicKey publicKey = MyKeyUtil.fromX509PEM(publicFR);
         assert MyKeyUtil.validateKeyPair(publicKey, privateKey) : "Invalid keypair";
@@ -32,8 +33,8 @@ public class KeyTest extends TestBase{
      * @throws Exception
      */
     public void testPublicPrivate() throws Exception{
-        Reader privateFR = new FileReader("/home/ncsa/dev/ncsa-git/security-lib/util/src/test/resources/private-key.pem");
-        Reader publicFR = new FileReader("/home/ncsa/dev/ncsa-git/security-lib/util/src/test/resources/public-key.pem");
+        Reader privateFR = new FileReader(DebugUtil.getDevPath() + "/security-lib/util/src/test/resources/private-key.pem");
+        Reader publicFR = new FileReader(DebugUtil.getDevPath() + "/security-lib/util/src/test/resources/public-key.pem");
         PrivateKey privateKey = fromPKCS1PEM(privateFR);
         PublicKey publicKey = MyKeyUtil.fromX509PEM(publicFR);
         assert MyKeyUtil.validateKeyPair(publicKey, privateKey) : "Invalid keypair";

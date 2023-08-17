@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.security.core.configuration;
 import edu.uiuc.ncsa.security.core.inheritance.InheritanceList;
 import edu.uiuc.ncsa.security.core.inheritance.MultipleInheritanceEngine;
 import edu.uiuc.ncsa.security.core.inheritance.UnresolvedReferenceException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import org.junit.Test;
 
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.Map;
   Running this -- it is run in OA4MP and QDL in their builds as a regression test too.
  */
 public class MultipleInheritanceTest extends AbstractInheritanceTest {
-    protected String path = "/home/ncsa/dev/ncsa-git/security-lib/core/src/test/resources/cfg_loader/";
+    protected String path = DebugUtil.getDevPath() + "/security-lib/core/src/test/resources/cfg_loader/";
 
 
     void verbose(String x) {

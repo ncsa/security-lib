@@ -12,7 +12,7 @@ import edu.uiuc.ncsa.security.core.exceptions.NFWException;
  * <p>Created by Jeff Gaynor<br>
  * on 7/27/16 at  2:55 PM
  */
-public class DebugUtil implements DebugConstants{
+public class DebugUtil implements DebugConstants {
 
     static MetaDebugUtil debugUtil = null;
 
@@ -23,19 +23,21 @@ public class DebugUtil implements DebugConstants{
         return debugUtil;
     }
 
-    public static void setInstance(MetaDebugUtil newDebugUtil){
+    public static void setInstance(MetaDebugUtil newDebugUtil) {
         debugUtil = newDebugUtil;
     }
 
     /**
      * If an instance has been set. Note that calling {@link #getInstance()}  will always return
      * an instance.
+     *
      * @return
      */
-    public static boolean hasInstance(){
+    public static boolean hasInstance() {
         return debugUtil != null;
     }
-    public static void setEnabled(boolean enabled){
+
+    public static void setEnabled(boolean enabled) {
         getInstance().setIsEnabled(enabled);
     }
 
@@ -44,8 +46,9 @@ public class DebugUtil implements DebugConstants{
     }
 
     public static void setPrintTS(boolean printTS) {
-        getInstance().setPrintTS( printTS);
+        getInstance().setPrintTS(printTS);
     }
+
     protected static String toLabel(int level) {
         if (level == DEBUG_LEVEL_OFF) return "";
         if (level == DEBUG_LEVEL_INFO) return DEBUG_LEVEL_INFO_LABEL;
@@ -99,11 +102,12 @@ public class DebugUtil implements DebugConstants{
         return getInstance().isEnabled();
     }
 
-    public static void printStackTrace(Throwable t){
-        if(isEnabled()){
+    public static void printStackTrace(Throwable t) {
+        if (isEnabled()) {
             t.printStackTrace();
         }
     }
+
     public static void setIsEnabled(boolean isEnabled) {
         getInstance().setIsEnabled(isEnabled);
     }
@@ -132,8 +136,9 @@ public class DebugUtil implements DebugConstants{
 
 
     public static void info(String message) {
-        getInstance().info( message);
+        getInstance().info(message);
     }
+
     public static void info(String title, String message) {
         getInstance().info(title, message);
     }
@@ -149,9 +154,11 @@ public class DebugUtil implements DebugConstants{
     public static void warn(String message) {
         getInstance().warn(message);
     }
+
     public static void warn(String title, String message) {
         getInstance().warn(title, message);
     }
+
     public static void warn(Class callingClass, String message) {
         getInstance().warn(callingClass, message);
     }
@@ -161,21 +168,23 @@ public class DebugUtil implements DebugConstants{
     }
 
     public static void error(String message, Throwable t) {
-        getInstance().error(message,t);
+        getInstance().error(message, t);
     }
+
     public static void error(String title, String message, Throwable t) {
-        getInstance().error(title,message,t);
+        getInstance().error(title, message, t);
     }
+
     public static void error(Object obj, String message, Throwable t) {
-        getInstance().error(obj,message,t);
+        getInstance().error(obj, message, t);
     }
 
     public static void error(Class callingClass, String message, Throwable t) {
-        getInstance().error(callingClass,message,t);
+        getInstance().error(callingClass, message, t);
     }
 
     public static void error(Class callingClass, String message) {
-        getInstance().error(callingClass,message);
+        getInstance().error(callingClass, message);
     }
 
     public static void error(Object obj, String message) {
@@ -203,18 +212,21 @@ public class DebugUtil implements DebugConstants{
     }
 
     public static void severe(Object obj, String message) {
-              getInstance().severe(obj, message);
+        getInstance().severe(obj, message);
     }
 
     public static void trace(String message) {
         getInstance().trace(message);
     }
+
     public static void trace(String message, Throwable t) {
         getInstance().trace(message, t);
     }
+
     public static void trace(String title, String message, Throwable t) {
         getInstance().trace(title, message, t);
     }
+
     public static void trace(Object obj, String message, Throwable t) {
         getInstance().trace(obj, message, t);
     }
@@ -223,34 +235,42 @@ public class DebugUtil implements DebugConstants{
         getInstance().trace(callingClass, message, t);
     }
 
-    public static void trace(Class callingClass, String message)
-    {
+    public static void trace(Class callingClass, String message) {
         getInstance().trace(callingClass, message);
     }
 
     public static void trace(Object obj, String message) {
         getInstance().trace(obj, message);
     }
+
     /*
     do local means to only print out the debug message if there is a local flag for a component. This allows
     you to turn on or off component wise debugging.
      */
     public static void trace(boolean doLocal, Object obj, String message, Throwable t) {
-        if(doLocal){getInstance().trace(obj, message, t);}
+        if (doLocal) {
+            getInstance().trace(obj, message, t);
+        }
     }
 
     public static void trace(boolean doLocal, Class callingClass, String message, Throwable t) {
-        if(doLocal){getInstance().trace(callingClass, message, t);}
+        if (doLocal) {
+            getInstance().trace(callingClass, message, t);
+        }
     }
 
-    public static void trace(boolean doLocal, Class callingClass, String message)
-    {
-        if(doLocal){getInstance().trace(callingClass, message);}
+    public static void trace(boolean doLocal, Class callingClass, String message) {
+        if (doLocal) {
+            getInstance().trace(callingClass, message);
+        }
     }
 
     public static void trace(boolean doLocal, Object obj, String message) {
-        if(doLocal){getInstance().trace(obj, message);}
+        if (doLocal) {
+            getInstance().trace(obj, message);
+        }
     }
+
     /**
      * This will print out a message from a class that includes the class name and current timestamp.
      *
@@ -292,8 +312,41 @@ public class DebugUtil implements DebugConstants{
     public static void dbg(Class callingClass, String message) {
         getInstance().warn(callingClass, message);
     }
-    public static void setHost(String host){
+
+    public static void setHost(String host) {
         getInstance().host = host;
     }
 
+    static String devPath = null;
+    static public String NCSA_DEV_ROOT = "NCSA_DEV_ROOT";
+    static public String DEFAULT_DEV_ROOT = "/home/ncsa/dev/ncsa-git"; // Jeff's system...
+
+    /**
+     * This is used to supply all the paths in tests. Set the environment variable NCSA_DEV_PATH
+     * and it will be used to resolve resources etc.
+     * @return
+     */
+    static public String getDevPath() {
+        if (devPath == null) {
+            devPath = System.getenv(NCSA_DEV_ROOT);
+            if (StringUtils.isTrivial(devPath)) {
+                devPath = DEFAULT_DEV_ROOT;
+            }
+        }
+        return devPath;
+    }
+
+    static String configPath = null;
+    static public String NCSA_CONFIG_ROOT = "NCSA_CONFIG_ROOT";
+
+    static public String DEFAULT_CONFIG_ROOT = "/home/ncsa/dev/csd/config"; // Jeff's system...
+    static public String getConfigPath() {
+        if (configPath == null) {
+            configPath = System.getenv(NCSA_CONFIG_ROOT);
+            if (StringUtils.isTrivial(configPath)) {
+                configPath = DEFAULT_CONFIG_ROOT;
+            }
+        }
+        return configPath;
+    }
 }

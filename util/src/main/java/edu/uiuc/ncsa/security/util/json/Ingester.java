@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.util.json;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -101,7 +102,7 @@ public class Ingester {
 
     public static void main(String[] args) {
         JSONStore<JSONEntry> store = new TestMemStore();
-        File f = new File("/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/new-form/ldap-minimal.json");
+        File f = new File(DebugUtil.getDevPath() + "/oa4mp/oa4mp-server-admin-oauth2/src/main/resources/new-form/ldap-minimal.json");
         Ingester ingester = new Ingester(store);
         try {
             List<Identifier> ids = ingester.ingest(f, true);

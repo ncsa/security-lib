@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.help;
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.cli.HelpUtil;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
@@ -202,7 +203,7 @@ public class MarkdownConverter {
         say();
         say("Entries are sorted and minimially formatted.");
         say("E.g.");
-        say("java " + MarkdownConverter.class.getCanonicalName() + " -in \"/home/ncsa/dev/ncsa-git/security-lib/storage/src/main/resources/basic-help.xml:/home/ncsa/dev/ncsa-git/security-lib/storage/src/main/resources/store-help.xml\" -v ");
+        say("java " + MarkdownConverter.class.getCanonicalName() + " -in " + DebugUtil.getDevPath() + "/security-lib/storage/src/main/resources/basic-help.xml:" + DebugUtil.getDevPath() +"/security-lib/storage/src/main/resources/store-help.xml\" -v ");
         say("");
         say("");
     }
