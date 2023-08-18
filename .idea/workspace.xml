@@ -10,17 +10,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/DevUtils.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/util/src/main/resources/sec-lib.xp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/build.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/DebugUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/DebugUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/SASEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/SASEnvironment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/SASServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/SASServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/loader/SASConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/loader/SASConfigurationLoader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/test/java/edu/uiuc/ncsa/security/util/TestBase.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/test/java/edu/uiuc/ncsa/security/util/TestBase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/make-website.sh" beforeDir="false" afterPath="$PROJECT_DIR$/website/make-website.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/MultipleInheritanceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/MultipleInheritanceTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -418,7 +409,7 @@
       <workItem from="1692134926818" duration="627000" />
       <workItem from="1692185435998" duration="19248000" />
       <workItem from="1692368108728" duration="48000" />
-      <workItem from="1692368265634" duration="4978000" />
+      <workItem from="1692368265634" duration="7720000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -721,7 +712,14 @@
       <option name="project" value="LOCAL" />
       <updated>1692295875335</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL-00044" summary="https://github.com/ncsa/security-lib/issues/21 mke the build more portable #2.">
+      <created>1692387219212</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1692387219212</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -731,7 +729,6 @@
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Twiddling website" />
     <MESSAGE value="Updating build for making the website, plus general build cleanup." />
     <MESSAGE value="documents updated" />
     <MESSAGE value="Website created." />
@@ -756,7 +753,8 @@
     <MESSAGE value="Had a blindingly good idea for printing the online help.  https://jira.ncsa.illinois.edu/browse/CIL-1815" />
     <MESSAGE value="Slightly improved object creation in the CLI." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/21 mke the build more portable." />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/21 mke the build more portable." />
+    <MESSAGE value="https://github.com/ncsa/security-lib/issues/21 mke the build more portable #2." />
+    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/21 mke the build more portable #2." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">

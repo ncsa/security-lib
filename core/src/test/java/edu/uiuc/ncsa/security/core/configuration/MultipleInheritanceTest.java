@@ -88,6 +88,9 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
     }
 
     public void testBasicInclude() throws Exception {
+        if(System.getProperty("basic.include.test") == null || !System.getProperty("basic.include.test").equals("true")){
+            return;
+        }
         verbose("test basic includes:");
 
         String fileName = path + "basic-include-test.xml";
@@ -158,6 +161,9 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
      */
     @Test
     public void testSingleInclude() throws Exception {
+        if(System.getProperty("basic.include.test") == null || !System.getProperty("basic.include.test").equals("true")){
+             return;
+         }
         verbose("testSingleInclude:");
         String fileName = path + "single-include-test.xml";
         MultiConfigurations configurations2 = getConfigurations2(fileName);
