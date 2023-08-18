@@ -1,0 +1,17 @@
+#test header, note that the names here are prepended with their type
+#Fri Aug 18 07:25:53 CDT 2023
+ser.test=rO0ABXVyABNbTGphdmEubGFuZy5PYmplY3Q7kM5YnxBzKWwCAAB4cAAAAAF0AFBGb3VyIHNjb3JlIGFuZCBzZXZlbiB5ZWFycyBhZ28sCm91cglmYXRoZXJzCgpzZXQgZm9ydGgsIHVoLCBJIGZvcmdldCB0aGUgcmVzdC4uLg\=\=
+serList.test=rO0ABXVyABNbTGphdmEubGFuZy5PYmplY3Q7kM5YnxBzKWwCAAB4cAAAAAN0ABZ5b3UgbmVlZCBtb3JlIHRobmVlZHMuc3IAEWphdmEubGFuZy5JbnRlZ2VyEuKgpPeBhzgCAAFJAAV2YWx1ZXhyABBqYXZhLmxhbmcuTnVtYmVyhqyVHQuU4IsCAAB4cAdbzRVzcgAQamF2YS5sYW5nLkRvdWJsZYCzwkopa/sEAgABRAAFdmFsdWV4cQB+AAQ/5biFqchnlw\=\=
+string.test=${NCSA_DEV_INPUT}you need more thneeds.
+list.test2=foo**fnord**fnibble
+date.test=10000000
+double.test=0.678774673087207
+uri.test=http\://foo/bar/baz\#fnord
+boolean.test=true
+long.test=1692361553059
+list.test=foo,fnord,fnibble
+file.test=/tmp/foo.xp
+integer.test=123456789
+b64.test=Rm91
+ciBzY29yZSBhbmQgc2V2ZW4geWVhcnMgYWdvLApvdXIJZmF0aGVycwoKc2V0IGZvcnRoLCB1aCwgSSBmb3JnZXQgdGhlIHJlc3QuLi4\=
+ARF=WOOF

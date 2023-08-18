@@ -318,7 +318,7 @@ public class DebugUtil implements DebugConstants {
     }
 
     static String devPath = null;
-    static public String NCSA_DEV_ROOT = "NCSA_DEV_ROOT";
+    static public String NCSA_DEV_INPUT = "NCSA_DEV_INPUT";
     static public String DEFAULT_DEV_ROOT = "/home/ncsa/dev/ncsa-git"; // Jeff's system...
 
     /**
@@ -328,7 +328,7 @@ public class DebugUtil implements DebugConstants {
      */
     static public String getDevPath() {
         if (devPath == null) {
-            devPath = System.getenv(NCSA_DEV_ROOT);
+            devPath = System.getenv(NCSA_DEV_INPUT);
             if (StringUtils.isTrivial(devPath)) {
                 devPath = DEFAULT_DEV_ROOT;
             }
@@ -349,4 +349,19 @@ public class DebugUtil implements DebugConstants {
         }
         return configPath;
     }
+
+    public static String getDevOutput() {
+        if(devOutput == null){
+            devOutput = System.getenv(NCSA_DEV_OUTPUT);
+            if(StringUtils.isTrivial(devOutput)){
+                devOutput = DEFAULT_DEV_OUTPUT;
+            }
+        }
+        return devOutput;
+    }
+
+    static String devOutput = null;
+     static public String NCSA_DEV_OUTPUT = "NCSA_DEV_OUTPUT";
+     static public String DEFAULT_DEV_OUTPUT = "/home/ncsa/dev/temp-deploy"; // Jeff's system...
+
 }

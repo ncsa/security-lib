@@ -1,6 +1,5 @@
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 
-NCSA_ROOT=$NCSA_DEV_ROOT/security-lib
+NCSA_ROOT=$NCSA_DEV_INPUT/security-lib
 
 cd $NCSA_ROOT
 echo 'Changing to ' $NCSA_ROOT

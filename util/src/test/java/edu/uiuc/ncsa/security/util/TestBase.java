@@ -1,9 +1,14 @@
 package edu.uiuc.ncsa.security.util;
 
+import edu.uiuc.ncsa.security.core.configuration.XProperties;
+import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import junit.framework.TestCase;
 import org.apache.commons.codec.binary.Base64;
 
+import java.io.*;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**

@@ -10,18 +10,15 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
 import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
-import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.security.interfaces.RSAPublicKey;
@@ -37,13 +34,6 @@ public class SASServlet extends AbstractServlet {
     @Override
     public void loadEnvironment() throws IOException {
         setEnvironment(getConfigurationLoader().load());
-        try {
-            // keys.jwk contains the set of keys for this service.
-            JSONWebKeys jsonWebKeys = JSONWebKeyUtil.fromJSON(new File(DebugUtil.getConfigPath() + "/sas/keys.jwk"));
-            jsonWebKeys.setDefaultKeyID("2D700DF531E09B455B9E74D018F9A133"); // for testing!
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
     }
 
     protected SASEnvironment getSASE() {

@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.sas.loader;
 
-import edu.uiuc.ncsa.sas.thing.action.ActionDeserializer;
 import edu.uiuc.ncsa.sas.SASEnvironment;
 import edu.uiuc.ncsa.sas.client.ClientConverter;
 import edu.uiuc.ncsa.sas.client.ClientKeys;
@@ -9,6 +8,7 @@ import edu.uiuc.ncsa.sas.client.SASClient;
 import edu.uiuc.ncsa.sas.storage.ClientMemoryStore;
 import edu.uiuc.ncsa.sas.storage.SASClientStore;
 import edu.uiuc.ncsa.sas.storage.SASClientStoreProvider;
+import edu.uiuc.ncsa.sas.thing.action.ActionDeserializer;
 import edu.uiuc.ncsa.sas.thing.response.ResponseSerializer;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
@@ -42,11 +42,11 @@ public class SASConfigurationLoader<T extends SASEnvironment> extends DBConfigLo
 
     @Override
     public T createInstance() {
-        return (T) new SASEnvironment(loggerProvider.get(),
+        T t = (T) new SASEnvironment(loggerProvider.get(),
                 (Store<? extends SASClient>) getCSP().get(),
                 new ActionDeserializer(),
                 new ResponseSerializer());
-
+        return t;
     }
 
     HashMap<String, String> constants = new HashMap<>();
@@ -114,4 +114,39 @@ public class SASConfigurationLoader<T extends SASEnvironment> extends DBConfigLo
         }
         return csp;
     }
+ /*   protected JSONWebKeys getJSONWebKeys() {
+         ConfigurationNode node = getFirstNode(cn, "JSONWebKey");
+         if (node == null) {
+             warn("Error: No signing keys in the configuration file. Signing is not available");
+             //throw new IllegalStateException();
+             return new JSONWebKeys(null);
+         }
+         String json = getNodeValue(node, "json", null); // if the whole thing is included
+         JSONWebKeys keys = null;
+         try {
+             if (json == null) {
+                 String path = getNodeValue(node, "path", null); // points to a file that contains it all
+                 if (path != null) {
+                     keys = JSONWebKeyUtil.fromJSON(new File(path));
+                     info("loaded JSON web keys from file \"" + path + "\"");
+                 }
+             } else {
+                 keys = JSONWebKeyUtil.fromJSON(json);
+                 info("loaded JSON web keys directly from configuration");
+             }
+         } catch (Throwable t) {
+             throw new GeneralException("Error reading signing keys", t);
+         }
+
+         if (keys == null) {
+             throw new IllegalStateException("Error: Could not load signing keys");
+         }
+         if (keys.size() == 1) {
+             // If there is a single key in the file, use that as the default.
+             keys.setDefaultKeyID(keys.keySet().iterator().next());
+         } else {
+             keys.setDefaultKeyID(getFirstAttribute(node, "defaultKeyID"));
+         }
+         return keys;
+     }*/
 }
