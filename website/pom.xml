@@ -3,7 +3,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>edu.uiuc.ncsa.security</groupId>
     <artifactId>website</artifactId>
     <version>5.3.4</version>
@@ -12,6 +11,8 @@
     <!-- FIXME change it to the project's website -->
     <url>http://ncsa.github.io/security-all</url>
     <inceptionYear>2012</inceptionYear>
+    <packaging>pom</packaging>
+    <description>Website for the NCSA Security Library.</description>
 
 
     <properties>
@@ -49,6 +50,23 @@
      </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <configuration>
+                    <skip>false</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -109,4 +127,22 @@
                </plugin>
            </plugins>
        </reporting>
+    <licenses>
+        <license>
+            <name>Apache license</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Jeff Gaynor</name>
+            <email>gaynor@illinois.edu</email>
+        </developer>
+    </developers>
+    <scm>
+        <developerConnection>scm:git:https://github.com/ncsa/security-lib</developerConnection>
+        <connection>scm:git:https://github.com/ncsa/security-lib</connection>
+        <url>scm:git:https://github.com/ncsa/security-lib</url>
+    </scm>
 </project>
