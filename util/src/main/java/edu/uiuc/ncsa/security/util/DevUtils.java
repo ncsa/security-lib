@@ -11,6 +11,7 @@ import java.util.Map;
  * Tools for development, such as centralizing certain things for testing.
  * <p>Created by Jeff Gaynor<br>
  * on 8/18/23 at  9:19 AM
+ * @deprecated Use {@link XXProperties} instead.
  */
 public class DevUtils {
     /**
@@ -25,6 +26,7 @@ public class DevUtils {
        * @param filename
        * @return
        */
+
       public static XProperties getTestProperties(String filename) throws IOException {
           Map<String,String> p = getAllProperties();
           XProperties xp = new XProperties();
@@ -70,6 +72,7 @@ public class DevUtils {
 
       public static void main(String[] args) {
           try {
+              // Just for testing.
               System.out.println(getTestProperties("/sec-lib.xp"));
           }catch (Exception e){
               e.printStackTrace();

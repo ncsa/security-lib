@@ -17,13 +17,11 @@
 
     <url>http://www.ncsa.illinois.edu</url>
     <scm>
-        <developerConnection>
-            scm:svn:https://jeff92@svn.code.sf.net/p/cilogon/code/trunk/edu.uiuc.ncsa/ncsa-security-all
-        </developerConnection>
-        <connection>scm:svn:https://jeff92@svn.code.sf.net/p/cilogon/code/trunk/edu.uiuc.ncsa/ncsa-security-all
-        </connection>
-        <url>scm:svn:https://jeff92@svn.code.sf.net/p/cilogon/code/trunk/edu.uiuc.ncsa/ncsa-security-all</url>
+        <developerConnection>scm:git:https://github.com/ncsa/security-lib</developerConnection>
+        <connection>scm:git:https://github.com/ncsa/security-lib</connection>
+        <url>scm:git:https://github.com/ncsa/security-lib</url>
     </scm>
+
     <licenses>
         <license>
             <name>Apache license</name>
@@ -88,7 +86,7 @@
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.6</version>
                 <configuration>
-                    <skip>true</skip>
+                    <skip>false</skip>
                 </configuration>
                 <executions>
                     <execution>
@@ -104,6 +102,14 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.5.0</version>
+                <executions>
+                       <execution>
+                           <id>attach-javadocs</id>
+                           <goals>
+                               <goal>jar</goal>
+                           </goals>
+                       </execution>
+                   </executions>
             </plugin>
         </plugins>
 
