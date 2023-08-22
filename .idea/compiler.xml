@@ -19,7 +19,6 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="core" />
-        <module name="website" />
         <module name="storage" />
         <module name="util" />
         <module name="servlet" />
@@ -29,6 +28,7 @@
     <bytecodeTargetLevel>
       <module name="crypto" target="1.8" />
       <module name="ncsa-qdl-gui" target="1.8" />
+      <module name="skin" target="1.5" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

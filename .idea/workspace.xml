@@ -10,29 +10,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e2370508-a694-4084-b56a-b8e77c115dc1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/core/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/Version.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/Version.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/crypto/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/crypto/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/dependencies.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/dependencies.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/dependency-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/dependency-info.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/distribution-management.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/distribution-management.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/faq.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/faq.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/format.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/format.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/markdown-velocity.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/markdown-velocity.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/markdown.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/markdown.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/plugin-management.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/plugin-management.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/plugins.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/plugins.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/project-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/project-info.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/summary.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/xdoc.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/xdoc.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl-gui/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/servlet/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/storage/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -340,11 +320,11 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.WebClientConfig" />
-        <item itemvalue="Application.SASCommands" />
-        <item itemvalue="Application.DecryptUtils" />
-        <item itemvalue="Java Scratch.Scratch" />
         <item itemvalue="Shell Script.build.sh" />
+        <item itemvalue="Java Scratch.Scratch" />
+        <item itemvalue="Application.DecryptUtils" />
+        <item itemvalue="Application.SASCommands" />
+        <item itemvalue="Application.WebClientConfig" />
       </list>
     </recent_temporary>
   </component>
