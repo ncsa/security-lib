@@ -1,17 +1,33 @@
 [![Javadocs](https://www.javadoc.io/badge/edu.uiuc.ncsa.security/ncsa-security-core.svg)](https://www.javadoc.io/doc/edu.uiuc.ncsa.security/ncsa-security-core)
-  
+ 
+# Using the NCSA Security Libraries
+
+The easiest way to incorporate these into your project is using Maven.
+```
+
+```
+ 
 # Building the library
                               
 ## Required software
 
 To build the NCSA security library you need
 
-* Java 11
-* Maven 3.9.1 or above
+* Java 11 JDK (must have javadoc command available)
+* Maven 3.6 or above
 * The ability to run bash scripts. Linux works and there are ports of bash to other platfroms as well.
 * The version of the code you want to build checked out from git. Check this out, from https://github.com/ncsa/security-lib and clone it or however you want to get it to NCSA_DEV_INPUT.,
 
-__Note:__ You must set the environment variable for NCSA_DEV_INPUT, as well as JAVA_HOME. 
+## Required environment variables
+
+* NCSA_DEV_INPUT - location of root. 
+* NCSA_DEV_OUTPUT  - location of created artifacts
+* NCSA_CONFIG_ROOT - location of the configuration files
+* JAVA_HOME - location of JDK.  
+
+# Getting the sources
+
+These are available from 
 
 ## Creating the library (rolling a snapshot)
 
