@@ -12,7 +12,6 @@
     <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,7 +34,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="5.3.4" />
+        <entry key="$PROJECT_DIR$" value="5.2.8" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -315,11 +314,11 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.XXProperties" />
-        <item itemvalue="Application.DevUtils" />
-        <item itemvalue="Application.TestBase" />
         <item itemvalue="Application.XProperties" />
         <item itemvalue="Application.TemplateUtil" />
+        <item itemvalue="Application.TestBase" />
+        <item itemvalue="Application.DevUtils" />
+        <item itemvalue="Application.XXProperties" />
       </list>
     </recent_temporary>
   </component>

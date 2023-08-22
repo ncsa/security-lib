@@ -2,12 +2,18 @@
  
 # Using the NCSA Security Libraries
 
-The easiest way to incorporate these into your project is using Maven.
+The easiest way to incorporate these into your project is using Maven. There are
+several libraries, e.g. This is how the storage library would be referenced
 ```
-
+<dependency>
+    <groupId>edu.uiuc.ncsa.security</groupId>
+    <artifactId>storage</artifactId>
+    <version>5.3-SNAPSHOT</version>
+    <scope>compile</scope>
+</dependency>
 ```
  
-# Building the library
+# Building the libraries
                               
 ## Required software
 
@@ -27,52 +33,53 @@ To build the NCSA security library you need
 
 # Getting the sources
 
-These are available from 
+These are available from the [NCSA Security Library](https://github.com/ncsa/security-lib.git) project on GitHub.
+You would clone this to `$NCSA_DEV_INPUT` which would result in `$NCSA_DEV_INPUT/security-lib`. This
+is the root for this project.
 
-## Creating the library (rolling a snapshot)
+## Creating the library (local release)
 
-There is a single file named build.sh. Typically you set a couple of environment variables
-and invoke this script. You need to set  the environment  variable NCSA_DEV_INPUT as per
-above. The script will then run and your local maven repository will be populated
-with the current version.
+There is a single file named build.sh in `$NCSA_DEV_INPUT/security-lib`. 
+Typically you set the  environment variables as per above
+and invoke this script.  The script will then run and your local maven 
+repository will be populated with the current version.
 
 ## Output
 
-The result is a set of jars in your maven repository. These will be local to your
-system but will be used i building subsequent components (such as OA4MP, QDL, CILogon).
+The result is a set of jars in your local maven repository. These will be local to your
+system but will be used i building subsequent components (such as OA4MP, QDL, CILogon). This
+project does not currently use `$NCSA_DEV_OUTPUT`.
 
-## Uploading a snapshot to Sonatype
-
-You may also create the distro and upload it to Sonatype. Make sure you have permissions
-to do so. This consists of changing the maven target of the build file to deploy, so 
-`mvn clean install` would be replaced with `mvn clean deploy`. The resulting snapshot
-should be findable under https://oss.sonatype.org/#view-repositories;snapshots~browsestorage
-by navigating to edu > uiuc > ncsa > security
                          
 # Rolling a release
 
 The critical part is to replace the SNAPSHOT tag (e.g. 5.3-SNAPSHOT)
 globally with your preferred version. Note that this tag will also be found in
 java files (so the system is aware of the current release version), so this
-change does not merely affect the pom.xml files.
+change does not merely affect the pom.xml files. You should also be sure before
+doing a deploy to Sonatype that you have administrator privileges and have uploaded
+your signing keys. 
 
-## Local usage
+__Note__ There may be issues with the website module. I suggest you comment that out
+of `$NCSA_DEV_INPUT/security-lib/pom.xml` and sidestep having to tweak more of the 
+configuration. 
 
-If you are not planning on uploading it to Sonatype, simply run the build file with 
-the default maven target and your local repository will be updated. All references to this
-version (e.g. when building OA4MP) will use your version. 
+You would cd to
 
-## Uploading to Sonatype
+`$NCSA_DEV_INPUT/security-lib`
 
-Again, change the target of the maven build  from `install` to `deploy` and then
-got to https://oss.sonatype.org/index.html#welcome, login and close the release. 
-Note that you will have to be able to log in to Sonatype with correct access
-to do this step. 
+and issue
+
+`mvn clean deploy`
+
+If successful, you should then be able to go to the [Nexus Repository Manager](https://oss.sonatype.org/index.html#welcome)
+and close the upload. 
+
 
 # Creating the website
 
 If you want to update the website, you must be able to commit to Git. 
-You would
+You would (make sure that the website module is uncommented in `$NCSA_DEV_INPUT/security-lib/pom.xml`)
 
 * run build.sh 
 * invoke  website/make-website.sh
