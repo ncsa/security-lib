@@ -62,7 +62,8 @@ your signing keys.
 
 __Note__ There may be issues with the website module. I suggest you comment that out
 of `$NCSA_DEV_INPUT/security-lib/pom.xml` and sidestep having to tweak more of the 
-configuration. 
+configuration. You should also ensure that in the pom.xml file, that signing with GPG keys is
+set since Sonatype will refuse to validate the release without keys.
 
 You would cd to
 
