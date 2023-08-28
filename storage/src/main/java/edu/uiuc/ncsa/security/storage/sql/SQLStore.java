@@ -255,9 +255,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             ColumnMap map = rsToMap(rs);
             rs.close();
             stmt.close();
+            releaseConnection(cr); // CIL-1833
             t = create();
             populate(map, t);
-            releaseConnection(cr);
         } catch (SQLException e) {
             destroyConnection(cr);
             throw new GeneralException("Error getting object with identifier \"" + key + "\"", e);

@@ -11,8 +11,7 @@
   <component name="ChangeListManager">
     <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -405,6 +404,7 @@
       <workItem from="1692185435998" duration="19248000" />
       <workItem from="1692368108728" duration="48000" />
       <workItem from="1692368265634" duration="7720000" />
+      <workItem from="1693188674910" duration="2364000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -728,7 +728,14 @@
       <option name="project" value="LOCAL" />
       <updated>1692734636223</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="Pre-travel checkin">
+      <created>1692998390135</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1692998390135</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -738,7 +745,6 @@
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Website created." />
     <MESSAGE value="Test of scripts that build everything." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/16 -- state object need to be passed to AbstractServlet so logging of success/failures works.&#10;&#10;https://github.com/ncsa/security-lib/issues/17 -- Setting of log and debug level made to conform to expectations in other logging frameworks." />
     <MESSAGE value="More improvements to logging. Making everything more configurable." />
@@ -763,7 +769,8 @@
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/21 mke the build more portable #2." />
     <MESSAGE value="Wrong reference to crypt 8 library. Moved static utility to a class." />
     <MESSAGE value="Fixes for https://github.com/ncsa/security-lib/issues/21 and https://github.com/ncsa/security-lib/issues/22" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixes for https://github.com/ncsa/security-lib/issues/21 and https://github.com/ncsa/security-lib/issues/22" />
+    <MESSAGE value="Pre-travel checkin" />
+    <option name="LAST_COMMIT_MESSAGE" value="Pre-travel checkin" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
