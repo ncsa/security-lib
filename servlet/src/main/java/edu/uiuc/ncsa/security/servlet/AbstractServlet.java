@@ -377,6 +377,16 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
      * @param request
      */
     public  void logOK(HttpServletRequest request) {
-        getMyLogger().info(getClass().getSimpleName() + " <" + getRequestIPAddress(request) + ">: request ok"  );
+        logOK(request, "request ok"); // default message
     }
+
+    /**
+     * For logging a success with a custom message. If you don't need a custom message, use {@link #logOK(HttpServletRequest)}.
+     * @param request
+     * @param message
+     */
+    public  void logOK(HttpServletRequest request, String message) {
+        getMyLogger().info(getClass().getSimpleName() + " <" + getRequestIPAddress(request) + ">: " + message  );
+    }
+
 }

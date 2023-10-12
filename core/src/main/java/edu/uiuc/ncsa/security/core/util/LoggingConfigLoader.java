@@ -39,13 +39,14 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
     protected MyLoggingFacade myLogger = null;
 
     protected MetaDebugUtil debugger = null;
+
     /**
      * Checks for and sets up the debugging for this loader. Once this is set up, you may have to tell any environments that
      * use it that debugging is enabled.  Note that this is not used in this module, but in OA4MP proper, but has to b
      * here for visibility later.
      */
     public MetaDebugUtil getDebugger() {
-        if(debugger == null){
+        if (debugger == null) {
             debugger = new MetaDebugUtil();
             String rawDebug = Configurations.getFirstAttribute(cn, ConfigurationTags.DEBUG);
             try {
@@ -54,7 +55,7 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
                 } else {
                     debugger.setDebugLevel(rawDebug);
                 }
-            //    debugger.trace(this, ".load: set debug to level " + DebugUtil.getDebugLevel());
+                //    debugger.trace(this, ".load: set debug to level " + DebugUtil.getDebugLevel());
 
             } catch (Throwable t) {
                 // ok, so that didn't work, fall back to the old way
@@ -84,10 +85,14 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
         // https://github.com/ncsa/oa4mp/issues/106 Check that this node is not null ==> bad config file
         // Don't blow up with an NPE, just exit gracefully.
         if (node == null) {
-            if(DebugUtil.isEnabled()){
-                System.out.println("No logging configured. Using default.");
+            if (logger == null) {
+                if (DebugUtil.isEnabled()) {
+                    System.out.println("No logging configured. Using default.");
+                }
+                this.myLogger = new MyLoggingFacade(Logger.getLogger("default"));
+            } else {
+                myLogger = logger;
             }
-           this.myLogger = new MyLoggingFacade(Logger.getLogger("default"));
             return;
         }
         this.cn = node;

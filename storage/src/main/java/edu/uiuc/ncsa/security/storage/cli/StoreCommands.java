@@ -824,9 +824,10 @@ public abstract class StoreCommands extends CommonCommands {
     /**
      * Wraps the store create method. This can be overridden in certain cases (e.g. creating users)
      * where special handling is needed.
+     *
      * @return
      */
-    protected Identifiable createEntry(int magicNumber){
+    protected Identifiable createEntry(int magicNumber) {
         return getStore().create();
     }
 
@@ -834,14 +835,16 @@ public abstract class StoreCommands extends CommonCommands {
 
     /**
      * Get the serialization keys for the main store.
+     *
      * @return
      */
-    protected SerializationKeys getSerializationKeys(){
-        if(serializationKeys == null){
-            serializationKeys =  getMapConverter().getKeys();
+    protected SerializationKeys getSerializationKeys() {
+        if (serializationKeys == null) {
+            serializationKeys = getMapConverter().getKeys();
         }
         return serializationKeys;
     }
+
     /**
      * does the actual creation and returns the created object. If you override {@link #create(InputLine)},
      * this is what does the actual work.
@@ -1074,7 +1077,7 @@ public abstract class StoreCommands extends CommonCommands {
                 if (allEntries == null || allEntries.isEmpty()) {
                     loadAllEntries(); // just in case...
                 }
-                if(index<0 || allEntries.size() < index){
+                if (index < 0 || allEntries.size() < index) {
                     return null;
                 }
                 return allEntries.get(index);
@@ -2867,6 +2870,24 @@ public abstract class StoreCommands extends CommonCommands {
         getHelpUtil().load("/store-help.xml");
     }
 
+    public void clear_store(InputLine line) throws Exception {
+        if (showHelp(line)) {
+            say("clear_store -- clear every entry in the current store");
+            say("This is mostly used in cases where there has been some great failure or");
+            say("perhaps as a debugging aid. It will remove every entry in the currently");
+            say("active store **unrecoverably**. Note this only works on precisely the current store,");
+            say("so related stores (e.g. approvals for clients) have to be cleared separately.");
+            say("This is inconvenient, but does prevent unwanted side effects.");
+            say("You will always be prompted before this operation");
+            return;
+        }
+        if (getInput("Do you really want to clear every entry from this store?(YES/n)", "n").equals("YES")) {
+            getStore().clear();
+            say("done");
+        } else{
+            say("clear store skipped!");
+        }
+    }
 }
 
 

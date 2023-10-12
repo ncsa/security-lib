@@ -11,6 +11,9 @@
   <component name="ChangeListManager">
     <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/LoggingConfigLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/LoggingConfigLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/AbstractServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/AbstractServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -404,7 +407,12 @@
       <workItem from="1692185435998" duration="19248000" />
       <workItem from="1692368108728" duration="48000" />
       <workItem from="1692368265634" duration="7720000" />
-      <workItem from="1693188674910" duration="2364000" />
+      <workItem from="1693188674910" duration="4096000" />
+      <workItem from="1693232709837" duration="783000" />
+      <workItem from="1693286095785" duration="1208000" />
+      <workItem from="1693335393908" duration="3568000" />
+      <workItem from="1695649451159" duration="6612000" />
+      <workItem from="1696360628020" duration="18988000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -735,7 +743,14 @@
       <option name="project" value="LOCAL" />
       <updated>1692998390135</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="https://github.com/ncsa/security-lib/issues/23 corrupt database causing SQL connection leak.">
+      <created>1693191270155</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1693191270155</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -745,7 +760,6 @@
     <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Test of scripts that build everything." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/16 -- state object need to be passed to AbstractServlet so logging of success/failures works.&#10;&#10;https://github.com/ncsa/security-lib/issues/17 -- Setting of log and debug level made to conform to expectations in other logging frameworks." />
     <MESSAGE value="More improvements to logging. Making everything more configurable." />
     <MESSAGE value="recent updates for website." />
@@ -770,7 +784,8 @@
     <MESSAGE value="Wrong reference to crypt 8 library. Moved static utility to a class." />
     <MESSAGE value="Fixes for https://github.com/ncsa/security-lib/issues/21 and https://github.com/ncsa/security-lib/issues/22" />
     <MESSAGE value="Pre-travel checkin" />
-    <option name="LAST_COMMIT_MESSAGE" value="Pre-travel checkin" />
+    <MESSAGE value="https://github.com/ncsa/security-lib/issues/23 corrupt database causing SQL connection leak." />
+    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/23 corrupt database causing SQL connection leak." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
