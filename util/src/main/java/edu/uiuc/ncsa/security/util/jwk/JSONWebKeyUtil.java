@@ -1,12 +1,8 @@
 package edu.uiuc.ncsa.security.util.jwk;
 
-import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.util.pkcs.MyKeyUtil;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.xml.namespace.QName;
@@ -15,22 +11,18 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.XMLEvent;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.*;
-import java.security.interfaces.RSAPrivateCrtKey;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.RSAPrivateCrtKeySpec;
-import java.security.spec.RSAPrivateKeySpec;
-import java.security.spec.RSAPublicKeySpec;
 import java.util.Random;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
+import static edu.uiuc.ncsa.security.util.jwk.JWKUtil2.KEYS;
 
 /**
  * A utility for <a href="https://tools.ietf.org/html/rfc7517">RFC 7515</a>, the JSON web key format.
@@ -40,6 +32,18 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * on 1/6/17 at  2:39 PM
  */
 public class JSONWebKeyUtil {
+    public static JWKUtil2 getJwkUtil2() {
+        if (jwkUtil2 == null) {
+            jwkUtil2 = new JWKUtil2();
+        }
+        return jwkUtil2;
+    }
+
+    public static void setJwkUtil2(JWKUtil2 jwkUtil) {
+        jwkUtil2 = jwkUtil;
+    }
+
+    protected static JWKUtil2 jwkUtil2 = null;
     public static final String ALGORITHM = "alg";
     public static final String MODULUS = "n";
     public static final String PUBLIC_EXPONENT = "e";
@@ -49,11 +53,6 @@ public class JSONWebKeyUtil {
     public static final String RSA_EXPONENT_1 = "dp";
     public static final String RSA_EXPONENT_2 = "dq";
     public static final String RSA_COEFFICIENTS = "qi"; // q^(-1) mod p
-
-    public static final String KEY_ID = "kid";
-    public static final String USE = "use";
-    public static final String KEY_TYPE = "kty";
-    public static final String KEYS = "keys";
 
 
     /**
@@ -65,29 +64,12 @@ public class JSONWebKeyUtil {
      * @throws InvalidKeySpecException
      * @throws IOException
      */
-    public static JSONWebKeys fromJSON(File file) throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
-        FileReader fileReader = new FileReader(file);
-        BufferedReader br = new BufferedReader(fileReader);
-        String x = br.readLine();
-        String out = "";
-        while (x != null) {
-            out = out + x;
-            x = br.readLine();
-
-        }
-        br.close();
-        JSONWebKeys keys = fromJSON(out);
-        return keys;
+    public static JSONWebKeys fromJSON(File file) throws IOException {
+        return getJwkUtil2().fromJSON(file);
     }
 
-    /**
-     * Take a raw string of text that is the JSON for the keys and convert it into a set of keys.
-     *
-     * @param x
-     * @return
-     */
-    public static JSONWebKeys fromJSON(String x) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        return fromJSON(JSONSerializer.toJSON(x));
+    public static JSONWebKeys fromJSON(String raw) {
+        return getJwkUtil2().fromJSON(raw); // used in OA4MP
     }
 
     /**
@@ -113,7 +95,7 @@ public class JSONWebKeyUtil {
         JSONWebKeys keys = new JSONWebKeys(null);
         for (int i = 0; i < array.size(); i++) {
             JSONObject key = array.getJSONObject(i);
-            JSONWebKey entry = getJsonWebKey(key);
+            JSONWebKey entry = getJwkUtil2().getJsonWebKey(key);
             if (entry == null) continue; // do not process unless there is enough information to resolve the key
             keys.put(entry.id, entry);
         }
@@ -132,12 +114,9 @@ public class JSONWebKeyUtil {
      *
      * @param rawJSON
      * @return
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeySpecException
      */
-    public static JSONWebKey getJsonWebKey(String rawJSON) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        JSONObject json = (JSONObject) JSONSerializer.toJSON(rawJSON);
-        return getJsonWebKey(json);
+    public static JSONWebKey getJsonWebKey(String rawJSON) {
+        return getJwkUtil2().getJsonWebKey(JSONObject.fromObject(rawJSON));
     }
 
 
@@ -146,24 +125,11 @@ public class JSONWebKeyUtil {
      *
      * @param key
      * @return
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeySpecException
      */
+/*
     public static JSONWebKey getJsonWebKey(JSONObject key) throws NoSuchAlgorithmException, InvalidKeySpecException {
+
         JSONWebKey entry = new JSONWebKey();
-        // Key type is required
-        boolean skipIt = false;
-        if (key.containsKey(KEY_TYPE)) {
-            entry.type = key.getString(KEY_TYPE);
-            // Note that OA4MP only supports RSA keys at this time, since these are by far the most widely used.
-            if (!entry.type.toLowerCase().startsWith("rsa")) {
-                DebugUtil.trace(JSONWebKeyUtil.class, "loading JSON webkeys and ignoring key of type " + entry.type);
-                skipIt = true;
-                // throw new GeneralException("Unsupported key type. Must be RSA");
-            }
-        } else {
-            throw new IllegalStateException("Error: missing key type");
-        }
         if (key.containsKey(KEY_ID)) {
             entry.id = key.getString(KEY_ID);
         }
@@ -173,6 +139,90 @@ public class JSONWebKeyUtil {
         }
         if (key.containsKey(USE)) {
             entry.use = key.getString(USE);
+        }
+        // have to figure out what is in this entry.
+
+        if (key.containsKey(KEY_TYPE)) {
+            entry.type = key.getString(KEY_TYPE);
+            // Note that OA4MP only supports RSA keys at this time, since these are by far the most widely used.
+            if (entry.type.toLowerCase().startsWith("ec")) {
+                return getECJsonWebKey(key, entry);
+
+            }
+            return getRSAJsonWebKey(key, entry, !entry.type.toLowerCase().startsWith("rsa"));
+        } else {
+            throw new IllegalStateException("Error: missing key type");
+        }
+
+
+    }
+*/
+
+    /*
+    secp256r1
+    secp384r1
+    secp521r1 	The NIST elliptic curves as specified in RFC 8422.
+    x25519
+    x448
+    	The elliptic curves as specified in RFC 8446 and RFC 8442.
+    ffdhe2048
+    ffdhe3072
+    ffdhe4096
+    ffdhe6144
+    ffdhe8192
+     */
+    // Fix https://github.com/ncsa/oa4mp/issues/131
+   /* protected static JSONWebKey getECJsonWebKey(JSONObject key, JSONWebKey entry) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        BigInteger x = getBI(key, EC_COEFFICIENT_X);
+        BigInteger y = getBI(key, EC_COEFFICIENT_Y);
+        ECPoint z = new ECPoint(x, y);
+         ECField ecField = new ECField() {
+             @Override
+             public int getFieldSize() {
+                 return 162;
+             }
+         };
+
+        EllipticCurve curve = new EllipticCurve(ecField, BigInteger.ONE, BigInteger.TEN);
+        if (key.containsKey(EC_CURVE)) {
+            switch (key.getString(EC_CURVE)) {
+                case "secp256r1":
+                    //  curve = new EllipticCurve()
+
+            }
+        }
+        ECGenParameterSpec gps = new ECGenParameterSpec("secp256r1"); // NIST P-256
+                               X509EncodedKeySpec x509EncodedKeySpec;
+
+        ECParameterSpec parameters = new ECParameterSpec(curve, z, BigInteger.ONE, 1);
+        entry.publicKey = KeyFactory.getInstance("EC").generatePublic(new ECPublicKeySpec(z, parameters));
+        if (key.containsKey(EC_COEFFICIENT_D)) {
+            BigInteger d = getBI(key, EC_COEFFICIENT_D); // in the Java class, this is s.
+
+            // Then we have a private key too.
+            entry.privateKey = KeyFactory.getInstance("EC").generatePrivate(new ECPrivateKeySpec(d, parameters));
+        }
+
+        return entry;
+
+        //ECPublicKeySpec spec = new ECPublicKeySpec(modulus, publicExp);
+
+    }*/
+
+    /*
+    final BigInteger x = new BigInteger(1, Base64.getUrlDecoder().decode(json.getString("x")));
+    final BigInteger y = new BigInteger(1, Base64.getUrlDecoder().decode(json.getString("y")));
+    publicKey = KeyFactory.getInstance("EC").generatePublic(new ECPublicKeySpec(new ECPoint(x, y), parameters.getParameterSpec(ECParameterSpec.class)));
+
+    final BigInteger x = new BigInteger(1, Base64.getUrlDecoder().decode(json.getString("x")));
+    final BigInteger y = new BigInteger(1, Base64.getUrlDecoder().decode(json.getString("y")));
+    final BigInteger d = new BigInteger(1, Base64.getUrlDecoder().decode(json.getString("d")));
+    privateKey = KeyFactory.getInstance("EC").generatePrivate(new ECPrivateKeySpec(d, parameters.getParameterSpec(ECParameterSpec.class)));
+     */
+  /*  protected static JSONWebKey getRSAJsonWebKey(JSONObject key, JSONWebKey entry, boolean skipIt) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        // Key type is required
+        if (skipIt) {
+            DebugUtil.trace(JSONWebKeyUtil.class, "loading JSON webkeys and ignoring key of type " + entry.type);
         }
         // have to figure out what is in this entry.
         if (!(skipIt || key.containsKey(MODULUS))) {
@@ -218,16 +268,14 @@ public class JSONWebKeyUtil {
             }
         }
         return entry;
-    }
+    }*/
 
     /**
      * Get the {@link BigInteger} from the component.
      *
-     * @param key
-     * @param component
      * @return
      */
-    protected static BigInteger getBI(JSONObject key, String component) {
+  /*  public static BigInteger getBI(JSONObject key, String component) {
         if (!key.containsKey(component)) {
             throw new IllegalArgumentException("key is missing component \"" + component + "\"");
         }
@@ -253,14 +301,11 @@ public class JSONWebKeyUtil {
      * @return
      */
     public static JSONObject toJSON(JSONWebKeys webKeys) {
-        JSONObject json = new JSONObject();
-        JSONArray array = new JSONArray();
-        for (String key : webKeys.keySet()) {
-            JSONWebKey webKey = webKeys.get(key);
-            array.add(toJSON(webKeys.get(key)));
-        }
-        json.put("keys", array);
-        return json;
+        return getJwkUtil2().toJSON(webKeys);
+    }
+
+    public static JSONObject toJSON(JSONWebKey webKey) {
+        return getJwkUtil2().toJSON(webKey);
     }
 
     /**
@@ -276,10 +321,20 @@ public class JSONWebKeyUtil {
         JSONWebKey jsonWebKey = new JSONWebKey();
         jsonWebKey.privateKey = keyPair.getPrivate();
         jsonWebKey.publicKey = keyPair.getPublic();
+        boolean gotType = false;
+        if (jsonWebKey.privateKey instanceof ECPrivateKey) {
+            jsonWebKey.type = "EC";
+            jsonWebKey.algorithm = "ES256";
+
+        }
         if (jsonWebKey.privateKey instanceof RSAPrivateKey) {
             jsonWebKey.type = "RSA";
-        } else {
-            throw new IllegalArgumentException("Unknown keypair type. Only RSA is supported");
+            jsonWebKey.algorithm = "RS256";
+            gotType = true;
+        }
+
+        if (!gotType) {
+            throw new IllegalArgumentException("Unknown keypair type. Only RSA, Elliptic curves is supported");
         }
 
         Random random = new Random();
@@ -287,42 +342,69 @@ public class JSONWebKeyUtil {
         random.nextBytes(bytes);
         jsonWebKey.id = Base64.encodeBase64URLSafeString(bytes);
         jsonWebKey.use = "sig";
-        jsonWebKey.algorithm = "RS256";
         return jsonWebKey;
     }
 
-    public static JSONObject toJSON(JSONWebKey webKey) {
 
-        if (webKey.type.equals("RSA")) {
-            JSONObject jsonKey = new JSONObject();
-            RSAPublicKey rsaPub = (RSAPublicKey) webKey.publicKey;
-            jsonKey.put(MODULUS, bigIntToString(rsaPub.getModulus()));
-            jsonKey.put(PUBLIC_EXPONENT, bigIntToString(rsaPub.getPublicExponent()));
-            jsonKey.put(ALGORITHM, webKey.algorithm);
-            jsonKey.put(KEY_ID, webKey.id);
-            jsonKey.put(USE, webKey.use);
-            jsonKey.put(KEY_TYPE, "RSA");
-            if (webKey.privateKey != null) {
-                if (webKey.privateKey instanceof RSAPrivateCrtKey) {
-                    // CIL-1193 Support CRT (Chinese remainder theorem) in keys.
-                    RSAPrivateCrtKey privateCrtKey = (RSAPrivateCrtKey) webKey.privateKey;
-                    jsonKey.put(PRIVATE_EXPONENT, bigIntToString(privateCrtKey.getPrivateExponent()));
-                    jsonKey.put(RSA_PRIME_1, bigIntToString(privateCrtKey.getPrimeP()));
-                    jsonKey.put(RSA_PRIME_2, bigIntToString(privateCrtKey.getPrimeQ()));
-                    jsonKey.put(RSA_EXPONENT_1, bigIntToString(privateCrtKey.getPrimeExponentP()));
-                    jsonKey.put(RSA_EXPONENT_2, bigIntToString(privateCrtKey.getPrimeExponentQ()));
-                    jsonKey.put(RSA_COEFFICIENTS, bigIntToString(privateCrtKey.getCrtCoefficient()));
-
-                } else {
-                    // bare bones -- best we can do
-                    RSAPrivateKey privateKey = (RSAPrivateKey) webKey.privateKey;
-                    jsonKey.put(PRIVATE_EXPONENT, bigIntToString(privateKey.getPrivateExponent()));
-                }
-            }
-            return jsonKey;
-        }
-        throw new IllegalArgumentException("Unsupported webkey type \"" + webKey.type + "\".");
+    /**
+     * Sets common elements for all keys.
+     *
+     * @param webKey
+     * @return
+     */
+/*
+    protected static JSONObject initToJSON(JSONWebKey webKey) {
+        JSONObject jsonKey = new JSONObject();
+        jsonKey.put(ALGORITHM, webKey.algorithm);
+        jsonKey.put(KEY_ID, webKey.id);
+        jsonKey.put(USE, webKey.use);
+        jsonKey.put(KEY_TYPE, webKey.type);
+        return jsonKey;
     }
+*/
+
+/*
+    protected static JSONObject toJSONEC(JSONWebKey webKey) {
+        JSONObject jsonKey = initToJSON(webKey);
+        ECPublicKey ecPublicKey = (ECPublicKey) webKey.publicKey;
+        ECPoint w = ecPublicKey.getW();
+        jsonKey.put(EC_COEFFICIENT_X, bigIntToString(w.getAffineX()));
+        jsonKey.put(EC_COEFFICIENT_Y, bigIntToString(w.getAffineY()));
+        jsonKey.put(EC_CURVE, ecPublicKey.getParams().getCurve().toString());
+        if (webKey.privateKey != null) {
+            ECPrivateKey ecPrivateKey = (ECPrivateKey) webKey.privateKey;
+            jsonKey.put(EC_COEFFICIENT_D, bigIntToString(ecPrivateKey.getS()));
+        }
+        return jsonKey;
+    }
+*/
+
+/*    protected static JSONObject toJSONRSA(JSONWebKey webKey) {
+
+        JSONObject jsonKey = initToJSON(webKey);
+        RSAPublicKey rsaPub = (RSAPublicKey) webKey.publicKey;
+        jsonKey.put(MODULUS, bigIntToString(rsaPub.getModulus()));
+        jsonKey.put(PUBLIC_EXPONENT, bigIntToString(rsaPub.getPublicExponent()));
+        if (webKey.privateKey != null) {
+            if (webKey.privateKey instanceof RSAPrivateCrtKey) {
+                // CIL-1193 Support CRT (Chinese remainder theorem) in keys.
+                RSAPrivateCrtKey privateCrtKey = (RSAPrivateCrtKey) webKey.privateKey;
+                jsonKey.put(PRIVATE_EXPONENT, bigIntToString(privateCrtKey.getPrivateExponent()));
+                jsonKey.put(RSA_PRIME_1, bigIntToString(privateCrtKey.getPrimeP()));
+                jsonKey.put(RSA_PRIME_2, bigIntToString(privateCrtKey.getPrimeQ()));
+                jsonKey.put(RSA_EXPONENT_1, bigIntToString(privateCrtKey.getPrimeExponentP()));
+                jsonKey.put(RSA_EXPONENT_2, bigIntToString(privateCrtKey.getPrimeExponentQ()));
+                jsonKey.put(RSA_COEFFICIENTS, bigIntToString(privateCrtKey.getCrtCoefficient()));
+
+            } else {
+                // bare bones -- best we can do
+                RSAPrivateKey privateKey = (RSAPrivateKey) webKey.privateKey;
+                jsonKey.put(PRIVATE_EXPONENT, bigIntToString(privateKey.getPrivateExponent()));
+            }
+        }
+        return jsonKey;
+    }*/
+
 
     /**
      * Very useful utility to take a set of keys and return another set of keys that are only the public parts.
@@ -332,23 +414,12 @@ public class JSONWebKeyUtil {
      * @return
      */
     public static JSONWebKeys makePublic(JSONWebKeys keys) {
-        JSONWebKeys newKeys = new JSONWebKeys(keys.getDefaultKeyID());
-        for (String key : keys.keySet()) {
-                newKeys.put(makePublic(keys.get(key)));
-        }
-        // now we have a clone with no private keys, we need to c
-        return newKeys;
+        return getJwkUtil2().makePublic(keys);
     }
-    public static JSONWebKey  makePublic(JSONWebKey key)  {
-        JSONWebKey newKey = null;
-        try {
-            newKey = key.clone();
-            newKey.privateKey = null;
-            return newKey;
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-            throw new NFWException("cloning not supporting on JSON web keys");
-        }
+
+    public static JSONWebKey makePublic(JSONWebKey key) {
+        return getJwkUtil2().makePublic(key);
+
     }
 
 
@@ -363,12 +434,13 @@ public class JSONWebKeyUtil {
      * @param xsw
      * @throws XMLStreamException
      */
+    // THIS and from XML are used by QDL Modules that have to serialize the state.
     public static void toXML(JSONWebKeys jwks, XMLStreamWriter xsw) throws XMLStreamException {
         xsw.writeStartElement(JSON_WEB_KEYS_TAG);
         if (!isTrivial(jwks.getDefaultKeyID())) {
             xsw.writeAttribute(DEFAULT_KEY_ID_TAG, jwks.getDefaultKeyID());
         }
-        xsw.writeCData(Base64.encodeBase64URLSafeString(toJSON(jwks).toString().getBytes()));
+        xsw.writeCData(Base64.encodeBase64URLSafeString(getJwkUtil2().toJSON(jwks).toString().getBytes()));
         xsw.writeEndElement(); // end JSON web keys
     }
 
@@ -376,7 +448,6 @@ public class JSONWebKeyUtil {
      * This is not a complete deserialization, but is part of a larger scheme. The assumption is that
      * the cursor for the stream is positioned at the start tag for JSON web keys.
      *
-     * @param xer
      * @throws XMLStreamException
      */
     public static JSONWebKeys fromXML(XMLEventReader xer) throws XMLStreamException, InvalidKeySpecException, NoSuchAlgorithmException {
@@ -393,7 +464,7 @@ public class JSONWebKeyUtil {
                 case XMLEvent.CHARACTERS:
                     if (!xe.asCharacters().isWhiteSpace()) {
                         byte[] b = Base64.decodeBase64(xe.asCharacters().getData());
-                        jwks = fromJSON(new String(b));
+                        jwks = getJwkUtil2().fromJSON(new String(b));
                     }
 
                     break;
@@ -410,8 +481,11 @@ public class JSONWebKeyUtil {
     }
 
 
-    public static void main(String[] args) throws Throwable {
+ /*   public static void main(String[] args) throws Throwable {
+        //testPython();
+    }*/
 
+/*    protected static void testPython() throws Throwable {
         JSONWebKeys jsonWebKeys;
 
         File f = new File("/home/ncsa/temp/zzz/python-keys.jwk");
@@ -419,11 +493,30 @@ public class JSONWebKeyUtil {
         JSONWebKeys jwks = fromJSON(f);
         JSONWebKey key = jwks.getDefault();
         System.out.println("keys valid? " + MyKeyUtil.validateKeyPair(key.publicKey, key.privateKey));
-        System.out.println("full key=" + toJSON(key).toString(2));
+        System.out.println("full key=" + getJwkUtil2().toJSON(key).toString(2));
         System.out.println();
         System.out.println("public keys = " + toJSON(makePublic(jwks)).toString(2));
 
         KeyPair kp = MyKeyUtil.generateKeyPair();
         System.out.println(toJSON(create(kp)).toString(2));
+
+    }*/
+
+
+
+
+
+/*   public elliptic curve key
+
     }
+
+    /*
+    Comparison of key size strength for RSA vs elliptic
+    RSA key size (bits)	: ECC key size (bits)
+            1024        :      160
+            2048        :      224
+            3072        :      256
+            7680        :      384
+            15360       :      521
+     */
 }
