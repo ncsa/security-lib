@@ -13,7 +13,6 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.XMLEvent;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.ECPrivateKey;
@@ -126,173 +125,10 @@ public class JSONWebKeyUtil {
      * @param key
      * @return
      */
-/*
-    public static JSONWebKey getJsonWebKey(JSONObject key) throws NoSuchAlgorithmException, InvalidKeySpecException {
 
-        JSONWebKey entry = new JSONWebKey();
-        if (key.containsKey(KEY_ID)) {
-            entry.id = key.getString(KEY_ID);
-        }
-        // The algorithm is optional and not every site supports it.
-        if (key.containsKey(ALGORITHM)) {
-            entry.algorithm = key.getString(ALGORITHM);
-        }
-        if (key.containsKey(USE)) {
-            entry.use = key.getString(USE);
-        }
-        // have to figure out what is in this entry.
-
-        if (key.containsKey(KEY_TYPE)) {
-            entry.type = key.getString(KEY_TYPE);
-            // Note that OA4MP only supports RSA keys at this time, since these are by far the most widely used.
-            if (entry.type.toLowerCase().startsWith("ec")) {
-                return getECJsonWebKey(key, entry);
-
-            }
-            return getRSAJsonWebKey(key, entry, !entry.type.toLowerCase().startsWith("rsa"));
-        } else {
-            throw new IllegalStateException("Error: missing key type");
-        }
-
-
-    }
-*/
-
-    /*
-    secp256r1
-    secp384r1
-    secp521r1 	The NIST elliptic curves as specified in RFC 8422.
-    x25519
-    x448
-    	The elliptic curves as specified in RFC 8446 and RFC 8442.
-    ffdhe2048
-    ffdhe3072
-    ffdhe4096
-    ffdhe6144
-    ffdhe8192
-     */
     // Fix https://github.com/ncsa/oa4mp/issues/131
-   /* protected static JSONWebKey getECJsonWebKey(JSONObject key, JSONWebKey entry) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        BigInteger x = getBI(key, EC_COEFFICIENT_X);
-        BigInteger y = getBI(key, EC_COEFFICIENT_Y);
-        ECPoint z = new ECPoint(x, y);
-         ECField ecField = new ECField() {
-             @Override
-             public int getFieldSize() {
-                 return 162;
-             }
-         };
 
-        EllipticCurve curve = new EllipticCurve(ecField, BigInteger.ONE, BigInteger.TEN);
-        if (key.containsKey(EC_CURVE)) {
-            switch (key.getString(EC_CURVE)) {
-                case "secp256r1":
-                    //  curve = new EllipticCurve()
 
-            }
-        }
-        ECGenParameterSpec gps = new ECGenParameterSpec("secp256r1"); // NIST P-256
-                               X509EncodedKeySpec x509EncodedKeySpec;
-
-        ECParameterSpec parameters = new ECParameterSpec(curve, z, BigInteger.ONE, 1);
-        entry.publicKey = KeyFactory.getInstance("EC").generatePublic(new ECPublicKeySpec(z, parameters));
-        if (key.containsKey(EC_COEFFICIENT_D)) {
-            BigInteger d = getBI(key, EC_COEFFICIENT_D); // in the Java class, this is s.
-
-            // Then we have a private key too.
-            entry.privateKey = KeyFactory.getInstance("EC").generatePrivate(new ECPrivateKeySpec(d, parameters));
-        }
-
-        return entry;
-
-        //ECPublicKeySpec spec = new ECPublicKeySpec(modulus, publicExp);
-
-    }*/
-
-    /*
-    final BigInteger x = new BigInteger(1, Base64.getUrlDecoder().decode(json.getString("x")));
-    final BigInteger y = new BigInteger(1, Base64.getUrlDecoder().decode(json.getString("y")));
-    publicKey = KeyFactory.getInstance("EC").generatePublic(new ECPublicKeySpec(new ECPoint(x, y), parameters.getParameterSpec(ECParameterSpec.class)));
-
-    final BigInteger x = new BigInteger(1, Base64.getUrlDecoder().decode(json.getString("x")));
-    final BigInteger y = new BigInteger(1, Base64.getUrlDecoder().decode(json.getString("y")));
-    final BigInteger d = new BigInteger(1, Base64.getUrlDecoder().decode(json.getString("d")));
-    privateKey = KeyFactory.getInstance("EC").generatePrivate(new ECPrivateKeySpec(d, parameters.getParameterSpec(ECParameterSpec.class)));
-     */
-  /*  protected static JSONWebKey getRSAJsonWebKey(JSONObject key, JSONWebKey entry, boolean skipIt) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        // Key type is required
-        if (skipIt) {
-            DebugUtil.trace(JSONWebKeyUtil.class, "loading JSON webkeys and ignoring key of type " + entry.type);
-        }
-        // have to figure out what is in this entry.
-        if (!(skipIt || key.containsKey(MODULUS))) {
-            return null;
-        }
-        KeyFactory factory = KeyFactory.getInstance("RSA");
-
-        BigInteger modulus = getBI(key, MODULUS);
-        BigInteger publicExp = getBI(key, PUBLIC_EXPONENT);
-
-        RSAPublicKeySpec spec = new RSAPublicKeySpec(modulus, publicExp);
-        PublicKey pub = factory.generatePublic(spec);
-        entry.publicKey = pub;
-
-        if (key.containsKey(PRIVATE_EXPONENT)) {
-            BigInteger privateExp = getBI(key, PRIVATE_EXPONENT);
-
-            if (key.containsKey(RSA_EXPONENT_1)) { // simple minded test if it is a full RSA KEY
-                // CIL-1193 The full explanation is the that CRT = Chinese Remainder Theorem and its use
-                // is documented at https://www.rfc-editor.org/rfc/rfc8017.txt
-                // Keys generated by e.g. Open SSL use this.
-                BigInteger prime1 = getBI(key, RSA_PRIME_1);
-                BigInteger prime2 = getBI(key, RSA_PRIME_2);
-                BigInteger exp1 = getBI(key, RSA_EXPONENT_1);
-                BigInteger exp2 = getBI(key, RSA_EXPONENT_2);
-                BigInteger crtCoef = getBI(key, RSA_COEFFICIENTS);
-
-                RSAPrivateCrtKeySpec keySpec =
-                        new RSAPrivateCrtKeySpec(modulus,
-                                publicExp,
-                                privateExp,
-                                prime1,
-                                prime2,
-                                exp1,
-                                exp2,
-                                crtCoef);
-                PrivateKey privateKey = factory.generatePrivate(keySpec);
-                entry.privateKey = privateKey;
-
-            } else {
-                RSAPrivateKeySpec privateSpec = new RSAPrivateKeySpec(modulus, privateExp);
-                entry.privateKey = factory.generatePrivate(privateSpec);
-            }
-        }
-        return entry;
-    }*/
-
-    /**
-     * Get the {@link BigInteger} from the component.
-     *
-     * @return
-     */
-  /*  public static BigInteger getBI(JSONObject key, String component) {
-        if (!key.containsKey(component)) {
-            throw new IllegalArgumentException("key is missing component \"" + component + "\"");
-        }
-        // CIL-1166 The modulus is always positive, so force the issue since some
-        // python libraries might not send along quite the right sequence of bytes.
-        // In particular, a positive number would be of the form [0,b0,b1,...] as a byte array.
-        // Since the spec says that the modulus must be positive, some python libraries omit the
-        // first byte and would send [b0,b1,...] which would yield a negative modulus which in turn
-        // causes an exception. This next call forces the bytes to be interpreted as positive (so it basically
-        // just adds an initial byte of 0 if its missing):
-        return new BigInteger(1, Base64.decodeBase64(key.getString(component)));
-    }
-
-    protected static String bigIntToString(BigInteger bigInteger) {
-        return Base64.encodeBase64URLSafeString(bigInteger.toByteArray());
-        //return Base64.encodeBase64String(bigInteger.toByteArray());
-    }
 
     /**
      * Serialize a set of keys (as a java object) to JSON.
@@ -352,58 +188,7 @@ public class JSONWebKeyUtil {
      * @param webKey
      * @return
      */
-/*
-    protected static JSONObject initToJSON(JSONWebKey webKey) {
-        JSONObject jsonKey = new JSONObject();
-        jsonKey.put(ALGORITHM, webKey.algorithm);
-        jsonKey.put(KEY_ID, webKey.id);
-        jsonKey.put(USE, webKey.use);
-        jsonKey.put(KEY_TYPE, webKey.type);
-        return jsonKey;
-    }
-*/
 
-/*
-    protected static JSONObject toJSONEC(JSONWebKey webKey) {
-        JSONObject jsonKey = initToJSON(webKey);
-        ECPublicKey ecPublicKey = (ECPublicKey) webKey.publicKey;
-        ECPoint w = ecPublicKey.getW();
-        jsonKey.put(EC_COEFFICIENT_X, bigIntToString(w.getAffineX()));
-        jsonKey.put(EC_COEFFICIENT_Y, bigIntToString(w.getAffineY()));
-        jsonKey.put(EC_CURVE, ecPublicKey.getParams().getCurve().toString());
-        if (webKey.privateKey != null) {
-            ECPrivateKey ecPrivateKey = (ECPrivateKey) webKey.privateKey;
-            jsonKey.put(EC_COEFFICIENT_D, bigIntToString(ecPrivateKey.getS()));
-        }
-        return jsonKey;
-    }
-*/
-
-/*    protected static JSONObject toJSONRSA(JSONWebKey webKey) {
-
-        JSONObject jsonKey = initToJSON(webKey);
-        RSAPublicKey rsaPub = (RSAPublicKey) webKey.publicKey;
-        jsonKey.put(MODULUS, bigIntToString(rsaPub.getModulus()));
-        jsonKey.put(PUBLIC_EXPONENT, bigIntToString(rsaPub.getPublicExponent()));
-        if (webKey.privateKey != null) {
-            if (webKey.privateKey instanceof RSAPrivateCrtKey) {
-                // CIL-1193 Support CRT (Chinese remainder theorem) in keys.
-                RSAPrivateCrtKey privateCrtKey = (RSAPrivateCrtKey) webKey.privateKey;
-                jsonKey.put(PRIVATE_EXPONENT, bigIntToString(privateCrtKey.getPrivateExponent()));
-                jsonKey.put(RSA_PRIME_1, bigIntToString(privateCrtKey.getPrimeP()));
-                jsonKey.put(RSA_PRIME_2, bigIntToString(privateCrtKey.getPrimeQ()));
-                jsonKey.put(RSA_EXPONENT_1, bigIntToString(privateCrtKey.getPrimeExponentP()));
-                jsonKey.put(RSA_EXPONENT_2, bigIntToString(privateCrtKey.getPrimeExponentQ()));
-                jsonKey.put(RSA_COEFFICIENTS, bigIntToString(privateCrtKey.getCrtCoefficient()));
-
-            } else {
-                // bare bones -- best we can do
-                RSAPrivateKey privateKey = (RSAPrivateKey) webKey.privateKey;
-                jsonKey.put(PRIVATE_EXPONENT, bigIntToString(privateKey.getPrivateExponent()));
-            }
-        }
-        return jsonKey;
-    }*/
 
 
     /**
@@ -478,36 +263,6 @@ public class JSONWebKeyUtil {
             xe = xer.nextEvent();
         }
         throw new IllegalArgumentException("Error: missing closing tag for element " + JSON_WEB_KEYS_TAG);
-    }
-
-
- /*   public static void main(String[] args) throws Throwable {
-        //testPython();
-    }*/
-
-/*    protected static void testPython() throws Throwable {
-        JSONWebKeys jsonWebKeys;
-
-        File f = new File("/home/ncsa/temp/zzz/python-keys.jwk");
-        //  File f = new File("/home/ncsa/temp/zzz/jwks.jwk");
-        JSONWebKeys jwks = fromJSON(f);
-        JSONWebKey key = jwks.getDefault();
-        System.out.println("keys valid? " + MyKeyUtil.validateKeyPair(key.publicKey, key.privateKey));
-        System.out.println("full key=" + getJwkUtil2().toJSON(key).toString(2));
-        System.out.println();
-        System.out.println("public keys = " + toJSON(makePublic(jwks)).toString(2));
-
-        KeyPair kp = MyKeyUtil.generateKeyPair();
-        System.out.println(toJSON(create(kp)).toString(2));
-
-    }*/
-
-
-
-
-
-/*   public elliptic curve key
-
     }
 
     /*

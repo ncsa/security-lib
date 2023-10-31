@@ -101,15 +101,16 @@ return ecKey;
     @Override
     protected JSONWebKey clone() throws CloneNotSupportedException {
         JSONWebKey newKey = new JSONWebKey();
-        newKey.id = id;
         newKey.algorithm = algorithm;
-        newKey.use = use;
-        newKey.type = type;
-        newKey.publicKey = publicKey;
-        newKey.privateKey = privateKey;
+        newKey.curve = curve;
         newKey.expiresAt = expiresAt;
+        newKey.id = id;
         newKey.issuedAt = issuedAt;
         newKey.notValidBefore = notValidBefore;
+        newKey.privateKey = privateKey;
+        newKey.publicKey = publicKey;
+        newKey.type = type;
+        newKey.use = use;
         return newKey;
     }
 

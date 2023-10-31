@@ -2,9 +2,9 @@ package edu.uiuc.ncsa.security.util.jwk;
 
 import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.*;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import net.sf.json.JSON;
@@ -27,6 +27,7 @@ import java.security.interfaces.*;
 import java.security.spec.ECPoint;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.Random;
 
 import static edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil.*;
@@ -43,6 +44,7 @@ public class JWKUtil2 {
     public static final String KEY_ID = "kid";
     public static final String USE = "use";
     public static final String KEY_TYPE = "kty";
+    public static final String EC_CURVE_KEY = "crv";
     public static final String ISSUED_AT = "iat";
     public static final String NOT_VALID_BEFORE = "nbf";
     public static final String EXPIRES_AT = "exp";
@@ -154,6 +156,33 @@ public class JWKUtil2 {
 
     public JSONWebKey getJsonWebKey(JSONObject json) {
         try {
+            /* Here's the rub. In https://www.rfc-editor.org/rfc/rfc7518.html#section-3.4 it specifies what
+               the default are and in practice, people do not include the crv for the JWK, just the
+               algorithm. JOSE will not deserialize without the right crv, so add it:
+            +-------------------+-------------------------------+
+            | "alg" Param Value | Digital Signature Algorithm   |
+            +-------------------+-------------------------------+
+            | ES256             | ECDSA using P-256 and SHA-256 |
+            | ES384             | ECDSA using P-384 and SHA-384 |
+            | ES512             | ECDSA using P-521 and SHA-512 |
+            +-------------------+-------------------------------+
+            */
+
+            if (!json.containsKey(EC_CURVE_KEY)) {
+                switch (json.getString(ALGORITHM)) {
+                    case ES_256K:
+                    case ES_256:
+                        json.put(EC_CURVE_KEY, EC_CURVE_P_256);
+                        break;
+                    case ES_384:
+                        json.put(EC_CURVE_KEY, EC_CURVE_P_384);
+                        break;
+                    case ES_512:
+                        json.put(EC_CURVE_KEY, EC_CURVE_P_521);
+                        break;
+                    // default is do nothing, just in case it is not an elliptic curve.
+                }
+            }
             JWK jwk = JWK.parse(json.toString());
             JSONWebKey jsonWebKey = new JSONWebKey(jwk);
             return jsonWebKey;
@@ -247,7 +276,7 @@ public class JWKUtil2 {
         ECPoint w = ecPublicKey.getW();
         jsonKey.put("x", bigIntToString(w.getAffineX()));
         jsonKey.put("y", bigIntToString(w.getAffineY()));
-        jsonKey.put("curv", ecPublicKey.getParams().getCurve().toString());
+        jsonKey.put("crv", webKey.curve); //as per rfc7518.
         if (webKey.privateKey != null) {
             ECPrivateKey ecPrivateKey = (ECPrivateKey) webKey.privateKey;
             jsonKey.put("d", bigIntToString(ecPrivateKey.getS()));
@@ -281,27 +310,6 @@ public class JWKUtil2 {
         return jsonKey;
     }
 
-/*
-    public JSONObject toJSON(JSONWebKey webKey) {
-        switch (webKey.type) {
-            case "RSA":
-                if (webKey.hasJOSEJWK()) {
-                    // This detour is the easiest way to get it right, at least for now
-                    return JSONObject.fromObject(webKey.getJOSEJWK().toString());
-                } else {
-                    return toJSONRSA(webKey);
-                }
-            case "EC":
-                if (webKey.hasJOSEJWK()) {
-                    return JSONObject.fromObject(webKey.getJOSEJWK().toString());
-                } else {
-                    return toJSONEC(webKey);
-                }
-        }
-        throw new IllegalArgumentException("Unsupported web key type \"" + webKey.type + "\".");
-    }
-*/
-
 
     /**
      * Create a webkey using the given named curve. Currently supported names are
@@ -321,7 +329,6 @@ public class JWKUtil2 {
      */
 
     public JSONWebKey createECKey() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-        KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
         return createECKey(EC_CURVE_P_256, "ES256");
     }
 
@@ -349,6 +356,7 @@ public class JWKUtil2 {
         JWK jwk = new ECKey.Builder(curve, (ECPublicKey) keyPair.getPublic())
                 .privateKey((ECPrivateKey) keyPair.getPrivate())
                 .keyID(createID())
+                .issueTime(new Date())
                 .algorithm(algorithm)
                 .keyUse(new KeyUse("sig"))
                 .build();
@@ -378,9 +386,11 @@ public class JWKUtil2 {
         JWK jwk = new RSAKey.Builder((RSAPublicKey) keyPair.getPublic())
                 .privateKey((RSAPrivateKey) keyPair.getPrivate())
                 .keyID(createID())
+                .issueTime(new Date())
                 .algorithm(algorithm)
                 .keyUse(new KeyUse("sig"))
                 .build();
+
         ;
 
         return new JSONWebKey(jwk);
@@ -428,6 +438,5 @@ public class JWKUtil2 {
 
     protected String bigIntToString(BigInteger bigInteger) {
         return Base64.encodeBase64URLSafeString(bigInteger.toByteArray());
-        //return Base64.encodeBase64String(bigInteger.toByteArray());
     }
 }
