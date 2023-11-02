@@ -180,7 +180,8 @@ public class JWKUtil2 {
                     case ES_512:
                         json.put(EC_CURVE_KEY, EC_CURVE_P_521);
                         break;
-                    // default is do nothing, just in case it is not an elliptic curve.
+                    // default is do nothing, just in case it is not an elliptic curve.https://test.cilogon.org/authorize?scope=openid&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A9443%2Fnot-ready&state=tlStIUF5d59xv4ImkRF_KH-04UfOo3iSSgq-GU0BTwA&nonce=dvWmeva9HEHo-u4w1wLYS1B_3z55mRTQGBs_5QeFMug&prompt=login&client_id=test%3Atest%2Fucsd
+                    // }
                 }
             }
             JWK jwk = JWK.parse(json.toString());

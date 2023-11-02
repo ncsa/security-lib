@@ -4,12 +4,11 @@ import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import org.apache.http.client.HttpClient;
-import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 
 import javax.net.ssl.*;
 import java.io.IOException;
@@ -187,6 +186,7 @@ public class VerifyingHTTPClientFactory implements Logable {
     public HttpClient getClient(String host) throws IOException, NoSuchAlgorithmException, KeyStoreException {
         return getClient(host, 0, 0);
     }
+
     //CIL-1174: Allow for use of default trust manager.
     protected X509TrustManager getDefaultTrustManager() throws NoSuchAlgorithmException, KeyStoreException {
         TrustManagerFactory tmf = TrustManagerFactory
@@ -224,20 +224,26 @@ public class VerifyingHTTPClientFactory implements Logable {
     public HttpClient getClient(X509TrustManager x509TrustManager, int connectionTimeout,
                                 int socketTimeout) {
         HttpClient httpclient = null;
-        try {
-            if (0 < connectionTimeout && 0 < socketTimeout) {
-                HttpParams httpParams = new BasicHttpParams();
-                HttpConnectionParams.setConnectionTimeout(httpParams, connectionTimeout);
-                HttpConnectionParams.setSoTimeout(httpParams, socketTimeout);
-                httpclient = new DefaultHttpClient(httpParams);
-            } else {
-                // just take the defaults
-                httpclient = new DefaultHttpClient();
 
-            }
-            // this is how to configure SSL with a custom socket factory for HttpClient 4.0+
-            httpclient.getConnectionManager().getSchemeRegistry().register(
-                    new Scheme("https", getSocketFactory(x509TrustManager), 443));
+        try {
+         /* Protocol changed for Cookie so now we are getting a bunch of failures
+            against more modern servers. Issue is not creating an http client, it is that
+            the old client made by DefaultHttpClient has a very different way of setting
+            a custom SSL socket than with the newer class created by the builder.
+            We HAVE to have custom ssl sockets or a lot of things cease to work.
+         */
+
+            // Fix https://github.com/ncsa/security-lib/issues/25
+            RequestConfig.Builder requestBuilder = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD);
+
+            if (0 < connectionTimeout) requestBuilder.setConnectTimeout(connectionTimeout);
+            if (0 < socketTimeout) requestBuilder.setSocketTimeout(socketTimeout);
+
+            HttpClientBuilder clientbuilder = HttpClients.custom();
+            clientbuilder = clientbuilder.setSSLSocketFactory(getSocketFactory(x509TrustManager));
+            clientbuilder.setDefaultRequestConfig(requestBuilder.build());
+
+            httpclient = clientbuilder.build();
             debug("done creating https client = " + httpclient);
             return httpclient;
         } catch (Throwable t) {
