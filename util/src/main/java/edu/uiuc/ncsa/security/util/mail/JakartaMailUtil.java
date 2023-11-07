@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.security.util.mail;
 
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import jakarta.mail.Session;
 
-import javax.mail.Session;
 import javax.naming.NamingException;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -16,19 +16,17 @@ import java.util.Properties;
  * <p>Created by Jeff Gaynor<br>
  * on 10/5/11 at  1:18 PM
  */
-public class MailUtil implements MailUtilInterface {
+public class JakartaMailUtil implements MailUtilInterface {
     public Session getSession(Properties props) throws NamingException {
         return Session.getDefaultInstance(props);
     }
 
-    public MailUtil(MyLoggingFacade myLogger) {
+    public JakartaMailUtil(MyLoggingFacade myLogger) {
         this.myLogger = myLogger;
     }
 
 
-
-
-    public MailUtil() {
+    public JakartaMailUtil() {
         try {
             mailEnvironment = new MailEnvironment(false, null, -1, null, null, null, null, null, false, false);
         } catch (Throwable x) {
@@ -36,28 +34,23 @@ public class MailUtil implements MailUtilInterface {
         }
     }
 
-    public MailUtil(MailEnvironment me) {
+    public JakartaMailUtil(MailEnvironment me) {
         mailEnvironment = me;
     }
 
-    @Override
     public boolean isEnabled() {
         return getMailEnvironment().mailEnabled;
     }
 
-    @Override
     public MailEnvironment getMailEnvironment() {
         return mailEnvironment;
     }
 
     MailEnvironment mailEnvironment;
 
-    @Override
     synchronized public boolean sendMessage(String subjectTemplate, String messageTemplate, Map replacements) {
         return sendMessage(subjectTemplate, messageTemplate, replacements, null);
     }
-
-
 
     /**
      * This allows for sending with a specific subject and message template. This is useful for
@@ -70,7 +63,6 @@ public class MailUtil implements MailUtilInterface {
      * @param replacements
      * @return
      */
-    @Override
     synchronized public boolean sendMessage(String subjectTemplate,
                                             String messageTemplate,
                                             Map replacements,
@@ -87,7 +79,7 @@ public class MailUtil implements MailUtilInterface {
                                                String messageTemplate,
                                                Map replacements,
                                                String newRecipients) {
-        MailSenderThread mst = new MailSenderThread(this, subjectTemplate, messageTemplate, replacements, newRecipients);
+        JakartaMailSenderThread mst = new JakartaMailSenderThread(this, subjectTemplate, messageTemplate, replacements, newRecipients);
         mst.start();
         return true;
     }
@@ -105,7 +97,6 @@ public class MailUtil implements MailUtilInterface {
      */
     // Probable fix for CIL-324: a sudden attempt to send many messages causes strange failures.
     // This looks like a synchronization issue, so this method is now synchronized.
-    @Override
     synchronized public boolean sendMessage(Map replacements) {
 
         try {

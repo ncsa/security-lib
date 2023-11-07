@@ -10,10 +10,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/JakartaMailSenderThread.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/JakartaMailUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailEnvironment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailSenderThread.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailUtilInterface.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JSONWebKey.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JSONWebKey.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JSONWebKeyUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JSONWebKeyUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JWKUtil2.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JWKUtil2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/mail/ServletMailUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/mail/ServletMailUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailUtilProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailUtilProvider.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,8 +34,8 @@
       <list>
         <option value="HTML File" />
         <option value="package-info" />
-        <option value="Interface" />
         <option value="Class" />
+        <option value="Interface" />
       </list>
     </option>
   </component>
@@ -71,27 +77,27 @@
     <option name="sortByType" value="true" />
     <option name="sortKey" value="BY_TYPE" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;11 (2)&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/security-lib/util/src/main/resources&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.projectsettings.compiler.javacompiler&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "jdk.selected.JAVA_MODULE": "11 (2)",
+    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/security-lib/util/src/main/resources",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Libraries",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "reference.projectsettings.compiler.javacompiler",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/util/src/main/resources" />
@@ -107,14 +113,19 @@
       <recent name="$PROJECT_DIR$/sas-server/src/main" />
     </key>
     <key name="ExtractSuperBase.RECENT_KEYS">
+      <recent name="edu.uiuc.ncsa.security.util.mail" />
       <recent name="edu.uiuc.ncsa.security.core.cache" />
       <recent name="edu.uiuc.ncsa.security.storage" />
     </key>
     <key name="MoveInnerDialog.RECENTS_KEY">
+      <recent name="edu.uiuc.ncsa.security.util.mail" />
       <recent name="edu.uiuc.ncsa.security.storage.events" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="edu.uiuc.ncsa.security.util" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="edu.uiuc.ncsa.security.util.mail" />
     </key>
   </component>
   <component name="RunManager" selected="Java Scratch.Scratch">
@@ -128,20 +139,6 @@
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
       <Port>5050</Port>
-    </configuration>
-    <configuration name="JSONWebKeyUtil" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil" />
-      <module name="util" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.util.jwk.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
     </configuration>
     <configuration name="TemplateUtil" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.configuration.TemplateUtil" />
@@ -203,6 +200,15 @@
       </method>
     </configuration>
     <configuration name="Scratch" type="Java Scratch" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Scratch" />
+      <module name="util" />
+      <option name="SCRATCH_FILE_URL" value="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_1.java" />
+      <shortenClasspath name="NONE" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Scratch1" type="Java Scratch" temporary="true">
       <option name="MAIN_CLASS_NAME" value="Scratch" />
       <module name="util" />
       <option name="SCRATCH_FILE_URL" value="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.java" />
@@ -300,17 +306,17 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Application.JSONWebKeyUtil" />
       <item itemvalue="Application.TestBase" />
       <item itemvalue="Application.TemplateUtil" />
       <item itemvalue="Application.XProperties" />
       <item itemvalue="Java Scratch.Scratch" />
+      <item itemvalue="Java Scratch.Scratch1" />
       <item itemvalue="Tomcat Server.SAS Servlet" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Java Scratch.Scratch" />
-        <item itemvalue="Application.JSONWebKeyUtil" />
+        <item itemvalue="Java Scratch.Scratch1" />
         <item itemvalue="Application.XProperties" />
         <item itemvalue="Application.TemplateUtil" />
         <item itemvalue="Application.TestBase" />
@@ -408,6 +414,8 @@
       <workItem from="1697978748756" duration="15917000" />
       <workItem from="1698248394435" duration="46016000" />
       <workItem from="1698668312828" duration="8216000" />
+      <workItem from="1699037740840" duration="3714000" />
+      <workItem from="1699183837180" duration="33416000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -752,7 +760,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <option name="localTasksCounter" value="52" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -761,7 +769,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="recent updates for website." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/18. Added tests for multiple-inheritance engine." />
     <MESSAGE value="Update website" />
     <MESSAGE value="Changed how CLI finds items" />
@@ -786,7 +793,8 @@
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/23 corrupt database causing SQL connection leak." />
     <MESSAGE value="Changges to constructors and initialization of logging. In cases where loggers are used by other components with existing logging (e.g. being used as part of QDL), the same logger should be used everywhere. Allow for it to be injected at instantiation.&#10;&#10;Allow for a command to clear a store of all entries in the CLI. This is not needed often, but when it is (e.g. after database corruption) it is essential." />
     <MESSAGE value="Adoption of JOSE to do Elliptic Curve cryptography." />
-    <option name="LAST_COMMIT_MESSAGE" value="Adoption of JOSE to do Elliptic Curve cryptography." />
+    <MESSAGE value="https://github.com/ncsa/security-lib/issues/25" />
+    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/25" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -796,11 +804,6 @@
           <url>file://$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/admin/SASCommands.java</url>
           <line>154</line>
           <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/MyLoggingFacade.java</url>
-          <line>97</line>
-          <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/WebClientConfig.java</url>
@@ -833,19 +836,14 @@
           <option name="timeStamp" value="11" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JSONWebKey.java</url>
-          <line>38</line>
-          <option name="timeStamp" value="12" />
+          <url>jar://$MAVEN_REPOSITORY$/com/sun/mail/javax.mail/1.6.2/javax.mail-1.6.2-sources.jar!/javax/mail/Service.java</url>
+          <line>527</line>
+          <option name="timeStamp" value="24" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JWKUtil2.java</url>
-          <line>362</line>
-          <option name="timeStamp" value="13" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$APPLICATION_CONFIG_DIR$/scratches/scratch.java</url>
-          <line>38</line>
-          <option name="timeStamp" value="14" />
+          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/JakartaMailSenderThread.java</url>
+          <line>77</line>
+          <option name="timeStamp" value="27" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

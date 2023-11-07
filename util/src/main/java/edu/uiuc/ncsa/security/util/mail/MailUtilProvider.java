@@ -5,7 +5,6 @@ import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.HierarchicalConfigProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import edu.uiuc.ncsa.security.util.mail.MailUtil.MailEnvironment;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.util.ArrayList;

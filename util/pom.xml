@@ -54,7 +54,7 @@
                     <includes>
                         <include>**/*Suite.java</include>
                     </includes>
-                  <!--  <forkMode>perTest</forkMode>-->
+                    <!--  <forkMode>perTest</forkMode>-->
                     <forkCount>1</forkCount>
                     <reuseForks>false</reuseForks>
 
@@ -99,12 +99,67 @@
             <scope>compile</scope>
         </dependency>
 
+        <!--
+                <dependency>
+                    <groupId>com.sun.mail</groupId>
+                    <artifactId>javax.mail</artifactId>
+                    <version>1.6.2</version>
+                    <scope>provided</scope>
+                </dependency>
+        -->
+
+        <!-- This only works for compiling even though it does not seem like it. You must
+             have the appropriate jar in your class path. It is kept because there are
+             classes that use it, but nothing will run if you try to load them, giving
+              a provider exception.-->
+        <dependency>
+            <groupId>jakarta.mail</groupId>
+            <artifactId>jakarta.mail-api</artifactId>
+            <version>2.1.2</version>
+        </dependency>
+        <!--
+            Note on dependencies with mail. Jakarta mail succeeds Java Mail, but is part of Jakarta EE
+            which is the successor of Java EE. This means that there are a lot of dependencies and oddities
+            Java mail 1.6.7 came out in 2000 and should actually provide support for TLS 1.3.
+        -->
         <dependency>
             <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-            <version>1.6.2</version>
-            <scope>provided</scope>
+            <artifactId>jakarta.mail</artifactId>
+            <version>1.6.7</version>
         </dependency>
+
+        <!--   Following commented out bits are for trying to get Jakarta mail to
+               work. These took a lot of tracking down.
+               <dependency>
+                    <groupId>jakarta.platform</groupId>
+                    <artifactId>jakarta.jakartaee-api</artifactId>
+                    <version>10.0.0</version>
+                    <scope>provided</scope>
+                </dependency>-->
+        <!--   API that goes with most recent public jar release, 2.0.1
+              <dependency>
+                    <groupId>jakarta.mail</groupId>
+                    <artifactId>jakarta.mail-api</artifactId>
+                    <version>2.0.1</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>jakarta.activation</groupId>
+                    <artifactId>jakarta.activation-api</artifactId>
+                    <version>2.0.1</version>
+                </dependency>-->
+        <!-- https://mvnrepository.com/artifact/com.sun.mail/jakarta.mail
+             This is the jar. Issue is that there is a clash with javax classes,
+             (as in they manipulate the class loader, use introspection to instantiate classes,
+             then identically named classes (e.g. Transport) cause class cast errors.) One option
+             is to do really nasty low level class loader surgery, or just not use both javax and jakarta
+             mail in the same application. Upshot: We can't have a partial upgrade with both.-->
+        <!--      <dependency>
+                  <groupId>com.sun.mail</groupId>
+                  <artifactId>jakarta.mail</artifactId>
+                  <version>2.0.1</version>
+              </dependency>-->
+
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>

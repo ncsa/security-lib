@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.servlet.mail;
 
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.util.mail.MailEnvironment;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
 
 import javax.mail.Session;
