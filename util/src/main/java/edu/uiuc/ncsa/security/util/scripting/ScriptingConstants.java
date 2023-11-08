@@ -44,6 +44,8 @@ public interface ScriptingConstants {
     String SRE_TX_REQ_AUDIENCE = "tx_audience";
     String SRE_REQ_FLOW_STATES = "flow_states";
     String SRE_REQ_CLAIM_SOURCES = "claim_sources";
+    String SRE_REQ_MAIL_CONFIG = "mail_cfg";
+    String SRE_REQ_MAIL_MESSAGE = "mail_message";
     String SRE_REQ_EXTENDED_ATTRIBUTES = "eas";
     String[] SRE_PHASES = {
             SRE_EXEC_INIT,

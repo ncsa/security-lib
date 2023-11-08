@@ -24,7 +24,7 @@ public class MailEnvironment extends AbstractEnvironment implements MailConfigur
         this.mailEnabled = mailEnabled;
     }
 
-    boolean starttls = false;
+
 
     /**
      * Populate from a map
@@ -59,7 +59,6 @@ public class MailEnvironment extends AbstractEnvironment implements MailConfigur
         this.starttls = starttls;
     }
 
-    String username;
 
     public MailEnvironment setUsername(String username) {
         this.username = username;
@@ -198,21 +197,25 @@ public class MailEnvironment extends AbstractEnvironment implements MailConfigur
 
     }
 
-    boolean mailEnabled;
-    boolean useSSL;
 
 
-    String from = null;
-    List<String> carbonCopy = null;
-    List<String> blindCarbonCopy = null;
-    String password;
-    String server;
-    int port = -1;
-    String messageTemplate;
-    String subjectTemplate;
+    public List<String> blindCarbonCopy = null;
+    public List<String> carbonCopy = null;
     public List<String> recipients;
-    String replyTo;
-    String contentType = null;
+    public String contentType = null;
+    public String from = null;
+    public String messageTemplate;
+    public String password;
+    public String replyTo;
+    public String server;
+    public String subjectTemplate;
+    public boolean mailEnabled;
+    public boolean useSSL;
+    public int port = -1;
+    public  boolean starttls = false;
+    public String username;
+
+
 
     public List<String> parseRecipients(String x) throws AddressException {
         List<String> z = new ArrayList<>();
