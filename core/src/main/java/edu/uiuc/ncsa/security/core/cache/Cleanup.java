@@ -29,6 +29,22 @@ import java.util.*;
  * on 7/12/11 at  11:39 AM
  */
 public class Cleanup<K, V> extends MyThread {
+    /**
+     * If this set true, then any failures cause the cleanup to stop.<br/><br/>
+     * If false, then this will attempt to remove all elements. Failures are logged in the
+     * {@link #getFailures()} list.
+     * @return
+     */
+    // Fixes https://github.com/ncsa/security-lib/issues/27
+    public boolean isFailOnError() {
+        return failOnError;
+    }
+
+    public void setFailOnError(boolean failOnError) {
+        this.failOnError = failOnError;
+    }
+
+    boolean failOnError = false;
     public Cleanup(MyLoggingFacade logger, String name) {
         super(name, logger);
     }
@@ -57,6 +73,18 @@ public class Cleanup<K, V> extends MyThread {
     }
     Store store;
 
+    /**
+     * List of failures. Each entry is for the form
+     * <pre>
+     *     id: message
+     * </pre>
+     * @return
+     */
+    public List<String> getFailures() {
+        return failures;
+    }
+
+    List<String> failures;
 
     public Store getStore() {
         return store;
@@ -84,6 +112,9 @@ public class Cleanup<K, V> extends MyThread {
             info("removing lock for " + getName() + " at " + new Date());
             getStore().remove(lockID);
             info("removed lock for " + getName());
+            if(0 < getFailures().size()) {
+                warn("cleanup failed to remove the following items: " + getFailures());
+            }
         }
     }
     /**
@@ -92,6 +123,7 @@ public class Cleanup<K, V> extends MyThread {
      */
     protected List<V> oldAge() {
         LinkedList<V> linkedList = new LinkedList<V>();
+        failures = new ArrayList<>();
         if (getMap().size() == 0) {
             debug("empty map for " + getName());
             return linkedList;
@@ -111,9 +143,17 @@ public class Cleanup<K, V> extends MyThread {
                     if (!rp.retain(key, co)) {
                         if(!isTestMode()){
                             debug("removing " + key);
-                            getMap().remove(key);
+                            // Fixes https://github.com/ncsa/security-lib/issues/27
+                            try {
+                                getMap().remove(key);
+                                linkedList.add(co);
+                            }catch(Throwable t){
+                                failures.add(key + ": " + t.getMessage());
+                                if(failOnError){
+                                    throw t;
+                                }
+                            }
                         }
-                        linkedList.add(co);
                     }
                 }
             }

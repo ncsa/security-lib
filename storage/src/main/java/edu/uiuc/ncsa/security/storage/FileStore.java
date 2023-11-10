@@ -41,7 +41,7 @@ import java.util.*;
  * <p>Created by Jeff Gaynor<br>
  * on 11/3/11 at  1:54 PM
  */
-public abstract class FileStore<V extends Identifiable> extends IndexedStreamStore<V>  {
+public abstract class FileStore<V extends Identifiable> extends IndexedStreamStore<V> {
 
     /**
      * Since administrators can and have inadvertently changed directory or file permissions while
@@ -143,7 +143,6 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         return getItemFile(t.getIdentifierString());
     }
 
-    HashSet<String> failures = new HashSet<>();
 
     protected File getItemFile(String identifier) {
         checkPermissions();
@@ -317,9 +316,10 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
     public Set<Identifier> keySet() {
         checkPermissions();
         HashSet<Identifier> ids = new HashSet<Identifier>(); // have to work with a copy or get concurrent modification exceptions
+        HashSet<String> failures = new HashSet<>(); // keep track of failures so we don't get in some weird loop.
+
         String[] filenames = storageDirectory.list();
         for (String filename : filenames) {
-
             File f = new File(storageDirectory, filename);
             try {
                 V t = null;
@@ -331,9 +331,13 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
                 }
             } catch (Throwable t) {
                 failures.add(f.getAbsolutePath());
-                System.out.println(t.getMessage());
+                DebugUtil.info("failed to parse file " + f.getAbsolutePath() + ":" + t.getMessage());
             }
         }
+        if (0 < failures.size()) {
+            DebugUtil.info("failed to parse a total of " + failures.size() + " files in " + storageDirectory.getAbsolutePath());
+        }
+
         return ids;
     }
 

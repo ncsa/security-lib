@@ -11,8 +11,10 @@
   <component name="ChangeListManager">
     <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailEnvironment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/scripting/ScriptingConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/scripting/ScriptingConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cache/Cleanup.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cache/Cleanup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/skin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/skin/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/skin/src/it/settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/skin/src/it/settings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/FileStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/FileStore.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,27 +72,27 @@
     <option name="sortByType" value="true" />
     <option name="sortKey" value="BY_TYPE" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "jdk.selected.JAVA_MODULE": "11 (2)",
-    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/security-lib/util/src/main/resources",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Libraries",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "reference.projectsettings.compiler.javacompiler",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;11 (2)&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/security-lib/util/src/main/resources&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.projectsettings.compiler.javacompiler&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/util/src/main/resources" />
@@ -408,7 +410,8 @@
       <workItem from="1698248394435" duration="46016000" />
       <workItem from="1698668312828" duration="8216000" />
       <workItem from="1699037740840" duration="3714000" />
-      <workItem from="1699183837180" duration="46313000" />
+      <workItem from="1699183837180" duration="62344000" />
+      <workItem from="1699633749056" duration="1902000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -753,7 +756,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="54" />
+    <option name="localTasksCounter" value="55" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -762,7 +765,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Changed how CLI finds items" />
     <MESSAGE value="unused client machinery moved to OA4MP. No need for it here." />
     <MESSAGE value="Last checkin before rolling release." />
     <MESSAGE value="RFC 7523 support https://github.com/ncsa/oa4mp/issues/101" />
@@ -787,7 +789,8 @@
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/25" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/26 Updated the mail utilities since they were out of date and made using them a lot easier. Need to upgrade to Java Mail 1.6.7 to get support for anything after 2008. This probably should have been done in our update from Java 1.8 to Java 11." />
     <MESSAGE value="needed to set the scope for the Java mail jar to provided." />
-    <option name="LAST_COMMIT_MESSAGE" value="needed to set the scope for the Java mail jar to provided." />
+    <MESSAGE value="https://github.com/ncsa/security-lib/issues/26 final changes." />
+    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/26 final changes." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
