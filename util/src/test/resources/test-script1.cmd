@@ -7,4 +7,5 @@ echo('The environment has key0=${key0}');
 # script but since this is the last thing in the script, it just terminates it a wee bit earlier.
 # You should see a stack trace with the argument as the message.
 echo('You should see a stack trace next...');
-if[contains('f','foo')]then[raiseError('this is an exception')];
+# 11/11/2023 disabling this test since functors are going away and we don't need to see a stack trace
+#if[contains('f','foo')]then[raiseError('this is an exception')];

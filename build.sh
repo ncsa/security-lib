@@ -2,14 +2,15 @@
 NCSA_ROOT=$NCSA_DEV_INPUT/security-lib
 
 cd $NCSA_ROOT
-echo 'Changing to ' $NCSA_ROOT
+echo 'building NCSA Sec-Lib'
 
-mvn clean install
+mvn clean install > maven.log
 
 if [[ $? -ne 0 ]] ; then
     echo "NCSA maven build failed, exiting..."
     exit 1
 fi
+echo '     ... done!'
 
 # javadoc and site package will fail since Java 8's sun packages are not allowed
 # for export. This can be fixed with compiler options in the surefire and compile
