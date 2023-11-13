@@ -377,8 +377,7 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
     @Override
     public int size(boolean includeVersions) {
         if (includeVersions) {
-            return storageDirectory.list().length;
-
+            return (int) storageDirectory.length();
         }
         int count = 0;
         Set<Identifier> keys = keySet();
