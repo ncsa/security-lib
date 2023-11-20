@@ -36,9 +36,35 @@ return ecKey;
 
     public JSONWebKey(JWK jwk) {
         id = jwk.getKeyID();
-        algorithm = jwk.getAlgorithm().getName();
-        use = jwk.getKeyUse().getValue();
-        type = jwk.getKeyType().getValue();
+        // Fix https://github.com/ncsa/security-lib/issues/28
+        // Be more forgiving of possibly missing values, since this also allows
+        // for updating these later.
+        if(jwk.getAlgorithm() != null) {
+            algorithm = jwk.getAlgorithm().getName();
+        }
+        if(jwk.getKeyUse() != null) {
+            use = jwk.getKeyUse().getValue();
+        }
+        if(jwk.getKeyType() != null) {
+            type = jwk.getKeyType().getValue();
+            try {
+                if (jwk.getKeyType().getValue().equals("RSA")) {
+                    rsaKey = true; ecKey=false;
+                    privateKey = jwk.toRSAKey().toPrivateKey();
+                    publicKey = jwk.toRSAKey().toPublicKey();
+                    return;
+                }
+                if (jwk.getKeyType().getValue().equals("EC")) {
+                    rsaKey = false; ecKey = true;
+                    privateKey = jwk.toECKey().toPrivateKey();
+                    publicKey = jwk.toECKey().toPublicKey();
+                    return;
+                }
+                throw new GeneralException("unknown key type \"" + jwk.getKeyType().getValue() + "\"");
+            } catch (JOSEException joseException) {
+                throw new GeneralException("error creating key: " + joseException.getMessage(), joseException);
+            }
+        }
         // Note that times are to the nearest second, not millisecond since JOSE does
         // that. This is the standard, but we usually like to record the exact time.
         issuedAt = jwk.getIssueTime();
@@ -49,23 +75,6 @@ return ecKey;
             curve = ((ECKey) jwk).getCurve().getName();
         }
         this.JOSEJWK = jwk;
-        try {
-            if (jwk.getKeyType().getValue().equals("RSA")) {
-                rsaKey = true; ecKey=false;
-                privateKey = jwk.toRSAKey().toPrivateKey();
-                publicKey = jwk.toRSAKey().toPublicKey();
-                return;
-            }
-            if (jwk.getKeyType().getValue().equals("EC")) {
-                rsaKey = false; ecKey = true;
-                privateKey = jwk.toECKey().toPrivateKey();
-                publicKey = jwk.toECKey().toPublicKey();
-                return;
-            }
-            throw new GeneralException("unknown key type \"" + jwk.getKeyType().getValue() + "\"");
-        } catch (JOSEException joseException) {
-            throw new GeneralException("error creating key: " + joseException.getMessage(), joseException);
-        }
     }
 
     public JWK getJOSEJWK() {
