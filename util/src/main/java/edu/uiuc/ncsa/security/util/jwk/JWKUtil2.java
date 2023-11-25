@@ -14,10 +14,7 @@ import net.sf.json.JSONSerializer;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
@@ -39,7 +36,7 @@ import static edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil.*;
  * on 10/26/23 at  8:41 AM
  */
 // Fixes https://github.com/ncsa/security-lib/issues/24
-public class JWKUtil2 {
+public class JWKUtil2 implements Serializable {
     public static final String KEYS = "keys";
     public static final String KEY_ID = "kid";
     public static final String USE = "use";
