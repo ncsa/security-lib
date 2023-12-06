@@ -33,6 +33,7 @@ public class Cleanup<K, V> extends MyThread {
      * If this set true, then any failures cause the cleanup to stop.<br/><br/>
      * If false, then this will attempt to remove all elements. Failures are logged in the
      * {@link #getFailures()} list.
+     *
      * @return
      */
     // Fixes https://github.com/ncsa/security-lib/issues/27
@@ -45,6 +46,7 @@ public class Cleanup<K, V> extends MyThread {
     }
 
     boolean failOnError = false;
+
     public Cleanup(MyLoggingFacade logger, String name) {
         super(name, logger);
     }
@@ -71,6 +73,7 @@ public class Cleanup<K, V> extends MyThread {
     public void info(List<V> removed) {
         info("removed:" + removed.size() + ", remaining:" + getMap().size());
     }
+
     Store store;
 
     /**
@@ -78,6 +81,7 @@ public class Cleanup<K, V> extends MyThread {
      * <pre>
      *     id: message
      * </pre>
+     *
      * @return
      */
     public List<String> getFailures() {
@@ -94,11 +98,12 @@ public class Cleanup<K, V> extends MyThread {
         this.store = store;
         setMap(store);
     }
+
     public List<V> age() {
-        if(!isEnabledLocking() || isTestMode()){
+        if (!isEnabledLocking() || isTestMode()) {
             return oldAge();
         }
-        if(getStore().containsKey(lockID)){
+        if (getStore().containsKey(lockID)) {
             info("Locked store for " + getName() + " at " + new Date());
             return new ArrayList<>();
         }
@@ -107,16 +112,17 @@ public class Cleanup<K, V> extends MyThread {
         getStore().save(lock);
         try {
             return oldAge();
-        }finally {
+        } finally {
             // finally block executes even after a return.
             info("removing lock for " + getName() + " at " + new Date());
             getStore().remove(lockID);
             info("removed lock for " + getName());
-            if(0 < getFailures().size()) {
+            if (0 < getFailures().size()) {
                 warn("cleanup failed to remove the following items: " + getFailures());
             }
         }
     }
+
     /**
      * Clean out old entries by aging the elements, i.e., apply the retention policies.
      * Returns a list of the entries removed
@@ -133,7 +139,7 @@ public class Cleanup<K, V> extends MyThread {
 
         // copy the object's sorted list or we will get a concurrent modification exception
         for (K key : getSortedKeys()) {
-            if(key.equals(lockID)){
+            if (key.equals(lockID)) {
                 continue;
             }
             V co = getMap().get(key);
@@ -141,15 +147,15 @@ public class Cleanup<K, V> extends MyThread {
                 // see if we should bother in the first place...
                 if (rp.applies()) {
                     if (!rp.retain(key, co)) {
-                        if(!isTestMode()){
+                        if (!isTestMode()) {
                             debug("removing " + key);
                             // Fixes https://github.com/ncsa/security-lib/issues/27
                             try {
                                 getMap().remove(key);
                                 linkedList.add(co);
-                            }catch(Throwable t){
+                            } catch (Throwable t) {
                                 failures.add(key + ": " + t.getMessage());
-                                if(failOnError){
+                                if (failOnError) {
                                     throw t;
                                 }
                             }
@@ -216,7 +222,7 @@ public class Cleanup<K, V> extends MyThread {
             try {
                 Date nextRun = new Date();
                 long nextCleanup = getNextSleepInterval();
-                if(nextCleanup <=0){
+                if (nextCleanup <= 0) {
                     // this disables cleanup.
                     warn("Cleanup disabled for " + getName() + ". Exiting...");
                     setStopThread(true); //just in case
@@ -225,11 +231,15 @@ public class Cleanup<K, V> extends MyThread {
                 nextRun.setTime(nextRun.getTime() + nextCleanup);
                 info("next cleanup for " + getName() + " scheduled for " + nextRun);
                 sleep(nextCleanup);
-
+                if (logger != null) {
+                    if (logger.getLogger() != null) {
+                        logger.getLogger().getLevel(); // tries to poke logging to keep it awake.
+                    }
+                }
 
                 if (getMap() == null) {
                     info("cleanup for " + getName() + " no entries, skipped at " + (new Date()));
-                }else{
+                } else {
                     info("cleanup for " + getName() + " starting at " + (new Date()));
                     try {
                         List<V> removed = age();
