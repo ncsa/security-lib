@@ -187,6 +187,24 @@ public class MultiConfigurations {
     }
 
     /**
+     * The contract is that this will return all the named https://localhost:9443/oauth2/authorize?scope=org.cilogon.userinfo+openid+profile+email+storage.read%3A%2F+wlcg.capabilityset%3A%2Fduneana+wlcg.groups&response_type=code&redirect_uri=https%3A%2F%2Flocalhost%3A9443%2Fclient2%2Fready&state=vpfVnb1M4VfybbmZP3gCj724wahA0bYUJk2kbtmDy1k&nonce=kH9WLyty1xQ2EyMHjLz1MGgPZmDg1TFL-RORH7-2pC8&prompt=login&client_id=localhost%3Atest%2Ffnal&skin=dataOne
+     * hildren nodes of the given node in order
+     * So if the argument is [node0,node1,...] Then result is all the children of node0,
+     * followed by all the children of node1,... Note that you can feed the result of
+     * this list back in to get the next level of children.
+     * @param nodes
+     * @return
+     */
+    public List<ConfigurationNode> getChildren(List<ConfigurationNode> nodes, String name) {
+       List<ConfigurationNode> kids = new ArrayList<>();
+        for (ConfigurationNode node : nodes) {
+            List list = node.getChildren(name);
+            kids.addAll(list);
+        }
+        return kids;
+    }
+
+    /**
      * Use this to get <b>all</b> the named nodes off the list. Rather than overrides, this
      * returns the kitchen sink. This is the equivalent of glomming together all of
      * the like-named nodes into one big virtual node. This also gets other nodes in the configuration

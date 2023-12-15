@@ -89,15 +89,22 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
                         File indexDirectory,
                         IdentifiableProvider<V> identifiableProvider,
                         MapConverter<V> converter,
-                        boolean removeEmptyFiles) {
-        doSetup(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles);
+                        boolean removeEmptyFiles,
+                        boolean removeFailedFiles) {
+        doSetup(storeDirectory,
+                indexDirectory,
+                identifiableProvider,
+                converter,
+                removeEmptyFiles,
+                removeFailedFiles);
     }
 
     protected void doSetup(File storeDirectory,
                            File indexDirectory,
                            IdentifiableProvider<V> identifiableProvider,
                            MapConverter<V> converter,
-                           boolean removeEmptyFiles) {
+                           boolean removeEmptyFiles,
+                           boolean removeFailedFiles) {
         initializer = new FSInitializer(storeDirectory, indexDirectory);
         if (!initializer.isCreated()) {
             if (!initializer.createNew()) {
@@ -111,6 +118,7 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         this.identifiableProvider = identifiableProvider;
         this.converter = converter;
         this.removeEmptyFiles = removeEmptyFiles;
+        this.removeFailedFiles = removeFailedFiles;
     }
 
     public MapConverter getMapConverter() {
@@ -124,13 +132,14 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
      * @param idp
      * @param cp
      */
-    public FileStore(File directory, IdentifiableProvider<V> idp, MapConverter<V> cp, boolean removeEmptyFiles) {
+    public FileStore(File directory, IdentifiableProvider<V> idp, MapConverter<V> cp, boolean removeEmptyFiles,
+                     boolean removeFailedFiles) {
         if (!directory.isDirectory()) {
             throw new IllegalArgumentException("Error: the given directory \"" + directory.getAbsolutePath() + "\" is not a directory. Cannot create sub-directories.");
         }
         File storeDir = new File(directory, "store");
         File index = new File(directory, "index");
-        doSetup(storeDir, index, idp, cp, removeEmptyFiles);
+        doSetup(storeDir, index, idp, cp, removeEmptyFiles, removeFailedFiles);
     }
 
     protected File indexDirectory;
@@ -256,6 +265,8 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
     }
 
     boolean removeEmptyFiles = true;
+    // Fixes https://github.com/ncsa/security-lib/issues/30
+    boolean removeFailedFiles = false;
 
     protected V loadFile(File f) {
         if (f.length() == 0) {
@@ -276,12 +287,25 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
             fis = new FileInputStream(f);
 
             return loadStream(fis);
-        } catch (Throwable e) {
-            if (DebugUtil.isEnabled()) {
-                System.err.println("Could not load file \"" + f.getAbsolutePath() + "\", printing stack trace...");
-                e.printStackTrace();
+        } catch (IOException e) {
+            if (removeFailedFiles) {
+
+                if (f.isFile()) {
+                    boolean fileRemoved = f.delete();
+                    if (DebugUtil.isEnabled()) {
+                        System.err.println("Could not load file \"" + f.getAbsolutePath() + "\", removed? " + fileRemoved );
+                        e.printStackTrace();
+                    }
+                }
             }
             return null;
+        }catch(Throwable t){
+            if (DebugUtil.isEnabled()) {
+                System.err.println("Could not load file \"" + f.getAbsolutePath() + "\", printing stack trace...");
+                t.printStackTrace();
+            }
+            return null;
+
         }
     }
 

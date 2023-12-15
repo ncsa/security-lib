@@ -18,9 +18,12 @@ public class Monitored extends IdentifiableImpl implements DateComparable {
     }
 
 
-    Date lastModifiedTS;
-    Date lastAccessed;
-    Date creationTS;
+    Date lastModifiedTS = null; // Note: never set this since the system manages it.
+
+    // Note: never set this, since the system manages it. In particular, this is null of the
+    // object has never been accessed, so is used in cleaning up unused objects.
+    Date creationTS  = new Date();
+    Date lastAccessed  = null;
 
     public Date getLastModifiedTS() {
         return lastModifiedTS;

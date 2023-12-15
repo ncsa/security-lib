@@ -505,6 +505,8 @@ public class InputLine {
      *     -key [a,b,...]
      * </pre>
      * Embedded commas are not allowed between list elements. Elements have whitespace trimmed.
+     * Note that this processes the <i>entire</i> input line, so that it finds the flag
+     * and starts snooping for the start delimeter.
      * @param flag
      * @return
      */
@@ -515,6 +517,16 @@ public class InputLine {
         if (rawLine == null || rawLine.isEmpty()) {
             return list;
         }
+        // Next bit checks if rather than a list, a single value is passed in.
+        // Fixes https://github.com/ncsa/security-lib/issues/29
+        String partial = getNextArgFor(flag);
+        if(!partial.startsWith(LIST_START_DELIMITER)){
+            // then the edge case is that the next argument is not a list,
+            // but should be treated as a single argument.
+            list.add(partial);
+            return list;
+        }
+        // The list may have embedded blanks and such, so more parsing is needed
         int ndx = rawLine.indexOf(flag);
         int nextSwitch = rawLine.indexOf("-",ndx+1);
         int startListIndex = rawLine.indexOf(LIST_START_DELIMITER, ndx);

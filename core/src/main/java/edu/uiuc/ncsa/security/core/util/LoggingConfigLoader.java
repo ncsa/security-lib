@@ -36,6 +36,16 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
     }
 
     protected Provider<MyLoggingFacade> loggerProvider;
+
+    public MyLoggingFacade getMyLogger() {
+        if(myLogger == null){
+            if(loggerProvider != null){
+                myLogger = loggerProvider.get();
+            }
+        }
+        return myLogger;
+    }
+
     protected MyLoggingFacade myLogger = null;
 
     protected MetaDebugUtil debugger = null;

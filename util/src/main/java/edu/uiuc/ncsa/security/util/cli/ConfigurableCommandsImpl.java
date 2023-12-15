@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.util.cli;
 
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
+import edu.uiuc.ncsa.security.core.configuration.MultiConfigurations;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
@@ -153,7 +154,6 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
             say("Sorry but \"" + target.getAbsolutePath() + "\" is not a file.");
             return;
         }
-
 
 
         String component = getComponentName();
@@ -337,10 +337,10 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         if (hasOption(LOG_FILE_OPTION, LOG_FILE_LONG_OPTION)) {
             // create the logger for this
             loggerProvider = new LoggerProvider(getLogfileName(), "cli logger", 1
-                    , 1000000,  true, true, Level.INFO);
+                    , 1000000, true, true, Level.INFO);
         } else {
             loggerProvider = new LoggerProvider("log.xml", "cli logger", 1,
-                    1000000,  true, true, Level.FINEST);
+                    1000000, true, true, Level.FINEST);
         }
         logger = loggerProvider.get();
 
@@ -370,7 +370,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         if (filename == null) {
             throw new MyConfigurationException("Error: no configuration file specified");
         }
-        setConfigurationNode(ConfigUtil.findConfiguration(filename, configName, getComponentName()));
+        setConfigurationNode(getNode(filename, configName, getComponentName()));
         setEnvironment(null); //so it gets loaded next time it's needed.
         getEnvironment(); // reload it
         this.configName = configName;
@@ -378,6 +378,35 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
 
     }
 
+    protected ConfigurationNode getNode(String filename, String configName, String componentName) {
+                       return getNodeOLD(filename, configName, componentName);
+//        return getNodeNEW(filename, configName, componentName);
+    }
+
+    protected ConfigurationNode getNodeOLD(String filename, String configName, String componentName) {
+        return ConfigUtil.findConfiguration(filename, configName, componentName);
+    }
+
+    protected ConfigurationNode getNodeNEW(String filename, String configName, String componentName) {
+        XMLConfiguration xmlConfiguration = Configurations.getConfiguration(new File(filename));
+        MultiConfigurations configurations2 = new MultiConfigurations();
+        configurations2.ingestConfig(xmlConfiguration, componentName);
+        //Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
+        List<ConfigurationNode> nodes = configurations2.getNamedConfig(configName);
+        // This is the list, in inhiertance order of the nodes. You must resolve this with
+        // configurations2.getFirstAttribute
+        // or
+        //configurations2.getFirstNode
+        // calls
+        // configurations2.getFirstAttribute(nodes, "myattrib").equals("attribute X");
+        //
+        // At this point, single inheritance is used so just return that
+
+        if (1 < nodes.size()) {
+            throw new MyConfigurationException("Ambiguous configuration. Too many nodes with are name " + configName);
+        }
+        return nodes.get(0);
+    }
 
     public String getConfigFile() {
         return configFile;
@@ -515,7 +544,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
     public MyLoggingFacade getMyLogger() {
         if (logger == null) {
             //  LoggerProvider loggerProvider = new LoggerProvider(getLogfileName(), "cli logger", 1, 1000000, isDebugOn(), true);
-            LoggerProvider loggerProvider = new LoggerProvider("log.xml", "cli logger", 1, 1000000,  true, true, Level.INFO);
+            LoggerProvider loggerProvider = new LoggerProvider("log.xml", "cli logger", 1, 1000000, true, true, Level.INFO);
             logger = loggerProvider.get();
         }
         return logger;

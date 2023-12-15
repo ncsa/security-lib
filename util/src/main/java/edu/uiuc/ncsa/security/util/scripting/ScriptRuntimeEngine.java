@@ -17,7 +17,8 @@ public abstract class ScriptRuntimeEngine {
 
     StateInterface state;
     public abstract  String serializeState();
-    public abstract   void deserializeState(String state);
+    public abstract  String serializeState(String version);
+    public abstract   void deserializeState(String state, String version);
 
     public ScriptSet getScriptSet() {
         return scriptSet;

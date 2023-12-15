@@ -26,6 +26,7 @@ public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
     protected static final String DATA_KEY = StorageConfigurationTags.FS_DATA;
 
     Boolean removeEmptyFiles = null;
+    Boolean removeFailedFiles = null;
     protected MapConverter converter;
     public boolean isRemoveEmptyFiles(){
         if(removeEmptyFiles == null) {
@@ -42,6 +43,20 @@ public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
         return removeEmptyFiles;
     }
 
+    public boolean isRemoveFailedFiles(){
+        if(removeFailedFiles == null) {
+            String rawValue = Configurations.getFirstAttribute(getConfig(), StorageConfigurationTags.FS_REMOVE_FAILED_FILES);
+            if(rawValue == null || rawValue.isEmpty()){
+                removeEmptyFiles = false; //default
+            }
+            try{
+                removeFailedFiles = Boolean.parseBoolean(rawValue);
+            }catch(Throwable t){
+                removeFailedFiles = false; // default
+            }
+        }
+        return removeFailedFiles;
+    }
     public FSProvider(ConfigurationNode config, String type, String target, MapConverter converter) {
         super(config, type, target);
         this.converter = converter;
@@ -65,8 +80,8 @@ public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
 
     /**
      * It is up to you to add the appropriate logic to check for the correct store type (e.g. transaction store)
-     * and instantiate it in the {@link #produce(java.io.File, java.io.File, boolean)} method. This method simply invokes the
-     * {@link #produce(java.io.File, java.io.File, boolean)}
+     * and instantiate it in the {@link #produce(File, File, boolean, boolean)} method. This method simply invokes the
+     * {@link #produce(java.io.File, java.io.File, boolean,boolean)}
      * method and returns that result.
      *
      * @return
@@ -119,7 +134,7 @@ public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
         }
         File indexDirectory = new File(indexPath);
         File storeDirectory = new File(dataPath);
-        fs = produce(storeDirectory, indexDirectory, isRemoveEmptyFiles());
+        fs = produce(storeDirectory, indexDirectory, isRemoveEmptyFiles(), isRemoveFailedFiles());
         Initializable initializable = new FSInitializer(storeDirectory, indexDirectory);
         if (!initializable.isCreated()) {
             initializable.createNew();
@@ -135,7 +150,7 @@ public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
      * @param indexPath
      * @return
      */
-    protected abstract T produce(File dataPath, File indexPath, boolean removeEmptyFiles);
+    protected abstract T produce(File dataPath, File indexPath, boolean removeEmptyFiles, boolean removeFailedFiles);
 
 
 }

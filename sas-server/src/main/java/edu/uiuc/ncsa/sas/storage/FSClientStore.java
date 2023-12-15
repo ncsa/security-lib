@@ -13,12 +13,13 @@ import java.util.List;
  * on 8/22/22 at  2:10 PM
  */
 public class FSClientStore<V extends SASClient> extends FileStore<V> implements SASClientStore<V> {
-    public FSClientStore(File storeDirectory, File indexDirectory, IdentifiableProvider<V> identifiableProvider, MapConverter<V> converter, boolean removeEmptyFiles) {
-        super(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles);
+    public FSClientStore(File storeDirectory, File indexDirectory, IdentifiableProvider<V> identifiableProvider, MapConverter<V> converter,
+                         boolean removeEmptyFiles, boolean removeFailedFiles) {
+        super(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles,removeFailedFiles);
     }
 
-    public FSClientStore(File directory, IdentifiableProvider<V> idp, MapConverter<V> cp, boolean removeEmptyFiles) {
-        super(directory, idp, cp, removeEmptyFiles);
+    public FSClientStore(File directory, IdentifiableProvider<V> idp, MapConverter<V> cp, boolean removeEmptyFiles, boolean removeFailedFiles) {
+        super(directory, idp, cp, removeEmptyFiles,removeFailedFiles);
     }
 
     @Override

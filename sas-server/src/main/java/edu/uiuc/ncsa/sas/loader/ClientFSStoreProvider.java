@@ -26,8 +26,16 @@ public class ClientFSStoreProvider<T extends FileStore> extends FSProvider<T> {
     Provider<? extends SASClient> clientProvider;
 
     @Override
-    protected T produce(File dataPath, File indexPath, boolean removeEmptyFiles) {
-        FSClientStore fsClientStore = new FSClientStore(dataPath, indexPath, (IdentifiableProvider) clientProvider, converter, removeEmptyFiles);
+    protected T produce(File dataPath,
+                        File indexPath,
+                        boolean removeEmptyFiles,
+                        boolean removeFailedFiles) {
+        FSClientStore fsClientStore = new FSClientStore(dataPath,
+                indexPath,
+                (IdentifiableProvider) clientProvider,
+                converter,
+                removeEmptyFiles,
+                removeFailedFiles);
         return (T) fsClientStore;
     }
 }

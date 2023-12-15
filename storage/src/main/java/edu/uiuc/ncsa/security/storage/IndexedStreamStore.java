@@ -1,12 +1,14 @@
 package edu.uiuc.ncsa.security.storage;
 
 import edu.uiuc.ncsa.security.core.*;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.UninitializedException;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import org.apache.commons.codec.digest.DigestUtils;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 
 /**
@@ -31,8 +33,9 @@ public abstract class IndexedStreamStore<V extends Identifiable> implements Stor
     protected Initializable initializer;
 
     /**
-     *   A hash map of items created by this store. You <i>should</i> keep track of every item created
-     *   and if an item already exists return that.
+     * A hash map of items created by this store. You <i>should</i> keep track of every item created
+     * and if an item already exists return that.
+     *
      * @return returns created items.
      */
     public HashMap<Identifier, V> getCreatedItems() {
@@ -75,28 +78,19 @@ public abstract class IndexedStreamStore<V extends Identifiable> implements Stor
     }
 
 
-
-    protected V loadStream(InputStream fis) {
+    protected V loadStream(InputStream fis) throws IOException {
         V t = null;
 
-        try {
-            if (converter != null) {
-                    XMLMap map = new XMLMap();
-                    map.fromXML(fis);
-                    t = identifiableProvider.get(false);
-                    converter.fromMap(map, t);
-                    fis.close();
-            } else {
-                throw new IllegalStateException("Error: no converter");
-            }
-            return t;
-        } catch (StreamCorruptedException q) {
-            throw new GeneralException("Error: Could not load stream. This exception usually means either that " +
-                    "you have an out of date library for items you want to store or that the operating system could not find " +
-                    "the something (e.g. a file). Is your file store configured correctly?", q);
-        } catch (IOException x) {
-            throw new GeneralException("Error: Could not load the stream. Is your store configured correctly?", x);
+        if (converter == null) {
+            throw new IllegalStateException("Error: no converter");
         }
+        XMLMap map = new XMLMap();
+        map.fromXML(fis);
+        t = identifiableProvider.get(false);
+        converter.fromMap(map, t);
+        fis.close();
+        return t;
+
     }
 
     public boolean isEmpty() {
