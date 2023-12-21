@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.security.util.testing;
 
 import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.util.HashMap;
@@ -46,7 +46,7 @@ public abstract class TestConfigLoader<T extends TestEnvironment> extends Loggin
 
     public static void main(String[] args) {
         // Args are file path and confi name
-        ConfigurationNode cn = ConfigUtil.findConfiguration(args[0], args[1], TESTS_TAG);
+        ConfigurationNode cn = XMLConfigUtil.findConfiguration(args[0], args[1], TESTS_TAG);
         TestConfigLoader<TestEnvironment> t = new TestConfigLoader<TestEnvironment>(cn) {
             @Override
             public String getVersionString() {

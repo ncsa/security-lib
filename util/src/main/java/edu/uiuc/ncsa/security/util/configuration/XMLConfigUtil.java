@@ -19,7 +19,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * <p>Created by Jeff Gaynor<br>
  * on 3/23/12 at  8:23 AM
  */
-public class ConfigUtil {
+public class XMLConfigUtil {
     /**
      * Finds the configuration in an XML file, given the filename, name of the configuration
      * (or null if you want to use the only one there) and the top node tag
@@ -113,7 +113,7 @@ public class ConfigUtil {
      * x (no units) for milliseconds
      * </pre>
      * Using this assumes that the default is milliseconds for the field. If you need
-     * to set the default for the field as seconds, use {@link ConfigUtil#getValueSecsOrMillis(String, boolean)}.
+     * to set the default for the field as seconds, use {@link XMLConfigUtil#getValueSecsOrMillis(String, boolean)}.
      *
      * @param x
      * @return
@@ -195,4 +195,36 @@ public class ConfigUtil {
             System.out.println(value + "= " + getValueSecsOrMillis(value) + " in ms.");
         }
     }
+
+/*    protected ConfigurationNode getNode(String filename, String configName, String componentName) {
+                        return getNodeOLD(filename, configName, componentName);
+ //        return getNodeNEW(filename, configName, componentName);
+     }
+
+     protected ConfigurationNode getNodeOLD(String filename, String configName, String componentName) {
+         return ConfigUtil.findConfiguration(filename, configName, componentName);
+     }*/
+
+ /*
+     protected ConfigurationNode getNodeNEW(String filename, String configName, String componentName) {
+         XMLConfiguration xmlConfiguration = Configurations.getConfiguration(new File(filename));
+         MultiConfigurations configurations2 = new MultiConfigurations();
+         configurations2.ingestConfig(xmlConfiguration, componentName);
+         //Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
+         List<ConfigurationNode> nodes = configurations2.getNamedConfig(configName);
+         // This is the list, in inhiertance order of the nodes. You must resolve this with
+         // configurations2.getFirstAttribute
+         // or
+         //configurations2.getFirstNode
+         // calls
+         // configurations2.getFirstAttribute(nodes, "myattrib").equals("attribute X");
+         //
+         // At this point, single inheritance is used so just return that
+
+         if (1 < nodes.size()) {
+             throw new MyConfigurationException("Ambiguous configuration. Too many nodes with are name " + configName);
+         }
+         return nodes.get(0);
+     }
+ */
 }

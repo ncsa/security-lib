@@ -1,12 +1,10 @@
 package edu.uiuc.ncsa.security.util.cli;
 
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
-import edu.uiuc.ncsa.security.core.configuration.MultiConfigurations;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.*;
-import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.cli.*;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -71,7 +69,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
 
     }
 
-    public void load(InputLine inputLine) throws Exception {
+    public void load(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showLoadHelp();
             return;
@@ -91,7 +89,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
 
         if (inputLine.hasArg(LIST_CFGS)) {
             listConfigs(inputLine);
-            // no way to return a value and have it findable with introspection (since cignature would change).
+            // no way to return a value and have it findable with introspection (since signature would change).
             // Only way to send notification. 
             throw new ListOnlyNotification();
         }
@@ -132,9 +130,10 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         say("trace " + (traceOn ? "on" : "off"));
     }
 
-    String FILE_SWITCH = "-file";
+    protected String FILE_SWITCH = "-file";
 
-    protected void listConfigs(InputLine inputLine) throws Exception {
+    protected  void listConfigs(InputLine inputLine) throws Exception {
+
         String targetFilename = getConfigFile();
         if (inputLine.hasArg(FILE_SWITCH)) {
             targetFilename = inputLine.getNextArgFor(FILE_SWITCH);
@@ -154,9 +153,31 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
             say("Sorry but \"" + target.getAbsolutePath() + "\" is not a file.");
             return;
         }
+        List<String> names = doListNames(target);
 
+        if (names.isEmpty()) {
+             say("no configurations found.");
+         } else {
+             FormatUtil.formatList(inputLine, names);
+             say("found " + names.size() + " entries. Done!");
+         }
+    }
 
-        String component = getComponentName();
+    /**
+     * Figures out by file extension what to list. Override as needed. Default is .xml.
+     * @param target
+     * @return
+     * @throws Exception
+     */
+    protected List<String> doListNames(File target) throws Exception{
+        List<String> names = new ArrayList<>();
+        if(target.getName().endsWith(".xml")) {
+            names = listXMLConfigs(target);
+        }
+         return names;
+    }
+    protected List<String> listXMLConfigs(File target) throws Exception {
+
         XMLConfiguration xmlConfiguration = Configurations.getConfiguration(target);
         ConfigurationNode rootNode = xmlConfiguration.getRoot();
         List<String> names = new ArrayList<>(); // To keep sorted
@@ -166,13 +187,8 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
                 names.add(name);
             }
         }
-        if (names.isEmpty()) {
-            say("no configurations found.");
-        } else {
-            FormatUtil.formatList(inputLine, names);
-            say("found " + names.size() + " entries. Done!");
-        }
 
+        return names;
     }
 
 
@@ -215,16 +231,10 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
     public abstract String getComponentName();
 
     public abstract ConfigurationLoader<? extends AbstractEnvironment> getLoader();
+    public abstract void setLoader(ConfigurationLoader<? extends AbstractEnvironment> loader);
 
-    public ConfigurationNode getConfigurationNode() {
-        return configurationNode;
-    }
 
-    public void setConfigurationNode(ConfigurationNode configurationNode) {
-        this.configurationNode = configurationNode;
-    }
-
-    ConfigurationLoader<? extends AbstractEnvironment> loader;
+//    ConfigurationLoader<? extends AbstractEnvironment> loadFSSLer;
 
     public static final String VERBOSE_OPTION = "v"; // if present do a backup of the target to a backup schema.
     public static final String VERBOSE_LONG_OPTION = "verbose"; // if present do a backup of the target to a backup schema.
@@ -322,6 +332,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
 
     /**
      * Called at initialization to read and process the command line arguments.
+     * NOTE that this is not called in this class, but by inheritors.
      */
     public void initialize() {
         if (getConfigFile() == null || getConfigFile().length() == 0) {
@@ -353,7 +364,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         }
         try {
             loadConfig(getConfigFile(), cfgName);
-        } catch (Exception x) {
+        } catch (Throwable x) {
             if (x instanceof RuntimeException) {
                 throw (RuntimeException) x;
             }
@@ -366,11 +377,11 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         }
     }
 
-    protected void loadConfig(String filename, String configName) throws Exception {
+    protected void loadConfig(String filename, String configName) throws Throwable {
         if (filename == null) {
             throw new MyConfigurationException("Error: no configuration file specified");
         }
-        setConfigurationNode(getNode(filename, configName, getComponentName()));
+       setLoader(figureOutLoader(filename, configName));
         setEnvironment(null); //so it gets loaded next time it's needed.
         getEnvironment(); // reload it
         this.configName = configName;
@@ -378,35 +389,13 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
 
     }
 
-    protected ConfigurationNode getNode(String filename, String configName, String componentName) {
-                       return getNodeOLD(filename, configName, componentName);
-//        return getNodeNEW(filename, configName, componentName);
-    }
-
-    protected ConfigurationNode getNodeOLD(String filename, String configName, String componentName) {
-        return ConfigUtil.findConfiguration(filename, configName, componentName);
-    }
-
-    protected ConfigurationNode getNodeNEW(String filename, String configName, String componentName) {
-        XMLConfiguration xmlConfiguration = Configurations.getConfiguration(new File(filename));
-        MultiConfigurations configurations2 = new MultiConfigurations();
-        configurations2.ingestConfig(xmlConfiguration, componentName);
-        //Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
-        List<ConfigurationNode> nodes = configurations2.getNamedConfig(configName);
-        // This is the list, in inhiertance order of the nodes. You must resolve this with
-        // configurations2.getFirstAttribute
-        // or
-        //configurations2.getFirstNode
-        // calls
-        // configurations2.getFirstAttribute(nodes, "myattrib").equals("attribute X");
-        //
-        // At this point, single inheritance is used so just return that
-
-        if (1 < nodes.size()) {
-            throw new MyConfigurationException("Ambiguous configuration. Too many nodes with are name " + configName);
-        }
-        return nodes.get(0);
-    }
+    /**
+     * This is done so configurations can be loaded by inheritors.
+     * @param fileName
+     * @param configName
+     * @return
+     */
+    protected abstract ConfigurationLoader<? extends AbstractEnvironment> figureOutLoader(String fileName, String configName) throws Throwable;
 
     public String getConfigFile() {
         return configFile;
@@ -453,6 +442,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
      * @throws Exception
      */
     protected boolean getOptions(String[] args) throws Exception {
+        // needed in OA4MP, QDL CLI, CLC etc.
         getOptions();
         if (args.length == 0) {
             //     help();

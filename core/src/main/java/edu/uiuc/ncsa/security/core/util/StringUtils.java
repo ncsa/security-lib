@@ -507,12 +507,39 @@ public class StringUtils {
      * @param displayWidth The total width that this must fit in.
      * @return
      */
+
+
     public static List<String> formatMap(Map map,
+                                             List<String> keySubset,
+                                             boolean sortKeys,
+                                             boolean multiLine,
+                                             int indent,
+                                             int displayWidth
+                                             ) {
+        return formatMap(map, keySubset, sortKeys, multiLine, indent, displayWidth, true);
+    }
+
+    /**
+     * The tryJSON flag means that if an entry might be JSON, try to interpret it and use JSON
+     * formatting guidelines. This should be set false in cases where you know that is not the
+     * case, e.g., in calls from QDL.
+     * @param map
+     * @param keySubset
+     * @param sortKeys
+     * @param multiLine
+     * @param indent
+     * @param displayWidth
+     * @param tryJSON
+     * @return
+     */
+        public static List<String> formatMap(Map map,
+
                                          List<String> keySubset,
                                          boolean sortKeys,
                                          boolean multiLine,
                                          int indent,
-                                         int displayWidth) {
+                                         int displayWidth,
+                                         boolean tryJSON) {
 
         List<String> outputList = new ArrayList<>();
         Map<String, Object> tMap;
@@ -560,12 +587,14 @@ public class StringUtils {
                         v = Iso8601.date2String((Date) rawValue);
                     } else {
                         v = rawValue.toString();
-                        try {
-                            // Check if it's serialized JSON.
-                            JSON json = JSONSerializer.toJSON(v);
-                            v = json.toString(1);
-                        } catch (Throwable t) {
+                        if(tryJSON){
+                            try {
+                                // Check if it's serialized JSON.
+                                JSON json = JSONSerializer.toJSON(v);
+                                v = json.toString(1);
+                            } catch (Throwable t) {
 
+                            }
                         }
                     }
 

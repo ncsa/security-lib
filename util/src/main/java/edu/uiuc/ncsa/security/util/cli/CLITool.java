@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.LoggerProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import org.apache.commons.cli.*;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
@@ -138,7 +138,7 @@ public abstract class CLITool implements Logable {
         }
 
 
-        setConfigurationNode(ConfigUtil.findConfiguration(getConfigFile(), cfgName, getComponentName()));
+        setConfigurationNode(XMLConfigUtil.findConfiguration(getConfigFile(), cfgName, getComponentName()));
 
 
     }

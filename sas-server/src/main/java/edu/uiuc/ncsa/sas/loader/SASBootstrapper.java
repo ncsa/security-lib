@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.sas.loader;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.servlet.Bootstrapper;
 import edu.uiuc.ncsa.security.servlet.Initialization;
-import edu.uiuc.ncsa.security.servlet.ServletConfigUtil;
+import edu.uiuc.ncsa.security.servlet.ServletXMLConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.servlet.ServletContext;
@@ -19,7 +19,7 @@ public class SASBootstrapper extends Bootstrapper {
 
 
     protected ConfigurationNode getNode(ServletContext servletContext) throws Exception {
-        return ServletConfigUtil.findConfigurationNode(servletContext, SAS_CONFIG_FILE_KEY, SAS_CONFIG_NAME_KEY, SAS_CONFIG_TAG);
+        return ServletXMLConfigUtil.findConfigurationNode(servletContext, SAS_CONFIG_FILE_KEY, SAS_CONFIG_NAME_KEY, SAS_CONFIG_TAG);
     }
 
     @Override

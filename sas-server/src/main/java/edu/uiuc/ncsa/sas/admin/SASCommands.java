@@ -12,7 +12,7 @@ import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.cli.StoreCommands;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -156,12 +156,12 @@ public class SASCommands extends StoreCommands {
 
         String cfgname = inputLine.hasArg(CONFIG_NAME_FLAG) ? inputLine.getNextArgFor(CONFIG_NAME_FLAG) : "default";
 //      Old style -- single inheritance
-        ConfigurationNode node = ConfigUtil.findConfiguration(
+        ConfigurationNode node = XMLConfigUtil.findConfiguration(
                 inputLine.getNextArgFor(CONFIG_FILE_FLAG),
                 cfgname, CONFIG_TAG_NAME);
 
         // New style -- multi-inheritance.
-        //     ConfigurationNode node = ConfigUtil.findMultiNode(inputLine.getNextArgFor(CONFIG_FILE_FLAG), cfgname, CONFIG_TAG_NAME );
+        //     ConfigurationNode node = XMLConfigUtil.findMultiNode(inputLine.getNextArgFor(CONFIG_FILE_FLAG), cfgname, CONFIG_TAG_NAME );
         SASConfigurationLoader loader = new SASConfigurationLoader(node);
 
         SASEnvironment SASEnvironment1 = loader.load();

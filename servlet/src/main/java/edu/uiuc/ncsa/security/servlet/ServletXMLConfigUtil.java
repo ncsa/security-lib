@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.security.servlet;
 
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
@@ -14,7 +14,7 @@ import java.net.URL;
  * <p>Created by Jeff Gaynor<br>
  * on 5/16/13 at  9:45 AM
  */
-public class ServletConfigUtil extends ConfigUtil {
+public class ServletXMLConfigUtil extends XMLConfigUtil {
     /**
        * Looks for the configuration in the servlet context using the keys for the init parameters
        * @param servletContext
