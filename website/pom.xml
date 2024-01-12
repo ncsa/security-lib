@@ -6,7 +6,7 @@
 
     <groupId>edu.uiuc.ncsa.security</groupId>
     <artifactId>website</artifactId>
-    <version>5.4.2</version>
+    <version>5.4.3</version>
 
     <name>NCSA security utilities website</name>
     <!-- FIXME change it to the project's website -->
@@ -21,29 +21,29 @@
          <dependency>
              <groupId>edu.uiuc.ncsa.security</groupId>
              <artifactId>servlet</artifactId>
-             <version>5.4.2</version>
+             <version>5.4.3</version>
          </dependency>
          <dependency>
              <groupId>edu.uiuc.ncsa.security</groupId>
              <artifactId>core</artifactId>
-             <version>5.4.2</version>
+             <version>5.4.3</version>
          </dependency>
 
          <dependency>
              <groupId>edu.uiuc.ncsa.security</groupId>
              <artifactId>crypt8</artifactId>
-             <version>5.4.2</version>
+             <version>5.4.3</version>
          </dependency>
 
          <dependency>
              <groupId>edu.uiuc.ncsa.security</groupId>
              <artifactId>storage</artifactId>
-             <version>5.4.2</version>
+             <version>5.4.3</version>
          </dependency>
          <dependency>
              <groupId>edu.uiuc.ncsa.security</groupId>
              <artifactId>util</artifactId>
-             <version>5.4.2</version>
+             <version>5.4.3</version>
          </dependency>
 
      </dependencies>
