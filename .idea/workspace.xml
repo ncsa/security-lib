@@ -11,24 +11,7 @@
   <component name="ChangeListManager">
     <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/Configurations.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/Configurations.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/constant-values.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/constant-values.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/servlet/ServletConfigUtil.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/servlet/ServletConfigUtil.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/servlet/class-use/ServletConfigUtil.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/servlet/class-use/ServletConfigUtil.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/util/configuration/ConfigUtil.TimeThingy.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/util/configuration/ConfigUtil.TimeThingy.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/util/configuration/ConfigUtil.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/util/configuration/ConfigUtil.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/util/configuration/class-use/ConfigUtil.TimeThingy.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/util/configuration/class-use/ConfigUtil.TimeThingy.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/util/configuration/class-use/ConfigUtil.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/util/configuration/class-use/ConfigUtil.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/admin/SASCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/admin/SASCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/loader/SASBootstrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/loader/SASBootstrapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServletConfigUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServletXMLConfigUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/ConnectionPoolProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/ConnectionPoolProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLITool.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLITool.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/configuration/ConfigUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/configuration/XMLConfigUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/testing/TestConfigLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/testing/TestConfigLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailSenderThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailSenderThread.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -437,7 +420,9 @@
       <workItem from="1700500540072" duration="670000" />
       <workItem from="1702073009465" duration="35111000" />
       <workItem from="1702903092749" duration="1021000" />
-      <workItem from="1702912796793" duration="31241000" />
+      <workItem from="1702912796793" duration="32496000" />
+      <workItem from="1703263140216" duration="12482000" />
+      <workItem from="1704837383242" duration="2759000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -782,7 +767,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="59" />
+    <option name="localTasksCounter" value="60" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -791,7 +776,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Fix Github OA4MP 106" />
     <MESSAGE value="Last checkin before rolling release" />
     <MESSAGE value="5.3.2 release" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/108" />
@@ -816,7 +800,8 @@
     <MESSAGE value="Getting build messages to be informative, not overpowering." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/28" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/30" />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/30" />
+    <MESSAGE value="Refactoring client configurations to allow for using a QDL ini file. Trying to decouple XML from configurations." />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactoring client configurations to allow for using a QDL ini file. Trying to decouple XML from configurations." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">

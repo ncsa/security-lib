@@ -93,10 +93,11 @@ public class MailSenderThread extends Thread {
             Session session = mailUtil.getSession(props);
 
             tr = session.getTransport(protocol);
-
+            // Fix for https://github.com/ncsa/security-lib/issues/31
+            // Allow using from if null too
             tr.connect(mailUtil.getMailEnvironment().server,
                     defaultPort,
-                    mailUtil.getMailEnvironment().username == null ? mailUtil.getMailEnvironment().from.toString() : mailUtil.getMailEnvironment().username,
+                    mailUtil.getMailEnvironment().username == null ? mailUtil.getMailEnvironment().from : mailUtil.getMailEnvironment().username,
                     mailUtil.getMailEnvironment().password);
 
             Message message = new MimeMessage(session);
