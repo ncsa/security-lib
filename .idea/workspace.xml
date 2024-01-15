@@ -11,20 +11,10 @@
   <component name="ChangeListManager">
     <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/core/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/Version.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/Version.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/delegation.xml" beforeDir="false" afterPath="$PROJECT_DIR$/delegation.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/LoggerProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/LoggerProvider.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sas-server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/servlet/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/skin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/skin/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/storage/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/resources/store-help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/resources/store-help.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailSenderThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailSenderThread.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/site.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/site.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -770,7 +760,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="60" />
+    <option name="localTasksCounter" value="61" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -779,7 +769,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Last checkin before rolling release" />
     <MESSAGE value="5.3.2 release" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/108" />
     <MESSAGE value="Tweak several small things for CLI. In particular, finding objects is now streamlined and object creation is too." />
@@ -804,7 +793,8 @@
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/28" />
     <MESSAGE value="Need to make JWKUtil2 serializable for cloning operations." />
     <MESSAGE value="5.4.2 checkin" />
-    <option name="LAST_COMMIT_MESSAGE" value="5.4.2 checkin" />
+    <MESSAGE value="5.4.3 checkin. Also fixed https://github.com/ncsa/security-lib/issues/31 since it was trivial." />
+    <option name="LAST_COMMIT_MESSAGE" value="5.4.3 checkin. Also fixed https://github.com/ncsa/security-lib/issues/31 since it was trivial." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
