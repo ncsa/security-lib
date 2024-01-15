@@ -172,10 +172,8 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
                     // Fix https://github.com/ncsa/security-lib/issues/32
                     StreamHandler streamHandler;
                     if (logFileName.equals("/dev/stdout") || logFileName.equals("/dev/stderr")) {
-                        System.err.println(getClass().getSimpleName() + ": setting handler to console");
                         streamHandler = new ConsoleHandler();
                     } else {
-                        System.err.println(getClass().getSimpleName() + ": setting handler to file");
                         streamHandler = new FileHandler(logFile, maxFileSize, fileCount, appendOn);
                     }
                     streamHandler.setFormatter(new SimpleFormatter()); // don't get carried away. XML is really verbose.
@@ -195,7 +193,6 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
                 logger.getLogger().addHandler(streamHandler);
                 logger.getLogger().setUseParentHandlers(false); // suppresses console output.
                 logger.info("Logging to console");
-                System.err.println(getClass().getSimpleName() + ": logging to console");
             }
         }
         return logger;
