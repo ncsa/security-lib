@@ -6,9 +6,7 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 import javax.inject.Provider;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.SimpleFormatter;
+import java.util.logging.*;
 
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.getFirstAttribute;
 
@@ -163,7 +161,6 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
             logger.setLogLevel(logLevel);
             logFileName = null;
             if (logFile != null) {
-                FileHandler fileHandler = null;
                 try {
                     File log = new File(logFile);
                     if (log.canWrite()) {
@@ -172,9 +169,15 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
                     } else {
                         logFileName = logFile;
                     }
-                    fileHandler = new FileHandler(logFile, maxFileSize, fileCount, appendOn);
-                    fileHandler.setFormatter(new SimpleFormatter()); // don't get carried away. XML is really verbose.
-                    logger.getLogger().addHandler(fileHandler);
+                    // Fix https://github.com/ncsa/security-lib/issues/32
+                    StreamHandler streamHandler;
+                    if (logFileName.equals("/dev/stdout") || logFileName.equals("/dev/stderr")) {
+                        streamHandler = new ConsoleHandler();
+                    } else {
+                        streamHandler = new FileHandler(logFile, maxFileSize, fileCount, appendOn);
+                    }
+                    streamHandler.setFormatter(new SimpleFormatter()); // don't get carried away. XML is really verbose.
+                    logger.getLogger().addHandler(streamHandler);
                     logger.getLogger().setUseParentHandlers(false); // suppresses console output.
                     logger.info("Logging to file " + logFileName);
                     logger.setFileName(logFileName);
@@ -184,6 +187,12 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
                     logger.info("Warning: could not setup logging to file. Message:\"" + e.getMessage() + "\". Logging to console. Processing will continue.");
                     logger.info("You probably should configure logging explicitly.");
                 }
+            } else {
+                StreamHandler streamHandler = new ConsoleHandler();
+                streamHandler.setFormatter(new SimpleFormatter()); // don't get carried away. XML is really verbose.
+                logger.getLogger().addHandler(streamHandler);
+                logger.getLogger().setUseParentHandlers(false); // suppresses console output.
+                logger.info("Logging to console");
             }
         }
         return logger;

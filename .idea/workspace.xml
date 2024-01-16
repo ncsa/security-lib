@@ -808,11 +808,6 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/admin/SASCommands.java</url>
-          <line>154</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/WebClientConfig.java</url>
           <line>350</line>
           <option name="timeStamp" value="4" />
@@ -821,11 +816,6 @@
           <url>file://$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/Client.java</url>
           <line>396</line>
           <option name="timeStamp" value="5" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/MultiConfigurations.java</url>
-          <line>57</line>
-          <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$APPLICATION_CONFIG_DIR$/scratches/scratch.java</url>
