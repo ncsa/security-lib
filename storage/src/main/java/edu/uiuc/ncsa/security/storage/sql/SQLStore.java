@@ -533,6 +533,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     }
 
     public boolean remove(List<Identifiable> objects) {
+        if(objects.size() == 0) return true; // do nothing
         String inSql = String.join(",", Collections.nCopies(objects.size(), "?"));
         inSql = "(" + inSql + ")";
         String query = "DELETE FROM " + getTable().getFQTablename() + " WHERE " + getTable().getPrimaryKeyColumnName() + " IN " + inSql;

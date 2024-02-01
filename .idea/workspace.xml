@@ -9,9 +9,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Getting fix for https://github.com/ncsa/security-lib/issues/32 from 5.4.3">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailSenderThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailSenderThread.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +121,7 @@
       <recent name="edu.uiuc.ncsa.security.util.mail" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.SSLKeystoreConfiguration">
+  <component name="RunManager" selected="Application.TokenUtil">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -146,13 +147,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="XProperties" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.configuration.XProperties" />
+    <configuration name="TokenUtil" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.util.TokenUtil" />
       <module name="core" />
-      <option name="PROGRAM_PARAMETERS" value="/tmp/foo.xp" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.core.configuration.*" />
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.core.util.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -304,8 +305,8 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Application.TokenUtil" />
       <item itemvalue="Application.SSLKeystoreConfiguration" />
-      <item itemvalue="Application.XProperties" />
       <item itemvalue="Java Scratch.Scratch" />
       <item itemvalue="Java Scratch.Scratch1" />
       <item itemvalue="JUnit.ConfigInheritanceTest.testAliasOverrideAttribute" />
@@ -313,11 +314,11 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.TokenUtil" />
         <item itemvalue="Application.SSLKeystoreConfiguration" />
         <item itemvalue="JUnit.ConfigInheritanceTest.testAliasOverrideAttribute" />
         <item itemvalue="Java Scratch.Scratch" />
         <item itemvalue="Java Scratch.Scratch1" />
-        <item itemvalue="Application.XProperties" />
       </list>
     </recent_temporary>
   </component>
@@ -423,6 +424,9 @@
       <workItem from="1702912796793" duration="32496000" />
       <workItem from="1703263140216" duration="12482000" />
       <workItem from="1704837383242" duration="2759000" />
+      <workItem from="1705423005925" duration="24811000" />
+      <workItem from="1706655305587" duration="23000" />
+      <workItem from="1706705363600" duration="3206000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -767,7 +771,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="60" />
+    <option name="localTasksCounter" value="61" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -776,7 +780,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Last checkin before rolling release" />
     <MESSAGE value="5.3.2 release" />
     <MESSAGE value="https://github.com/ncsa/oa4mp/issues/108" />
     <MESSAGE value="Tweak several small things for CLI. In particular, finding objects is now streamlined and object creation is too." />
@@ -801,7 +804,8 @@
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/28" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/30" />
     <MESSAGE value="Refactoring client configurations to allow for using a QDL ini file. Trying to decouple XML from configurations." />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactoring client configurations to allow for using a QDL ini file. Trying to decouple XML from configurations." />
+    <MESSAGE value="Getting fix for https://github.com/ncsa/security-lib/issues/32 from 5.4.3" />
+    <option name="LAST_COMMIT_MESSAGE" value="Getting fix for https://github.com/ncsa/security-lib/issues/32 from 5.4.3" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
