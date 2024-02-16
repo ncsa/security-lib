@@ -1,6 +1,8 @@
-package edu.uiuc.ncsa.security.storage.data;
+package edu.uiuc.ncsa.security.storage.monitored;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.storage.data.ConversionMap;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.util.Date;
 

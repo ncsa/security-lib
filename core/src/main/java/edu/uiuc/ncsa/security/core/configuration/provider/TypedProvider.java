@@ -123,4 +123,6 @@ public abstract class TypedProvider<T> extends HierarchicalConfigProvider<T> {
         }
         return className + "[type=" + getType()+", target=" + getTarget() + ", cfg node=" + (getConfig().getName()==null?"(null)":getConfig().getName()) + "]";
     }
+
+
 }

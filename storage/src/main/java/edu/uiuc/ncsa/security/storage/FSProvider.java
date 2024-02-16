@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.File;
@@ -151,6 +152,16 @@ public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
      * @return
      */
     protected abstract T produce(File dataPath, File indexPath, boolean removeEmptyFiles, boolean removeFailedFiles);
+
+    public UpkeepConfiguration getUpkeepConfiguration() {
+        return upkeepConfiguration;
+    }
+
+    public void setUpkeepConfiguration(UpkeepConfiguration upkeepConfiguration) {
+        this.upkeepConfiguration = upkeepConfiguration;
+    }
+
+    UpkeepConfiguration upkeepConfiguration;
 
 
 }

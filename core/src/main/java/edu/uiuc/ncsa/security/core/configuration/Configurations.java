@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.security.core.configuration;
 
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.SubnodeConfiguration;
@@ -12,6 +14,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -35,15 +39,15 @@ public class Configurations {
      * It is annoying to have to add a dependency to clean up after someone else!
      */
     public static void killLog4J() {
-     //   DebugUtil.trace(Configurations.class, "Killing off log 4 java!");
+        //   DebugUtil.trace(Configurations.class, "Killing off log 4 java!");
         // CIL-1145 fix. More recent log4j versions now have a way to reset all levels.
-       // Configurator.setAllLevels(LogManager.getRootLogger().getName(), Level.OFF);
+        // Configurator.setAllLevels(LogManager.getRootLogger().getName(), Level.OFF);
        /* List<Logger> loggers = Collections.<Logger>list(LogManager.getCurrentLoggers());
         loggers.add(LogManager.getRootLogger());
         for (Logger logger : loggers) {
             logger.setLevel(Level.OFF);
         }*/
-   //     DebugUtil.trace(Configurations.class, "log 4 java has been dispatched!");
+        //     DebugUtil.trace(Configurations.class, "log 4 java has been dispatched!");
     }
 
     /**
@@ -88,6 +92,7 @@ public class Configurations {
 
     /**
      * All the actual work for loading files is done here.
+     *
      * @param cfg
      * @param visitedFiles
      * @return
@@ -173,7 +178,7 @@ public class Configurations {
      * @return
      */
     public static String getNodeValue(ConfigurationNode node, String name) {
-        if(node == null){
+        if (node == null) {
             return null;
         }
         ConfigurationNode node1 = getFirstNode(node, name);
@@ -190,7 +195,7 @@ public class Configurations {
      * @return
      */
     public static ConfigurationNode getFirstNode(ConfigurationNode node, String name) {
-        if(node==null) return null;
+        if (node == null) return null;
         List list = node.getChildren(name);
         if (list.isEmpty()) {
             return null;
@@ -207,7 +212,7 @@ public class Configurations {
      * @return
      */
     public static String getFirstAttribute(ConfigurationNode node, String name) {
-        if(node == null){
+        if (node == null) {
             return null;
         }
         List list = node.getAttributes(name);
@@ -220,42 +225,42 @@ public class Configurations {
     }
 
     public static boolean getFirstBooleanValue(ConfigurationNode node, String attrib, boolean defaultValue) {
-         if (node == null) return defaultValue;
-         try {
-             String x = getFirstAttribute(node, attrib);
-             if (isTrivial(x)) {
-                 return defaultValue;
-             } //  Null argument returns false.
-             return Boolean.parseBoolean(x);
-         } catch (Throwable t) {
+        if (node == null) return defaultValue;
+        try {
+            String x = getFirstAttribute(node, attrib);
+            if (isTrivial(x)) {
+                return defaultValue;
+            } //  Null argument returns false.
+            return Boolean.parseBoolean(x);
+        } catch (Throwable t) {
 
-         }
-         return defaultValue;
-     }
+        }
+        return defaultValue;
+    }
 
     /**
      * Return the first long value of an attribute. Must have the default value specified. There is no
      * promise as to what "first value" means thanks to the XML spec., so effectively you should restrict
      * your XML to have at most one such value.
+     *
      * @param node
      * @param attrib
      * @param defaultValue
      * @return
      */
-     public static long getFirstLongValue(ConfigurationNode node, String attrib, long defaultValue){
-         if (node == null) return defaultValue;
-         try {
-             String x = getFirstAttribute(node, attrib);
-             if (isTrivial(x)) {
-                 return defaultValue;
-             } //  Null argument returns false.
-             return Long.parseLong(x);
-         } catch (Throwable t) {
+    public static long getFirstLongValue(ConfigurationNode node, String attrib, long defaultValue) {
+        if (node == null) return defaultValue;
+        try {
+            String x = getFirstAttribute(node, attrib);
+            if (isTrivial(x)) {
+                return defaultValue;
+            } //  Null argument returns false.
+            return Long.parseLong(x);
+        } catch (Throwable t) {
 
-         }
-         return defaultValue;
-     }
-
+        }
+        return defaultValue;
+    }
 
 
     /**
@@ -267,7 +272,7 @@ public class Configurations {
      * @return
      */
     public static String getNodeValue(ConfigurationNode node, String name, String defaultValue) {
-        if(node == null) return defaultValue;
+        if (node == null) return defaultValue;
         String x = getNodeValue(node, name);
         return x == null ? defaultValue : x;
     }
@@ -291,10 +296,9 @@ public class Configurations {
     }
 
     /**
-     *
      * @param cfg
-     * @param topNodeName The tag inside the outermost tag you want, e.g. "service", "client"
-     * @param configName The name (i.e. value of name attributes)
+     * @param topNodeName    The tag inside the outermost tag you want, e.g. "service", "client"
+     * @param configName     The name (i.e. value of name attributes)
      * @param checkedAliases Any aliases encountered so far.
      * @return
      */
@@ -326,5 +330,31 @@ public class Configurations {
         throw new MyConfigurationException("Configuration \"" + configName + "\" not found");
     }
 
+    /**
+     * Get alarms that are in a given tag. returns null if no alarms are set
+     *
+     * @param node
+     * @param tag
+     * @return
+     */
+    public static Collection<LocalTime> getAlarms(ConfigurationNode node, String tag) {
+        Collection<LocalTime> alarms = null;
+        String raw = getFirstAttribute(node, tag);
+        if (!StringUtils.isTrivial(raw)) {
+            alarms = new TreeSet<>();  // sorts them.
+            String[] ta = raw.split(",");
+            // get all the times that parse correctly
+            for (String time : ta) {
+                try {
+                    alarms.add(LocalTime.parse(time.trim()));
+                } catch (Throwable t) {
+                    DebugUtil.error(Configurations.class, "cannot parse alarm date \"" + ta + "\"");
+                    // do nothing
+                }
+            }
+            DebugUtil.trace(Configurations.class, tag + " found: " + alarms);
+        }
+        return alarms;
 
+    }
 }

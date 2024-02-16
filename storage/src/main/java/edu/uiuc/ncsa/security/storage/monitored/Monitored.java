@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.security.storage.data;
+package edu.uiuc.ncsa.security.storage.monitored;
 
 import edu.uiuc.ncsa.security.core.DateComparable;
 import edu.uiuc.ncsa.security.core.Identifier;

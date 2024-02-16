@@ -1,4 +1,6 @@
-package edu.uiuc.ncsa.security.storage.data;
+package edu.uiuc.ncsa.security.storage.monitored;
+
+import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 
 import java.util.List;
 

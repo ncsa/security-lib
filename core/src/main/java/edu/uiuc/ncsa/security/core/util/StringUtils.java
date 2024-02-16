@@ -19,10 +19,23 @@ public class StringUtils {
     public static boolean JUSTIFY_RIGHT = true;
     public static String ELLIPSIS = "...";
 
+    /**
+     * Right justify, so for the given width, the string is padded on the right. Note that
+     * if width < x.length, the string is returned unchanged.
+     * @param x
+     * @param width
+     * @return
+     */
     public static String RJustify(String x, int width) {
         return justify(x, width, JUSTIFY_RIGHT);
     }
 
+    /**
+     * Left justify, padding the string on the right. See note in {@link #RJustify(String, int)}
+     * @param x
+     * @param width
+     * @return
+     */
     public static String LJustify(String x, int width) {
         return justify(x, width, JUSTIFY_LEFT);
     }

@@ -27,10 +27,25 @@ public class TokenUtil {
            }
            return org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(token.getBytes(StandardCharsets.UTF_8));
        }
+       public static String b32Encode(byte[] b){
+        if(b.length == 0){
+            return "";
+        }
+           String x = base32.encodeToString(b);
+           // shave off padding.
+           int index = x.indexOf(trailingChar);
+           if (0 < index) {
+               return x.substring(0, index);
+           }
+           return x;
+
+       }
     public static String b32EncodeToken(String token) {
         if (isTrivial(token)) {
             return "";
         }
+       return b32Encode(token.getBytes(StandardCharsets.UTF_8));
+/*
         String x = base32.encodeToString(token.getBytes(StandardCharsets.UTF_8));
         // shave off padding.
         int index = x.indexOf(trailingChar);
@@ -38,6 +53,7 @@ public class TokenUtil {
             return x.substring(0, index);
         }
         return x;
+*/
     }
     public static String b64DecodeToken(String b64EncodedToken) {
            String out = new String(decodeBase64(b64EncodedToken));

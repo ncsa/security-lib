@@ -10,10 +10,13 @@ import edu.uiuc.ncsa.security.core.util.DoubleHashMap;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -78,11 +81,12 @@ public class StoreArchiver {
 
     /**
      * Boolean to test if the ID represents a versioned item. Used in OA4MP.
+     *
      * @param id
      * @return
      */
-    public boolean isVersion(Identifier id){
-         return -1L != getVersionNumber(id);
+    public boolean isVersion(Identifier id) {
+        return -1L != getVersionNumber(id);
     }
 
     /**
@@ -125,7 +129,7 @@ public class StoreArchiver {
         // no version means the next function returns -1:
         System.out.println(storeArchiver.getVersionNumber(new BasicIdentifier("uri:new")));
         System.out.println(storeArchiver.getVersionNumber(id));
-        ;
+
     }
 
     /**
@@ -270,11 +274,14 @@ public class StoreArchiver {
 
     /**
      * Create a new version. This returns the overloaded identifier of the versioned object.
+     * Note that this does not require mucking around with e.g. QDL connections and works on
+     * every generic {@link Store}.
      *
      * @param identifier
      * @return
      */
-    public Long create(Identifier identifier) {
+
+    protected Long create(Identifier identifier) {
         Identifiable identifiable = (Identifiable) getStore().get(identifier);
         Identifiable newVersion = getStore().create();
         XMLMap map = new XMLMap();
@@ -284,11 +291,7 @@ public class StoreArchiver {
         mc.toMap(identifiable, map);
 
         mc.fromMap(map, newVersion);
-        DoubleHashMap<URI, Long> versions = getVersions(identifier);
-        long newIndex = 0L;
-        if (!versions.isEmpty()) {
-            newIndex = getLatestVersionNumber(versions) + 1L;
-        }
+        long newIndex = getNewIndex(identifier);
         Identifier newID = createVersionedID(identifiable.getIdentifier(), newIndex);
         newVersion.setIdentifier(newID);
         getStore().save(newVersion);
@@ -317,11 +320,12 @@ public class StoreArchiver {
 
     /**
      * For a
+     *
      * @param id
      * @param version
      * @return
      */
-    public boolean restore(Identifier id, Long version){
+    public boolean restore(Identifier id, Long version) {
         try {
             Identifiable identifiable = getVersion(id, version);
             identifiable.setIdentifier(id);
@@ -330,7 +334,86 @@ public class StoreArchiver {
         } catch (IOException e) {
             return Boolean.FALSE;
         }
+    }
 
+    /*
+    insert into my_table( col1, col2 ) select col1, col2 from my_table where pk_id=?;
+    insert into my_table( id, col2 ) ? select  col2 from my_table where id=?;
+
+
+     */
+
+    /**
+     * Creates the batch update statement for this archive store. You use this as follows.<br/><br/>
+     * <b>Nota Bene:</b> It <b>only</b> works for SQL stores!
+     * <ol>
+     *     <li>Get this statement as a string, call it <b>stmt</b></li>
+     *     <li>get a connection, call it <b>c</b></li>
+     *     <li>Create a {@link java.sql.PreparedStatement} as <b>pstmt =c.</b>{@link java.sql.Connection#prepareStatement(String)} using <b>stmt</b></li>
+     *     <li>As you get values, set them. <br/>
+     *         pstmt.setString(1, id);</li>
+     * </ol>
+     * The major argument for doing this is that the processing happens almost exclusively on the
+     * server. For very large numbers of archives, this makes a huge difference.
+     *
+     * @return
+     */
+    public String createVersionStatement() {
+        if (!(getStore() instanceof SQLStore)) {
+            throw new IllegalArgumentException("batch mode only supported for SQL stores.");
+        }
+        List<String> allKeys = getMapConverter().getKeys().allKeys();
+        String pKey = getMapConverter().getKeys().identifier();
+        allKeys.remove(pKey);
+        // now turn it into a list
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean isFirst = true;
+        for (String s : allKeys) {
+            if (isFirst) {
+                isFirst = false;
+                stringBuilder.append(s);
+            } else {
+                stringBuilder.append(", " + s);
+            }
+        }
+        /*
+    insert into assets (identifier, access_token,nonce)  select 'test:id',access_token,nonce from assets where identifier='oa4mp:asset:/id/ffe6906dc2a5560c19e7a47026dd41d5/1646421913481';
+             The Right Way to select everything with the new id is to include it in the select statement as a constant.
+             Some databases allow for different syntax like insert into ... 'newID', select(...) but this is, actually,
+             non-standard. What is below **should** be standard across all dialects of SQL, near as can be told,
+             since you can always select a constant.
+         */
+        String columns = stringBuilder.toString(); // columns EXCEPT the primary key as a list.
+        String tablename = ((SQLStore) getStore()).getTable().getFQTablename();
+        String out = "insert into " + tablename + " (" + pKey + " ," + columns + ") "; // 1st element is always archived identifier
+
+        out = out + " select ?, " + columns + " from " + tablename + " where " + pKey + "=?";
+        return out;
+    }
+
+    public void addToBatch(PreparedStatement stmt, Identifier oldID) throws SQLException {
+        long newIndex = getNewIndex(oldID);
+        Identifier newID = createVersionedID(oldID, newIndex);
+        stmt.setString(1, newID.toString());
+        stmt.setString(2, oldID.toString());
+        stmt.addBatch();
+    }
+
+    /**
+     * Given the identifier, go to the store and find what the current highest index is, then
+     * return the next one. This does not alter the store. Note that for generic stores,
+     * this may be quite expensive.
+     *
+     * @param oldID
+     * @return
+     */
+    private long getNewIndex(Identifier oldID) {
+        DoubleHashMap<URI, Long> versions = getVersions(oldID); // involves a call to the DB. Cannot be avoided.
+        long newIndex = 0L;
+        if (!versions.isEmpty()) {
+            newIndex = getLatestVersionNumber(versions) + 1L;
+        }
+        return newIndex;
     }
     /*
         For testing -- get a couple of stores

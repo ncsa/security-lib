@@ -92,7 +92,9 @@ public class ServiceClient {
         @Override
         public HttpClient create() {
             try {
-                return getF().getClient(address.getHost()); // otherwise the client has the *entire* address.
+                HttpClient x= getF().getClient(address.getHost()); // otherwise the client has the *entire* address.
+                totalCreated++;
+                return x;
             } catch (IOException | NoSuchAlgorithmException | KeyStoreException e) {
                 throw new GeneralException("Error getting https-aware client");
             }
@@ -101,6 +103,7 @@ public class ServiceClient {
         @Override
         public void destroy(HttpClient HttpClient) {
             // stateless so nothing to do really.
+            totalDestroyed++;
         }
     };
 
@@ -332,7 +335,9 @@ public class ServiceClient {
         HttpResponse response = null;
         try {
             response = client.execute(httpRequestBase);
+            clientPool.push(client);  // put it back as soon as done.
         } catch (Throwable t) {
+            clientPool.destroy(client); // if it failed, get rid of connection
             ServletDebugUtil.trace(this, "Error  invoking execute for client", t);
             if (ServletDebugUtil.isEnabled()) {
                 t.printStackTrace();
@@ -340,15 +345,12 @@ public class ServiceClient {
             throw new GeneralException("Error invoking client:" + t.getMessage(), t);
         }
         try {
-
             if (response.getEntity() != null && response.getEntity().getContentType() != null) {
                 ServletDebugUtil.trace(this, "Raw response, content type:" + response.getEntity().getContentType());
             } else {
                 ServletDebugUtil.trace(this, "No response entity or no content type.");
-
             }
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT) {
-                clientPool.push(client);
                 return "";
             }
 
@@ -369,16 +371,14 @@ public class ServiceClient {
                 }
                 xx.setContent(x);
                 xx.setStatus(response.getStatusLine().getStatusCode());
-                clientPool.destroy(client);
+             //   clientPool.destroy(client);
                 throw xx;
             }
-            clientPool.push(client);
+          //  clientPool.push(client);
             return x;
         } catch (IOException e) {
             throw new GeneralException("Error invoking http client", e);
         }
-
-
     }
 
     public String doGet(String requestString, String id, String secret) {

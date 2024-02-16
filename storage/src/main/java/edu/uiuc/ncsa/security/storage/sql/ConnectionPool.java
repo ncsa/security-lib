@@ -49,7 +49,7 @@ public class ConnectionPool<T extends ConnectionRecord> extends Pool<T> {
             // and mysql. This meant that, depending upon load order for the drivers, the MariaDB
             // driver might be returned. Up until MySQL version 8.0.29 or so, there were no differences really,
             // but now there SQL Connection errors, so we must explicitly intercept the attempt if it
-            // fails and do it manually. Fortunately, I remember how to do this in Java 1.2. :(
+            // fails and do it manually. Fortunately, I remember how to do this from Java 1.2. :(
             Enumeration<Driver> drivers = DriverManager.getDrivers();
             ArrayList<Driver> reorderedDrivers = new ArrayList<>();
 

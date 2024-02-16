@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 
 /**
- * Very simple extension used by the {@link edu.uiuc.ncsa.security.storage.data.Monitored}
+ * Very simple extension used by the {@link edu.uiuc.ncsa.security.storage.monitored.Monitored}
  * object, this keeps a running list of identifiers and their most recent access times (as longs).
  * Mostly this is for readability of code and ease of access.
  * <p>Created by Jeff Gaynor<br>

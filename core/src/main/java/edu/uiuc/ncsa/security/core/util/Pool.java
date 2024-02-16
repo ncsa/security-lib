@@ -14,7 +14,7 @@ import java.util.Queue;
  */
 public abstract class Pool<T> {
     public static final int INFINITE = -1;
-    int maxSize = INFINITE;
+    protected int maxSize = INFINITE;
     protected int totalCreated = 0;
     protected int totalDestroyed = 0;
     protected int inUse = 0;
@@ -89,7 +89,7 @@ public abstract class Pool<T> {
             inUse++;
             return item;
         } else {
-            throw new PoolException("pool at capacity: " + inUse + " item(s) checked out. " + getStack().size() + " items in getStack().");
+            throw new PoolException(getClass().getSimpleName() + " pool at capacity: " + inUse + " item(s) checked out. " + getStack().size() + " items in getStack().");
         }
     }
 
@@ -132,7 +132,7 @@ public abstract class Pool<T> {
      * @param object the object
      */
     public synchronized void push(T object) throws PoolException {
-        trace("push: ");
+        trace("push: " + this);
         if ((getMaxSize() != INFINITE && getStack().size() >= getMaxSize()) || !isValid(object)) {
             doDestroy(object);
         } else if (getStack().contains(object)) {

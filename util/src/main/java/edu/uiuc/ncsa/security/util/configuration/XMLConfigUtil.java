@@ -49,6 +49,7 @@ public class XMLConfigUtil {
 
     /**
      * Entry point for multiple-inheritance.
+     *
      * @param fileName
      * @param cfgName
      * @param cfgTagName
@@ -94,15 +95,24 @@ public class XMLConfigUtil {
         return cn;
     }
 
+    public static final String UNITS_DAYS = "d";
+    public static final String UNITS_DAYS_LONG = "day";
+    public static final String UNITS_HOURS = "hr";
+    public static final String UNITS_HOURS_LONG = "hour";
+    public static final String UNITS_MILLISECONDS = "ms";
+    public static final String UNITS_MILLISECOND_LONG = "millisecond";
+    public static final String UNITS_MINUTES = "min";
+    public static final String UNITS_MINUTES_LONG = "min";
+    public static final String UNITS_MINUTES_LONG2 = "minute";
+    public static final String UNITS_MONTHS = "mo";
+    public static final String UNITS_MONTHS_LONG = "month";
     public static final String UNITS_SECONDS = "s";
     public static final String UNITS_SECONDS_LONG = "sec";
-    public static final String UNITS_MINUTES = "min";
-    public static final String UNITS_MINUTES_LONG = "mins";
-    public static final String UNITS_HOURS = "hr";
-    public static final String UNITS_HOURS_LONG = "hrs";
-    public static final String UNITS_DAYS = "day";
-    public static final String UNITS_DAYS_LONG = "days";
-    public static final String UNITS_MILLISECONDS = "ms";
+    public static final String UNITS_SECONDS_LONG2 = "second";
+    public static final String UNITS_WEEK_LONG = "week";
+    public static final String UNITS_YEARS = "yr";
+    public static final String UNITS_YEARS_LONG = "year";
+    public static final String UNITS__WEEK = "wk";
 
     /**
      * For getting times in configuration files. The acceptable entries are
@@ -133,10 +143,12 @@ public class XMLConfigUtil {
         }
         // CIL-1629, allow for other time units
         TimeThingy timeThingy = createTimeThingy(x, isSeconds);
-
-        long rawValue = Long.parseLong(timeThingy.rawValue.trim()); // blanks make it blow up, FYI...
-        return rawValue * timeThingy.unitMultiplier;
-
+        try {
+            long rawValue = Long.parseLong(timeThingy.rawValue.trim()); // blanks make it blow up, FYI...
+            return rawValue * timeThingy.unitMultiplier;
+        }catch(NumberFormatException nfx){
+            throw new IllegalArgumentException("could not parse integer \"" + timeThingy.rawValue + "\"");
+        }
     }
 
     public static class TimeThingy {
@@ -150,6 +162,103 @@ public class XMLConfigUtil {
     }
 
     protected static TimeThingy createTimeThingy(String x, boolean isSeconds) {
+        return NEWcreateTimeThingy(x, isSeconds);
+    }
+
+    // Fixes https://github.com/ncsa/security-lib/issues/33
+    protected static TimeThingy NEWcreateTimeThingy(String s, boolean isSeconds) {
+        String[] x = splitNumber(s, isSeconds);
+        return new TimeThingy(getMultiplier(x[1]), x[0]);
+    }
+
+    /**
+     * Splits a time into number and unit, normalizing.
+     * @param x
+     * @return
+     */
+     protected static String[] splitNumber(String x, boolean isSeconds){
+        String y = x.toLowerCase().trim();
+         String[] units = y.split("[0-9]");
+         String[] number = y.split("\\s*[a-zA-Z]+\\s*");
+         String u;
+         if(units.length == 0){
+             // no units
+             u = isSeconds?UNITS_SECONDS_LONG2:UNITS_MILLISECOND_LONG;
+         }else{
+             u = units[units.length-1].trim();
+         }
+         if (u.endsWith(".")) {
+                 // allows for "100 sec." or "100000 ms."
+                 u = u.substring(0, u.length() - 1);
+             }
+         // special cases are s for second or ms for millisecond. This allows
+         // for plurals like days or weeks to be processed
+         if(u.equals("s")){
+             u = UNITS_SECONDS_LONG2;
+         }else{
+             if(u.equals(UNITS_MILLISECONDS)){
+                 u = UNITS_MILLISECOND_LONG;
+             }else{
+                 if(u.endsWith("s")){
+                     u = u.substring(0,u.length()-1); // shave odd plural marker
+                 }
+             }
+         }
+         return new String[]{number[0], u};
+     }
+
+    /**
+     * Gets the correct multiplier for the units.
+     * @param units
+     * @return
+     */
+     protected static long getMultiplier(String units){
+        // Note that the Java compiler actually computes a hash of the string and uses that
+         // integer for the
+         // cases, so that in practice, this is  extremely fast.
+        switch (units){
+            case UNITS_MILLISECONDS:
+            case UNITS_MILLISECOND_LONG:
+                return UNITS_MILLISECOND_MULTIPLIER;
+            case UNITS_SECONDS:
+            case UNITS_SECONDS_LONG:
+            case UNITS_SECONDS_LONG2:
+                return UNITS_SECOND_MULTIPLIER;
+            case UNITS_MINUTES:
+            case UNITS_MINUTES_LONG2:
+                return UNITS_MINUTE_MULTIPLIER;
+            case UNITS_HOURS:
+            case UNITS_HOURS_LONG:
+                return UNITS_HOUR_MULTIPLIER;
+            case UNITS_DAYS:
+            case UNITS_DAYS_LONG:
+                return UNITS_DAY_MULTIPLIER;
+            case UNITS__WEEK:
+            case UNITS_WEEK_LONG:
+                return UNITS_WEEK_MULTIPLIER;
+            case UNITS_MONTHS:
+            case UNITS_MONTHS_LONG:
+                return UNITS_MONTH_MULTIPLIER;
+            case UNITS_YEARS:
+            case UNITS_YEARS_LONG:
+                return UNITS_YEAR_MULTIPLIER;
+            default:
+                throw new IllegalArgumentException("unknown unit \"" + units + "\"");
+
+        }
+     }
+    public static final long UNITS_MILLISECOND_MULTIPLIER = 1L;
+    public static final long UNITS_SECOND_MULTIPLIER = 1000L;
+    public static final long UNITS_MINUTE_MULTIPLIER = UNITS_SECOND_MULTIPLIER * 60;
+    public static final long UNITS_HOUR_MULTIPLIER = UNITS_MINUTE_MULTIPLIER * 60;
+    public static final long UNITS_DAY_MULTIPLIER = UNITS_HOUR_MULTIPLIER * 24;
+    public static final long UNITS_WEEK_MULTIPLIER = UNITS_DAY_MULTIPLIER * 7;
+    public static final long UNITS_MONTH_MULTIPLIER = UNITS_DAY_MULTIPLIER * 30;
+    public static final long UNITS_YEAR_MULTIPLIER = UNITS_DAY_MULTIPLIER * 365 + UNITS_HOUR_MULTIPLIER * 6; // 365¼ days
+
+    // Old way. Clunky direct parsing that just continued to grow. New way just uses regexs and is much better.
+    // Does not support weeks months or years
+ /*   protected static TimeThingy OLDcreateTimeThingy(String x, boolean isSeconds) {
         x = x.trim();
         if (x.endsWith(".")) {
             // allows for "100 sec." or "100000 ms."
@@ -180,6 +289,9 @@ public class XMLConfigUtil {
         if (x.endsWith(UNITS_DAYS_LONG)) {
             return new TimeThingy(1000L * 3600L * 24, x.substring(0, x.length() - UNITS_DAYS_LONG.length()));
         }
+
+
+
         // do seconds last since plural times (e.g. hrs) get flagged with this test and everything
         // is interpeted as seconds otherwise.
         if (x.endsWith(UNITS_SECONDS)) {
@@ -187,44 +299,43 @@ public class XMLConfigUtil {
         }
         return new TimeThingy(isSeconds ? 1000L : 1L, x); // nothing to do, it's already to go, just need to know if default is seconds.
 
-    }
+    }*/
 
+    /**
+     * Quick double check of this class. Run it and peruse the output.
+     * @param args
+     */
     public static void main(String[] args) {
-        String[] values = new String[]{"1000", "300 sec", "1000 ms", "2 hrs", "1hr", "1day", "2 days", "20 min"};
+        String[] values = new String[]{
+                "1000",
+                "300 sec",
+                "300 sEc.",
+                "1000 ms",
+                "2 hrs",
+                "1hr",
+                "1day",
+                "2 days",
+                "20 min",
+                "1    yr",
+                "2 weeks"};
         for (String value : values) {
             System.out.println(value + "= " + getValueSecsOrMillis(value) + " in ms.");
         }
+        String[] bad = new String[]{
+                "2.5 days",   // no decimals
+                "2 5 days",   // no blanks
+                "1 2 3",     //no blanks in numbers
+                "1000 se c", // no blanks in units
+                "1000 se.c", // no misplaced periods
+                "5 woof"};   // wholly wrong units
+        for (String value : bad) {
+            try{
+                System.out.println(value + "= " + getValueSecsOrMillis(value) + " in ms.");
+            }catch(Throwable t){
+                System.out.println("error:" + t.getMessage());
+            }
+        }
     }
 
-/*    protected ConfigurationNode getNode(String filename, String configName, String componentName) {
-                        return getNodeOLD(filename, configName, componentName);
- //        return getNodeNEW(filename, configName, componentName);
-     }
 
-     protected ConfigurationNode getNodeOLD(String filename, String configName, String componentName) {
-         return ConfigUtil.findConfiguration(filename, configName, componentName);
-     }*/
-
- /*
-     protected ConfigurationNode getNodeNEW(String filename, String configName, String componentName) {
-         XMLConfiguration xmlConfiguration = Configurations.getConfiguration(new File(filename));
-         MultiConfigurations configurations2 = new MultiConfigurations();
-         configurations2.ingestConfig(xmlConfiguration, componentName);
-         //Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
-         List<ConfigurationNode> nodes = configurations2.getNamedConfig(configName);
-         // This is the list, in inhiertance order of the nodes. You must resolve this with
-         // configurations2.getFirstAttribute
-         // or
-         //configurations2.getFirstNode
-         // calls
-         // configurations2.getFirstAttribute(nodes, "myattrib").equals("attribute X");
-         //
-         // At this point, single inheritance is used so just return that
-
-         if (1 < nodes.size()) {
-             throw new MyConfigurationException("Ambiguous configuration. Too many nodes with are name " + configName);
-         }
-         return nodes.get(0);
-     }
- */
 }

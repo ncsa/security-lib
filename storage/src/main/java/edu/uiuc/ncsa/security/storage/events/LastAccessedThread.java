@@ -20,6 +20,15 @@ public class LastAccessedThread extends MyThread {
     LastAccessedEventListener lael;
     public static String LOCK_ID = "monitor:lock";
 
+    public boolean isDebugOn() {
+        return debugOn;
+    }
+
+    public void setDebugOn(boolean debugOn) {
+        this.debugOn = debugOn;
+    }
+
+    boolean debugOn = false;
 
     protected void updateStore() {
         Map<UUID, IDMap> map = lael.getIdsByStoreMap();
@@ -64,7 +73,6 @@ public class LastAccessedThread extends MyThread {
                 info("next iteration for " + getName() + " scheduled for " + nextRun);
                 sleep(nextCleanup);
 
-
                 if (lael.getIdsByStoreMap().isEmpty()) {
                     info("thread for " + getName() + " no entries, skipped at " + (new Date()));
                 } else {
@@ -78,6 +86,23 @@ public class LastAccessedThread extends MyThread {
                 warn("Cleanup for " + getName() + " interrupted, stopping thread...");
             }
         }
+    }
+
+    @Override
+    protected void info(String x) {
+        if(isDebugOn()){
+            System.err.println(getClass().getSimpleName() + " INFO:" + x);
+            return;
+        }
+        super.info(x);
+    }
+
+    @Override
+    protected void warn(String x) {
+        if(isDebugOn()){
+            System.err.println(getClass().getSimpleName() + " WARN:" + x);
+        }
+        super.warn(x);
     }
 }
 

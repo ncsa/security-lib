@@ -16,11 +16,11 @@ public class BasicIdentifier implements Identifier {
     static final long serialVersionUID = 0xcafebeefL;
 
     final URI id;
-
+    final String idString;   // Set the ID string to speed this up, since toString for URIs is actually pretty complex.
     @Override
     public String toString() {
-        if (id == null) return null;
-        return id.toString();
+        if (idString == null) return null;
+        return idString;
     }
 
     @Override
@@ -29,11 +29,19 @@ public class BasicIdentifier implements Identifier {
     }
 
     public BasicIdentifier(URI id) {
+        if(id == null) {
+            throw new IllegalArgumentException("null cannot be used as an identifier");
+        }
         this.id = id;
+        idString =id.toString();
     }
 
     public BasicIdentifier(String id) {
+        if(id == null){
+            throw new IllegalArgumentException("null cannot be used as an identifier");
+        }
         try {
+            this.idString = id;
             this.id = URI.create(id);
         }catch(Throwable t){
             throw new InvalidURIException("Error parsing URI \"" + id + "\"", t);

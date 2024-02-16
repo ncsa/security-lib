@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.storage.events.IDMap;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedEventListener;
+import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
 
 import java.util.List;
 import java.util.UUID;
@@ -34,4 +35,5 @@ public interface ListeningStoreInterface<V extends Identifiable> {
     boolean isMonitorEnabled();
 
     void setMonitorEnabled(boolean x);
+
 }

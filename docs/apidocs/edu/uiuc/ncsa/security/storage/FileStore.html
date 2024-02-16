@@ -257,7 +257,7 @@ extends <a href="IndexedStreamStore.html" title="class in edu.uiuc.ncsa.security
 <td class="colFirst"><code>&nbsp;</code></td>
 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.io.File,edu.uiuc.ncsa.security.core.IdentifiableProvider,edu.uiuc.ncsa.security.storage.data.MapConverter,boolean)">FileStore</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html?is-external=true" title="class or interface in java.io" class="externalLink">File</a>&nbsp;directory,
          <a href="../core/IdentifiableProvider.html" title="interface in edu.uiuc.ncsa.security.core">IdentifiableProvider</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;idp,
-         <a href="data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.data">MapConverter</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;cp,
+         <a href="data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.monitored">MapConverter</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;cp,
          boolean&nbsp;removeEmptyFiles)</code></th>
 <td class="colLast">
 <div class="block">Accepts a directory for both the index and data and creates the subdirectories.</div>
@@ -268,7 +268,7 @@ extends <a href="IndexedStreamStore.html" title="class in edu.uiuc.ncsa.security
 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.io.File,java.io.File,edu.uiuc.ncsa.security.core.IdentifiableProvider,edu.uiuc.ncsa.security.storage.data.MapConverter,boolean)">FileStore</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html?is-external=true" title="class or interface in java.io" class="externalLink">File</a>&nbsp;storeDirectory,
          <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html?is-external=true" title="class or interface in java.io" class="externalLink">File</a>&nbsp;indexDirectory,
          <a href="../core/IdentifiableProvider.html" title="interface in edu.uiuc.ncsa.security.core">IdentifiableProvider</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;identifiableProvider,
-         <a href="data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.data">MapConverter</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;converter,
+         <a href="data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.monitored">MapConverter</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;converter,
          boolean&nbsp;removeEmptyFiles)</code></th>
 <td class="colLast">
 <div class="block">For the case where the data and index directories are explicitly given.</div>
@@ -342,7 +342,7 @@ extends <a href="IndexedStreamStore.html" title="class in edu.uiuc.ncsa.security
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#doSetup(java.io.File,java.io.File,edu.uiuc.ncsa.security.core.IdentifiableProvider,edu.uiuc.ncsa.security.storage.data.MapConverter,boolean)">doSetup</a></span>&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html?is-external=true" title="class or interface in java.io" class="externalLink">File</a>&nbsp;storeDirectory,
        <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html?is-external=true" title="class or interface in java.io" class="externalLink">File</a>&nbsp;indexDirectory,
        <a href="../core/IdentifiableProvider.html" title="interface in edu.uiuc.ncsa.security.core">IdentifiableProvider</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;identifiableProvider,
-       <a href="data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.data">MapConverter</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;converter,
+       <a href="data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.monitored">MapConverter</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;converter,
        boolean&nbsp;removeEmptyFiles)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -383,7 +383,7 @@ extends <a href="IndexedStreamStore.html" title="class in edu.uiuc.ncsa.security
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i14" class="altColor">
-<td class="colFirst"><code><a href="data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.data">MapConverter</a></code></td>
+<td class="colFirst"><code><a href="data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.monitored">MapConverter</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getMapConverter()">getMapConverter</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -610,7 +610,7 @@ extends <a href="IndexedStreamStore.html" title="class in edu.uiuc.ncsa.security
 <pre>protected&nbsp;FileStore&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html?is-external=true" title="class or interface in java.io" class="externalLink">File</a>&nbsp;storeDirectory,
                     <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html?is-external=true" title="class or interface in java.io" class="externalLink">File</a>&nbsp;indexDirectory,
                     <a href="../core/IdentifiableProvider.html" title="interface in edu.uiuc.ncsa.security.core">IdentifiableProvider</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;identifiableProvider,
-                    <a href="data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.data">MapConverter</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;converter,
+                    <a href="data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.monitored">MapConverter</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;converter,
                     boolean&nbsp;removeEmptyFiles)</pre>
 <div class="block">For the case where the data and index directories are explicitly given.</div>
 <dl>
@@ -630,7 +630,7 @@ extends <a href="IndexedStreamStore.html" title="class in edu.uiuc.ncsa.security
 <h4>FileStore</h4>
 <pre>public&nbsp;FileStore&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html?is-external=true" title="class or interface in java.io" class="externalLink">File</a>&nbsp;directory,
                  <a href="../core/IdentifiableProvider.html" title="interface in edu.uiuc.ncsa.security.core">IdentifiableProvider</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;idp,
-                 <a href="data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.data">MapConverter</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;cp,
+                 <a href="data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.monitored">MapConverter</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;cp,
                  boolean&nbsp;removeEmptyFiles)</pre>
 <div class="block">Accepts a directory for both the index and data and creates the subdirectories.</div>
 <dl>
@@ -672,7 +672,7 @@ extends <a href="IndexedStreamStore.html" title="class in edu.uiuc.ncsa.security
 <pre class="methodSignature">protected&nbsp;void&nbsp;doSetup&#8203;(<a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html?is-external=true" title="class or interface in java.io" class="externalLink">File</a>&nbsp;storeDirectory,
                        <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/io/File.html?is-external=true" title="class or interface in java.io" class="externalLink">File</a>&nbsp;indexDirectory,
                        <a href="../core/IdentifiableProvider.html" title="interface in edu.uiuc.ncsa.security.core">IdentifiableProvider</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;identifiableProvider,
-                       <a href="data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.data">MapConverter</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;converter,
+                       <a href="data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.monitored">MapConverter</a>&lt;<a href="FileStore.html" title="type parameter in FileStore">V</a>&gt;&nbsp;converter,
                        boolean&nbsp;removeEmptyFiles)</pre>
 </li>
 </ul>
@@ -682,7 +682,7 @@ extends <a href="IndexedStreamStore.html" title="class in edu.uiuc.ncsa.security
 <ul class="blockList">
 <li class="blockList">
 <h4>getMapConverter</h4>
-<pre class="methodSignature">public&nbsp;<a href="data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.data">MapConverter</a>&nbsp;getMapConverter()</pre>
+<pre class="methodSignature">public&nbsp;<a href="data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.monitored">MapConverter</a>&nbsp;getMapConverter()</pre>
 </li>
 </ul>
 <a id="getItemFile(edu.uiuc.ncsa.security.core.Identifiable)">

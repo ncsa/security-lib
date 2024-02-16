@@ -152,7 +152,7 @@ implements <a href="../../core/Store.html" title="interface in edu.uiuc.ncsa.sec
 <div class="block">Top-level SQL store object. A store is simply a logical analog of a hash table, where the key
  is the primary key. This in practice may front multiple tables. This implements several of the
  basic operations. You need to implement a couple of methods and supply a <a href="internals/Table.html" title="class in edu.uiuc.ncsa.security.storage.sql.internals"><code>Table</code></a> that models the
- storage and a <a href="../data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.data"><code>MapConverter</code></a> that allows you to turn a java object's properties into
+ storage and a <a href="../data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.monitored"><code>MapConverter</code></a> that allows you to turn a java object's properties into
  a map -- then you should be in business for using an SQL backend.
  All of these statements are SQL 2003 compliant and should work without change for all major vendors.
  This class also maintains a  <a href="ConnectionPool.html" title="class in edu.uiuc.ncsa.security.storage.sql"><code>ConnectionPool</code></a>to a database.
@@ -196,7 +196,7 @@ implements <a href="../../core/Store.html" title="interface in edu.uiuc.ncsa.sec
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>protected <a href="../data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.data">MapConverter</a>&lt;<a href="SQLStore.html" title="type parameter in SQLStore">V</a>&gt;</code></td>
+<td class="colFirst"><code>protected <a href="../data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.monitored">MapConverter</a>&lt;<a href="SQLStore.html" title="type parameter in SQLStore">V</a>&gt;</code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#converter">converter</a></span></code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -240,7 +240,7 @@ implements <a href="../../core/Store.html" title="interface in edu.uiuc.ncsa.sec
 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(edu.uiuc.ncsa.security.storage.sql.ConnectionPool,edu.uiuc.ncsa.security.storage.sql.internals.Table,javax.inject.Provider,edu.uiuc.ncsa.security.storage.data.MapConverter)">SQLStore</a></span>&#8203;(<a href="ConnectionPool.html" title="class in edu.uiuc.ncsa.security.storage.sql">ConnectionPool</a>&nbsp;connectionPool,
         <a href="internals/Table.html" title="class in edu.uiuc.ncsa.security.storage.sql.internals">Table</a>&nbsp;table,
         javax.inject.Provider&lt;<a href="SQLStore.html" title="type parameter in SQLStore">V</a>&gt;&nbsp;identifiableProvider,
-        <a href="../data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.data">MapConverter</a>&lt;<a href="SQLStore.html" title="type parameter in SQLStore">V</a>&gt;&nbsp;converter)</code></th>
+        <a href="../data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.monitored">MapConverter</a>&lt;<a href="SQLStore.html" title="type parameter in SQLStore">V</a>&gt;&nbsp;converter)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
 </table>
@@ -333,7 +333,7 @@ implements <a href="../../core/Store.html" title="interface in edu.uiuc.ncsa.sec
 <td class="colLast">&nbsp;</td>
 </tr>
 <tr id="i12" class="altColor">
-<td class="colFirst"><code><a href="../data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.data">MapConverter</a></code></td>
+<td class="colFirst"><code><a href="../data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.monitored">MapConverter</a></code></td>
 <th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#getMapConverter()">getMapConverter</a></span>()</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -536,7 +536,7 @@ implements <a href="../../core/Store.html" title="interface in edu.uiuc.ncsa.sec
 <ul class="blockListLast">
 <li class="blockList">
 <h4>converter</h4>
-<pre>protected&nbsp;<a href="../data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.data">MapConverter</a>&lt;<a href="SQLStore.html" title="type parameter in SQLStore">V</a> extends <a href="../../core/Identifiable.html" title="interface in edu.uiuc.ncsa.security.core">Identifiable</a>&gt; converter</pre>
+<pre>protected&nbsp;<a href="../data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.monitored">MapConverter</a>&lt;<a href="SQLStore.html" title="type parameter in SQLStore">V</a> extends <a href="../../core/Identifiable.html" title="interface in edu.uiuc.ncsa.security.core">Identifiable</a>&gt; converter</pre>
 </li>
 </ul>
 </li>
@@ -558,7 +558,7 @@ implements <a href="../../core/Store.html" title="interface in edu.uiuc.ncsa.sec
 <pre>protected&nbsp;SQLStore&#8203;(<a href="ConnectionPool.html" title="class in edu.uiuc.ncsa.security.storage.sql">ConnectionPool</a>&nbsp;connectionPool,
                    <a href="internals/Table.html" title="class in edu.uiuc.ncsa.security.storage.sql.internals">Table</a>&nbsp;table,
                    javax.inject.Provider&lt;<a href="SQLStore.html" title="type parameter in SQLStore">V</a>&gt;&nbsp;identifiableProvider,
-                   <a href="../data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.data">MapConverter</a>&lt;<a href="SQLStore.html" title="type parameter in SQLStore">V</a>&gt;&nbsp;converter)</pre>
+                   <a href="../data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.monitored">MapConverter</a>&lt;<a href="SQLStore.html" title="type parameter in SQLStore">V</a>&gt;&nbsp;converter)</pre>
 </li>
 </ul>
 <a id="&lt;init&gt;()">
@@ -1054,7 +1054,7 @@ implements <a href="../../core/Store.html" title="interface in edu.uiuc.ncsa.sec
 <ul class="blockList">
 <li class="blockList">
 <h4>getMapConverter</h4>
-<pre class="methodSignature">public&nbsp;<a href="../data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.data">MapConverter</a>&nbsp;getMapConverter()</pre>
+<pre class="methodSignature">public&nbsp;<a href="../data/MapConverter.html" title="class in edu.uiuc.ncsa.security.storage.monitored">MapConverter</a>&nbsp;getMapConverter()</pre>
 </li>
 </ul>
 <a id="getCreationTSField()">

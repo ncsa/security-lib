@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
@@ -111,4 +112,13 @@ public abstract class SQLStoreProvider<T extends Store> extends TypedProvider<T>
 
     public abstract T newInstance(Table table);
 
+    public UpkeepConfiguration getUpkeepConfiguration() {
+        return upkeepConfiguration;
+    }
+
+    public void setUpkeepConfiguration(UpkeepConfiguration upkeepConfiguration) {
+        this.upkeepConfiguration = upkeepConfiguration;
+    }
+
+    UpkeepConfiguration upkeepConfiguration;
 }

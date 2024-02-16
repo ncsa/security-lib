@@ -1,0 +1,51 @@
+<!DOCTYPE upkeep [
+        <!ELEMENT upkeep (rule)*>
+        <!ATTLIST upkeep
+                testOnly CDATA #REQUIRED
+                debug CDATA #REQUIRED
+                enabled CDATA #REQUIRED
+                interval CDATA #REQUIRED
+                alarms CDATA #REQUIRED>
+        <!ELEMENT rule (date|id)*>
+        <!ATTLIST rule
+                action CDATA #REQUIRED
+                name CDATA #IMPLIED>
+        <!ELEMENT date (#PCDATA)>
+        <!ATTLIST date
+                type CDATA #REQUIRED
+                value CDATA #IMPLIED
+                when CDATA #REQUIRED>
+        <!ELEMENT id (#PCDATA)>
+        <!ATTLIST id
+                regex CDATA #IMPLIED>
+        ]>
+<upkeep testOnly="true"
+        debug="true"
+        enabled="true"
+        interval="2 min"
+        alarms="09:00:00,   16:00:00"
+>
+    <rule name="whitelist" action="retain">                         <!-- Rule list -->
+        <id>lh:/dwd-7</id>
+        <id>client:/my_ersatz</id>
+        <id regex="true"><![CDATA[^localhost.*]]></id>
+        <id regex="true">^dev:.*</id>
+        <id regex="true">^qdl:.*</id>
+        <id regex="true">^test:.*</id>
+        <id regex="true">^prod:.*</id>
+    </rule>
+
+    <rule name="unused" action="delete">                          <!-- Rule List -->
+        <date type="created" when="after" value="6 hr"></date>     <!-- rule entries -->
+        <date type="accessed" when="never"></date>
+    </rule>
+    <rule name="abandoned" action="archive">                        <!-- Rule list -->
+        <date type="accessed" when="before" value="1 year"></date>
+    </rule>
+
+    <rule action="delete"> <!-- unnamed rule -->
+        <id regex="true">^foo.*</id>
+        <id regex="true">^delete.*</id>
+        <id regex="true">^testScheme.*</id>
+    </rule>
+</upkeep>

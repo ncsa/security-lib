@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.storage.events.IDMap;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedEvent;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedEventListener;
+import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,7 +29,7 @@ public  class AbstractListeningStore<V extends Identifiable> implements Listenin
     }
 
     /**
-     * A unique identifier for this instance so we can stash this a hash table in the listener
+     * A unique identifier for this instance, so we can stash this a hash table in the listener
      * @return
      */
     @Override
@@ -73,4 +74,19 @@ public  class AbstractListeningStore<V extends Identifiable> implements Listenin
     }
 
     boolean monitorEnabled = true;
+
+    public UpkeepConfiguration getUpkeepConfiguration() {
+        return upkeepConfiguration;
+    }
+
+    public void setUpkeepConfiguration(UpkeepConfiguration upkeepConfiguration) {
+        this.upkeepConfiguration = upkeepConfiguration;
+    }
+
+    UpkeepConfiguration upkeepConfiguration = null;
+
+    public boolean hasUpkeepConfiguration(){
+        return  upkeepConfiguration != null;
+    }
+
 }

@@ -23,20 +23,12 @@ public class SQLClientStoreProvider<T extends SQLStore> extends SQLStoreProvider
         this.clientProvider = clientProvider;
     }
 
-
     ClientProvider clientProvider;
     @Override
     public T newInstance(Table table) {
         return null;
     }
 
-    /*
-         public DSClientSQLStoreProvider(ConnectionPoolProvider<? extends ConnectionPool> cpp, String type, MapConverter converter,
-                                     Provider<? extends Client> clientProvider) {
-        super(null, cpp, type, OA4MPConfigTags.CLIENTS_STORE, SQLClientStore.DEFAULT_TABLENAME, converter);
-         this.clientProvider = clientProvider;
-    }
-     */
     @Override
     public T get() {
         ClientTable clientTable = new ClientTable(new ClientKeys(), getSchema(), getPrefix(), getTablename());
