@@ -25,6 +25,10 @@ public class StackMap<V extends Identifiable>  extends LinkedBlockingQueue<V> {
       super(capacity);
    }
 
+   public HashMap<Identifier, V> getMap() {
+      return map;
+   }
+
    HashMap<Identifier, V> map = new HashMap<>();
 
    @Override

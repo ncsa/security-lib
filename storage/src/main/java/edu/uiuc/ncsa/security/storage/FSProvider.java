@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfigUtils;
 import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
@@ -29,35 +30,37 @@ public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
     Boolean removeEmptyFiles = null;
     Boolean removeFailedFiles = null;
     protected MapConverter converter;
-    public boolean isRemoveEmptyFiles(){
-        if(removeEmptyFiles == null) {
+
+    public boolean isRemoveEmptyFiles() {
+        if (removeEmptyFiles == null) {
             String rawValue = Configurations.getFirstAttribute(getConfig(), StorageConfigurationTags.FS_REMOVE_EMPTY_FILES);
-            if(rawValue == null || rawValue.isEmpty()){
+            if (rawValue == null || rawValue.isEmpty()) {
                 removeEmptyFiles = true; //default
             }
-            try{
+            try {
                 removeEmptyFiles = Boolean.parseBoolean(rawValue);
-            }catch(Throwable t){
+            } catch (Throwable t) {
                 removeEmptyFiles = true; // default
             }
         }
         return removeEmptyFiles;
     }
 
-    public boolean isRemoveFailedFiles(){
-        if(removeFailedFiles == null) {
+    public boolean isRemoveFailedFiles() {
+        if (removeFailedFiles == null) {
             String rawValue = Configurations.getFirstAttribute(getConfig(), StorageConfigurationTags.FS_REMOVE_FAILED_FILES);
-            if(rawValue == null || rawValue.isEmpty()){
+            if (rawValue == null || rawValue.isEmpty()) {
                 removeEmptyFiles = false; //default
             }
-            try{
+            try {
                 removeFailedFiles = Boolean.parseBoolean(rawValue);
-            }catch(Throwable t){
+            } catch (Throwable t) {
                 removeFailedFiles = false; // default
             }
         }
         return removeFailedFiles;
     }
+
     public FSProvider(ConfigurationNode config, String type, String target, MapConverter converter) {
         super(config, type, target);
         this.converter = converter;
@@ -82,7 +85,7 @@ public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
     /**
      * It is up to you to add the appropriate logic to check for the correct store type (e.g. transaction store)
      * and instantiate it in the {@link #produce(File, File, boolean, boolean)} method. This method simply invokes the
-     * {@link #produce(java.io.File, java.io.File, boolean,boolean)}
+     * {@link #produce(java.io.File, java.io.File, boolean, boolean)}
      * method and returns that result.
      *
      * @return
@@ -163,5 +166,17 @@ public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
 
     UpkeepConfiguration upkeepConfiguration;
 
-
+    @Override
+    public void setConfig(ConfigurationNode config) {
+        super.setConfig(config);
+        ConfigurationNode upkeepNode = Configurations.getFirstNode(getConfig(), UpkeepConfigUtils.UPKEEP_TAG);
+        if (upkeepNode != null) {
+            try {
+                upkeepConfiguration = UpkeepConfigUtils.processUpkeep(Configurations.getFirstNode(getConfig(), UpkeepConfigUtils.UPKEEP_TAG));
+            }catch (Throwable t){
+                System.err.println("could not load configuration for " + getClass().getSimpleName() + ":" + t.getMessage());
+                throw t;
+            }
+        }
+    }
 }

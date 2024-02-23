@@ -8,7 +8,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.util.*;
-import edu.uiuc.ncsa.security.storage.ListeningStoreInterface;
+import edu.uiuc.ncsa.security.storage.MonitoredStoreInterface;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.monitored.MonitoredKeys;
@@ -74,8 +74,8 @@ public abstract class StoreCommands extends CommonCommands {
     public StoreCommands(MyLoggingFacade logger, Store store) throws Throwable {
         this(logger);
         setStore(store);
-        if (store instanceof ListeningStoreInterface) {
-            ((ListeningStoreInterface) store).setMonitorEnabled(false); // do not fire monitor event in CLI!
+        if (store instanceof MonitoredStoreInterface) {
+            ((MonitoredStoreInterface) store).setMonitorEnabled(false); // do not fire monitor event in CLI!
         }
         setSortable(new BasicSorter());
     }
@@ -1424,7 +1424,7 @@ public abstract class StoreCommands extends CommonCommands {
             // CIL1677 fallout we must store last_accessed as a long so we can do comparisons
             // across various types of stores, but we *really* want this to display as a date.
             // So, we just convert it here for display purposes.
-            if (getStore() instanceof ListeningStoreInterface) {
+            if (getStore() instanceof MonitoredStoreInterface) {
                 MonitoredKeys keys = (MonitoredKeys) getSerializationKeys();
                 if (map.containsKey(keys.lastAccessed())) {
                     long la = map.getLong(keys.lastAccessed());

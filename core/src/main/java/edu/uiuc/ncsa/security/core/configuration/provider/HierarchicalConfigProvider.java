@@ -17,6 +17,10 @@ import java.util.List;
  * on 1/10/12 at  1:57 PM
  */
 public abstract class HierarchicalConfigProvider<T> implements Provider<T>, CfgEventListener {
+    public LinkedList<CfgEventListener> getListeners() {
+        return listeners;
+    }
+
     LinkedList<CfgEventListener> listeners = new LinkedList<CfgEventListener>();
 
     public HierarchicalConfigProvider() {

@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.security.storage.events;
 import edu.uiuc.ncsa.security.core.cache.MyThread;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.storage.ListeningStoreInterface;
+import edu.uiuc.ncsa.security.storage.MonitoredStoreInterface;
 
 import java.util.*;
 
@@ -32,7 +32,7 @@ public class LastAccessedThread extends MyThread {
 
     protected void updateStore() {
         Map<UUID, IDMap> map = lael.getIdsByStoreMap();
-        Map<UUID, ListeningStoreInterface> stores = lael.getStoreMap();
+        Map<UUID, MonitoredStoreInterface> stores = lael.getStoreMap();
         lael.clear(); // so we don't get concurrent mod exceptions
         for (UUID uuid : map.keySet()) {
             IDMap idMap = map.get(uuid);

@@ -56,4 +56,14 @@ public class IDEntry implements RuleEntry{
                 ", value='" + value + '\'' +
                 '}';
     }
+
+    public boolean isNegation() {
+        return negation;
+    }
+
+    public void setNegation(boolean negation) {
+        this.negation = negation;
+    }
+
+    boolean negation = false;
 }

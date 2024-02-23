@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.storage.monitored.Monitored;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -17,6 +18,37 @@ public class RuleList extends ArrayList<RuleEntry> implements UpkeepConstants{
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
+
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+    }
+
+    public Boolean isSkipVersions() {
+        return skipVersions;
+    }
+
+    public List<String> getExtendsList() {
+        return extendsList;
+    }
+
+    public void setExtendsList(List<String> extendsList) {
+        this.extendsList = extendsList;
+    }
+
+    List<String> extendsList = new ArrayList<>();
+    public void setSkipVersions(Boolean skipVersions) {
+        this.skipVersions = skipVersions;
+    }
+
+    public boolean hasSkipVersion(){
+        return skipVersions != null;
+    }
+    Boolean skipVersions = null;
+    boolean verbose = false;
 
     public String getAction() {
         return action;

@@ -28,7 +28,12 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
     public static final String PARAMETERS = "parameters";
     public static final String SCHEMA = SQLStoreProvider.SCHEMA; // since this is shared, really.
     public static final String BOOT_PASSWORD = "bootPassword"; // for derby databases
-    public static final String IN_MEMORY = "inMemory"; // for derby databases
+    public static final String DERBY_CREATE_SCRIPT = "createScript"; // for derby databases that create
+    public static final String DERBY_STORE_TYPE = "storeType"; // for derby databases
+    public static final String DERBY_FS_DEFAULT_USER = "oa4mp"; // for derby databases
+    public static final String DERBY_FS_DEFAULT_PASSWORD = "Asdfghjkl123"; // for derby filestores
+    public static final String DERBY_FS_DEFAULT_BOOT_PASSWORD = "Qwertyuiop321"; // for derby filestores
+    public static final String DERBY_FS_DEFAULT_SCHEMA = "oauth2"; // for derby filestore
     public static final String CONNECTION_MAX = "maxConnections";
     public static final String CONNECTION_IDLE_TIMEOUT = "idleTimeout";
     public static final String CONNECTION_CLEANUP_INTERVAL = "cleanupInterval";

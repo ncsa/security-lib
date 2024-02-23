@@ -30,6 +30,20 @@ public class UpkeepConfiguration {
 
     boolean debug;
 
+    public Boolean isSkipVersions() {
+        return skipVersions;
+    }
+
+    public void setSkipVersions(Boolean skipVersions) {
+        this.skipVersions = skipVersions;
+    }
+
+    Boolean skipVersions = null;
+
+    public boolean hasSkipVersion(){
+        return skipVersions != null;
+    }
+
     public boolean isTestOnly() {
         return testOnly;
     }
@@ -68,9 +82,50 @@ public class UpkeepConfiguration {
 
     Long interval = null;
 
+    boolean verbose = false;
+
+    public int getRunCount() {
+        return runCount;
+    }
+
+    public void setRunCount(int runCount) {
+        this.runCount = runCount;
+    }
+
+    int runCount = -1;
 
 
-    Map<String, RuleList> rules = new HashMap<>();
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+    }
+
+
+    public String getOutput() {
+        return output;
+    }
+
+    public void setOutput(String output) {
+        this.output = output;
+    }
+
+    public boolean hasOutput(){
+        return output!=null && !output.isEmpty();
+    }
+    String output = null;
+
+    public Map<String, RuleList> getRulesMap() {
+        return rulesMap;
+    }
+
+    public void setRulesMap(Map<String, RuleList> rulesMap) {
+        this.rulesMap = rulesMap;
+    }
+
+    Map<String, RuleList> rulesMap = new HashMap<>();
 
     public List<RuleList> getRuleList() {
         return ruleList;
@@ -83,20 +138,24 @@ public class UpkeepConfiguration {
      * @param ruleList
      */
     public void add(RuleList ruleList) {
-        rules.put(ruleList.getName(), ruleList);
+        rulesMap.put(ruleList.getName(), ruleList);
         this.ruleList.add(ruleList);
     }
 
     @Override
     public String toString() {
         return "UpkeepConfiguration{" +
-                "enabled=" + enabled +
-                ",\n debug=" + debug +
-                ",\n testOnly=" + testOnly +
-                ",\n alarms=" + alarms +
-                ",\n interval=" + interval +
-                ",\n rules=" + rules +
-                ",\n ruleList=" + ruleList +
+                "\nenabled=" + enabled +
+                ", \ndebug=" + debug +
+                ", \nskipVersions=" + skipVersions +
+                ", \ntestOnly=" + testOnly +
+                ", \nalarms=" + alarms +
+                ", \ninterval=" + interval +
+                ", \nverbose=" + verbose +
+                ", \nrunCount=" + runCount +
+                ", \noutput='" + output + '\'' +
+                ", \nrulesMap=" + rulesMap +
+                ", \nruleList=" + ruleList +
                 '}';
     }
 

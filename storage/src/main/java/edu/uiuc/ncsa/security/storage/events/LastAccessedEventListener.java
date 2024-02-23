@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.security.storage.events;
 
-import edu.uiuc.ncsa.security.storage.ListeningStoreInterface;
+import edu.uiuc.ncsa.security.storage.MonitoredStoreInterface;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,12 +30,12 @@ public class LastAccessedEventListener {
         return idsByStoreMap;
     }
 
-    public Map<UUID, ListeningStoreInterface> getStoreMap() {
+    public Map<UUID, MonitoredStoreInterface> getStoreMap() {
         return storeMap;
     }
 
     Map<UUID, IDMap> idsByStoreMap = new HashMap<>();
-    Map<UUID, ListeningStoreInterface> storeMap = new HashMap<>();
+    Map<UUID, MonitoredStoreInterface> storeMap = new HashMap<>();
 
     public void clear() {
         idsByStoreMap = new HashMap<>();

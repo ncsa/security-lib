@@ -8,24 +8,27 @@ package edu.uiuc.ncsa.security.core.configuration;
  */
 public interface StorageConfigurationTags extends ConfigurationTags {
     // Basic store types
-    public static final String MEMORY_STORE = "memoryStore";
-    public static final String FILE_STORE = "fileStore";
-    public static final String MYSQL_STORE = "mysql";
-    public static final String MARIADB_STORE = "mariadb";
-    public static final String POSTGRESQL_STORE = "postgresql";
-    public static final String DERBY_STORE = "derby";
+     String MEMORY_STORE = "memoryStore";
+     String FILE_STORE = "fileStore";
+     String MYSQL_STORE = "mysql";
+     String MARIADB_STORE = "mariadb";
+     String POSTGRESQL_STORE = "postgresql";
+     String DERBY_STORE = "derby";
+     String DERBY_STORE_TYPE_MEMORY = "memory";
+     String DERBY_STORE_TYPE_FILE = "file";
+     String DERBY_STORE_TYPE_SERVER = "server";
 
-    // for file stores
-    public static final String FS_PATH = "path";
-    public static final String FS_INDEX = "indexPath";
-    public static final String FS_DATA = "dataPath";
-    public static final String FS_REMOVE_EMPTY_FILES = "removeEmptyFiles";
-    public static final String FS_REMOVE_FAILED_FILES = "removeFailedFiles";
 
-    // for SQL stores
+     String FS_PATH = "path";
+     String FS_INDEX = "indexPath";
+     String FS_DATA = "dataPath";
+     String FS_REMOVE_EMPTY_FILES = "removeEmptyFiles";
+     String FS_REMOVE_FAILED_FILES = "removeFailedFiles";
 
-    public static final String SQL_TABLENAME = "tablename";
-    public static final String SQL_PREFIX = "tablePrefix";
-    public static final String SQL_SCHEMA = "schema";
-    public static final String SQL_DATABASE = "database";
+
+
+     String SQL_TABLENAME = "tablename";
+     String SQL_PREFIX = "tablePrefix";
+     String SQL_SCHEMA = "schema";
+     String SQL_DATABASE = "database";
 }

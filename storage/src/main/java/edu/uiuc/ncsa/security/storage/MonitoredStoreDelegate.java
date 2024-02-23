@@ -2,10 +2,12 @@ package edu.uiuc.ncsa.security.storage;
 
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.storage.events.IDMap;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedEvent;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedEventListener;
 import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
+import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepResponse;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,12 +15,12 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- *
+ *  This is the logic behind monitoring a store. It should be a class of any store that
+ *  does monitoring and calls should be forwarded to it. 
  * <p>Created by Jeff Gaynor<br>
  * on 3/29/23 at  6:22 AM
  */
-// Should be renamed to something like LastAccessedStoreFacade
-public  class AbstractListeningStore<V extends Identifiable> implements ListeningStoreInterface<V> {
+public  class MonitoredStoreDelegate<V extends Identifiable> implements MonitoredStoreInterface<V> {
 
     @Override
     public List<LastAccessedEventListener> getLastAccessedEventListeners() {
@@ -47,7 +49,7 @@ public  class AbstractListeningStore<V extends Identifiable> implements Listenin
                 getLastAccessedEventListeners().add(lastAccessedEventListener);
     }
     @Override
-    public void fireLastAccessedEvent(ListeningStoreInterface store, Identifier identifier){
+    public void fireLastAccessedEvent(MonitoredStoreInterface store, Identifier identifier){
         if(!isMonitorEnabled()){
             return;
         }
@@ -89,4 +91,12 @@ public  class AbstractListeningStore<V extends Identifiable> implements Listenin
         return  upkeepConfiguration != null;
     }
 
+    /**
+     * This delegate does not do upkeep. The store itself must.
+     * @return
+     */
+    @Override
+    public UpkeepResponse doUpkeep() {
+       throw new NotImplementedException("not implemented in facade.");
+    }
 }

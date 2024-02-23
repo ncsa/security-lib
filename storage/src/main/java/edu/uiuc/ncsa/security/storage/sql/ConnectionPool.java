@@ -20,6 +20,9 @@ import java.util.concurrent.TimeUnit;
  * on Mar 12, 2010 at  4:06:15 PM
  */
 public class ConnectionPool<T extends ConnectionRecord> extends Pool<T> {
+    public ConnectionPool() {
+    }
+
     public UUID getUuid() {
         return uuid;
     }
@@ -30,7 +33,15 @@ public class ConnectionPool<T extends ConnectionRecord> extends Pool<T> {
         return connectionParameters;
     }
 
-    ConnectionParameters connectionParameters;
+    public void setConnectionParameters(ConnectionParameters connectionParameters) {
+        this.connectionParameters = connectionParameters;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    protected ConnectionParameters connectionParameters;
 
     public ConnectionPool(SQLConnectionImpl connectionParameters, int connectionType) {
         this.connectionParameters = connectionParameters;
@@ -85,7 +96,6 @@ public class ConnectionPool<T extends ConnectionRecord> extends Pool<T> {
     public T create() throws PoolException {
         trace("create pool id:" + getUuid() + ", connections: " + getStackMap().map.keySet());
         try {
-            String jdbcURL = getConnectionParameters().getJdbcUrl();
             Connection con = DriverManager.getConnection(getConnectionParameters().getJdbcUrl());
             if (con == null) {
                 throw new IllegalStateException("Could not find any suitable JDBC driver. ");
@@ -214,4 +224,13 @@ public class ConnectionPool<T extends ConnectionRecord> extends Pool<T> {
     public static final int CONNECTION_TYPE_POSTGRES = 3;
     public static final int CONNECTION_TYPE_DEBRY = 4;
     public static final int CONNECTION_TYPE_H2 = 5;
+
+    protected boolean alreadyShutdown = false;
+    /**
+     * For those store that need some cleanup.
+     */
+    public void shutdown(){
+
+
+    }
 }

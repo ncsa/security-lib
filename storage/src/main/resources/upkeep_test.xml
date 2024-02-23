@@ -1,28 +1,39 @@
 <!DOCTYPE upkeep [
-        <!ELEMENT upkeep (rule)*>
-        <!ATTLIST upkeep
-                testOnly CDATA #REQUIRED
-                debug CDATA #REQUIRED
-                enabled CDATA #REQUIRED
-                interval CDATA #REQUIRED
-                alarms CDATA #REQUIRED>
-        <!ELEMENT rule (date|id)*>
-        <!ATTLIST rule
-                action CDATA #REQUIRED
-                name CDATA #IMPLIED>
-        <!ELEMENT date (#PCDATA)>
-        <!ATTLIST date
-                type CDATA #REQUIRED
-                value CDATA #IMPLIED
-                when CDATA #REQUIRED>
-        <!ELEMENT id (#PCDATA)>
-        <!ATTLIST id
-                regex CDATA #IMPLIED>
-        ]>
+  <!ELEMENT upkeep (rule)*>
+  <!ATTLIST upkeep
+          alarms CDATA #REQUIRED
+          debug CDATA #REQUIRED
+          enabled CDATA #REQUIRED
+          interval CDATA #REQUIRED
+          output CDATA #REQUIRED
+          runCount CDATA #REQUIRED
+          skipVersions CDATA #IMPLIED
+          testOnly CDATA #REQUIRED
+          verbose CDATA #REQUIRED>
+  <!ELEMENT rule (id|date)*>
+  <!ATTLIST rule
+          action CDATA #REQUIRED
+          extends CDATA #IMPLIED
+          name CDATA #IMPLIED
+          skipVersions CDATA #IMPLIED
+          verbose CDATA #IMPLIED >
+  <!ELEMENT id (#PCDATA)>
+  <!ATTLIST id
+          negate CDATA #IMPLIED
+          regex CDATA #IMPLIED>
+  <!ELEMENT date (#PCDATA)>
+  <!ATTLIST date
+          type CDATA #REQUIRED
+          value CDATA #IMPLIED
+          when CDATA #REQUIRED>
+ ]>
 <upkeep testOnly="true"
         debug="true"
         enabled="true"
         interval="2 min"
+        verbose="true"
+        runCount="1"
+        output="/tmp/out.json"
         alarms="09:00:00,   16:00:00"
 >
     <rule name="whitelist" action="retain">                         <!-- Rule list -->
@@ -32,20 +43,26 @@
         <id regex="true">^dev:.*</id>
         <id regex="true">^qdl:.*</id>
         <id regex="true">^test:.*</id>
+        <id regex="true" negate="true">.*delete</id>
         <id regex="true">^prod:.*</id>
+        <id regex="true">^auto-test:.*</id>
     </rule>
 
-    <rule name="unused" action="delete">                          <!-- Rule List -->
+    <rule name="unused"
+          action="delete"
+          skipVersions="false"
+          verbose="false">       <!-- Rule List -->
         <date type="created" when="after" value="6 hr"></date>     <!-- rule entries -->
         <date type="accessed" when="never"></date>
     </rule>
     <rule name="abandoned" action="archive">                        <!-- Rule list -->
         <date type="accessed" when="before" value="1 year"></date>
     </rule>
-
+    <rule name="unused2" action="delete" extends="unused">          <!-- Rule list -->
+        <date type="modified" when="before" value="1 year"></date>
+    </rule>
     <rule action="delete"> <!-- unnamed rule -->
         <id regex="true">^foo.*</id>
-        <id regex="true">^delete.*</id>
         <id regex="true">^testScheme.*</id>
     </rule>
 </upkeep>

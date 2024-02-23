@@ -3,11 +3,13 @@ package edu.uiuc.ncsa.security.storage.monitored;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.storage.AbstractListeningStore;
-import edu.uiuc.ncsa.security.storage.ListeningStoreInterface;
+import edu.uiuc.ncsa.security.storage.MonitoredStoreDelegate;
+import edu.uiuc.ncsa.security.storage.MonitoredStoreInterface;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
 import edu.uiuc.ncsa.security.storage.events.IDMap;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedEventListener;
+import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
+import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepResponse;
 
 import java.util.Date;
 import java.util.List;
@@ -17,12 +19,12 @@ import java.util.UUID;
  * <p>Created by Jeff Gaynor<br>
  * on 3/29/23 at  12:43 PM
  */
-public abstract class MonitoredMemoryStore<V extends Identifiable> extends MemoryStore<V> implements ListeningStoreInterface<V> {
+public abstract class MonitoredMemoryStore<V extends Identifiable> extends MemoryStore<V> implements MonitoredStoreInterface<V> {
     public MonitoredMemoryStore(IdentifiableProvider<V> identifiableProvider) {
         super(identifiableProvider);
     }
 
-    AbstractListeningStore<V> listeningStore = new AbstractListeningStore<>();
+    MonitoredStoreDelegate<V> monitoredStoreDelegate = new MonitoredStoreDelegate<>();
 
     @Override
     public List<V> getMostRecent(int n, List<String> attributes) {
@@ -31,33 +33,33 @@ public abstract class MonitoredMemoryStore<V extends Identifiable> extends Memor
 
     @Override
     public List<LastAccessedEventListener> getLastAccessedEventListeners() {
-        return listeningStore.getLastAccessedEventListeners();
+        return monitoredStoreDelegate.getLastAccessedEventListeners();
     }
 
     @Override
     public UUID getUuid() {
-        return listeningStore.getUuid();
+        return monitoredStoreDelegate.getUuid();
     }
 
     @Override
     public void addLastAccessedEventListener(LastAccessedEventListener lastAccessedEventListener) {
-        listeningStore.addLastAccessedEventListener(lastAccessedEventListener);
+        monitoredStoreDelegate.addLastAccessedEventListener(lastAccessedEventListener);
     }
 
     @Override
-    public void fireLastAccessedEvent(ListeningStoreInterface store,Identifier identifier) {
-        listeningStore.fireLastAccessedEvent(store, identifier);
+    public void fireLastAccessedEvent(MonitoredStoreInterface store, Identifier identifier) {
+        monitoredStoreDelegate.fireLastAccessedEvent(store, identifier);
     }
 
     @Override
     public boolean isMonitorEnabled() {
-        return listeningStore.isMonitorEnabled();
+        return monitoredStoreDelegate.isMonitorEnabled();
     }
 
     @Override
 
     public void setMonitorEnabled(boolean x) {
-        listeningStore.setMonitorEnabled(x);
+        monitoredStoreDelegate.setMonitorEnabled(x);
     }
     @Override
     public void lastAccessUpdate(IDMap idMap) {
@@ -76,6 +78,21 @@ public abstract class MonitoredMemoryStore<V extends Identifiable> extends Memor
         V v =super.get(key);
         fireLastAccessedEvent(this, (Identifier) key);
         return v;
+    }
+
+    @Override
+    public void setUpkeepConfiguration(UpkeepConfiguration upkeepConfiguration) {
+          monitoredStoreDelegate.setUpkeepConfiguration(upkeepConfiguration);
+    }
+
+    @Override
+    public UpkeepConfiguration getUpkeepConfiguration() {
+        return monitoredStoreDelegate.getUpkeepConfiguration();
+    }
+
+    @Override
+    public UpkeepResponse doUpkeep() {
+        return null;
     }
 }
 

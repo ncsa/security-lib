@@ -97,6 +97,11 @@ abstract public class SQLConnectionImpl implements ConnectionParameters {
 
     protected String host;
     protected String username;
+
+    public String getPassword() {
+        return password;
+    }
+
     protected String password;
     protected int port;
     protected String jdbcDriver;

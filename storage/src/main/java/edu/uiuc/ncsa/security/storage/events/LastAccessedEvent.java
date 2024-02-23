@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.security.storage.events;
 
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.storage.ListeningStoreInterface;
+import edu.uiuc.ncsa.security.storage.MonitoredStoreInterface;
 
 import java.util.Date;
 import java.util.EventObject;
@@ -17,14 +17,14 @@ public class LastAccessedEvent extends EventObject {
     }
 
 
-    public LastAccessedEvent(ListeningStoreInterface store, Identifier identifier, Date lastAccessed) {
+    public LastAccessedEvent(MonitoredStoreInterface store, Identifier identifier, Date lastAccessed) {
         super(store);
         this.lastAccessed = lastAccessed;
         this.identifier = identifier;
     }
 
-    public ListeningStoreInterface getStore() {
-        return (ListeningStoreInterface) source;
+    public MonitoredStoreInterface getStore() {
+        return (MonitoredStoreInterface) source;
     }
 
     public Date getLastAccessed() {

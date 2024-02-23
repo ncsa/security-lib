@@ -6,8 +6,8 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.storage.AbstractListeningStore;
-import edu.uiuc.ncsa.security.storage.ListeningStoreInterface;
+import edu.uiuc.ncsa.security.storage.MonitoredStoreDelegate;
+import edu.uiuc.ncsa.security.storage.MonitoredStoreInterface;
 import edu.uiuc.ncsa.security.storage.cli.StoreArchiver;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.events.IDMap;
@@ -19,8 +19,9 @@ import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 
 import javax.inject.Provider;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +31,7 @@ import static edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConstants.WH
  * <p>Created by Jeff Gaynor<br>
  * on 3/29/23 at  10:24 AM
  */
-public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore<V> implements ListeningStoreInterface<V> {
+public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore<V> implements MonitoredStoreInterface<V> {
     public MonitoredSQLStore(ConnectionPool connectionPool, Table table, Provider<V> identifiableProvider, MapConverter<V> converter) {
         super(connectionPool, table, identifiableProvider, converter);
     }
@@ -39,7 +40,7 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
     }
 
 
-    AbstractListeningStore<V> listeningStore = new AbstractListeningStore<>();
+    MonitoredStoreDelegate<V> monitoredStoreDelegate = new MonitoredStoreDelegate<>();
 
     @Override
     public List<V> getMostRecent(int n, List<String> attributes) {
@@ -48,33 +49,33 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
 
     @Override
     public List<LastAccessedEventListener> getLastAccessedEventListeners() {
-        return listeningStore.getLastAccessedEventListeners();
+        return monitoredStoreDelegate.getLastAccessedEventListeners();
     }
 
     @Override
     public UUID getUuid() {
-        return listeningStore.getUuid();
+        return monitoredStoreDelegate.getUuid();
     }
 
     @Override
     public void addLastAccessedEventListener(LastAccessedEventListener lastAccessedEventListener) {
-        listeningStore.addLastAccessedEventListener(lastAccessedEventListener);
+        monitoredStoreDelegate.addLastAccessedEventListener(lastAccessedEventListener);
     }
 
     @Override
-    public void fireLastAccessedEvent(ListeningStoreInterface store, Identifier identifier) {
-        listeningStore.fireLastAccessedEvent(store, identifier);
+    public void fireLastAccessedEvent(MonitoredStoreInterface store, Identifier identifier) {
+        monitoredStoreDelegate.fireLastAccessedEvent(store, identifier);
     }
 
     @Override
     public boolean isMonitorEnabled() {
-        return listeningStore.isMonitorEnabled();
+        return monitoredStoreDelegate.isMonitorEnabled();
     }
 
     @Override
 
     public void setMonitorEnabled(boolean x) {
-        listeningStore.setMonitorEnabled(x);
+        monitoredStoreDelegate.setMonitorEnabled(x);
     }
 
     boolean DEEP_DEBUG = false;
@@ -141,7 +142,7 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
     @Override
     public V get(Object o) {
         V v = super.get(o);
-        listeningStore.fireLastAccessedEvent(this, (Identifier) o);
+        monitoredStoreDelegate.fireLastAccessedEvent(this, (Identifier) o);
         return v;
     }
 
@@ -149,84 +150,138 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
         return (MonitoredKeys) getMapConverter().getKeys();
     }
 
-    protected String createUpkeepQuery(RuleList ruleList) {
+    protected String createUpkeepQuery(RuleList ruleList, boolean skipVersions) {
         MonitoredKeys keys = getKeys();
         String query = "select " + keys.identifier() + ", " + keys.creationTS() + ", " + keys.lastModifiedTS() + ", " + keys.lastAccessed()
-                + " from " + getTable().getFQTablename() + " where ";
-
-        for (RuleEntry ruleEntry : ruleList) {
-            query = query + toSQLClause(ruleEntry, keys);
+                + " from " + getTable().getFQTablename();
+        if (skipVersions) {
+            query = query + " WHERE " + keys.identifier() + " NOT REGEXP '.*#version.*' ";
+        } else {
+            if (ruleList.isEmpty()) {
+                return query;
+            }
         }
+        query = query + " where ";
+        boolean firstPassAnds = true;
+        boolean firstPassOrs = true;
+        String ands = "";
+        String ors = "";
+        for (RuleEntry ruleEntry : ruleList) {
+
+            if (ruleEntry instanceof IDEntry) {
+                String x = toSQLClause((IDEntry) ruleEntry, keys);
+                if (firstPassOrs) {
+                    firstPassOrs = false;
+                    ors = ors + x;
+                } else {
+                    ors = ors + " OR " + x;
+                }
+            }
+            if (ruleEntry instanceof DateEntry) {
+                String x = toSQLClause((DateEntry) ruleEntry, keys);
+                if (firstPassAnds) {
+                    firstPassAnds = false;
+                    ands = ands + toSQLClause((DateEntry) ruleEntry, keys);
+                } else {
+                    ands = ands + " AND " + toSQLClause((DateEntry) ruleEntry, keys);
+                }
+            }
+        } // end for
+        if (ands.isEmpty()) {
+            query = query + " " + ors;
+        } else {
+            query = query + " " + ands;
+            if (!ors.isEmpty()) {
+                query = query + " AND (" + ors + ")";
+            }
+        }
+
         return query;
     }
 
-    public UpkeepResponse upkeep(UpkeepConfiguration upkeepConfiguration) {
+    @Override
+    public UpkeepResponse doUpkeep() {
         UpkeepResponse upkeepResponse = new UpkeepResponse();
-
-        if (!upkeepConfiguration.isEnabled()) {
+        UpkeepConfiguration cfg = getUpkeepConfiguration();  // just keep it short.
+        if (!cfg.isEnabled()) {
             return upkeepResponse;
         }
         /*
          Next is for stats
          */
-        int totalFound = 0;
-        int numberProcessed = 0;
-        int totalTested = 0;
-        int totalRetained = 0;
-        int skipped = 0;
-        List<String> toRemove = new ArrayList<>();
-        List<String> toArchive = new ArrayList<>();
-        List<String> toRetain = new ArrayList<>();
+
+        upkeepResponse.testModeOnly = cfg.isTestOnly();
+        upkeepResponse.name = "upkeep for " + getClass().getSimpleName();
         MonitoredKeys keys = getKeys();
           /*
             SQL stuff
            */
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
-        String deleteStmt = "delete from " + getTable().getFQTablename() + " where " + keys.identifier() + "=?";
 
         StoreArchiver storeArchiver = new StoreArchiver(this);        // Each rule is processed in turn.
-        for (RuleList ruleList : upkeepConfiguration.getRuleList()) {
+        for (RuleList ruleList : cfg.getRuleList()) {
             if (ruleList.isEmpty() || !ruleList.isEnabled()) {
                 continue;
             }
             // If the configuration is test only, all rules are in test mode.
-
-            String query = createUpkeepQuery(ruleList);
+            boolean skipVersions = true;// default
+            if (cfg.hasSkipVersion()) {
+                skipVersions = cfg.isSkipVersions();
+            }
+            if (ruleList.hasSkipVersion()) {
+                skipVersions = ruleList.isSkipVersions();
+            }
+            String query = createUpkeepQuery(ruleList, skipVersions);
+            if (cfg.isDebug()) {
+                System.err.println("upkeep SQL query for rule " + ruleList.getName() + " is \"" + query + "\"");
+            }
             try {
+                PreparedStatement deletepStmt = null;
+                PreparedStatement archiveStmt = null;
                 Statement stmt = c.createStatement();
-                PreparedStatement deletepStmt = c.prepareStatement(deleteStmt);
-                String aQuery = storeArchiver.createVersionStatement();
-                System.out.println(getClass().getSimpleName() + " a query=\"" + aQuery + "\"");
-                PreparedStatement archiveStmt = c.prepareStatement(aQuery);
-
+                if (!cfg.isTestOnly()) {
+                    String aQuery = storeArchiver.createVersionStatement();
+                    String deleteStmt = "delete from " + getTable().getFQTablename() + " where " + keys.identifier() + "=?";
+                    System.out.println(getClass().getSimpleName() + " a query=\"" + aQuery + "\"");
+                    deletepStmt = c.prepareStatement(deleteStmt);
+                    archiveStmt = c.prepareStatement(aQuery);
+                }
 
                 ResultSet rs = stmt.executeQuery(query);
                 while (rs.next()) {
-                    Identifier identifier = BasicIdentifier.newID(rs.getString(keys.identifier()));
-                    totalFound++;
-                    if (toRetain.contains(identifier.toString())) { // If a rule to retain is done, retain it
+                    String idString = rs.getString(keys.identifier());
+                    Identifier identifier = BasicIdentifier.newID(idString);
+                    upkeepResponse.attempted++;
+                    if (upkeepResponse.retainedList.contains(idString)) { // If a rule to retain is done, retain it
+                        upkeepResponse.skipped++;
+                        if (cfg.isDebug()) {
+                            System.err.println(getClass().getSimpleName() + " skipped:" + idString);
+                        }
                         continue;                                 // even if another rule says not to.
                     }
                     switch (ruleList.getAction()) {
                         case UpkeepConstants.ACTION_TEST:
                             // do nothing
-                            totalTested++;
-                            break;
-                        case UpkeepConstants.ACTION_ARCHIVE:
-                            if (!upkeepConfiguration.isTestOnly()) {
-                                storeArchiver.addToBatch(archiveStmt, identifier);
-                            }
-                            toArchive.add(identifier.toString());
+                            upkeepResponse.testedCount++;
                             break;
                         case UpkeepConstants.ACTION_RETAIN:
-                            totalRetained++;
+                            upkeepResponse.retainedCount++;
+                            upkeepResponse.retainedList.add(idString);
                             break;
+                        case UpkeepConstants.ACTION_ARCHIVE:
+                            if (!cfg.isTestOnly()) {
+                                storeArchiver.addToBatch(archiveStmt, identifier);
+                                upkeepResponse.archivedList.add(idString);
+                            }
+                            upkeepResponse.archiveCount++;
+                            /// archive implies delete from main store too...
                         case UpkeepConstants.ACTION_DELETE:
-                            toRemove.add(identifier.toString());
-                            if (!upkeepConfiguration.isTestOnly()) {
+                            upkeepResponse.deleteCount++;
+                            if (!cfg.isTestOnly()) {
                                 deletepStmt.setString(1, identifier.toString());
                                 deletepStmt.addBatch();
+                                upkeepResponse.deletedList.add(idString);
                             }
                             break;
                         default:
@@ -235,30 +290,38 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
                 }
                 rs.close();
                 stmt.close();
-                int[] deletedRecords = deletepStmt.executeBatch();
-                UpkeepStats deletedStats = gatherStats(deletedRecords);
-                int[] archivedRecords = archiveStmt.executeBatch();
-                UpkeepStats archivedStats = gatherStats(archivedRecords);
-                deletepStmt.close();
-                archiveStmt.close();
-                releaseConnection(cr);
-                upkeepResponse.archivedStats = archivedStats;
-                upkeepResponse.deletedStats = deletedStats;
-                upkeepResponse.attempted = numberProcessed;
-                upkeepResponse.total = totalFound;
-                upkeepResponse.skipped = skipped;
-                upkeepResponse.found = toRemove;
-                upkeepResponse.archived = toArchive;
-                upkeepResponse.retained = toRetain;
+                if (!cfg.isTestOnly()) {
+                    // must do archives before deletes.
+                    int[] archivedRecords = archiveStmt.executeBatch();
+                    upkeepResponse.archivedStats.add(gatherStats(archivedRecords));
+                    int[] deletedRecords = deletepStmt.executeBatch();
+                    upkeepResponse.deletedStats.add(gatherStats(deletedRecords));
+                    deletepStmt.close();
+                    archiveStmt.close();
+                }
+
             } catch (SQLException sqlException) {
                 destroyConnection(cr);
-                if (DebugUtil.isEnabled()) {
+                if (cfg.isDebug() || DebugUtil.isEnabled()) {
                     sqlException.printStackTrace();
                 }
+            }
+        }// end for
+        releaseConnection(cr);
+        if (cfg.hasOutput()) {
+            try {
+                FileWriter fos = new FileWriter(cfg.getOutput());
+                fos.write(upkeepResponse.toJSON().toString(1));
+                fos.flush();
+                fos.close();
+            } catch (IOException ioException) {
+                // Not being able to write the output should not be a hard fail.
+                DebugUtil.warn("could not write file \"" + cfg.getOutput() + "\":" + ioException.getMessage());
             }
         }
         return upkeepResponse;
     }
+
 
     protected String getTypeKey(MonitoredKeys keys, String type) {
         switch (type) {
@@ -280,8 +343,12 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
     }
 
     public String toSQLClause(IDEntry idEntry, MonitoredKeys keys) {
-        return " " + keys.identifier() + (idEntry.isRegex() ? " REGEXP " : " = '") + idEntry.getValue() + "' ";
+        return " " + keys.identifier() +
+                (idEntry.isNegation() ? " NOT " : "") +  
+                (idEntry.isRegex() ? " REGEXP " : " = ") + "'" +
+                idEntry.getValue() + "' ";
     }
+
 
     public String toSQLClause(DateEntry dateEntry, MonitoredKeys keys) {
         String query = "";
@@ -323,7 +390,6 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
                 // applies = applies && (  dateThingy.iso8601.getTime() <= created);
             }
         }
-        System.out.println(getClass().getSimpleName() + "filter query=" + query);
         return query;
     }
 
@@ -355,4 +421,48 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
         return upkeepStats;
     }
 
+
+    @Override
+    public void setUpkeepConfiguration(UpkeepConfiguration upkeepConfiguration) {
+        monitoredStoreDelegate.setUpkeepConfiguration(upkeepConfiguration);
+    }
+
+    @Override
+    public UpkeepConfiguration getUpkeepConfiguration() {
+        return monitoredStoreDelegate.getUpkeepConfiguration();
+    }
+
+/*
+    @Override
+    public UpkeepResponse doUpkeep() {
+        UpkeepResponse upkeepResponse = new UpkeepResponse();
+        if (!getUpkeepConfiguration().isEnabled()) {
+            return upkeepResponse;
+        }
+        MonitoredKeys keys = getKeys();
+        String deleteStmt = "delete from " + getTable().getFQTablename() + " where " + keys.identifier() + "=?";
+        StoreArchiver storeArchiver = new StoreArchiver(this);
+        int totalFound = 0;
+        int numberProcessed = 0;
+        int skipped = 0;
+        List<String> toRemove = new ArrayList<>();
+        List<String> toArchive = new ArrayList<>();
+
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+        UpkeepConfiguration cfg = getUpkeepConfiguration();
+        try{
+          for(RuleList ruleList: cfg.getRuleList()){
+
+          }
+        }catch (SQLException e) {
+                    destroyConnection(cr);
+                    if (DebugUtil.isEnabled()) {
+                        e.printStackTrace();
+                    }
+                    throw new GeneralException("Error getting last accessed information for clients", e);
+                }
+        return upkeepResponse;
+    }
+*/
 }

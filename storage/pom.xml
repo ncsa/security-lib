@@ -23,6 +23,7 @@
             <artifactId>util</artifactId>
             <version>5.3-SNAPSHOT</version>
         </dependency>
+
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
@@ -34,6 +35,12 @@
             <artifactId>config</artifactId>
             <version>1.4.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>9.9.2</version>
+        </dependency>
+
     </dependencies>
     <build>
 <!--        <plugins>

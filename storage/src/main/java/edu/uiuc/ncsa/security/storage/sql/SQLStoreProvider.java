@@ -1,11 +1,14 @@
 package edu.uiuc.ncsa.security.storage.sql;
 
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
+import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
+import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfigUtils;
 import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
+import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionParameters;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
@@ -17,7 +20,11 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 public abstract class SQLStoreProvider<T extends Store> extends TypedProvider<T> {
 
     public String getSchema() {
-        return getTypeAttribute(SCHEMA);
+        if(getConnectionPool().getConnectionParameters() instanceof DerbyConnectionParameters){
+            // Special case since file store and memory store may have this overridden
+            return ((DerbyConnectionParameters)getConnectionPool().getConnectionParameters()).getSchema();
+        }
+    return getTypeAttribute(SCHEMA);
     }
 
     public String getPrefix() {
@@ -25,8 +32,10 @@ public abstract class SQLStoreProvider<T extends Store> extends TypedProvider<T>
     }
 
     String tablename = null;
+
     /**
      * Return the configured tablename if there is one, otherwise return the default.
+     *
      * @return
      */
     public String getTablename() {
@@ -40,9 +49,10 @@ public abstract class SQLStoreProvider<T extends Store> extends TypedProvider<T>
         this.tablename = tablename;
     }
 
-    public String getDatabaseName(){
+    public String getDatabaseName() {
         return getTypeAttribute(StorageConfigurationTags.SQL_DATABASE);
     }
+
     public static final String TABLENAME = StorageConfigurationTags.SQL_TABLENAME;
     public static final String PREFIX = StorageConfigurationTags.SQL_PREFIX;
     public static final String SCHEMA = StorageConfigurationTags.SQL_SCHEMA;
@@ -113,6 +123,7 @@ public abstract class SQLStoreProvider<T extends Store> extends TypedProvider<T>
     public abstract T newInstance(Table table);
 
     public UpkeepConfiguration getUpkeepConfiguration() {
+
         return upkeepConfiguration;
     }
 
@@ -121,4 +132,18 @@ public abstract class SQLStoreProvider<T extends Store> extends TypedProvider<T>
     }
 
     UpkeepConfiguration upkeepConfiguration;
+
+    @Override
+    public void setConfig(ConfigurationNode config) {
+        super.setConfig(config);
+        ConfigurationNode upkeepNode = Configurations.getFirstNode(getConfig(), UpkeepConfigUtils.UPKEEP_TAG);
+        if (upkeepNode != null) {
+            try {
+                upkeepConfiguration = UpkeepConfigUtils.processUpkeep(Configurations.getFirstNode(getConfig(), UpkeepConfigUtils.UPKEEP_TAG));
+            } catch (Throwable t) {
+                System.err.println("could not load configuration for " + getClass().getSimpleName() + ":" + t.getMessage());
+                throw t;
+            }
+        }
+    }
 }

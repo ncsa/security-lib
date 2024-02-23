@@ -65,4 +65,5 @@ public abstract class MultiTypeProvider<T> extends TypedProvider<T> {
      * @return
      */
     public abstract T getDefaultStore();
+
 }

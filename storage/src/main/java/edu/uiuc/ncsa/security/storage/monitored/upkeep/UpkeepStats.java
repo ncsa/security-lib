@@ -5,6 +5,9 @@ package edu.uiuc.ncsa.security.storage.monitored.upkeep;
  * on 2/14/24 at  11:21 AM
  */
 public class UpkeepStats {
+    public UpkeepStats() {
+    }
+
     /**
      * Actual number of successful deletes
      */
@@ -29,13 +32,23 @@ public class UpkeepStats {
         this.unknown = unknown;
     }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "{" +
+    public void add(UpkeepStats stats){
+        success += stats.success;
+        noInfo += stats.noInfo;
+        failed += stats.failed;
+        unknown += stats.unknown;
+    }
+    public String report(){
+        return "{" +
                 "success=" + success +
                 ", noInfo=" + noInfo +
                 ", failed=" + failed +
                 ", unknown=" + unknown +
                 '}';
+
+    }
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + report();
     }
 }

@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.storage.events.IDMap;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedEventListener;
 import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
+import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepResponse;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,14 +16,14 @@ import java.util.UUID;
  * <p>Created by Jeff Gaynor<br>
  * on 3/29/23 at  7:19 AM
  */
-public interface ListeningStoreInterface<V extends Identifiable> {
+public interface MonitoredStoreInterface<V extends Identifiable> {
     List<LastAccessedEventListener> getLastAccessedEventListeners();
 
     UUID getUuid();
 
     void addLastAccessedEventListener(LastAccessedEventListener lastAccessedEventListener);
 
-    void fireLastAccessedEvent(ListeningStoreInterface store, Identifier identifier);
+    void fireLastAccessedEvent(MonitoredStoreInterface store, Identifier identifier);
 
     void lastAccessUpdate(IDMap idMap);
 
@@ -35,5 +36,11 @@ public interface ListeningStoreInterface<V extends Identifiable> {
     boolean isMonitorEnabled();
 
     void setMonitorEnabled(boolean x);
+     void setUpkeepConfiguration(UpkeepConfiguration upkeepConfiguration);
+    UpkeepConfiguration getUpkeepConfiguration();
 
+    /**
+     * Do the actual upkeep for the store, applying all the rules and using the configuration.
+     */
+    UpkeepResponse doUpkeep();
 }

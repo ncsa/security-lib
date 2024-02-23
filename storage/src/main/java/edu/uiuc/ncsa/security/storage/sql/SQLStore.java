@@ -9,10 +9,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.StatusValue;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptors;
@@ -20,6 +17,9 @@ import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 
 import javax.inject.Provider;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.Date;
@@ -875,4 +875,78 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     protected String getDerbyMostRecent(String attrbutes, boolean desc){
         return "select " + attrbutes + " from " + getTable().getFQTablename() + " order by " +  getCreationTSField() + (desc?" desc ": " asc ") + " fetch first ? rows only";
     }
+
+    /**
+     * This is to take an SQL script for e.g. creating a database and return a list of
+     * statements. It is not a clever parser at all. It strips out comments
+     * and anything that ends with a ; is a statement. Mostly the assumption
+     * is that this is a set of table create statements and ceate index statements.
+     * Anything else is at your own risk.
+     * @param fileName  either the name of a resource or the fully qualified path to the file.
+     * @return
+     * @throws Throwable
+     */
+    public static List<String> crappySQLParser(String fileName)  {
+        try {
+            // try to get it as a resource first. Then as a file
+            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+            InputStream is = classloader.getResourceAsStream(fileName);
+            List<String> raw = null;
+            if (is == null) {
+                raw = FileUtil.readFileAsLines(fileName);
+            } else {
+                raw = new ArrayList<>();
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                String currentLine = br.readLine();
+                while (currentLine != null) {
+                    raw.add(currentLine);
+                    currentLine = br.readLine();
+                }
+                br.close();
+            }
+            return crappySQLParser(raw);
+        }catch (Throwable t){
+            if(t instanceof RuntimeException){
+                throw (RuntimeException)t;
+            }
+            throw new GeneralException("error reading SQL script \"" + fileName + "\" (" + t.getClass().getSimpleName() + "):" + t.getMessage());
+        }
+    }
+    public static List<String> crappySQLParser(List<String> script){
+          String stmtEnd = ";";
+          String lineComment = "--";
+          String startMLC = "/*";
+          String endMLC = "*/";
+          StringBuilder currentStatement = new StringBuilder();
+          boolean inMultilineComment = false;
+          ArrayList<String> statements = new ArrayList<>();
+          for(String x : script){
+             x = x.trim();
+             // skip any comments
+              if(x.endsWith(endMLC)){
+                  inMultilineComment = false;
+                  continue;
+              }
+             if(x.startsWith(lineComment) || inMultilineComment){
+                 continue;
+             }
+             if(x.startsWith(startMLC)){
+                 inMultilineComment = true;
+                 continue;
+             }
+
+             if(x.isEmpty() || x.isBlank()){
+                 continue;
+             }
+             // finally, start accumulating things
+             if(x.endsWith(stmtEnd)){
+                 currentStatement.append(x.substring(0,x.length()-1)); // when executing SQL statements, JDBC requires they do NOT end in ;, so strip it.
+                   statements.add(currentStatement.toString());
+                   currentStatement = new StringBuilder();
+             }else{
+                 currentStatement.append(x + "\n");
+             }
+          }
+          return statements;
+      }
 }
