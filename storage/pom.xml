@@ -35,11 +35,7 @@
             <artifactId>config</artifactId>
             <version>1.4.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>9.9.2</version>
-        </dependency>
+
 
     </dependencies>
     <build>
