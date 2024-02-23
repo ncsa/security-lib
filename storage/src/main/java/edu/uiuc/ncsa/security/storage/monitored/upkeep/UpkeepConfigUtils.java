@@ -138,7 +138,7 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
         return upkeepConfiguration;
     }
 
-    protected static boolean doSkipVersions(ConfigurationNode node) {
+    protected static Boolean doSkipVersions(ConfigurationNode node) {
         String raw = getFirstAttribute(node, RULE_SKIP_VERSIONS);
         if (!isTrivial(raw)) {
             // We DON'T want Boolean to parse this since it returns false if the value is not exactly "true"
@@ -151,10 +151,7 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
                 return Boolean.FALSE;
             }
         }
-        // Yes blow up here, since if this ends up being wrong, it could unintentionally
-        // delete all of the versions of an object,
-        // which is very bad.
-        throw new IllegalArgumentException("could not parse " + RULE_SKIP_VERSIONS + " value of \"" + raw + "\"");
+        return null;
     }
 
     /**
