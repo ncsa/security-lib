@@ -25,8 +25,6 @@ import java.sql.*;
 import java.util.List;
 import java.util.UUID;
 
-import static edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConstants.WHEN_BEFORE;
-
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/29/23 at  10:24 AM
@@ -150,55 +148,6 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
         return (MonitoredKeys) getMapConverter().getKeys();
     }
 
-    protected String createUpkeepQuery(RuleList ruleList, boolean skipVersions) {
-        MonitoredKeys keys = getKeys();
-        String query = "select " + keys.identifier() + ", " + keys.creationTS() + ", " + keys.lastModifiedTS() + ", " + keys.lastAccessed()
-                + " from " + getTable().getFQTablename();
-        if (skipVersions) {
-            query = query + " WHERE " + keys.identifier() + " NOT REGEXP '.*#version.*' ";
-        } else {
-            if (ruleList.isEmpty()) {
-                return query;
-            }
-        }
-        query = query + " where ";
-        boolean firstPassAnds = true;
-        boolean firstPassOrs = true;
-        String ands = "";
-        String ors = "";
-        for (RuleEntry ruleEntry : ruleList) {
-
-            if (ruleEntry instanceof IDEntry) {
-                String x = toSQLClause((IDEntry) ruleEntry, keys);
-                if (firstPassOrs) {
-                    firstPassOrs = false;
-                    ors = ors + x;
-                } else {
-                    ors = ors + " OR " + x;
-                }
-            }
-            if (ruleEntry instanceof DateEntry) {
-                String x = toSQLClause((DateEntry) ruleEntry, keys);
-                if (firstPassAnds) {
-                    firstPassAnds = false;
-                    ands = ands + toSQLClause((DateEntry) ruleEntry, keys);
-                } else {
-                    ands = ands + " AND " + toSQLClause((DateEntry) ruleEntry, keys);
-                }
-            }
-        } // end for
-        if (ands.isEmpty()) {
-            query = query + " " + ors;
-        } else {
-            query = query + " " + ands;
-            if (!ors.isEmpty()) {
-                query = query + " AND (" + ors + ")";
-            }
-        }
-
-        return query;
-    }
-
     @Override
     public UpkeepResponse doUpkeep() {
         UpkeepResponse upkeepResponse = new UpkeepResponse();
@@ -232,7 +181,7 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
             if (ruleList.hasSkipVersion()) {
                 skipVersions = ruleList.isSkipVersions();
             }
-            String query = createUpkeepQuery(ruleList, skipVersions);
+            String query = ruleList.toSQLQuery(keys, getTable().getFQTablename(), skipVersions);
             if (cfg.isDebug()) {
                 System.err.println("upkeep SQL query for rule " + ruleList.getName() + " is \"" + query + "\"");
             }
@@ -283,6 +232,8 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
                                 deletepStmt.addBatch();
                                 upkeepResponse.deletedList.add(idString);
                             }
+                        case UpkeepConstants.ACTION_NONE:
+                            // Do nothing.
                             break;
                         default:
                             throw new NFWException("unknown action \"" + ruleList.getAction() + "\"");
@@ -323,75 +274,10 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
     }
 
 
-    protected String getTypeKey(MonitoredKeys keys, String type) {
-        switch (type) {
-            case UpkeepConstants.TYPE_CREATED:
-                return keys.creationTS();
-            case UpkeepConstants.TYPE_ACCESSED:
-                return keys.lastAccessed;
-            case UpkeepConstants.TYPE_MODIFIED:
-                return keys.lastModified;
-        }
-        throw new IllegalArgumentException("unknown type \"" + type + "\"");
-    }
-
-    public String toSQLClause(RuleEntry ruleEntry, MonitoredKeys keys) {
-        if (ruleEntry instanceof IDEntry) {
-            return toSQLClause((IDEntry) ruleEntry, keys);
-        }
-        return toSQLClause((DateEntry) ruleEntry, keys);
-    }
-
-    public String toSQLClause(IDEntry idEntry, MonitoredKeys keys) {
-        return " " + keys.identifier() +
-                (idEntry.isNegation() ? " NOT " : "") +  
-                (idEntry.isRegex() ? " REGEXP " : " = ") + "'" +
-                idEntry.getValue() + "' ";
-    }
 
 
-    public String toSQLClause(DateEntry dateEntry, MonitoredKeys keys) {
-        String query = "";
-        if (dateEntry.getWhen().equals(UpkeepConstants.WHEN_NEVER)) {
-            return " " + getTypeKey(keys, dateEntry.getType()) + " IS NULL ";
-        }
-        // date value is not null
-        DateValue dv = dateEntry.getDateValue();
-        String key = getTypeKey(keys, dateEntry.getType());
-        long now = System.currentTimeMillis();
-        if (dateEntry.getWhen().equals(UpkeepConstants.WHEN_AFTER)) {
-            if (dv.isRelative()) {
-                /*
-     WRONG:
-     select client_id, creation_ts, last_modified_ts, last_accessed from oauth2.clients
-        where creation_ts<='2023-02-14 07:39:38.997' AND  '2023-08-18 14:39:38.997'<=creation_ts;
 
-     RIGHT:
-     select client_id, creation_ts, last_modified_ts, last_accessed from oauth2.clients where
-         '2023-02-14 07:39:38.997'<=creation_ts AND creation_ts<= '2023-08-18 14:39:38.997';
-                 */
-                //query = query + key + "<=" + (now - dateThingy.getRelativeDate());
-                query = query + " '" + new Timestamp(now - dv.getRelativeDate()) + "'<=" + key + " ";
-                //applies = created + dateThingy.relativeDate <= System.currentTimeMillis();
-            } else {
-                //query = query + key + "<=" + (dateThingy.getIso8601().getTime());
-                query = query + " '" + new Timestamp(dv.getIso8601().getTime()) + "'<=" + key + " ";
-                //applies = created <= dateThingy.iso8601.getTime();
-            }
-        }
-        if (dateEntry.getWhen().equals(WHEN_BEFORE)) {
-            if (dv.isRelative()) {
-                //query = query + (now - dateThingy.getRelativeDate()) + "<=" + key;
-                query = query + " " + key + "<='" + new Timestamp(now - dv.getRelativeDate()) + "' ";
-                //applies = applies && (  System.currentTimeMillis() <= created + dateThingy.relativeDate);
-            } else {
-                //query = query + dateThingy.getIso8601().getTime() + "<=" + key;
-                query = query + " " + key + "<='" + new Timestamp(dv.getIso8601().getTime()) + "' ";
-                // applies = applies && (  dateThingy.iso8601.getTime() <= created);
-            }
-        }
-        return query;
-    }
+
 
     protected UpkeepStats gatherStats(int[] records) {
         int success = 0;

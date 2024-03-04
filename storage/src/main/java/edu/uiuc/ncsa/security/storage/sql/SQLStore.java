@@ -100,8 +100,11 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
      * @param value
      */
     public void update(V value) {
+            update(value, false);
+    }
+    public void update(V value, boolean existenceChecked) {
 
-        if (!containsValue(value)) {
+        if (!existenceChecked && !containsValue(value)) {
             throw new UnregisteredObjectException("Error: cannot update non-existent entry for\"" +
                     value.getIdentifierString() + "\". Register it first or call save.");
         }
@@ -111,29 +114,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         try {
 
             PreparedStatement stmt = c.prepareStatement(getTable().createUpdateStatement());
-            ColumnMap map = depopulate(value);
-            int i = 1;
-            for (ColumnDescriptorEntry cde : getTable().getColumnDescriptor()) {
-                // now we loop through the table and set each and every one of these
-                if (!cde.isPrimaryKey()) {
-                    Object obj = map.get(cde.getName());
-                    // Dates confuse setObject, so turn it into an SQL Timestamp object.
-                    boolean gotOne = false;
-                    if (obj instanceof Date) {
-                        obj = new Timestamp(((Date) obj).getTime());
-                    }
-                    if (obj instanceof BasicIdentifier) {
-                        obj = obj.toString();
-                    }
-                    if (obj instanceof StatusValue) {
-                        obj = ((StatusValue) obj).getStatus();
-                    }
-                        stmt.setObject(i++, obj);
-                }
-            }
-
-            // now set the primary key
-            stmt.setString(i++, value.getIdentifierString());
+            setUpdateValues(value, stmt);
             stmt.executeUpdate();
             stmt.close();
             releaseConnection(cr);
@@ -141,6 +122,32 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             destroyConnection(cr);
             throw new GeneralException("Error updating object with identifier = \"" + value.getIdentifierString() + " (" + e.getMessage() + ")", e);
         }
+    }
+
+    public void setUpdateValues(V value, PreparedStatement stmt) throws SQLException {
+        ColumnMap map = depopulate(value);
+        int i = 1;
+        for (ColumnDescriptorEntry cde : getTable().getColumnDescriptor()) {
+            // now we loop through the table and set each and every one of these
+            if (!cde.isPrimaryKey()) {
+                Object obj = map.get(cde.getName());
+                // Dates confuse setObject, so turn it into an SQL Timestamp object.
+                boolean gotOne = false;
+                if (obj instanceof Date) {
+                    obj = new Timestamp(((Date) obj).getTime());
+                }
+                if (obj instanceof BasicIdentifier) {
+                    obj = obj.toString();
+                }
+                if (obj instanceof StatusValue) {
+                    obj = ((StatusValue) obj).getStatus();
+                }
+                    stmt.setObject(i++, obj);
+            }
+        }
+
+        // now set the primary key
+        stmt.setString(i++, value.getIdentifierString());
     }
 
 
@@ -175,12 +182,35 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
 
     public void save(V value) {
         if (containsKey(value.getIdentifier())) {
-            update(value);
+            update(value, true); // pass flag so we don't redo the call to check it
         } else {
             register(value);
         }
     }
 
+    /**
+     * Sets the values in the {@link PreparedStatement} to those in the value. This allows
+     * other utilities to create batch statements for this store.
+     * @param stmt
+     * @param value
+     * @throws SQLException
+     */
+    public void doRegisterStatement(PreparedStatement stmt, V value) throws SQLException {
+        Map<String, Object> map = depopulate(value);
+        int i = 1;
+        for (ColumnDescriptorEntry cde : getTable().getColumnDescriptor()) {
+            // now we loop through the table and set each and every one of these
+            // OAUTH-148 fix: MariaDB driver does not accept longvarchar as a type in setObject (known bug for
+            // them. Workaround is to explicitly test for this and carry out a setString call instead.)
+            if (cde.getType() == Types.LONGVARCHAR) {
+                Object obj = map.get(cde.getName());
+                stmt.setString(i++, obj == null ? null : obj.toString());
+            } else {
+                stmt.setObject(i++, map.get(cde.getName()), cde.getType());
+            }
+        }
+
+    }
     public void register(V value) {
         if(value.isReadOnly()){
         throw  new IllegalAccessException(value.getIdentifierString() + " is read only");
@@ -190,19 +220,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
 
         try {
             PreparedStatement stmt = c.prepareStatement(getTable().createInsertStatement());
-            Map<String, Object> map = depopulate(value);
-            int i = 1;
-            for (ColumnDescriptorEntry cde : getTable().getColumnDescriptor()) {
-                // now we loop through the table and set each and every one of these
-                // OAUTH-148 fix: MariaDB driver does not accept longvarchar as a type in setObject (known bug for
-                // them. Workaround is to explicitly test for this and carry out a setString call instead.)
-                if (cde.getType() == Types.LONGVARCHAR) {
-                    Object obj = map.get(cde.getName());
-                    stmt.setString(i++, obj == null ? null : obj.toString());
-                } else {
-                    stmt.setObject(i++, map.get(cde.getName()), cde.getType());
-                }
-            }
+            doRegisterStatement(stmt, value);
             stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content of x as per JDBC spec.
             stmt.close();
             releaseConnection(cr);

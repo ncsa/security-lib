@@ -2,7 +2,10 @@ package edu.uiuc.ncsa.security.storage.monitored.upkeep;
 
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
+import edu.uiuc.ncsa.security.storage.monitored.Monitored;
+import edu.uiuc.ncsa.security.storage.monitored.MonitoredKeys;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -10,14 +13,13 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 import java.io.File;
 import java.security.SecureRandom;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.pad;
 import static edu.uiuc.ncsa.security.core.util.TokenUtil.b32Encode;
+import static edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConstants.*;
 
 /**
  * Utilities for processing upkeep configurations found in a server configuration file.
@@ -177,7 +179,7 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
     protected static String getRandomRuleName() {
         byte[] b = new byte[5]; // use base32 which is 5 bits, so this matches with no padding.
         secureRandom.nextBytes(b);
-        return "rule_" + b32Encode(b).toLowerCase();
+        return "anon_" + b32Encode(b).toLowerCase();
     }
 
     protected static RuleEntry createRuleEntry(ConfigurationNode ruleEntryNode) {
@@ -195,9 +197,9 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
                 if (!(obj instanceof String)) {
                     throw new IllegalArgumentException("unknown id type \"" + obj + "\"");
                 }
-                String v = (String)obj;
-                if(isTrivial(v)){
-                    throw new IllegalArgumentException("missing value for " + ID_TAG + " element" );
+                String v = (String) obj;
+                if (isTrivial(v)) {
+                    throw new IllegalArgumentException("missing value for " + ID_TAG + " element");
                 }
 
                 IDEntry idEntry = new IDEntry(getFirstBooleanValue(ruleEntryNode, ID_REGEX_FLAG, false), (String) obj);
@@ -265,13 +267,103 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
         // and debug it as part of a configuration.
         String testFile = "/home/ncsa/dev/ncsa-git/security-lib/storage/src/main/resources/upkeep_test.xml";
         File f = new File(testFile);
+
         XMLConfiguration xmlConfiguration = Configurations.getConfiguration(f);
         ConfigurationNode root = xmlConfiguration.getRoot();
         UpkeepConfiguration upkeepConfiguration = processUpkeep(root);
         System.out.println(upkeepConfiguration);
+        List<String> actionList = new ArrayList<>(); // list of actions to check these against
+        List<Monitored> monitoreds = getTestList(actionList);
+        for (int i = 0; i < monitoreds.size(); i++) {
+            Monitored monitored = monitoreds.get(i);
+            String[] rc = upkeepConfiguration.applies(monitored);
+            String action = rc[0];
+            String ruleName = rc[1];
+            if (action.equals(actionList.get(i))) {
+                System.out.println("  action = " + pad(action, 10) + "| rule = " + pad(ruleName, 15) + "| ok");
+            } else {
+                System.out.println("  action = " + pad(action, 10) + "| rule = " + pad(ruleName, 15) + "| FAIL: expected " + actionList.get(i));
+            }
+        }
+        MonitoredKeys monitoredKeys = new MonitoredKeys();
+        for (RuleList ruleList : upkeepConfiguration.ruleList) {
+            boolean skipVersions = true;
+            if (upkeepConfiguration.hasSkipVersion()) {
+                skipVersions = upkeepConfiguration.isSkipVersions();
+            }
+            if (ruleList.hasSkipVersion()) {
+                skipVersions = ruleList.isSkipVersions();
+            }
+            System.out.println(ruleList.toSQLQuery(monitoredKeys, "oauth2.clients", skipVersions));
+
+        }
     }
 
+    /*
+    Gets a list of monitored items for testing applies
+     */
+    protected static List<Monitored> getTestList(List<String> actionList) {
+        long now = System.currentTimeMillis();
+        List<Monitored> monitoreds = new ArrayList<>();
+        Monitored monitored;
+        long oneYearAgo = ONE_YEAR;
 
+        // abandoned = created long time ago and never used DELETE
+        monitored = new Monitored(BasicIdentifier.newID("woof:1234"));
+        monitored.setCreationTS(new Date(now - oneYearAgo)); // created 1 year ago
+        monitored.setLastModifiedTS(new Date(now - oneYearAgo - ONE_HOUR));
+        monitoreds.add(monitored);
+        actionList.add(ACTION_DELETE);
+
+        // Version Still unused and a version, but rulle says to delete versions
+        monitored = new Monitored(BasicIdentifier.newID("woof:1234#version=0"));
+        monitored.setCreationTS(new Date(now - oneYearAgo)); // created 1 year ago
+        monitored.setLastModifiedTS(new Date(now - oneYearAgo - ONE_HOUR));
+        monitoreds.add(monitored);
+        actionList.add(ACTION_DELETE);
+
+        // used recently ARCHIVE
+        monitored = new Monitored(BasicIdentifier.newID("woof:1234"));
+        monitored.setCreationTS(new Date(now - 2 * oneYearAgo)); // created 2 years ago
+        monitored.setLastModifiedTS(new Date(now - 2 * oneYearAgo));
+        monitored.setLastAccessed(new Date(now - oneYearAgo - ONE_MONTH)); // last accessed more than a year ago
+        monitoreds.add(monitored);
+        actionList.add(ACTION_ARCHIVE);
+
+        // Same as pervious, but this is a version and versions are ignored, so not re-archived
+        monitored = new Monitored(BasicIdentifier.newID("woof:1234#version=0"));
+        monitored.setCreationTS(new Date(now - 2 * oneYearAgo)); // created 2 years ago
+        monitored.setLastModifiedTS(new Date(now - 2 * oneYearAgo));
+        monitored.setLastAccessed(new Date(now - oneYearAgo - ONE_MONTH)); // last accessed more than a year ago
+        monitoreds.add(monitored);
+        actionList.add(ACTION_NONE);
+
+        // This is whitelisted RETAIN
+        monitored = new Monitored(BasicIdentifier.newID("client:/my_ersatz"));
+        monitored.setCreationTS(new Date(now - 7 * ONE_HOUR)); // created 7 hours ago
+        monitored.setLastModifiedTS(new Date(now - 6 * ONE_HOUR));
+        monitoreds.add(monitored);
+        actionList.add(ACTION_RETAIN);
+
+
+        // 1/2 hour old. Not used but valid.  NONE
+        monitored = new Monitored(BasicIdentifier.newID("woof:arf:/blah/123"));
+        monitored.setCreationTS(new Date(now - ONE_HOUR / 2)); // created  1/2 hours ago, not used
+        monitored.setLastModifiedTS(new Date(now - ONE_HOUR / 4));
+        monitoreds.add(monitored);
+        actionList.add(ACTION_NONE);
+
+
+        // Blacklisted. DELETE
+        monitored = new Monitored(BasicIdentifier.newID("testScheme:arf"));
+        monitored.setCreationTS(new Date(now - oneYearAgo)); // created 1 year ago
+        monitored.setLastModifiedTS(new Date(now - oneYearAgo));
+        monitored.setLastAccessed(new Date(now - 1000 * 60)); // last accessed a minute ago
+        monitoreds.add(monitored);
+        actionList.add(ACTION_DELETE);
+
+        return monitoreds;
+    }
 
 
 }

@@ -52,13 +52,13 @@
           action="delete"
           skipVersions="false"
           verbose="false">       <!-- Rule List -->
-        <date type="created" when="after" value="6 hr"></date>     <!-- rule entries -->
+        <date type="created" when="before" value="6 hr"></date>     <!-- rule entries -->
         <date type="accessed" when="never"></date>
     </rule>
     <rule name="abandoned" action="archive">                        <!-- Rule list -->
         <date type="accessed" when="before" value="1 year"></date>
     </rule>
-    <rule name="unused2" action="delete" extends="unused">          <!-- Rule list -->
+    <rule name="unmodified" action="delete" extends="abandoned">          <!-- Rule list -->
         <date type="modified" when="before" value="1 year"></date>
     </rule>
     <rule action="delete"> <!-- unnamed rule -->

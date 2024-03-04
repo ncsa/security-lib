@@ -10,6 +10,8 @@ import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
  * on 1/17/12 at  12:07 PM
  */
 public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends HierarchicalConfigProvider<T> {
+    public ConnectionPoolProvider() {
+    }
 
     protected String host;
     protected String driver;
@@ -98,6 +100,7 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
      * @return
      */
     protected String checkValue(String key, String defaultValue) {
+        if(getConfig() == null) return defaultValue;
         String x = getAttribute(key);
         if (x != null) return x;
         if (defaultValue != null) return defaultValue;
@@ -106,6 +109,7 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
     }
 
     protected int checkValue(String key, int defaultValue) {
+        if(getConfig() == null) return defaultValue;
         String x = getAttribute(key);
         if (x != null) return Integer.parseInt(x);
         if (defaultValue != -1) return defaultValue;
@@ -122,6 +126,7 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
      * @return
      */
     protected long checkTime(String key, long defaultValue) {
+        if(getConfig() == null) return defaultValue;
         String x = getAttribute(key);
         if(x!= null) return XMLConfigUtil.getValueSecsOrMillis(x);
         if (defaultValue != -1) return defaultValue;
@@ -129,6 +134,7 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
     }
 
     protected long checkValue(String key, long defaultValue) {
+        if(getConfig() == null) return defaultValue;
         String x = getAttribute(key);
         if (x != null) return Long.parseLong(x);
         if (defaultValue != -1) return defaultValue;
@@ -136,6 +142,7 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
     }
 
     protected boolean checkValue(String key, boolean defaultValue) {
+        if(getConfig() == null) return defaultValue;
         String x = getAttribute(key);
         if (x != null) return Boolean.parseBoolean(x);
         return defaultValue;
@@ -153,5 +160,59 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
             throw new MyConfigurationException("Error: no value specified for " + key);
         }
         return x;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public ConnectionPoolProvider setHost(String host) {
+        this.host = host;
+        return this;
+    }
+
+    public String getDriver() {
+        return driver;
+    }
+
+    public ConnectionPoolProvider setDriver(String driver) {
+        this.driver = driver;
+        return this;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public ConnectionPoolProvider setPort(int port) {
+        this.port = port;
+        return this;
+    }
+
+    public String getSchema() {
+        return schema;
+    }
+
+    public ConnectionPoolProvider setSchema(String schema) {
+        this.schema = schema;
+        return this;
+    }
+
+    public String getDatabase() {
+        return database;
+    }
+
+    public ConnectionPoolProvider setDatabase(String database) {
+        this.database = database;
+        return this;
+    }
+
+    public boolean isUseSSL() {
+        return useSSL;
+    }
+
+    public ConnectionPoolProvider setUseSSL(boolean useSSL) {
+        this.useSSL = useSSL;
+        return this;
     }
 }

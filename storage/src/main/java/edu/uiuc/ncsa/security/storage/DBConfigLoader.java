@@ -78,12 +78,13 @@ public abstract class DBConfigLoader<T extends AbstractEnvironment> extends Logg
     DerbyConnectionPoolProvider derbyConnectionPoolProvider;
     // need no-arg constructor whose values will be overriden later from configuration.
 
-    public DerbyConnectionPoolProvider getDerbyConnectionPoolProvider(){
-           return getDerbyConnectionPoolProvider("oa4mp", "oauth2");
+    public DerbyConnectionPoolProvider getDerbyConnectionPoolProvider() {
+        return getDerbyConnectionPoolProvider("oa4mp", "oauth2");
     }
-    public DerbyConnectionPoolProvider getDerbyConnectionPoolProvider(String databaseName, String schema){
-        if(derbyConnectionPoolProvider == null){
-                     derbyConnectionPoolProvider = new DerbyConnectionPoolProvider(databaseName, schema);
+
+    public DerbyConnectionPoolProvider getDerbyConnectionPoolProvider(String databaseName, String schema) {
+        if (derbyConnectionPoolProvider == null) {
+            derbyConnectionPoolProvider = new DerbyConnectionPoolProvider(databaseName, schema);
         }
         return derbyConnectionPoolProvider;
     }

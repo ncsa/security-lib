@@ -105,7 +105,13 @@ public class SASServlet extends AbstractServlet {
     @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
         // Either there is basic auth (to do logon) or there is a session id. The payload is always a blob.
-
+        if(getSASE().hasAccessList()){
+            String ipAddress =  httpServletRequest.getRemoteAddr();
+            if(!getSASE().getAccessList().contains(ipAddress)){
+                httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+        }
         String rawSessionID = httpServletRequest.getHeader(SASConstants.HEADER_SESSION_ID);
         Identifier clientID = null;
         UUID sessionID = null;

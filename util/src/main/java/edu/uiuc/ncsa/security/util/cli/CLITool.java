@@ -97,9 +97,22 @@ public abstract class CLITool implements Logable {
     BufferedReader bufferedReader;
 
     protected String readline() throws IOException {
-        return getBufferedReader().readLine();
+        return getIoInterface().readline();
+        //return getBufferedReader().readLine();
     }
 
+    public static IOInterface getIoInterface() {
+        if(ioInterface == null){
+            ioInterface = new BasicIO();
+        }
+        return ioInterface;
+    }
+
+    public static void setIoInterface(IOInterface newIOInterface) {
+        ioInterface = newIOInterface;
+    }
+
+   static IOInterface ioInterface = null;
     /**
      * Does the actual work. This is where you put your executable code.
      */
@@ -370,7 +383,8 @@ public abstract class CLITool implements Logable {
      * @param x
      */
     public static void say(String x) {
-        System.out.println(x);
+    //    System.out.println(x);
+        getIoInterface().println(x);
     }
 
     /**
@@ -379,7 +393,8 @@ public abstract class CLITool implements Logable {
      * @param x
      */
     public void say2(String x) {
-        System.out.print(x);
+     //   System.out.print(x);
+        getIoInterface().print(x);
     }
 
     public void setMyLogger(MyLoggingFacade myLoggingFacade) {

@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.security.core.util;
 
+import java.math.BigDecimal;
+
 /**
  * A class used in command line utilities. This has little thingies pacing back and forth
  * in front of the user -- it's an ASCII  status bar.
@@ -87,17 +89,21 @@ public class Pacer {
      */
     public void pace(long items, String tail) {
         Long l = new Long(items);
-        String appendLine = l.toString() + " " + tail;
+        String appendLine = l + " " + tail;
         char temp[] = frame.toCharArray();
         temp[index] = '/';
         temp[len - index - 1] = '\\';
         if (appendLineLength < appendLine.length())
             appendLineLength = appendLine.length();
-        System.out.print("\r" + frame.copyValueOf(temp) + "  " + appendLine);
+        String line = "\r" + frame.copyValueOf(temp) + "  " + appendLine;
+        maxLineLength = Math.max(maxLineLength, line.length());
+        // Blanks out the rest of the line since if the length varies, you can get artifacts at the end that are not erased.
+        line = line + StringUtils.getBlanks(maxLineLength - line.length());
+        System.out.print(line);
         index = (index + 1) % (len);
-
     }
 
+    int maxLineLength = 0 ;
     public void pace(long items) {
         pace(items, message);
 
@@ -111,11 +117,14 @@ public class Pacer {
      */
     public static void main(String[] args) throws InterruptedException {
         int n = 2000;
+        String r = "random message to check line overflow/truncation";
         System.out.println("This will pace for " + n + " 'records' to show how this works as a status bar");
         Pacer pacer = new Pacer(20);
         for (int i = 0; i < n; i++) {
             if (0 == Math.floorMod(i, 20)) {
-                pacer.pace(i, "records read");
+
+                BigDecimal bigDecimal = new BigDecimal(String.valueOf(Math.ceil(Math.abs(Math.random())*r.length())));
+                pacer.pace(i, "records read " + r.substring(0,bigDecimal.intValue()));
                 Thread.sleep(100);
             }
         }

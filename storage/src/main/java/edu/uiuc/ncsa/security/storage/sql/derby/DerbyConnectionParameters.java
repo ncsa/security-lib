@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.security.storage.sql.derby;
 
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.sql.SQLConnectionImpl;
 import net.sf.json.JSONObject;
@@ -32,36 +31,40 @@ public class DerbyConnectionParameters extends SQLConnectionImpl {
     @Override
     public String getJdbcUrl() {
         if (jdbcURL == null) {
-            jdbcURL = "jdbc:derby:";
-            switch (storeType) {
-                case DERBY_STORE_TYPE_MEMORY:
+            createJdbcUrls();
+        }
+        return jdbcURL;
+    }
+
+    public void createJdbcUrls() {
+        jdbcURL = "jdbc:derby:";
+        switch (storeType) {
+            case DERBY_STORE_TYPE_MEMORY:
                 /*
                    Example from the manual
                    jdbc:derby:memory:myDB;create=true
                  */
 
-                    jdbcURL = jdbcURL + "memory:" + databaseName + ";create=true";
-                    setCreateURL(jdbcURL); // always create  in memory store
-                    setCreateOne(true);
-                    break;
+                jdbcURL = jdbcURL + "memory:" + databaseName + ";create=true";
+                setCreateURL(jdbcURL); // always create  in memory store
+                setCreateOne(true);
+                break;
 
-                case DERBY_STORE_TYPE_FILE:
-                    // connect 'jdbc:derby:/home/ncsa/dev/derby/oa4mp;create=true;dataEncryption=true;bootPassword=o7MtXykd;user=oa4mp';
-                    jdbcURL = jdbcURL + databaseName +
-                            ";dataEncryption=true" +
-                            ";user=" + username +
-                            ";bootPassword=" + bootPassword
-                    ;
-                    File f = new File(databaseName);
-                    setCreateURL(jdbcURL + ";create=true;");
-                    setShutdownURL(jdbcURL + databaseName +
-                            ";user=" + username +
-                            ";password=" + password +
-                            ";shutdown=true");
-                    jdbcURL = jdbcURL + ";password=" + password;
-                    setCreateOne(!new File(databaseName).exists());
-                    break;
-                case DERBY_STORE_TYPE_SERVER:
+            case DERBY_STORE_TYPE_FILE:
+                // connect 'jdbc:derby:/home/ncsa/dev/derby/oa4mp;create=true;dataEncryption=true;bootPassword=o7MtXykd;user=oa4mp';
+                jdbcURL = jdbcURL + databaseName;
+                setShutdownURL(jdbcURL + ";shutdown=true");
+                jdbcURL = jdbcURL +
+                        ";dataEncryption=true" +
+                        ";user=" + username +
+                        ";bootPassword=" + bootPassword
+                ;
+                File f = new File(databaseName);
+                setCreateURL(jdbcURL + ";create=true;");
+                jdbcURL = jdbcURL + ";password=" + password;
+                setCreateOne(!new File(databaseName).exists());
+                break;
+            case DERBY_STORE_TYPE_SERVER:
                 /*
                    Example full connection string from the reference manual
                    'jdbc:derby://localhost:8246/mchrystaEncryptedDB;create=true;
@@ -69,25 +72,23 @@ public class DerbyConnectionParameters extends SQLConnectionImpl {
                       encryptionAlgorithm=Blowfish/CBC/NoPadding;
                       bootPassword=mySuperSecretBootPassword;ssl=peerAuthentication';
                  */
-                    setCreateURL(null);
-                    setCreateOne(false);
-                    jdbcURL = jdbcURL + host + ":" + port + "/" +
-                            databaseName +
-                            ";dataEncryption=true" +
-                            ";user=" + username +
-                            ";password=" + password +
-                            (!StringUtils.isTrivial(bootPassword) ? ";bootPassword=" + bootPassword : "");
-                    break;
-                default:
-                    throw new IllegalStateException("unknown derby " + DERBY_STORE_TYPE + "\"" + storeType + "\"");
-            }
-            DebugUtil.trace("Derby connection string is:\n" + "connect " + jdbcURL + ";");
+                setCreateURL(null);
+                setCreateOne(false);
+                jdbcURL = jdbcURL + host + ":" + port + "/" +
+                        databaseName +
+                        ";dataEncryption=true" +
+                        ";user=" + username +
+                        ";password=" + password +
+                        (!StringUtils.isTrivial(bootPassword) ? ";bootPassword=" + bootPassword : "");
+                break;
+            default:
+                throw new IllegalStateException("unknown derby " + DERBY_STORE_TYPE + "\"" + storeType + "\"");
         }
-        return jdbcURL;
-        // jdbc:derby:PATH_TO_DATABASE;create=true;dataEncryption=true;bootPassword=BOOT_PASSWORD;
-        //return "'jdbc:derby:" + (useSSL?"ssl":"tcp") + "://" + host  + (0<port?":"+port:"")  + "/" + databaseName;
     }
+    public String getDerbyConnectionString(){
+        return "connect '" + jdbcURL + "';";
 
+    }
     public String getShutdownURL() {
         return shutdownURL;
     }
@@ -148,7 +149,7 @@ public class DerbyConnectionParameters extends SQLConnectionImpl {
         this.storeType = storeType;
         this.bootPassword = bootPassword;
         this.rootDirectory = rootDirectory;
-        getJdbcUrl(); // this will set a bunch of other URLs.
+        createJdbcUrls(); // this will set a bunch of other URLs.
     }
 
     protected String bootPassword = null;

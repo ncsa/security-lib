@@ -11,13 +11,18 @@ import edu.uiuc.ncsa.sas.storage.SASClientStoreProvider;
 import edu.uiuc.ncsa.sas.thing.action.ActionDeserializer;
 import edu.uiuc.ncsa.sas.thing.response.ResponseSerializer;
 import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.DBConfigLoader;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -45,10 +50,25 @@ public class SASConfigurationLoader<T extends SASEnvironment> extends DBConfigLo
         T t = (T) new SASEnvironment(loggerProvider.get(),
                 (Store<? extends SASClient>) getCSP().get(),
                 new ActionDeserializer(),
-                new ResponseSerializer());
+                new ResponseSerializer(),
+                getAccessList());
         return t;
     }
 
+    List<String> accessList = null;
+    protected List<String> getAccessList(){
+        if(accessList == null){
+                    accessList = new ArrayList<>();
+            String raw = Configurations.getFirstAttribute(cn, "accessList");
+            if(!StringUtils.isTrivial(raw)){
+                StringTokenizer stringTokenizer = new StringTokenizer(raw, ",");
+                while(stringTokenizer.hasMoreTokens()){
+                    accessList.add(stringTokenizer.nextToken().trim());
+                }
+            }
+        }
+        return accessList;
+    }
     HashMap<String, String> constants = new HashMap<>();
 
     /**

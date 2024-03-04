@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.security.storage.sql.derby;
 
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
@@ -11,12 +10,29 @@ import java.io.File;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.getFirstAttribute;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 5/2/12 at  1:46 PM
  */
 public class DerbyConnectionPoolProvider extends ConnectionPoolProvider<ConnectionPool> implements StorageConfigurationTags {
+    public DerbyConnectionPoolProvider() {
+        // Wholly reasonable defaults for superclass.
+        driver = "org.apache.derby.jdbc.EmbeddedDriver";
+        port = 1527;
+        host = "localhost";
+        schema = "oauth2";
+    }
+
+    /**
+     * Use this for builder/factory pattern.
+     *
+     * @return
+     */
+    public static DerbyConnectionPoolProvider newInstance() {
+        return new DerbyConnectionPoolProvider();
+    }
 
     public DerbyConnectionPoolProvider(String database,
                                        String schema,
@@ -27,12 +43,61 @@ public class DerbyConnectionPoolProvider extends ConnectionPoolProvider<Connecti
         super(database, schema, host, port, driver, useSSL);
     }
 
+
+    public DerbyConnectionPoolProvider(String database) {
+        this(database, DERBY_FS_DEFAULT_SCHEMA);
+    }
+
     public DerbyConnectionPoolProvider(String database, String schema) {
         super(database, schema);
         driver = "org.apache.derby.jdbc.EmbeddedDriver";
         port = 1527;
         host = "localhost";
+    }
 
+    public String getStoreType() {
+        return storeType;
+    }
+
+    public DerbyConnectionPoolProvider setStoreType(String storeType) {
+        this.storeType = storeType;
+        return this;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public DerbyConnectionPoolProvider setUsername(String username) {
+        this.username = username;
+        return this;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public DerbyConnectionPoolProvider setPassword(String password) {
+        this.password = password;
+        return this;
+    }
+
+    public String getBootPassword() {
+        return bootPassword;
+    }
+
+    public DerbyConnectionPoolProvider setBootPassword(String bootPassword) {
+        this.bootPassword = bootPassword;
+        return this;
+    }
+
+    public String getRootDirectory() {
+        return rootDirectory;
+    }
+
+    public DerbyConnectionPoolProvider setRootDirectory(String rootDirectory) {
+        this.rootDirectory = rootDirectory;
+        return this;
     }
 
     String storeType = null;
@@ -61,47 +126,27 @@ public class DerbyConnectionPoolProvider extends ConnectionPoolProvider<Connecti
     public ConnectionPool get() {
         // Reminder that these are pulling the values from the XML configuration directly,
         // hence the check and default values.
-        storeType = getFirstAttribute(getConfig(), DERBY_STORE_TYPE)==null?"DERBY_STORE_TYPE_MEMORY":getFirstAttribute(getConfig(), DERBY_STORE_TYPE);
+        if (storeType == null) {
+            storeType = getFirstAttribute(getConfig(), DERBY_STORE_TYPE) == null ? DERBY_STORE_TYPE_MEMORY : getFirstAttribute(getConfig(), DERBY_STORE_TYPE);
+        }
         if (DERBY_STORE_TYPE_FILE.equals(storeType)) {
-            // It is possible some of these are missing
-            String x = getFirstAttribute(getConfig(), USERNAME);
-            if (x == null) {
-                username = DERBY_FS_DEFAULT_USER;
-            } else{
-                username = x;
+            if (getCreateScriptPath() != null) {
+                // Then they are injecting the script in the configuration. Use it.
+                createScript = SQLStore.crappySQLParser(getCreateScriptPath());
             }
-            x = getFirstAttribute(getConfig(), PASSWORD);
-            if (x == null) {
-                password = DERBY_FS_DEFAULT_PASSWORD;
-            }else{
-                password = x;
-            }
-            x = getFirstAttribute(getConfig(), BOOT_PASSWORD);
-            if (x == null) {
-                bootPassword = DERBY_FS_DEFAULT_BOOT_PASSWORD;
-            }else{
-                bootPassword = x;
-            }
-            // options are to set the path and let the system manage everything
-            // or set the databaseName which is the exact path to the database
-            x = getFirstAttribute(getConfig(), FS_PATH);
-            if(x == null){
+            username = getVar(username, USERNAME, DERBY_FS_DEFAULT_USER);
+            password = getVar(password, PASSWORD, DERBY_FS_DEFAULT_PASSWORD);
+            bootPassword = getVar(bootPassword, BOOT_PASSWORD, DERBY_FS_DEFAULT_BOOT_PASSWORD);
+            rootDirectory = getVar(rootDirectory, FS_PATH, null);
+            schema = getVar(schema, SCHEMA, DERBY_FS_DEFAULT_SCHEMA);
+            if (rootDirectory == null) {
                 throw new IllegalArgumentException("file stores require a path");
             }
-            String db = getFirstAttribute(getConfig(), DATABASE);
-            if (x != null) {
-                if (StringUtils.isTrivial(db)) {
-                    rootDirectory = x;
-                    File f = new File(x, DERBY_STORE); // let the file system figure out the path
-                    database = f.getAbsolutePath();
-                }
-            }
-            x = getFirstAttribute(getConfig(), SCHEMA);
-            if(x==null){
-                schema = DERBY_FS_DEFAULT_SCHEMA;
-            }else{
-                schema = x;
-            }
+            database = getVar(database, DATABASE, new File(rootDirectory, DERBY_STORE).getAbsolutePath());
+            // options are to set the path and let the system manage everything
+            // or set the databaseName which is the exact path to the database
+            // They can set the root directory directly or we can pull it out of the
+            // configuration as the value of the path attribute.
         }
 
         /*
@@ -133,6 +178,18 @@ public class DerbyConnectionPoolProvider extends ConnectionPoolProvider<Connecti
         return createNewPool(x);
     }
 
+    protected String getVar(String var, String key, String defaultValue) {
+        if (isTrivial(var)) {
+            String x = getFirstAttribute(getConfig(), key);
+            if (x == null) {
+                return defaultValue;
+            } else {
+                return x;
+            }
+        }
+        return var;
+    }
+
     DerbyConnectionPool pool = null; // There can be only one.
 
     /**
@@ -151,19 +208,55 @@ public class DerbyConnectionPoolProvider extends ConnectionPoolProvider<Connecti
         return pool;
     }
 
+    /**
+     * The default creation script is injected
+     *
+     * @return
+     */
     public List<String> getCreateScript() {
         if (createScript == null) {
             String path = getCreateScriptPath();
-            if (!StringUtils.isTrivial(path)) {
+            if (!isTrivial(path)) {
                 createScript = SQLStore.crappySQLParser(path);
             }
         }
         return createScript;
     }
 
-    public void setCreateScript(List<String> createScript) {
+    public DerbyConnectionPoolProvider setCreateScript(List<String> createScript) {
         this.createScript = createScript;
+        return this;
     }
 
     List<String> createScript = null;
+
+    @Override
+    public DerbyConnectionPoolProvider setHost(String host) {
+        return (DerbyConnectionPoolProvider) super.setHost(host);
+    }
+
+    @Override
+    public DerbyConnectionPoolProvider setDriver(String driver) {
+        return (DerbyConnectionPoolProvider) super.setDriver(driver);
+    }
+
+    @Override
+    public DerbyConnectionPoolProvider setPort(int port) {
+        return (DerbyConnectionPoolProvider) super.setPort(port);
+    }
+
+    @Override
+    public DerbyConnectionPoolProvider setSchema(String schema) {
+        return (DerbyConnectionPoolProvider) super.setSchema(schema);
+    }
+
+    @Override
+    public DerbyConnectionPoolProvider setDatabase(String database) {
+        return (DerbyConnectionPoolProvider) super.setDatabase(database);
+    }
+
+    @Override
+    public DerbyConnectionPoolProvider setUseSSL(boolean useSSL) {
+        return (DerbyConnectionPoolProvider) super.setUseSSL(useSSL);
+    }
 }

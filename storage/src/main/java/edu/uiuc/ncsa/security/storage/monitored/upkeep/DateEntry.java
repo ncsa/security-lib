@@ -37,23 +37,35 @@ public class DateEntry implements RuleEntry {
                 break;
         }
         long now = System.currentTimeMillis();
+        boolean rc = false;
         switch (getWhen()) {
             case WHEN_NEVER:
-                return targetValue == null;
+                rc = targetValue == null;
+                break;
             case WHEN_AFTER:
-                if (getDateValue().isRelative()) {
-                    return now - dateValue.getRelativeDate() <= targetValue;
+                if (targetValue == null) {
+                    rc = false;
                 } else {
-                    return dateValue.getIso8601().getTime() <= targetValue;
+                    if (getDateValue().isRelative()) {
+                        rc = now - dateValue.getRelativeDate() <= targetValue;
+                    } else {
+                        rc = dateValue.getIso8601().getTime() <= targetValue;
+                    }
                 }
+                break;
             case WHEN_BEFORE:
-                if (getDateValue().isRelative()) {
-                    return targetValue <= now - dateValue.getRelativeDate();
+                if (targetValue == null) {
+                    rc = false;
                 } else {
-                    return targetValue <= dateValue.getIso8601().getTime();
+                    if (getDateValue().isRelative()) {
+                        rc = targetValue <= now - dateValue.getRelativeDate();
+                    } else {
+                        rc = targetValue <= dateValue.getIso8601().getTime();
+                    }
                 }
+                break;
         }
-        return false;
+        return rc;
     }
 
 

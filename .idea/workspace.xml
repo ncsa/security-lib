@@ -10,49 +10,38 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/filestore/LuceneStore.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/MonitoredMultiTypeProvider.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionPool.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/storage/src/main/docs/upkeep.odt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/configuration/TimeConstants.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/core/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/StorageConfigurationTags.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/StorageConfigurationTags.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/provider/HierarchicalConfigProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/provider/HierarchicalConfigProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/provider/MultiTypeProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/provider/MultiTypeProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/class-use/Identifier.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/class-use/Identifier.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/AbstractListeningStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/AbstractListeningStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/ListeningStoreInterface.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/ListeningStoreInterface.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/AbstractListeningStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/AbstractListeningStore.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/ListeningStoreInterface.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/ListeningStoreInterface.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/events/LastAccessedEvent.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/events/LastAccessedEvent.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/index-all.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/index-all.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/storage/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/AbstractListeningStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/MonitoredStoreDelegate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/FSProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/FSProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/ListeningStoreInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/MonitoredStoreInterface.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/MemoryStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/MemoryStoreProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/events/LastAccessedEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/events/LastAccessedEvent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/events/LastAccessedEventListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/events/LastAccessedEventListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/events/LastAccessedThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/events/LastAccessedThread.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/MonitoredFileStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/MonitoredFileStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/MonitoredMemoryStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/MonitoredMemoryStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/FileUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/FileUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/Pacer.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/Pacer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sas-server/src/main/docs/SAS-protocol.odt" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/docs/SAS-protocol.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/SASEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/SASEnvironment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/SASServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/SASServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/client/SASClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/client/SASClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/loader/SASConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/loader/SASConfigurationLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/DBConfigLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/DBConfigLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/FileStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/FileStore.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/MonitoredSQLStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/MonitoredSQLStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/DateEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/DateEntry.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/IDEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/IDEntry.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/RuleList.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/RuleList.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/UpkeepConfigUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/UpkeepConfigUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/UpkeepConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/UpkeepConfiguration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/UpkeepResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/UpkeepResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/UpkeepStats.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/UpkeepStats.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/ConnectionPool.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/ConnectionPool.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/UpkeepConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/UpkeepConstants.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/ConnectionPoolProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/ConnectionPoolProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLConnectionImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLConnectionImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStoreProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/StackMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/StackMap.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionParameters.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionParameters.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionPool.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionPool.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionPoolProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionPoolProvider.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/resources/upkeep_test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/resources/upkeep_test.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLITool.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLITool.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CommonCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CommonCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/configuration/XMLConfigUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/configuration/XMLConfigUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/website/make-website.sh" beforeDir="false" afterPath="$PROJECT_DIR$/website/make-website.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/alt-index.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/alt-index.xhtml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,8 +56,8 @@
       <list>
         <option value="HTML File" />
         <option value="package-info" />
-        <option value="Interface" />
         <option value="Class" />
+        <option value="Interface" />
       </list>
     </option>
   </component>
@@ -110,27 +99,27 @@
     <option name="sortByType" value="true" />
     <option name="sortKey" value="BY_TYPE" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "jdk.selected.JAVA_MODULE": "11 (2)",
-    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/security-lib/storage/src/main/java/edu/uiuc/ncsa/security/storage/data",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Libraries",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "reference.projectsettings.compiler.javacompiler",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;11 (2)&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/security-lib/storage/src/main/java/edu/uiuc/ncsa/security/storage/data&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.projectsettings.compiler.javacompiler&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/data" />
@@ -162,7 +151,7 @@
       <recent name="edu.uiuc.ncsa.security.util.mail" />
     </key>
   </component>
-  <component name="RunManager" selected="Java Scratch.Derby Scratch">
+  <component name="RunManager" selected="Application.UpkeepConfigUtils">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -188,13 +177,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UpkeepConfigUtils" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfigUtils" />
-      <module name="storage" />
+    <configuration name="Pacer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.util.Pacer" />
+      <module name="core" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.storage.monitored.upkeep.*" />
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.core.util.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -202,13 +191,27 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="XMLConfigUtil" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil" />
-      <module name="util" />
+    <configuration name="StringUtils" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.util.StringUtils" />
+      <module name="core" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.util.configuration.*" />
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.core.util.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UpkeepConfigUtils" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfigUtils" />
+      <module name="storage" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.storage.monitored.upkeep.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -240,15 +243,6 @@
       <option name="MAIN_CLASS_NAME" value="Scratch" />
       <module name="storage" />
       <option name="SCRATCH_FILE_URL" value="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_10.java" />
-      <shortenClasspath name="NONE" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Scratch1" type="Java Scratch" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="Scratch" />
-      <module name="util" />
-      <option name="SCRATCH_FILE_URL" value="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.java" />
       <shortenClasspath name="NONE" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -344,19 +338,19 @@
     </configuration>
     <list>
       <item itemvalue="Application.DerbyTest" />
+      <item itemvalue="Application.Pacer" />
+      <item itemvalue="Application.StringUtils" />
       <item itemvalue="Application.UpkeepConfigUtils" />
-      <item itemvalue="Application.XMLConfigUtil" />
       <item itemvalue="Java Scratch.Derby Scratch" />
-      <item itemvalue="Java Scratch.Scratch1" />
       <item itemvalue="Tomcat Server.SAS Servlet" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.UpkeepConfigUtils" />
+        <item itemvalue="Application.Pacer" />
+        <item itemvalue="Application.StringUtils" />
         <item itemvalue="Java Scratch.Derby Scratch" />
         <item itemvalue="Application.DerbyTest" />
-        <item itemvalue="Application.UpkeepConfigUtils" />
-        <item itemvalue="Java Scratch.Scratch1" />
-        <item itemvalue="Application.XMLConfigUtil" />
       </list>
     </recent_temporary>
   </component>
@@ -469,7 +463,7 @@
       <workItem from="1706970858885" duration="627000" />
       <workItem from="1707138086191" duration="1851000" />
       <workItem from="1707151180090" duration="53675000" />
-      <workItem from="1708022164686" duration="155013000" />
+      <workItem from="1708022164686" duration="229610000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -814,7 +808,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="63" />
+    <option name="localTasksCounter" value="66" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -823,9 +817,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Tweak several small things for CLI. In particular, finding objects is now streamlined and object creation is too." />
-    <MESSAGE value="5.3.4 checkin." />
-    <MESSAGE value="updates to support https://jira.ncsa.illinois.edu/browse/CIL-1815" />
     <MESSAGE value="Had a blindingly good idea for printing the online help.  https://jira.ncsa.illinois.edu/browse/CIL-1815" />
     <MESSAGE value="Slightly improved object creation in the CLI." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/21 mke the build more portable." />
@@ -848,7 +839,10 @@
     <MESSAGE value="Getting fix for https://github.com/ncsa/security-lib/issues/32 from 5.4.3" />
     <MESSAGE value="Tiny optimization: If adding an empty list of objects to an SQL store, just return -- don't set up the entire connection and try to access the database." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/34" />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/34" />
+    <MESSAGE value="https://github.com/ncsa/security-lib/issues/35&#10;https://github.com/ncsa/security-lib/issues/36" />
+    <MESSAGE value="Backing out of lucene experiment. Neet tool, but way to much work when we already have an SQL database (Derby) that does it all." />
+    <MESSAGE value="Handled case of missing parameter in upkeep config." />
+    <option name="LAST_COMMIT_MESSAGE" value="Handled case of missing parameter in upkeep config." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -900,18 +894,8 @@
           <option name="timeStamp" value="29" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/UpkeepConfigUtils.java</url>
-          <line>121</line>
-          <option name="timeStamp" value="43" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/UpkeepConfigUtils.java</url>
-          <line>173</line>
-          <option name="timeStamp" value="44" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionParameters.java</url>
-          <line>34</line>
+          <line>39</line>
           <option name="timeStamp" value="45" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -923,11 +907,6 @@
           <url>file://$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStoreProvider.java</url>
           <line>24</line>
           <option name="timeStamp" value="47" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionParameters.java</url>
-          <line>60</line>
-          <option name="timeStamp" value="48" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

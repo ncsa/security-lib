@@ -145,6 +145,22 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
     protected File indexDirectory;
 
 
+    public File getIndexDirectory() {
+        return indexDirectory;
+    }
+
+    public void setIndexDirectory(File indexDirectory) {
+        this.indexDirectory = indexDirectory;
+    }
+
+    public File getStorageDirectory() {
+        return storageDirectory;
+    }
+
+    public void setStorageDirectory(File storageDirectory) {
+        this.storageDirectory = storageDirectory;
+    }
+
     protected File storageDirectory = null;
 
 

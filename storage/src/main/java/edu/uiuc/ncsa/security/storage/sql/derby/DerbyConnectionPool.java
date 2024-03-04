@@ -51,12 +51,14 @@ public class DerbyConnectionPool extends ConnectionPool {
 
 
     boolean alreadyCreated = false;
-     boolean DEEP_DEBUG = false;
-     void dbg(String x){
-         if(DEEP_DEBUG){
-             System.out.println(getClass().getSimpleName() + ":" + x);
-         }
-     }
+    boolean DEEP_DEBUG = false;
+
+    void dbg(String x) {
+        if (DEEP_DEBUG) {
+            System.out.println(getClass().getSimpleName() + ":" + x);
+        }
+    }
+
     /*
     There is an argument that this should be a static method in SQLStore. However, at this point having
     the system create non-Derby databases seems like remarkably bad store management. Derby only creates
@@ -118,24 +120,20 @@ public class DerbyConnectionPool extends ConnectionPool {
             }
             alreadyCreated = true;
             stmt.close();
+            Properties oldProperties;
             if (isFileStore()) {
                 // If you close the connection to an in-memory database, it goes away!
                 // but you need to close it if creating an embedded database on the local file system.
-                Properties p = System.getProperties();
-                p.setProperty("derby.connection.requireAuthentication", "true");
-                p.setProperty("derby.database.sqlAuthorization", "true");
-                p.setProperty("derby.authentication.provider", "BUILTIN");
-                p.setProperty("derby.user." + getConnectionParameters().getUsername(), getConnectionParameters().getPassword());  // sets user name and password
-                p.setProperty("derby.database.propertiesOnly", "true");
+                oldProperties = setProperties();
+
                 c.close();
                 getConnectionParameters().setCreateOne(false);
                 getConnectionParameters().setCreateURL(null);
-              //  getConnectionParameters().createOne = false;
                 // shut it down properly to get all the right database attributes
                 // or the system will try to create it on the next access.
-                c = DriverManager.getConnection(getConnectionParameters().getShutdownURL());
-                // The next call might throw a benign exception.
-                c.close();
+                shutdown();
+                unsetProperties(oldProperties);
+                setupDriverManager(); // re-initialize the driver or all calls will fail.
             } else {
                 getConnectionParameters().setCreateOne(false);
                 getConnectionParameters().setCreateURL(null);
@@ -146,12 +144,62 @@ public class DerbyConnectionPool extends ConnectionPool {
             if (!isFileStore()) {
                 destroy(cr);
             }
-            if(sqlx instanceof RuntimeException){
-                throw (RuntimeException)sqlx;
+            if (sqlx instanceof RuntimeException) {
+                throw (RuntimeException) sqlx;
             }
             throw new GeneralException("error creating derby store:" + sqlx.getMessage());
         }
 
+    }
+
+    protected Properties getDerbySecurityProperties() {
+        Properties derbySecurityProperties = new Properties();
+        derbySecurityProperties.setProperty("derby.connection.requireAuthentication", "true");
+        derbySecurityProperties.setProperty("derby.database.sqlAuthorization", "true");
+        derbySecurityProperties.setProperty("derby.authentication.provider", "BUILTIN");
+        derbySecurityProperties.setProperty("derby.user." + getConnectionParameters().getUsername(), getConnectionParameters().getPassword());  // sets user name and password
+        derbySecurityProperties.setProperty("derby.database.propertiesOnly", "true");
+        return derbySecurityProperties;
+    }
+
+    /**
+     * Sets ths derby properties for creating the database. Once these are set the newly created database has
+     * the correct security internal to the database, including setting the user name and password.
+     * However, as long as these are set, this means any subsequent access
+     * can only be to this database, unless this is undone by {@link #unsetProperties(Properties)}.
+     * When creating a database, set these for the minimum time required, then unset them or you
+     * will get all manner of authentication failures! <br/><br/>
+     * <b>In particular</b> if these are set, then you can only use a single database and attempts to
+     * connect to another database (unless it has identical password, bootpassword and user) will
+     * always fail.
+     *
+     * @return
+     */
+    protected Properties setProperties() {
+        Properties oldProperties = new Properties();
+        Properties derbySP = getDerbySecurityProperties();
+        Properties systemProperties = System.getProperties();
+
+        for (String key : derbySP.stringPropertyNames()) {
+            Object oldValue = systemProperties.setProperty(key, derbySP.getProperty(key));
+            if (oldValue != null) {
+                oldProperties.put(key, oldValue); // can't set a null property value
+            }
+        }
+        return oldProperties;
+    }
+
+    protected void unsetProperties(Properties oldProperties) {
+        Properties derbySP = getDerbySecurityProperties();
+        Properties systemProperties = System.getProperties();
+
+        for (String key : derbySP.stringPropertyNames()) {
+            if (oldProperties.containsKey(key)) {
+                systemProperties.put(key, oldProperties.get(key));
+            } else {
+                systemProperties.remove(key);
+            }
+        }
     }
 
     public boolean isMemoryStore() {

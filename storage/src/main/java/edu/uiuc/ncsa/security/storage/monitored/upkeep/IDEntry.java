@@ -27,7 +27,7 @@ public class IDEntry implements RuleEntry{
         if(isRegex()){
                 return id.toString().matches(getValue());
         }
-        return id.equals(getValue());
+        return id.toString().equals(getValue());
     }
     boolean regex = false;
 

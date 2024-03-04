@@ -19,7 +19,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * <p>Created by Jeff Gaynor<br>
  * on 3/23/12 at  8:23 AM
  */
-public class XMLConfigUtil {
+public class XMLConfigUtil implements TimeConstants {
     /**
      * Finds the configuration in an XML file, given the filename, name of the configuration
      * (or null if you want to use the only one there) and the top node tag
@@ -95,24 +95,7 @@ public class XMLConfigUtil {
         return cn;
     }
 
-    public static final String UNITS_DAYS = "d";
-    public static final String UNITS_DAYS_LONG = "day";
-    public static final String UNITS_HOURS = "hr";
-    public static final String UNITS_HOURS_LONG = "hour";
-    public static final String UNITS_MILLISECONDS = "ms";
-    public static final String UNITS_MILLISECOND_LONG = "millisecond";
-    public static final String UNITS_MINUTES = "min";
-    public static final String UNITS_MINUTES_LONG = "min";
-    public static final String UNITS_MINUTES_LONG2 = "minute";
-    public static final String UNITS_MONTHS = "mo";
-    public static final String UNITS_MONTHS_LONG = "month";
-    public static final String UNITS_SECONDS = "s";
-    public static final String UNITS_SECONDS_LONG = "sec";
-    public static final String UNITS_SECONDS_LONG2 = "second";
-    public static final String UNITS_WEEK_LONG = "week";
-    public static final String UNITS_YEARS = "yr";
-    public static final String UNITS_YEARS_LONG = "year";
-    public static final String UNITS__WEEK = "wk";
+
 
     /**
      * For getting times in configuration files. The acceptable entries are
@@ -223,38 +206,31 @@ public class XMLConfigUtil {
             case UNITS_SECONDS:
             case UNITS_SECONDS_LONG:
             case UNITS_SECONDS_LONG2:
-                return UNITS_SECOND_MULTIPLIER;
+                return SECONDS;
             case UNITS_MINUTES:
             case UNITS_MINUTES_LONG2:
-                return UNITS_MINUTE_MULTIPLIER;
+                return ONE_MINUTES;
             case UNITS_HOURS:
             case UNITS_HOURS_LONG:
-                return UNITS_HOUR_MULTIPLIER;
+                return ONE_HOUR;
             case UNITS_DAYS:
             case UNITS_DAYS_LONG:
-                return UNITS_DAY_MULTIPLIER;
+                return ONE_DAY;
             case UNITS__WEEK:
             case UNITS_WEEK_LONG:
-                return UNITS_WEEK_MULTIPLIER;
+                return ONE_WEEK;
             case UNITS_MONTHS:
             case UNITS_MONTHS_LONG:
-                return UNITS_MONTH_MULTIPLIER;
+                return ONE_MONTH;
             case UNITS_YEARS:
             case UNITS_YEARS_LONG:
-                return UNITS_YEAR_MULTIPLIER;
+                return ONE_YEAR;
             default:
                 throw new IllegalArgumentException("unknown unit \"" + units + "\"");
 
         }
      }
-    public static final long UNITS_MILLISECOND_MULTIPLIER = 1L;
-    public static final long UNITS_SECOND_MULTIPLIER = 1000L;
-    public static final long UNITS_MINUTE_MULTIPLIER = UNITS_SECOND_MULTIPLIER * 60;
-    public static final long UNITS_HOUR_MULTIPLIER = UNITS_MINUTE_MULTIPLIER * 60;
-    public static final long UNITS_DAY_MULTIPLIER = UNITS_HOUR_MULTIPLIER * 24;
-    public static final long UNITS_WEEK_MULTIPLIER = UNITS_DAY_MULTIPLIER * 7;
-    public static final long UNITS_MONTH_MULTIPLIER = UNITS_DAY_MULTIPLIER * 30;
-    public static final long UNITS_YEAR_MULTIPLIER = UNITS_DAY_MULTIPLIER * 365 + UNITS_HOUR_MULTIPLIER * 6; // 365¼ days
+
 
     // Old way. Clunky direct parsing that just continued to grow. New way just uses regexs and is much better.
     // Does not support weeks months or years

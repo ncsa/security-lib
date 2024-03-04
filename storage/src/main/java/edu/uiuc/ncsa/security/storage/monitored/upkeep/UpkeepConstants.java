@@ -9,6 +9,10 @@ public interface UpkeepConstants {
     String ACTION_ARCHIVE = "archive";
     String ACTION_TEST = "test";
     String ACTION_RETAIN = "retain";
+    /**
+     * This means nothing applied, take no action.
+     */
+    String ACTION_NONE = "none";
 
     String WHEN_AFTER = "after";
     String WHEN_BEFORE = "before";

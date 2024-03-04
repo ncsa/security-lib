@@ -1,9 +1,12 @@
 package edu.uiuc.ncsa.security.storage.monitored.upkeep;
 
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.storage.monitored.Monitored;
 
 import java.time.LocalTime;
 import java.util.*;
+
+import static edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConstants.ACTION_NONE;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -159,13 +162,17 @@ public class UpkeepConfiguration {
                 '}';
     }
 
-    public boolean applies(Identifier id, Long create, Long accessed, Long modified){
+    public String[] applies(Identifier id, Long create, Long accessed, Long modified){
+    // Do retain actions first!
         for(RuleList rr : ruleList ){
-            // Logical OR of the rules.
             if(rr.applies(id, create, accessed, modified)){
-                return true;
+                return new String[]{rr.getAction(),rr.getName()};
             }
         }
-        return false;
+        return new String[]{ACTION_NONE, ""}; // does not apply
+    }
+    public String[] applies(Monitored monitored){
+        return applies(monitored.getIdentifier(), monitored.getCreationTS().getTime(), monitored.getLastAccessed()==null?null:monitored.getLastAccessed().getTime(),
+                monitored.getLastModifiedTS()==null?null:monitored.getLastModifiedTS().getTime());
     }
 }

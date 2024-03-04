@@ -9,6 +9,7 @@ import java.security.PublicKey;
 import java.util.Date;
 
 /**
+ * Contains the information for a client of the system -- such as keys, name, etc.
  * <p>Created by Jeff Gaynor<br>
  * on 8/15/22 at  8:43 AM
  */

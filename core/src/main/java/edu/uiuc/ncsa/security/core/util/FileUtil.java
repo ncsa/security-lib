@@ -2,16 +2,16 @@ package edu.uiuc.ncsa.security.core.util;
 
 import org.apache.commons.codec.binary.Base64;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Utility do to certain common file operations. These are mostly aimed at smaller files.
+ * It uses NIO when possible.
  * <p>Created by Jeff Gaynor<br>
  * on 1/26/21 at  7:10 AM
  */
@@ -83,6 +83,51 @@ public class FileUtil {
 
         return stringBuffer.toString();
 
+    }
+    /**
+     * Reads an {@link InputStream} as a single string. This is useful when reading
+     * a resource as an input stream.
+     * @param inputStream
+     * @return
+     * @throws Throwable
+     */
+    public static String readFileAsString(InputStream inputStream) throws Throwable {
+        if(inputStream == null){
+            return null;
+        }
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+
+        BufferedReader br = new BufferedReader(inputStreamReader);
+        String in = br.readLine();
+        StringBuilder stringBuilder = new StringBuilder();
+        while(in != null){
+             stringBuilder.append(in + "\n");
+             in = br.readLine();
+        }
+        return stringBuilder.toString();
+    }
+
+    /**
+     * Reads an {@link InputStream} as a set of lines. This is useful when reading
+     * a resource as an input stream.
+     * @param inputStream
+     * @return
+     * @throws Throwable
+     */
+    public static List<String> readFileAsLines(InputStream inputStream) throws Throwable {
+        if(inputStream == null){
+            return null;
+        }
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+
+        BufferedReader br = new BufferedReader(inputStreamReader);
+        String in = br.readLine();
+        List<String> out = new ArrayList<>();
+        while(in != null){
+            out.add(in);
+             in = br.readLine();
+        }
+        return out;
     }
 
     /**

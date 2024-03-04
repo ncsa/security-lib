@@ -40,7 +40,16 @@ public class StringUtils {
         return justify(x, width, JUSTIFY_LEFT);
     }
 
+    /**
+     * Get a string of blanks for the given width. If the width is non-positive,
+     * the empty string is returned.
+     * @param width
+     * @return
+     */
     public static String getBlanks(int width) {
+        if(width <= 0){
+            return "";
+        }
         if (blanks.length() < width) {
             // never run out of blanks...
             while (blanks.length() < width) {
@@ -87,7 +96,7 @@ public class StringUtils {
      * @return
      */
     public static boolean isTrivial(String x) {
-        return x == null || x.isEmpty();
+        return x == null || x.isEmpty() || x.isBlank();
     }
 
     /**
@@ -103,6 +112,16 @@ public class StringUtils {
 
 
     private static void tableTest() {
+        System.out.println(formatElapsedTime(8000)); // 8 sec
+        System.out.println(formatElapsedTime(4*3600*1000));  //4 hours
+        System.out.println(formatByteCount(1000000L));
+        System.out.println(formatByteCount(123456789L));
+        System.out.println(formatByteCount(74123456789L));
+        System.out.println(formatHerz(200, System.currentTimeMillis()-100000));
+        System.out.println(formatHerz(54321, System.currentTimeMillis()-100));
+
+
+        System.out.println();
         System.out.println("\n===== table test =====");
         Random random = new Random();
         int cols = 5;
@@ -446,7 +465,10 @@ public class StringUtils {
      * @return
      */
     public static String pad(String s, int commandBufferMaxWidth) {
-        if (s.length() < commandBufferMaxWidth) {
+        if (isTrivial(s)) {
+               return getBlanks(commandBufferMaxWidth);
+           }
+        if (commandBufferMaxWidth < s.length()) {
             return s;
         }
         return s + getBlanks(commandBufferMaxWidth - s.length());
@@ -825,4 +847,60 @@ public class StringUtils {
         return toUnicode(chars[0]);
     }
 
+    /**
+     * Make E.g. byte counts from files human readable.
+     * @param count
+     * @return
+     */
+    public static String formatByteCount(long count) {
+        return formatCount(count, "B");
+    }
+
+    public static String formatCount(long count, String unit) {
+        long acount = Math.abs(count);
+        if (acount <= 999) {
+            return Long.toString(count) + " " + unit;
+        }
+        if (1000 <= acount && acount <= 999999) {
+            return (count < 0 ? "-" : "") + String.format("%,.4f", acount / 1000.0d) + " K"+unit;
+        }
+        if (1000000 <= acount && acount <= 999999999) {
+            return (count < 0 ? "-" : "") + String.format("%,.4f", acount / 1000000.0d) + " M" + unit;
+        }
+        if (1000000000 <= acount && acount <= 999999999999L) {
+            return (count < 0 ? "-" : "") + String.format("%,.4f", acount / 1000000000.0d) + " G" + unit;
+        }
+        if (1000000000000L <= acount && acount <= 999999999999999L) {
+            return (count < 0 ? "-" : "") + String.format("%,.4f", acount / 1000000000000.0d) + " T" + unit;
+        }
+
+        return Long.toString(count);
+    }
+
+    /**
+     * Makes elapsed times in milliseconds  human readable.
+     * @param elapsedTime The actual elapsed time in ms. E.g. 1000 is 1 sec.
+     * @return
+     */
+    public static String formatElapsedTime(long elapsedTime) {
+       long a = Math.abs(elapsedTime);
+       if(a <= 999){
+           return a + " ms.";
+       }
+       if(1000<=a && a<=(60*1000L - 1)){
+          return (elapsedTime < 0 ? "-" : "") + String.format("%,.4f", a /( 1000.0d)) + " sec.";
+       }
+       if(60*1000L <= a && a <= 60*60*1000L-1){
+           return (elapsedTime < 0 ? "-" : "") + String.format("%,.4f", a /(60* 1000.0d)) + " min.";
+       }
+        if(60*60*1000L <= a && a <= 24*60*60*1000L-1){
+            return (elapsedTime < 0 ? "-" : "") + String.format("%,.4f", a /(60*60* 1000.0d)) + " hr.";
+        }
+        return (elapsedTime < 0 ? "-" : "") + String.format("%,.4f", a /(24*60*60* 1000.0d)) + " days";
+
+    }
+
+    public static String formatHerz(int period, long startTime){
+        return formatCount(1000*period/(System.currentTimeMillis() - startTime), "Hz");
+    }
 }

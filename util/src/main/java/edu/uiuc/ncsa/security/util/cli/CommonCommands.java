@@ -117,7 +117,8 @@ public abstract class CommonCommands implements Commands {
 
     protected String readline() {
         try {
-            String x = getBufferedReader().readLine();
+            //String x = getBufferedReader().readLine();
+            String x = getIoInterface().readline();
             if (x.equals(EXIT_COMMAND)) {
                 throw new ExitException(EXIT_COMMAND + " encountered");
             }
@@ -663,7 +664,7 @@ public abstract class CommonCommands implements Commands {
     boolean printOuput = true; // default is to always print output since this a command line tool.
 
 
-    protected void setOuputOnHelp() {
+    protected void setOutputOnHelp() {
         say("set_output_on true| false");
         sayi("This is used chiefly with batch files, to toggle whether or not there is output directed to the console,");
         sayi("true means to turn on output, false means to suspend it");
@@ -672,7 +673,7 @@ public abstract class CommonCommands implements Commands {
 
     public void set_output_on(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            setOuputOnHelp();
+            setOutputOnHelp();
             return;
         }
         // A little bit trickier than it looks since we have an internal flag for the negation of this.
