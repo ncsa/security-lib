@@ -74,7 +74,15 @@ public class CLIDriver {
 
     public CLIDriver(Commands... cci) {
         super();
+        addCommands(cci);
+    }
 
+
+    public CLIDriver(IOInterface ioInterface) {
+        this.ioInterface = ioInterface;
+    }
+
+    public void addCommands(Commands... cci) {
         for (Commands xxx : cci) {
             // Set exactly one instance of the component manager
             if (xxx instanceof ComponentManager && componentManager == null) {
@@ -83,8 +91,10 @@ public class CLIDriver {
             if (xxx instanceof CommonCommands) {
                 ((CommonCommands) xxx).setDriver(this);
             }
+            xxx.setIOInterface(getIOInterface());
         }
         setCLICommands(cci);
+
     }
 
     public Commands[] getCLICommands() {
@@ -97,7 +107,7 @@ public class CLIDriver {
 
 
     protected String readline(String prompt) throws IOException {
-        return getIoInterface().readline(prompt);
+        return getIOInterface().readline(prompt);
     }
 
     protected static final int USER_DEFINED_COMMAND = -1;
@@ -514,7 +524,7 @@ public class CLIDriver {
 
     /**
      * Returns a logical true if one of the command lines executes the line successfully. This will
-     * also throw a shutdown exception if the user asks it to..
+     * also throw a shutdown exception if the user asks it to...
      * Otherwise it returns false;
      *
      * @param cliAV
@@ -584,7 +594,7 @@ public class CLIDriver {
         if (commands.length == 0) {
         } else {
             // special case, no arguments so print out every topic
-            if(inputLine.getArgCount() == 0){
+            if (inputLine.getArgCount() == 0) {
                 printHelpTopics(inputLine);
                 return;
             }
@@ -602,7 +612,7 @@ public class CLIDriver {
         }
     }
 
-    protected void printHelpTopics(InputLine inputLine){
+    protected void printHelpTopics(InputLine inputLine) {
         HelpUtil helpUtil1 = new HelpUtil();
         if (getHelpUtil() != null) {
             helpUtil1.getOnlineHelp().putAll(getHelpUtil().getOnlineHelp());
@@ -612,8 +622,9 @@ public class CLIDriver {
                 helpUtil1.getOnlineHelp().putAll(command.getHelpUtil().getOnlineHelp());
             }
         }
-              helpUtil1.printHelp(inputLine);
+        helpUtil1.printHelp(inputLine);
     }
+
     protected void listCLIMethods(InputLine inputLine) {
         // trick is that even though this is made to list out all the methods, in practice
         // there is never more than a single active Command object.
@@ -649,7 +660,7 @@ public class CLIDriver {
      * @param x
      */
     protected void say(String x) {
-        getIoInterface().println(x);
+        getIOInterface().println(x);
         //System.out.println(x);
     }
 
@@ -659,18 +670,18 @@ public class CLIDriver {
      * @param x
      */
     protected void say2(String x) {
-        getIoInterface().print(x);
+        getIOInterface().print(x);
         //System.out.print(x);
     }
 
-    public IOInterface getIoInterface() {
+    public IOInterface getIOInterface() {
         if (ioInterface == null) {
             ioInterface = new BasicIO();
         }
         return ioInterface;
     }
 
-    public void setIoInterface(IOInterface ioInterface) {
+    public void setIOInterface(IOInterface ioInterface) {
         this.ioInterface = ioInterface;
     }
 

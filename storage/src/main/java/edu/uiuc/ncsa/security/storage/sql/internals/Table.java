@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.storage.sql.internals;
 
+import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 
 import static java.sql.Types.LONGVARCHAR;
@@ -189,7 +190,8 @@ public abstract class Table  {
     }
 
     /**
-     * Creates a new insert statement with every column.
+     * Creates a new insert statement with every column. This is used in the {@link edu.uiuc.ncsa.security.storage.sql.SQLStore#register(Identifiable)}
+     * call, e.g.
      *
      * @return
      */

@@ -28,4 +28,6 @@ public interface Commands extends Logable{
     public void bootstrap() throws Throwable;
 
     public HelpUtil getHelpUtil();
+    IOInterface getIOInterface();
+    void setIOInterface(IOInterface io);
 }

@@ -2808,7 +2808,7 @@ public abstract class StoreCommands extends CommonCommands {
             say("list_keys");
             sayi("Usage: This lists the keys of the current store.");
             sayi("The primary key will have a '*' added to the end of it");
-            FormatUtil.printFormatListHelp(getIoInterface(), INDENT, inputLine);
+            FormatUtil.printFormatListHelp(getIOInterface(), INDENT, inputLine);
         }
 
         protected void showLSHelp3 () {

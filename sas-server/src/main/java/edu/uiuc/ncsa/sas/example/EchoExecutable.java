@@ -33,6 +33,7 @@ public class EchoExecutable implements Executable {
                 getIO().println("test exec, got action:" + action.getType());
         }
         output = ((StringIO) getIO()).getOutput();
+
         return new OutputResponse(action, output.toString());
 
     }

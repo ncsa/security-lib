@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.storage;
 
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.storage.events.IDMap;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedEventListener;
 import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
@@ -40,7 +41,14 @@ public interface MonitoredStoreInterface<V extends Identifiable> {
     UpkeepConfiguration getUpkeepConfiguration();
 
     /**
-     * Do the actual upkeep for the store, applying all the rules and using the configuration.
+     * Do the upkeep. Note that some stores may have to update other stores. The
+     * environment allows for this. E.g. Deleting a client should delete its approval
+     * record and remove any permissions associated with it.
+     * @param environment
+     * @return
      */
-    UpkeepResponse doUpkeep();
+    UpkeepResponse doUpkeep(AbstractEnvironment environment);
+     void updateHook(String action, AbstractEnvironment environment,  List<Identifier> identifiers) ;
+
+
 }

@@ -351,7 +351,7 @@ public class Client extends ServiceClient implements SASConstants {
             vector.add(arg);
         }
         InputLine inputLine = new InputLine(vector); // now we have a bunch of utilities for this
-        if (inputLine.hasArg(FLAG_HELP)) {
+        if (inputLine.hasArg(FLAG_HELP) || !inputLine.hasArgs()) {
             showHelp();
             return;
         }
@@ -503,12 +503,21 @@ public class Client extends ServiceClient implements SASConstants {
 
     private static void showHelp() {
         say(Client.class.getName() + " " + FLAG_CONFIG + " config_file {" + FLAG_EDIT + "} {" + FLAG_HELP + "} {" + FLAG_VERBOSE + "}");
-        say(FLAG_CONFIG + " the name of an existing configuration file ");
+        say("Demonstration client for the SAS. This allows you to create/edit a configuration for a client ");
+        say("that will connect to an SAS server. You can set your keys and other information here. Note that you must");
+        say("get your public key on the server or you cannot connect.");
+        say(FLAG_CONFIG + " the name of an existing configuration file. Use this when connecting. ");
         say(FLAG_EDIT + " edit existing file or update current ");
         say(FLAG_HELP + " display this help message ");
         say(FLAG_VERBOSE + " print more output about functioning of this. Mostly for debugging.");
         say(FLAG_PRINT_PUBLIC_KEY + " print the public key then exit. Arguments are jwk for JSON web key or pkcs for PKCS 5 format.");
         say("If you simply supply the " + FLAG_EDIT + " flag, you will be prompted to create a new configuration file.");
+        say("");
+        say("E.g");
+        say("If your client has been registered and has an identifier, ");
+        say("client -cfg /path/to/config");
+        say("will start a session on the SAS server");
+
     }
 
     // /home/ncsa/dev/csd/config/sas/sas-test-config.xml

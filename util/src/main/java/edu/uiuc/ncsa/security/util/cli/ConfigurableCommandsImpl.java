@@ -44,9 +44,23 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         if ((1 < inputLine.size()) && inputLine.getArg(1).equals("--help")) return true;
         return false;
     }
+     @Override
+    public IOInterface getIOInterface() {
+        if(ioInterface == null){
+            ioInterface = new BasicIO();
+        }
+        return ioInterface;
+    }
 
+    @Override
+    public void setIOInterface(IOInterface ioInterface) {
+        this.ioInterface = ioInterface;
+    }
+
+    IOInterface ioInterface;
     protected void say(String x) {
-        System.out.println(x);
+        //System.out.println(x);
+        getIOInterface().println(x);
     }
 
     protected void sayv(String x) {

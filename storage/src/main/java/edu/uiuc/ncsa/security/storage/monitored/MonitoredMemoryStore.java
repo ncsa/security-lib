@@ -3,6 +3,8 @@ package edu.uiuc.ncsa.security.storage.monitored;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.XMLConverter;
+import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.storage.MonitoredStoreDelegate;
 import edu.uiuc.ncsa.security.storage.MonitoredStoreInterface;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
@@ -91,8 +93,18 @@ public abstract class MonitoredMemoryStore<V extends Identifiable> extends Memor
     }
 
     @Override
-    public UpkeepResponse doUpkeep() {
+    public UpkeepResponse doUpkeep(AbstractEnvironment environment) {
         return null;
+    }
+
+    @Override
+    public void updateHook(String action, AbstractEnvironment environment, List<Identifier> identifiers) {
+
+    }
+
+    @Override
+    public XMLConverter<V> getXMLConverter() {
+        return getMapConverter();
     }
 }
 

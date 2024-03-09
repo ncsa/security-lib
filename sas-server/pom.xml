@@ -15,8 +15,8 @@
          jar so that extensions (e.g. QDL) can use it. If you need to run it locally
          barebones for debugging. build it as a war and deploy it. Note that you must
          revert back and rebuild for projects to get the changes.-->
-    <!--<packaging>war</packaging>-->
-
+    <!--<packaging>war</packaging>
+-->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <additionalparam>-Xdoclint:none</additionalparam>

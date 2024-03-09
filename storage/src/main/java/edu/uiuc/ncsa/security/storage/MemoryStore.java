@@ -159,7 +159,7 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
         return count;
     }
 
-    public MapConverter getMapConverter() {
+    public MapConverter<V> getMapConverter() {
         return null;
     }
 

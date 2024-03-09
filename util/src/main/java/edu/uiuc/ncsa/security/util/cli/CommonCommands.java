@@ -98,27 +98,29 @@ public abstract class CommonCommands implements Commands {
 
     BufferedReader bufferedReader;
 
-    public IOInterface getIoInterface() {
+    @Override
+    public IOInterface getIOInterface() {
         if (ioInterface == null) {
             ioInterface = new BasicIO();
         }
         return ioInterface;
     }
 
-    public void setIoInterface(IOInterface ioInterface) {
+    @Override
+    public void setIOInterface(IOInterface ioInterface) {
         this.ioInterface = ioInterface;
     }
 
     IOInterface ioInterface;
 
     protected String readline(String prompt) throws IOException {
-        return getIoInterface().readline(prompt);
+        return getIOInterface().readline(prompt);
     }
 
     protected String readline() {
         try {
             //String x = getBufferedReader().readLine();
-            String x = getIoInterface().readline();
+            String x = getIOInterface().readline();
             if (x.equals(EXIT_COMMAND)) {
                 throw new ExitException(EXIT_COMMAND + " encountered");
             }
@@ -157,7 +159,7 @@ public abstract class CommonCommands implements Commands {
      */
     protected void say(String x) {
         if (isPrintOuput()) {
-            getIoInterface().println(defaultIndent + x);
+            getIOInterface().println(defaultIndent + x);
         }
     }
 
@@ -192,7 +194,7 @@ public abstract class CommonCommands implements Commands {
      * @param x
      */
     protected void say2(String x) {
-        getIoInterface().print(defaultIndent + x);
+        getIOInterface().print(defaultIndent + x);
     }
 
 

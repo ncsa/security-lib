@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.security.storage;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.storage.events.IDMap;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedEvent;
 import edu.uiuc.ncsa.security.storage.events.LastAccessedEventListener;
@@ -96,7 +97,16 @@ public  class MonitoredStoreDelegate<V extends Identifiable> implements Monitore
      * @return
      */
     @Override
-    public UpkeepResponse doUpkeep() {
+    public UpkeepResponse doUpkeep(AbstractEnvironment environment) {
        throw new NotImplementedException("not implemented in facade.");
     }
+
+
+
+    @Override
+    public void updateHook(String action, AbstractEnvironment environment,  List<Identifier> identifiers) {
+
+    }
+
+
 }

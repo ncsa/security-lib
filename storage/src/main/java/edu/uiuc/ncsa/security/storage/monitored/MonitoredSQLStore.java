@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.storage.MonitoredStoreDelegate;
@@ -22,6 +23,7 @@ import javax.inject.Provider;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -149,7 +151,7 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
     }
 
     @Override
-    public UpkeepResponse doUpkeep() {
+    public UpkeepResponse doUpkeep(AbstractEnvironment environment) {
         UpkeepResponse upkeepResponse = new UpkeepResponse();
         UpkeepConfiguration cfg = getUpkeepConfiguration();  // just keep it short.
         if (!cfg.isEnabled()) {
@@ -167,10 +169,9 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
            */
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
-
         StoreArchiver storeArchiver = new StoreArchiver(this);        // Each rule is processed in turn.
         for (RuleList ruleList : cfg.getRuleList()) {
-            if (ruleList.isEmpty() || !ruleList.isEnabled()) {
+            if (ruleList.isEmpty() || !ruleList.isEnabled() || (ruleList.getAction() == UpkeepConstants.ACTION_RETAIN)) {
                 continue;
             }
             // If the configuration is test only, all rules are in test mode.
@@ -189,7 +190,7 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
                 PreparedStatement deletepStmt = null;
                 PreparedStatement archiveStmt = null;
                 Statement stmt = c.createStatement();
-                if (!cfg.isTestOnly()) {
+                if (!cfg.isTestOnly()) {    // globally set testMode means all test actions are overridden
                     String aQuery = storeArchiver.createVersionStatement();
                     String deleteStmt = "delete from " + getTable().getFQTablename() + " where " + keys.identifier() + "=?";
                     System.out.println(getClass().getSimpleName() + " a query=\"" + aQuery + "\"");
@@ -198,9 +199,11 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
                 }
 
                 ResultSet rs = stmt.executeQuery(query);
+                List<Identifier> idList = new ArrayList<>();
                 while (rs.next()) {
                     String idString = rs.getString(keys.identifier());
                     Identifier identifier = BasicIdentifier.newID(idString);
+                    idList.add(identifier);
                     upkeepResponse.attempted++;
                     if (upkeepResponse.retainedList.contains(idString)) { // If a rule to retain is done, retain it
                         upkeepResponse.skipped++;
@@ -240,8 +243,7 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
                     }
                 }
                 rs.close();
-                stmt.close();
-                if (!cfg.isTestOnly()) {
+                stmt.close();                if (!cfg.isTestOnly()) {
                     // must do archives before deletes.
                     int[] archivedRecords = archiveStmt.executeBatch();
                     upkeepResponse.archivedStats.add(gatherStats(archivedRecords));
@@ -250,7 +252,7 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
                     deletepStmt.close();
                     archiveStmt.close();
                 }
-
+                updateHook(ruleList.getAction(), environment, idList);
             } catch (SQLException sqlException) {
                 destroyConnection(cr);
                 if (cfg.isDebug() || DebugUtil.isEnabled()) {
@@ -318,37 +320,8 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
         return monitoredStoreDelegate.getUpkeepConfiguration();
     }
 
-/*
     @Override
-    public UpkeepResponse doUpkeep() {
-        UpkeepResponse upkeepResponse = new UpkeepResponse();
-        if (!getUpkeepConfiguration().isEnabled()) {
-            return upkeepResponse;
-        }
-        MonitoredKeys keys = getKeys();
-        String deleteStmt = "delete from " + getTable().getFQTablename() + " where " + keys.identifier() + "=?";
-        StoreArchiver storeArchiver = new StoreArchiver(this);
-        int totalFound = 0;
-        int numberProcessed = 0;
-        int skipped = 0;
-        List<String> toRemove = new ArrayList<>();
-        List<String> toArchive = new ArrayList<>();
+    public void updateHook(String action, AbstractEnvironment environment, List<Identifier> identifiers) {
 
-        ConnectionRecord cr = getConnection();
-        Connection c = cr.connection;
-        UpkeepConfiguration cfg = getUpkeepConfiguration();
-        try{
-          for(RuleList ruleList: cfg.getRuleList()){
-
-          }
-        }catch (SQLException e) {
-                    destroyConnection(cr);
-                    if (DebugUtil.isEnabled()) {
-                        e.printStackTrace();
-                    }
-                    throw new GeneralException("Error getting last accessed information for clients", e);
-                }
-        return upkeepResponse;
     }
-*/
 }

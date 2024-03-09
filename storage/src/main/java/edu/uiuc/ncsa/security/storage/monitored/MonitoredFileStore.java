@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.security.storage.monitored;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.storage.MonitoredStoreDelegate;
 import edu.uiuc.ncsa.security.storage.FileStore;
 import edu.uiuc.ncsa.security.storage.MonitoredStoreInterface;
@@ -107,7 +108,12 @@ public abstract class MonitoredFileStore<V extends Identifiable> extends FileSto
     }
 
     @Override
-    public UpkeepResponse doUpkeep() {
+    public UpkeepResponse doUpkeep(AbstractEnvironment environment) {
         return null;
+    }
+
+    @Override
+    public void updateHook(String action, AbstractEnvironment environment, List<Identifier> identifiers) {
+
     }
 }

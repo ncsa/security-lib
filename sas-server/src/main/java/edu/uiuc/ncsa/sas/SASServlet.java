@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
 import edu.uiuc.ncsa.security.servlet.AbstractServlet;
 import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
 import edu.uiuc.ncsa.security.servlet.HeaderUtils;
+import edu.uiuc.ncsa.security.util.cli.ExitException;
 import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 
@@ -69,14 +70,19 @@ public class SASServlet extends AbstractServlet {
         //   System.out.println(getClass().getSimpleName() + ": s key size =" + keySize);
         byte[] sKey = KeyUtil.generateSKey(keySize); //1024 bits, probably.
         logonResponse = new LogonResponse(logonAction, sessionID, sKey);
-        sessionRecord.executable = createExecutable();
+        sessionRecord.executable = createExecutable(logonAction.getExecutableType());
         sessionRecord.sKey = sKey;
         sessionRecord.sessionID = sessionID;
         sessions.put(sessionID, sessionRecord);
         return logonResponse;
     }
 
-    public Executable createExecutable() {
+    /**
+     * Create the appropriate executable.
+     * @param executableName name to allow you to choose which executable to create
+     * @return
+     */
+    public Executable createExecutable(String executableName) {
         return new EchoExecutable();   // Just to demo this. Write your own and override.
     }
 
@@ -170,7 +176,14 @@ public class SASServlet extends AbstractServlet {
                         break;
                     default:
                     case SASConstants.ACTION_EXECUTE:
-                        response = doExecute(sessionRecord, actions.get(i));
+                        try {
+                            response = doExecute(sessionRecord, actions.get(i));
+                        }catch(ExitException xx){
+                            // Shutdown hook. An application can throw this to signal logging off. In this way
+                            // a user does not need to know about the SAS, but can simply exit their application
+                            // normally and the effect is the same.
+                            response = doLogoff(client, (LogoffAction) actions.get(i), httpServletResponse, sessionRecord, "log off");
+                        }
                         break;
                 }
                 responses.add(response);
@@ -178,7 +191,8 @@ public class SASServlet extends AbstractServlet {
             sessionRecord.lastAccessed = new Date();
             getSASE().getResponseSerializer().serialize(responses, httpServletResponse, sessionRecord);
 
-        } catch (Throwable t) {
+        }
+        catch (Throwable t) {
             handleException(new SASExceptionHandlerThingie(t, httpServletRequest, httpServletResponse, sessionRecord));
         }
 
