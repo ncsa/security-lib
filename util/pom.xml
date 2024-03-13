@@ -197,7 +197,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>crypt8</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.4.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -209,7 +209,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>crypt8</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.4.2</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

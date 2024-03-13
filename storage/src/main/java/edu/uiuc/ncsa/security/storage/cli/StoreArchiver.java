@@ -350,8 +350,12 @@ public class StoreArchiver {
      *     <li>Get this statement as a string, call it <b>stmt</b></li>
      *     <li>get a connection, call it <b>c</b></li>
      *     <li>Create a {@link java.sql.PreparedStatement} as <b>pstmt =c.</b>{@link java.sql.Connection#prepareStatement(String)} using <b>stmt</b></li>
-     *     <li>As you get values, set them. <br/>
-     *         pstmt.setString(1, id);</li>
+     *     <li>As you get values, set them with <br/>
+     *         {@link #addToBatch(PreparedStatement, Identifier)} (if you need the system to figure out the new version) or
+     *         {@link #addToBatch(PreparedStatement, Identifier, boolean)} with a last argument of true to create a completely new version</li>
+     *     <li><b>Nota Bene:</b> do <b>not</b> add to the batch statement using the standard SQL call, since this does not get the versioned id
+     *         right!</li>
+     *     <li>When you are done, call the standard SQL pstmt.executeBatch()</li>
      * </ol>
      * The major argument for doing this is that the processing happens almost exclusively on the
      * server. For very large numbers of archives, this makes a huge difference.
@@ -392,7 +396,22 @@ public class StoreArchiver {
     }
 
     public void addToBatch(PreparedStatement stmt, Identifier oldID) throws SQLException {
-        long newIndex = getNewIndex(oldID);
+        addToBatch(stmt, oldID, false);
+    }
+
+    /**
+     * If you <b><i>know</i></b> this is a completely new version, then set isNew to true and the
+     * version will be set to 0. This will avoid a call to the database to check the version.
+     * If you get this wrong, you will get a primary key exception on update, since the version exists.
+     * This is quite useful if you are, e.g., migrating a store.
+     *
+     * @param stmt
+     * @param oldID
+     * @param isNew
+     * @throws SQLException
+     */
+    public void addToBatch(PreparedStatement stmt, Identifier oldID, boolean isNew) throws SQLException {
+        long newIndex = isNew ? 0L : getNewIndex(oldID);
         Identifier newID = createVersionedID(oldID, newIndex);
         stmt.setString(1, newID.toString());
         stmt.setString(2, oldID.toString());

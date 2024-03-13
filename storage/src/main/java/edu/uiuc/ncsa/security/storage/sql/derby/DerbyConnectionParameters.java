@@ -40,6 +40,7 @@ public class DerbyConnectionParameters extends SQLConnectionImpl {
         jdbcURL = "jdbc:derby:";
         switch (storeType) {
             case DERBY_STORE_TYPE_MEMORY:
+                // Fix for https://github.com/ncsa/security-lib/issues/35
                 /*
                    Example from the manual
                    jdbc:derby:memory:myDB;create=true
@@ -51,6 +52,7 @@ public class DerbyConnectionParameters extends SQLConnectionImpl {
                 break;
 
             case DERBY_STORE_TYPE_FILE:
+                // Fix for https://github.com/ncsa/security-lib/issues/36
                 // connect 'jdbc:derby:/home/ncsa/dev/derby/oa4mp;create=true;dataEncryption=true;bootPassword=o7MtXykd;user=oa4mp';
                 jdbcURL = jdbcURL + databaseName;
                 setShutdownURL(jdbcURL + ";shutdown=true");

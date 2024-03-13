@@ -103,7 +103,9 @@ public class ServiceClient {
         @Override
         public void destroy(HttpClient HttpClient) {
             // stateless so nothing to do really.
-            totalDestroyed++;
+            // Don't call this, but call doDestroy that actually does the bookkeeping.
+         /*   inUse--;
+            totalDestroyed++;*/
         }
     };
 
@@ -337,7 +339,8 @@ public class ServiceClient {
             response = client.execute(httpRequestBase);
             clientPool.push(client);  // put it back as soon as done.
         } catch (Throwable t) {
-            clientPool.destroy(client); // if it failed, get rid of connection
+            // Fix https://github.com/ncsa/security-lib/issues/37
+            clientPool.doDestroy(client); // if it failed, get rid of connection
             ServletDebugUtil.trace(this, "Error  invoking execute for client", t);
             if (ServletDebugUtil.isEnabled()) {
                 t.printStackTrace();

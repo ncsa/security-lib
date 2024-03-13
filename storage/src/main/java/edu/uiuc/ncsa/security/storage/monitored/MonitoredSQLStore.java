@@ -252,7 +252,13 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
                     deletepStmt.close();
                     archiveStmt.close();
                 }
-                updateHook(ruleList.getAction(), environment, idList);
+                if( !ruleList.isSkipCollateral()) {
+                    if(cfg.isTestOnly()){
+                        upkeepResponse.getCollateralMap().put(UpkeepConstants.ACTION_TEST, (long) idList.size());
+                    }else {
+                        upkeepResponse.getCollateralMap().put(ruleList.getAction(), updateHook(ruleList.getAction(), environment, idList));
+                    }
+                }
             } catch (SQLException sqlException) {
                 destroyConnection(cr);
                 if (cfg.isDebug() || DebugUtil.isEnabled()) {
@@ -274,12 +280,6 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
         }
         return upkeepResponse;
     }
-
-
-
-
-
-
 
     protected UpkeepStats gatherStats(int[] records) {
         int success = 0;
@@ -321,7 +321,12 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
     }
 
     @Override
-    public void updateHook(String action, AbstractEnvironment environment, List<Identifier> identifiers) {
+    public long updateHook(String action, AbstractEnvironment environment, List<Identifier> identifiers) {
+          return 0L;
+    }
 
+    @Override
+    public boolean hasUpkeepConfiguration() {
+        return monitoredStoreDelegate.hasUpkeepConfiguration();
     }
 }

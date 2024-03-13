@@ -55,6 +55,15 @@ public class RuleList extends ArrayList<RuleEntry> implements UpkeepConstants {
     }
 
     Boolean skipVersions = null;
+    public boolean isSkipCollateral() {
+        return skipCollateral;
+    }
+
+    public void setSkipCollateral(boolean skipCollateral) {
+        this.skipCollateral = skipCollateral;
+    }
+
+    boolean skipCollateral = true;
     boolean verbose = false;
 
     public String getAction() {

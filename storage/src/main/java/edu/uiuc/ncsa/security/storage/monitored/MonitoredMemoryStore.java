@@ -98,13 +98,18 @@ public abstract class MonitoredMemoryStore<V extends Identifiable> extends Memor
     }
 
     @Override
-    public void updateHook(String action, AbstractEnvironment environment, List<Identifier> identifiers) {
-
+    public long updateHook(String action, AbstractEnvironment environment, List<Identifier> identifiers) {
+       return 0L;
     }
 
     @Override
     public XMLConverter<V> getXMLConverter() {
         return getMapConverter();
+    }
+
+    @Override
+    public boolean hasUpkeepConfiguration() {
+        return monitoredStoreDelegate.hasUpkeepConfiguration();
     }
 }
 

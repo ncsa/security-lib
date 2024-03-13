@@ -4,11 +4,10 @@ import edu.uiuc.ncsa.security.core.util.Iso8601;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
-import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.RJustify;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -51,11 +50,21 @@ public class UpkeepResponse {
      */
     public int skipped = 0;
 
+    public Map<String, Long> getCollateralMap() {
+        return collateralMap;
+    }
+
+    public void setCollateralMap(Map<String, Long> collateralMap) {
+        this.collateralMap = collateralMap;
+    }
+
+    Map<String, Long> collateralMap = new HashMap<>();
+
     Date now = new Date();
 
     public String report(boolean prettyPrint) {
         String n = prettyPrint ? "\n" : " ";
-        int width = prettyPrint ? 20 : -1;
+        int width = prettyPrint ? 20 : -1; // turns off right justification below
         String spacer = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"; // 40 of these in case it ever changes  /u2501
         String ends = "════════════════════════════════════════"; // 40 of these in case it ever changes  /u2550
         return n +
@@ -68,6 +77,7 @@ public class UpkeepResponse {
                 RJustify("deleted # = ", width) + deleteCount + "," + n +
                 RJustify("retained = ", width) + retainedCount + "," + n +
                 RJustify("skipped = ", width) + skipped + "," + n +
+                formatCollaterals(prettyPrint, width) +
                 (prettyPrint ? spacer + n : "") +
                 RJustify("archived list# = ", width) + (archivedList == null ? 0 : archivedList.size()) + "," + n +
                 RJustify("archived stats = ", width) + (archivedStats == null ? "(none)" : archivedStats.report()) + "," + n +
@@ -79,6 +89,25 @@ public class UpkeepResponse {
                 (prettyPrint ? ends + n : "");
     }
 
+    protected String formatCollaterals(boolean prettyPrint, int width){
+        if(getCollateralMap().isEmpty()) return "";
+        String n = prettyPrint ? "\n" : " ";
+        String entry = "";
+        boolean isFirst = true;
+        for(String key : getCollateralMap().keySet()){
+            if(isFirst){
+                isFirst = false;
+            }else{
+                entry = entry + ", ";
+            }
+            entry = key + "=" + getCollateralMap().get(key);
+
+        }
+
+        String out = RJustify("collateral : ", width)+ entry + n;
+        
+        return out;
+    }
 
     @Override
     public String toString() {
@@ -97,6 +126,11 @@ public class UpkeepResponse {
         counts.put("retained", retainedCount);
         counts.put("skipped", skipped);
         jsonObject.put("counts", counts);
+        if(!getCollateralMap().isEmpty()) {
+            JSONObject collaterals = new JSONObject();
+            collaterals.putAll(getCollateralMap());
+            jsonObject.put("collateral", collaterals);
+        }
         // do lists
         JSONObject lists = new JSONObject();
         JSONArray array = new JSONArray();

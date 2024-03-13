@@ -89,6 +89,8 @@ public abstract class Pool<T> {
             inUse++;
             return item;
         } else {
+            // Fix for https://github.com/ncsa/security-lib/issues/37
+            // Spit out component name so it ends up in the log.
             throw new PoolException(getClass().getSimpleName() + " pool at capacity: " + inUse + " item(s) checked out. " + getStack().size() + " items in getStack().");
         }
     }
@@ -103,6 +105,7 @@ public abstract class Pool<T> {
     public synchronized void doDestroy(T item) throws PoolException {
         destroy(item);
         inUse--;
+        totalDestroyed++;
         trace("doDestroy, in use=" + inUse + ", destroyed = " + totalDestroyed);
     }
 

@@ -40,6 +40,8 @@ public interface MonitoredStoreInterface<V extends Identifiable> {
      void setUpkeepConfiguration(UpkeepConfiguration upkeepConfiguration);
     UpkeepConfiguration getUpkeepConfiguration();
 
+    boolean hasUpkeepConfiguration();
+
     /**
      * Do the upkeep. Note that some stores may have to update other stores. The
      * environment allows for this. E.g. Deleting a client should delete its approval
@@ -47,8 +49,9 @@ public interface MonitoredStoreInterface<V extends Identifiable> {
      * @param environment
      * @return
      */
+    // Fix for https://github.com/ncsa/security-lib/issues/34
     UpkeepResponse doUpkeep(AbstractEnvironment environment);
-     void updateHook(String action, AbstractEnvironment environment,  List<Identifier> identifiers) ;
+     long updateHook(String action, AbstractEnvironment environment,  List<Identifier> identifiers) ;
 
 
 }

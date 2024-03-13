@@ -44,7 +44,7 @@ public class SQLDatabase {
     }
 
 
-    protected void destroyConnection(ConnectionRecord c)  {
+    public void destroyConnection(ConnectionRecord c)  {
         try {
             connectionPool.doDestroy(c);
             DebugUtil.trace(this, "after destroyConnection for " + c + ", " + getConnectionPool());

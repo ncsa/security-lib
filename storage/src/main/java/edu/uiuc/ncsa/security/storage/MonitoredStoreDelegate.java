@@ -104,8 +104,8 @@ public  class MonitoredStoreDelegate<V extends Identifiable> implements Monitore
 
 
     @Override
-    public void updateHook(String action, AbstractEnvironment environment,  List<Identifier> identifiers) {
-
+    public long updateHook(String action, AbstractEnvironment environment,  List<Identifier> identifiers) {
+         return 0L;
     }
 
 

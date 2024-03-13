@@ -59,6 +59,16 @@ public class StringUtils {
         return blanks.substring(0, width);
     }
 
+    static String nbSpaces = "                          ";
+    public static String getNBSpaces(int width){
+        if(width <=0) return "";
+        if(nbSpaces.length()<width){
+            while (nbSpaces.length() < width) {
+                nbSpaces = nbSpaces + nbSpaces; // lots and lots of spaces
+            }
+        }
+        return nbSpaces.substring(0,width);
+    }
     /**
      * Right or right justify a snippet of text to the given width, e.g.
      * for right justify:

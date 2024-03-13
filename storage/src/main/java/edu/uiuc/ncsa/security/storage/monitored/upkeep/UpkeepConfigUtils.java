@@ -44,6 +44,10 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
     public static final String RULE_ENABLED = "enabled";
     public static final String RULE_EXTENDS = "extends";
     public static final String RULE_SKIP_VERSIONS = "skipVersions";
+    /**
+     * Skip the update hooks, i.e., have no collateral damage from the rule.
+     */
+    public static final String RULE_SKIP_COLLATERAL = "skipCollateral";
     public static final String ID_TAG = "id";
     public static final String ID_REGEX_FLAG = "regex";
     public static final String ID_NOT_FLAG = "negate";
@@ -141,7 +145,11 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
     }
 
     protected static Boolean doSkipVersions(ConfigurationNode node) {
-        String raw = getFirstAttribute(node, RULE_SKIP_VERSIONS);
+        return getaBoolean(node, RULE_SKIP_VERSIONS);
+    }
+
+    private static Boolean getaBoolean(ConfigurationNode node, String ruleSkipVersions) {
+        String raw = getFirstAttribute(node, ruleSkipVersions);
         if (!isTrivial(raw)) {
             // We DON'T want Boolean to parse this since it returns false if the value is not exactly "true"
             // The value is a Boolean hence overloaded and we need to know if it is null to know if
@@ -154,6 +162,16 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
             }
         }
         return null;
+    }
+
+    protected static Boolean doSkipCollateral(ConfigurationNode node) {
+        String raw = getFirstAttribute(node, RULE_SKIP_COLLATERAL);
+        if (!isTrivial(raw)) {
+            if (raw.equals("true")) {
+                return Boolean.TRUE;
+            }
+        }
+        return Boolean.FALSE;
     }
 
     /**
@@ -218,6 +236,7 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
         ruleList.setAction(getFirstAttribute(ruleNode, RULE_ACTION));
         ruleList.setVerbose(getFirstBooleanValue(ruleNode, UPKEEP_VERBOSE, false));
         ruleList.setSkipVersions(doSkipVersions(ruleNode));
+        ruleList.setSkipCollateral(doSkipCollateral(ruleNode));
         String rawList = getFirstAttribute(ruleNode, RULE_EXTENDS);
         if (!isTrivial(rawList)) {
             List<String> rr = new ArrayList<>();
