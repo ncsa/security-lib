@@ -866,6 +866,13 @@ public class StringUtils {
         return formatCount(count, "B");
     }
 
+    /**
+     * Formats the count and units with the correct unit prefix, formatting the count. So if
+     * formatCount(54321, "b") --> 54.321 Kb, here "b" is the unit
+     * @param count
+     * @param unit
+     * @return
+     */
     public static String formatCount(long count, String unit) {
         long acount = Math.abs(count);
         if (acount <= 999) {
@@ -910,7 +917,18 @@ public class StringUtils {
 
     }
 
-    public static String formatHerz(int period, long startTime){
-        return formatCount(1000*period/(System.currentTimeMillis() - startTime), "Hz");
+    /**
+     * Formats the number of cycles from the starting time. This will return properly formatted
+     * results to 4 places with units e.g. 12345 Hz is returned as 12.345 KHz
+     * @param cycles
+     * @param startTime
+     * @return
+     */
+    public static String formatHerz(long cycles, long startTime){
+        long elapsedTime = (System.currentTimeMillis() - startTime);
+        if(elapsedTime == 0L){
+               elapsedTime = 1; // no divide by zero
+        }
+        return formatCount(1000*cycles/elapsedTime, "Hz"); // converts to seconds
     }
 }
