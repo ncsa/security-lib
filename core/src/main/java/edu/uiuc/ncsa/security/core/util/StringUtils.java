@@ -22,6 +22,7 @@ public class StringUtils {
     /**
      * Right justify, so for the given width, the string is padded on the right. Note that
      * if width < x.length, the string is returned unchanged.
+     *
      * @param x
      * @param width
      * @return
@@ -32,6 +33,7 @@ public class StringUtils {
 
     /**
      * Left justify, padding the string on the right. See note in {@link #RJustify(String, int)}
+     *
      * @param x
      * @param width
      * @return
@@ -43,11 +45,12 @@ public class StringUtils {
     /**
      * Get a string of blanks for the given width. If the width is non-positive,
      * the empty string is returned.
+     *
      * @param width
      * @return
      */
     public static String getBlanks(int width) {
-        if(width <= 0){
+        if (width <= 0) {
             return "";
         }
         if (blanks.length() < width) {
@@ -60,15 +63,17 @@ public class StringUtils {
     }
 
     static String nbSpaces = "                          ";
-    public static String getNBSpaces(int width){
-        if(width <=0) return "";
-        if(nbSpaces.length()<width){
+
+    public static String getNBSpaces(int width) {
+        if (width <= 0) return "";
+        if (nbSpaces.length() < width) {
             while (nbSpaces.length() < width) {
                 nbSpaces = nbSpaces + nbSpaces; // lots and lots of spaces
             }
         }
-        return nbSpaces.substring(0,width);
+        return nbSpaces.substring(0, width);
     }
+
     /**
      * Right or right justify a snippet of text to the given width, e.g.
      * for right justify:
@@ -122,13 +127,17 @@ public class StringUtils {
 
 
     private static void tableTest() {
+        System.out.println("center:\"" + center("abcd", 10) + "\""); // 8 sec
+        System.out.println("center:\"" + center("abcd", 15) + "\""); // 8 sec
+        System.out.println("center:\"" + center("abcd", 6) + "\""); // 8 sec
+
         System.out.println(formatElapsedTime(8000)); // 8 sec
-        System.out.println(formatElapsedTime(4*3600*1000));  //4 hours
+        System.out.println(formatElapsedTime(4 * 3600 * 1000));  //4 hours
         System.out.println(formatByteCount(1000000L));
         System.out.println(formatByteCount(123456789L));
         System.out.println(formatByteCount(74123456789L));
-        System.out.println(formatHerz(200, System.currentTimeMillis()-100000));
-        System.out.println(formatHerz(54321, System.currentTimeMillis()-100));
+        System.out.println(formatHerz(200, System.currentTimeMillis() - 100000));
+        System.out.println(formatHerz(54321, System.currentTimeMillis() - 100));
 
 
         System.out.println();
@@ -290,13 +299,14 @@ public class StringUtils {
      * </pre>
      * If width &lt; 0, then do not truncate.<br/>
      * If ellipsis is null or empty, use the default {@link #ELLIPSIS}
+     *
      * @param x
      * @param width
      * @param ellipsis
      * @return
      */
     public static String truncate(String x, int width, String ellipsis) {
-        if(width < 0){
+        if (width < 0) {
             return x;
         }
         if (x.length() <= width) {
@@ -476,8 +486,8 @@ public class StringUtils {
      */
     public static String pad(String s, int commandBufferMaxWidth) {
         if (isTrivial(s)) {
-               return getBlanks(commandBufferMaxWidth);
-           }
+            return getBlanks(commandBufferMaxWidth);
+        }
         if (commandBufferMaxWidth < s.length()) {
             return s;
         }
@@ -555,12 +565,12 @@ public class StringUtils {
 
 
     public static List<String> formatMap(Map map,
-                                             List<String> keySubset,
-                                             boolean sortKeys,
-                                             boolean multiLine,
-                                             int indent,
-                                             int displayWidth
-                                             ) {
+                                         List<String> keySubset,
+                                         boolean sortKeys,
+                                         boolean multiLine,
+                                         int indent,
+                                         int displayWidth
+    ) {
         return formatMap(map, keySubset, sortKeys, multiLine, indent, displayWidth, true);
     }
 
@@ -568,6 +578,7 @@ public class StringUtils {
      * The tryJSON flag means that if an entry might be JSON, try to interpret it and use JSON
      * formatting guidelines. This should be set false in cases where you know that is not the
      * case, e.g., in calls from QDL.
+     *
      * @param map
      * @param keySubset
      * @param sortKeys
@@ -577,7 +588,7 @@ public class StringUtils {
      * @param tryJSON
      * @return
      */
-        public static List<String> formatMap(Map map,
+    public static List<String> formatMap(Map map,
 
                                          List<String> keySubset,
                                          boolean sortKeys,
@@ -596,12 +607,12 @@ public class StringUtils {
         if (keySubset == null || keySubset.isEmpty()) {
             try {
                 tMap.putAll(map);
-            }catch(ClassCastException cce){
+            } catch (ClassCastException cce) {
                 // So the map has different types of keys (e.g., integer and string). Slow approach is to convert them
-               tMap.clear();
-               for(Object obj : map.keySet()){
-                   tMap.put(obj.toString(), map.get(obj));
-               }
+                tMap.clear();
+                for (Object obj : map.keySet()) {
+                    tMap.put(obj.toString(), map.get(obj));
+                }
             }
         } else {
             // take only a subset
@@ -632,7 +643,7 @@ public class StringUtils {
                         v = Iso8601.date2String((Date) rawValue);
                     } else {
                         v = rawValue.toString();
-                        if(tryJSON){
+                        if (tryJSON) {
                             try {
                                 // Check if it's serialized JSON.
                                 JSON json = JSONSerializer.toJSON(v);
@@ -683,7 +694,7 @@ public class StringUtils {
                                         boolean multiLine) {
         // the given indent plus space for the " : " in the middle
         indentWidth = indentWidth + 3;
-        if(displayWidth < 0){
+        if (displayWidth < 0) {
             multiLine = false; // displayWidth =-1 means infinite width, so truncate is not possible.
         }
 
@@ -726,7 +737,7 @@ public class StringUtils {
                     truncate(value.replace("\n", "\n"+bbb).replace("\r", "\r"+bbb), realWidth);
         }
 */
-        return RJustify(key,indentWidth + leftColumWidth) + " : " +
+        return RJustify(key, indentWidth + leftColumWidth) + " : " +
                 truncate(value.replace("\n", "").replace("\r", ""), realWidth);
     }
 
@@ -843,22 +854,25 @@ public class StringUtils {
 
     /**
      * Returns the unicode for a single character
+     *
      * @param ch
      * @return
      */
-    public  static String toUnicode(char ch) {
+    public static String toUnicode(char ch) {
         return String.format("\\u%04x", (int) ch);
     }
-    public static String toUnicode(String x){
+
+    public static String toUnicode(String x) {
         char[] chars = x.toCharArray();
-        if(chars.length != 1){
-            throw new IllegalArgumentException(StringUtils.class.getSimpleName()+".toUnicode accepts a single character, not \"" + x + "\"");
+        if (chars.length != 1) {
+            throw new IllegalArgumentException(StringUtils.class.getSimpleName() + ".toUnicode accepts a single character, not \"" + x + "\"");
         }
         return toUnicode(chars[0]);
     }
 
     /**
      * Make E.g. byte counts from files human readable.
+     *
      * @param count
      * @return
      */
@@ -869,6 +883,7 @@ public class StringUtils {
     /**
      * Formats the count and units with the correct unit prefix, formatting the count. So if
      * formatCount(54321, "b") --> 54.321 Kb, here "b" is the unit
+     *
      * @param count
      * @param unit
      * @return
@@ -879,7 +894,7 @@ public class StringUtils {
             return Long.toString(count) + " " + unit;
         }
         if (1000 <= acount && acount <= 999999) {
-            return (count < 0 ? "-" : "") + String.format("%,.4f", acount / 1000.0d) + " K"+unit;
+            return (count < 0 ? "-" : "") + String.format("%,.4f", acount / 1000.0d) + " K" + unit;
         }
         if (1000000 <= acount && acount <= 999999999) {
             return (count < 0 ? "-" : "") + String.format("%,.4f", acount / 1000000.0d) + " M" + unit;
@@ -896,39 +911,58 @@ public class StringUtils {
 
     /**
      * Makes elapsed times in milliseconds  human readable.
+     *
      * @param elapsedTime The actual elapsed time in ms. E.g. 1000 is 1 sec.
      * @return
      */
     public static String formatElapsedTime(long elapsedTime) {
-       long a = Math.abs(elapsedTime);
-       if(a <= 999){
-           return a + " ms.";
-       }
-       if(1000<=a && a<=(60*1000L - 1)){
-          return (elapsedTime < 0 ? "-" : "") + String.format("%,.4f", a /( 1000.0d)) + " sec.";
-       }
-       if(60*1000L <= a && a <= 60*60*1000L-1){
-           return (elapsedTime < 0 ? "-" : "") + String.format("%,.4f", a /(60* 1000.0d)) + " min.";
-       }
-        if(60*60*1000L <= a && a <= 24*60*60*1000L-1){
-            return (elapsedTime < 0 ? "-" : "") + String.format("%,.4f", a /(60*60* 1000.0d)) + " hr.";
+        long a = Math.abs(elapsedTime);
+        if (a <= 999) {
+            return a + " ms.";
         }
-        return (elapsedTime < 0 ? "-" : "") + String.format("%,.4f", a /(24*60*60* 1000.0d)) + " days";
+        if (1000 <= a && a <= (60 * 1000L - 1)) {
+            return (elapsedTime < 0 ? "-" : "") + String.format("%,.4f", a / (1000.0d)) + " sec.";
+        }
+        if (60 * 1000L <= a && a <= 60 * 60 * 1000L - 1) {
+            return (elapsedTime < 0 ? "-" : "") + String.format("%,.4f", a / (60 * 1000.0d)) + " min.";
+        }
+        if (60 * 60 * 1000L <= a && a <= 24 * 60 * 60 * 1000L - 1) {
+            return (elapsedTime < 0 ? "-" : "") + String.format("%,.4f", a / (60 * 60 * 1000.0d)) + " hr.";
+        }
+        return (elapsedTime < 0 ? "-" : "") + String.format("%,.4f", a / (24 * 60 * 60 * 1000.0d)) + " days";
 
     }
 
     /**
      * Formats the number of cycles from the starting time. This will return properly formatted
      * results to 4 places with units e.g. 12345 Hz is returned as 12.345 KHz
+     *
      * @param cycles
      * @param startTime
      * @return
      */
-    public static String formatHerz(long cycles, long startTime){
+    public static String formatHerz(long cycles, long startTime) {
         long elapsedTime = (System.currentTimeMillis() - startTime);
-        if(elapsedTime == 0L){
-               elapsedTime = 1; // no divide by zero
+        if (elapsedTime == 0L) {
+            elapsedTime = 1; // no divide by zero
         }
-        return formatCount(1000*cycles/elapsedTime, "Hz"); // converts to seconds
+        return formatCount(1000 * cycles / elapsedTime, "Hz"); // converts to seconds
+    }
+
+    /**
+     * Centers the string within the width. If the string is longer than the width, nothing is
+     * done and no truncation results. The result is a string of length equal to width,
+     * with the text in centered.
+     *
+     * @param text
+     * @param width
+     * @return
+     */
+    public static String center(String text, int width) {
+        if (width <= text.length()) {
+            return text;
+        }
+        int padLeft = (width - text.length()) / 2;
+        return getBlanks(padLeft) + text + getBlanks(width - text.length() - padLeft);
     }
 }
