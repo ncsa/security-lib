@@ -60,10 +60,10 @@ public class Pacer {
      * Clears the current line of text. Call this when you want to clear where pacer was.
      */
     public void clear() {
-        char temp[] = new char[len + appendLineLength];
+ /*       char temp[] = new char[len + appendLineLength];
         for (int i = 0; i < len; i++)
-            temp[i] = ' ';
-        System.out.print(String.copyValueOf(temp) + "\n");
+            temp[i] = ' ';*/
+        System.out.print("\r" + StringUtils.getBlanks(maxLineLength));
     }
 
     /**

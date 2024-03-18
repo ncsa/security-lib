@@ -67,9 +67,22 @@ public class Monitored extends IdentifiableImpl implements DateComparable {
         }
         if (!(obj instanceof Monitored)) return false;
         Monitored mm = (Monitored) obj;
-        if (!mm.getCreationTS().equals(getCreationTS())) return false;
-        if (!mm.getLastAccessed().equals(getLastAccessed())) return false;
-        if (!mm.getLastModifiedTS().equals(getLastModifiedTS())) return false;
+        if(getCreationTS() == null){
+            if(mm.getCreationTS() != null) return false;
+        }else{
+            if(!getCreationTS().equals(mm.getCreationTS())) return false;
+        }
+        if(getLastAccessed() == null){
+            if(mm.getLastAccessed()!=null) return false;
+        } else{
+
+            if (!getLastAccessed().equals(mm.getLastAccessed())) return false;
+        }
+        if(getLastModifiedTS() == null){
+              if(mm.getLastModifiedTS() != null) return false;
+        } else{
+            if (!getLastModifiedTS().equals(mm.getLastModifiedTS())) return false;
+        }
         return true;
 
     }
