@@ -737,7 +737,7 @@ public class StringUtils {
                     truncate(value.replace("\n", "\n"+bbb).replace("\r", "\r"+bbb), realWidth);
         }
 */
-        return RJustify(key, indentWidth + leftColumWidth) + " : " +
+        return RJustify(key,indentWidth + leftColumWidth) + " : " +
                 truncate(value.replace("\n", "").replace("\r", ""), realWidth);
     }
 
