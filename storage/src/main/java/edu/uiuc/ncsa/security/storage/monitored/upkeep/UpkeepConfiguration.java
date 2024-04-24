@@ -1,8 +1,10 @@
 package edu.uiuc.ncsa.security.storage.monitored.upkeep;
 
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.monitored.Monitored;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -12,7 +14,7 @@ import static edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConstants.AC
  * <p>Created by Jeff Gaynor<br>
  * on 2/15/24 at  1:21 PM
  */
-public class UpkeepConfiguration {
+public class UpkeepConfiguration implements Serializable {
     public boolean isEnabled() {
         return enabled;
     }
@@ -147,21 +149,50 @@ public class UpkeepConfiguration {
 
     @Override
     public String toString() {
-        return "UpkeepConfiguration{" +
-                "\nenabled=" + enabled +
-                ", \ndebug=" + debug +
-                ", \nskipVersions=" + skipVersions +
-                ", \ntestOnly=" + testOnly +
-                ", \nalarms=" + alarms +
-                ", \ninterval=" + interval +
-                ", \nverbose=" + verbose +
-                ", \nrunCount=" + runCount +
-                ", \noutput='" + output + '\'' +
-                ", \nrulesMap=" + rulesMap +
-                ", \nruleList=" + ruleList +
+        return toString(false);
+
+    }
+    public String toString(boolean prettyPrint) {
+        String spacer = prettyPrint?"\n":" ";
+        String out =  "UpkeepConfiguration{" +
+                       spacer + "alarms=" + (alarms==null?"(none)":alarms) +
+                "," + spacer + "debug=" + debug +
+                "," + spacer + "enabled=" + enabled +
+                "," + spacer + "interval=" + interval +
+                "," + spacer + "output='" + output + '\'';
+                if(prettyPrint){
+                    out = out  +
+                     "," + spacer + "rulesMap=" + ppRulesMap(9);
+                }else{
+                    out = out  +  "," + spacer + "ruleList=" + ruleList +
+                     "," + spacer + "rulesMap=" + rulesMap;
+                }
+               out = out  +  "," + spacer + "runCount=" + runCount +
+                "," + spacer + "skipVersions=" + skipVersions +
+                "," + spacer + "testOnly=" + testOnly +
+                "," + spacer + "verbose=" + verbose +
                 '}';
+                return out;
     }
 
+    /**
+     * Pretty print the rules map. First entry is not indented, but the rest are.
+     * @return
+     */
+    protected String ppRulesMap(int indent){
+        String out ="";
+        boolean isFirst = true;
+        for(String key : getRulesMap().keySet()){
+            RuleList ruleList = getRulesMap().get(key);
+            if(isFirst){
+                isFirst = false;
+            }else{
+               out = out + "\n" + StringUtils.getBlanks(indent);
+            }
+            out = out   + key + " : " + ruleList.toString();
+        }
+        return out;
+    }
     public String[] applies(Identifier id, Long create, Long accessed, Long modified){
     // Do retain actions first!
         for(RuleList rr : ruleList ){

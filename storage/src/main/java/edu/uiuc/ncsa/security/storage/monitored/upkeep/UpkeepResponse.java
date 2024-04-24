@@ -89,6 +89,13 @@ public class UpkeepResponse {
                 (prettyPrint ? ends + n : "");
     }
 
+    /**
+     * Format the contents of the collateral map. This offsets each entry for proper display
+     * within the margins.
+     * @param prettyPrint
+     * @param width
+     * @return
+     */
     protected String formatCollaterals(boolean prettyPrint, int width){
         if(getCollateralMap().isEmpty()) return "";
         String n = prettyPrint ? "\n" : " ";

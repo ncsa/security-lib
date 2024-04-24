@@ -152,8 +152,12 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
 
     @Override
     public UpkeepResponse doUpkeep(AbstractEnvironment environment) {
+        return doUpkeep(getUpkeepConfiguration(), environment);
+    }
+
+    @Override
+    public UpkeepResponse doUpkeep(UpkeepConfiguration cfg, AbstractEnvironment environment) {
         UpkeepResponse upkeepResponse = new UpkeepResponse();
-        UpkeepConfiguration cfg = getUpkeepConfiguration();  // just keep it short.
         if (!cfg.isEnabled()) {
             return upkeepResponse;
         }

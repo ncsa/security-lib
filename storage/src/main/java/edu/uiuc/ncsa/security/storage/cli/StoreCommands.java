@@ -7,12 +7,15 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;
+import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.storage.MonitoredStoreInterface;
 import edu.uiuc.ncsa.security.storage.XMLMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import edu.uiuc.ncsa.security.storage.monitored.MonitoredKeys;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
+import edu.uiuc.ncsa.security.storage.monitored.MonitoredKeys;
+import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
+import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepResponse;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.cli.editing.EditorEntry;
@@ -21,6 +24,8 @@ import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
+import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -30,6 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
+import static edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfigUtils.processUpkeep;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.CLEAR_BUFFER_COMMAND;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 
@@ -43,6 +49,21 @@ public abstract class StoreCommands extends CommonCommands {
     public StoreCommands(MyLoggingFacade logger) throws Throwable {
         super(logger);
     }
+
+    public StoreCommands(AbstractEnvironment environment) throws Throwable {
+        super(environment.getMyLogger());
+        this.environment = environment;
+    }
+
+    public AbstractEnvironment getEnvironment() {
+        return environment;
+    }
+
+    public void setEnvironment(AbstractEnvironment environment) {
+        this.environment = environment;
+    }
+
+    AbstractEnvironment environment = null;
 
     public void setSortable(Sortable sortable) {
         this.sortable = sortable;
@@ -79,6 +100,161 @@ public abstract class StoreCommands extends CommonCommands {
         }
         setSortable(new BasicSorter());
     }
+
+    public boolean isMonitored() {
+        return (getStore() instanceof MonitoredStoreInterface);
+
+    }
+
+    UpkeepConfiguration upkeepConfiguration = null;
+
+    UpkeepConfiguration getUpkeepConfiguration() {
+        if (upkeepConfiguration == null) {
+            if (isMonitored()) {
+                upkeepConfiguration = ((MonitoredStoreInterface) getStore()).getUpkeepConfiguration();
+            }
+        }
+        return upkeepConfiguration;
+    }
+
+    public static String UPKEEP_FLAG_TEST = "-test";
+    public static String UPKEEP_FLAG_SHOW = "-show";
+    public static String UPKEEP_FLAG_CFG = "-cfg";
+    public static String UPKEEP_FLAG_RUN = "-run";
+    public static String UPKEEP_FLAG_ENABLE = "-enable";
+
+    protected void showUpkeepHelp() {
+        say("upkeep ["
+                + UPKEEP_FLAG_TEST + " (true | false) | "
+                + UPKEEP_FLAG_SHOW + " | "
+                + UPKEEP_FLAG_CFG + " path | "
+                + UPKEEP_FLAG_RUN + " | "
+                + UPKEEP_FLAG_ENABLE + " (true | false) ]" +
+                " = do upkeep for this store"
+        );
+        int width = 8;
+
+    say(StringUtils.RJustify(UPKEEP_FLAG_TEST, width) + " = true or false, all rules are tun in test mode only. This overrides individual rules settings." );
+    say(StringUtils.RJustify(UPKEEP_FLAG_SHOW, width) + " = print the current configuration" );
+    say(StringUtils.RJustify(UPKEEP_FLAG_CFG, width) + " = the full path to an XML configuration. This is exactly the upkeep block for a store, nothing else." );
+    say(StringUtils.RJustify(UPKEEP_FLAG_RUN, width) + " = flag, if present, run upkeep for thr current store with the current configuration. A report is printed" );
+    say(StringUtils.RJustify(UPKEEP_FLAG_ENABLE, width) + " = true or false, enable or disable the entire current configuration" );
+    say("Note that you cannot change the stored upkeep for the store, with this utility,");
+    say( "though you may load different one and " + UPKEEP_FLAG_RUN + "  it.");
+    say();
+    say("");
+        /*
+    UPKEEP_FLAG_TEST
+    UPKEEP_FLAG_SHOW
+    UPKEEP_FLAG_CFG
+    UPKEEP_FLAG_RUN
+    UPKEEP_FLAG_ENABLE
+         */
+    }
+
+    public void upkeep(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            showUpkeepHelp();
+            return;
+        }
+        if (!isMonitored()) {
+            say("Unmonitored store -- upkeep not supported for this store");
+            return;
+        }
+        MonitoredStoreInterface monitored = (MonitoredStoreInterface) getStore();
+        UpkeepConfiguration upkeepConfiguration = monitored.getUpkeepConfiguration(); // may be null
+        if (inputLine.hasArg(UPKEEP_FLAG_CFG)) {
+            String fileName = inputLine.getNextArgFor(UPKEEP_FLAG_CFG);
+            inputLine.removeSwitchAndValue(UPKEEP_FLAG_CFG);
+            File file = new File(fileName);
+            if (!file.exists()) {
+                say("sorry but \"" + file.getAbsolutePath() + "\" does not exist.");
+                return;
+            }
+            if (!file.isFile()) {
+                say("sorry but \"" + file.getAbsolutePath() + "\" is not a file.");
+                return;
+            }
+            try {
+                XMLConfiguration xmlConfiguration = Configurations.getConfiguration(file);
+                ConfigurationNode root = xmlConfiguration.getRoot();
+                UpkeepConfiguration cfg = processUpkeep(root);
+                upkeepConfiguration = cfg;
+            } catch (Throwable t) {
+                say("sorry but \"" + file.getAbsolutePath() + "\" could not be parsed:" + t.getMessage());
+                return;
+            }
+        }
+        boolean configurationCloned = false;
+        if (inputLine.hasArg(UPKEEP_FLAG_TEST)) {
+            String raw = inputLine.getNextArgFor(UPKEEP_FLAG_TEST);
+            boolean testOnly = "true".equals(raw);
+            if(!testOnly){
+                // spellcheck, basically. since if we only test fopr "true" and they mistype it
+                // we don't want to toggle testing and have something run that should not.
+                if( !"false".equals(raw)){
+                     say("unknown option \"" + raw + "\" for " + UPKEEP_FLAG_TEST);
+                     return;
+                }
+
+            }
+            inputLine.removeSwitchAndValue(UPKEEP_FLAG_TEST);
+            if (upkeepConfiguration != null) {
+                if (upkeepConfiguration.isTestOnly() != testOnly) {
+                    // The user want to run this in test mode only. Clone it
+                    upkeepConfiguration = cloneConfiguration(upkeepConfiguration);
+                    upkeepConfiguration.setTestOnly(testOnly);
+                    configurationCloned = true;
+                }
+            }
+        }
+        if (inputLine.hasArg(UPKEEP_FLAG_ENABLE)) {
+            boolean enableTest = "true".equals(inputLine.getNextArgFor(UPKEEP_FLAG_ENABLE));
+            inputLine.removeSwitchAndValue(UPKEEP_FLAG_ENABLE);
+            if (upkeepConfiguration.isEnabled() != enableTest) {
+                if (!configurationCloned) {
+                    upkeepConfiguration = cloneConfiguration(upkeepConfiguration);
+                    configurationCloned = true;
+                }
+                upkeepConfiguration.setEnabled(enableTest);
+            }
+        }
+
+        if (inputLine.hasArg(UPKEEP_FLAG_SHOW)) {
+             if (upkeepConfiguration== null) {
+                 say("no upkeep configuration");
+                 return;
+             }
+             say(upkeepConfiguration.toString(true));
+             return;
+         }
+
+        if (inputLine.hasArg(UPKEEP_FLAG_RUN)) {
+            if(getEnvironment() == null){
+                say("No runtime environment for this store has been set.");
+                return;
+            }
+            UpkeepResponse response = ((MonitoredStoreInterface) getStore()).doUpkeep(upkeepConfiguration, getEnvironment());
+            say(response.report(true));
+        }
+    }
+
+    private static UpkeepConfiguration cloneConfiguration(UpkeepConfiguration upkeepConfiguration) throws IOException, ClassNotFoundException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream
+                = new ObjectOutputStream(baos);
+        objectOutputStream.writeObject(upkeepConfiguration);
+        objectOutputStream.flush();
+        objectOutputStream.close();
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        ObjectInputStream objectInputStream
+                = new ObjectInputStream(bais);
+        UpkeepConfiguration tempCfg = (UpkeepConfiguration) objectInputStream.readObject();
+        tempCfg.setTestOnly(true);
+        upkeepConfiguration = tempCfg;
+        return upkeepConfiguration;
+    }
+
 
     // The name that will be shown in the prompt.
     public abstract String getName();
@@ -1147,61 +1323,61 @@ public abstract class StoreCommands extends CommonCommands {
             getStore().remove(identifier);
             return;
         }
-            Identifiable identifiable = findItem(inputLine);
+        Identifiable identifiable = findItem(inputLine);
+        if (identifiable == null) {
+            say("Object not found");
+            return;
+        }
+        String key = getAndCheckKeyArg(inputLine);
+        // if the request does not have new stuff, do old stuff.
+        if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
+            oldrm(inputLine);
+            rmCleanup(identifiable);
+            return;
+        }
+        if (inputLine.hasArg(KEYS_FLAG)) {
+            List<String> array = inputLine.getArgList(KEYS_FLAG);
+
+            if (array == null) {
+                say("sorry, but this requires a list for this option.");
+                return;
+            }
             if (identifiable == null) {
-                say("Object not found");
+                say("sorry, I could not find that object. Check your id.");
                 return;
             }
-            String key = getAndCheckKeyArg(inputLine);
-            // if the request does not have new stuff, do old stuff.
-            if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
-                oldrm(inputLine);
-                rmCleanup(identifiable);
+            removeEntries(identifiable, array);
+        }
+        if (key != null) {
+            if (identifiable == null) {
+                say("sorry, I could not find that object. Check your id.");
                 return;
             }
-            if (inputLine.hasArg(KEYS_FLAG)) {
-                List<String> array = inputLine.getArgList(KEYS_FLAG);
 
-                if (array == null) {
-                    say("sorry, but this requires a list for this option.");
-                    return;
-                }
-                if (identifiable == null) {
-                    say("sorry, I could not find that object. Check your id.");
-                    return;
-                }
-                removeEntries(identifiable, array);
-            }
-            if (key != null) {
-                if (identifiable == null) {
-                    say("sorry, I could not find that object. Check your id.");
-                    return;
-                }
-
-                removeEntry(identifiable, key);
-                say("removed attribute \"" + key + "\"");
-            }
-            //    rmCleanup(identifiable);
+            removeEntry(identifiable, key);
+            say("removed attribute \"" + key + "\"");
         }
+        //    rmCleanup(identifiable);
+    }
 
-        protected void showLSHelp () {
-            say("ls [flags] [number]");
-            sayi("Usage: Show information about an object or objects.");
-            sayi("flags are");
-            sayi(StringUtils.RJustify(LINE_LIST_COMMAND, 4) + " = " + "line list of an object or all objects. Longer entries will be truncated.");
-            sayi(StringUtils.RJustify(ALL_LIST_COMMAND, 4) + " = " + " list of **every** entry in the store. You have been warned.");
-            sayi(StringUtils.RJustify(VERBOSE_COMMAND, 4) + " = " + "verbose list. All entries will be shown in their entirety.");
-            sayi("If you have listed all objects you may use the index number as the argument. Or you can supply");
-            sayi("the identifier escaped with a /");
-            say("E.g.");
-            sayi("ls " + LINE_LIST_COMMAND + " " + ALL_LIST_COMMAND + " = line listing of entire store. This may be huge.");
-            sayi("ls " + LINE_LIST_COMMAND + " = line list of the currently active object.");
-            sayi("ls " + ALL_LIST_COMMAND + "  = short list of the entire store.");
-            sayi("ls " + LINE_LIST_COMMAND + " 4 = line list of the 4th item from the ls -a command");
-            sayi("ls " + LINE_LIST_COMMAND + " /foo:bar = line list of the object with identifier foo:bar");
-            sayi("ls " + LINE_LIST_COMMAND + " foo:bar = line list of the object with identifier foo:bar");
-            sayi("ls " + VERBOSE_COMMAND + " foo:bar = verbose list of the object with identifier foo:bar");
-        }
+    protected void showLSHelp() {
+        say("ls [flags] [number]");
+        sayi("Usage: Show information about an object or objects.");
+        sayi("flags are");
+        sayi(StringUtils.RJustify(LINE_LIST_COMMAND, 4) + " = " + "line list of an object or all objects. Longer entries will be truncated.");
+        sayi(StringUtils.RJustify(ALL_LIST_COMMAND, 4) + " = " + " list of **every** entry in the store. You have been warned.");
+        sayi(StringUtils.RJustify(VERBOSE_COMMAND, 4) + " = " + "verbose list. All entries will be shown in their entirety.");
+        sayi("If you have listed all objects you may use the index number as the argument. Or you can supply");
+        sayi("the identifier escaped with a /");
+        say("E.g.");
+        sayi("ls " + LINE_LIST_COMMAND + " " + ALL_LIST_COMMAND + " = line listing of entire store. This may be huge.");
+        sayi("ls " + LINE_LIST_COMMAND + " = line list of the currently active object.");
+        sayi("ls " + ALL_LIST_COMMAND + "  = short list of the entire store.");
+        sayi("ls " + LINE_LIST_COMMAND + " 4 = line list of the 4th item from the ls -a command");
+        sayi("ls " + LINE_LIST_COMMAND + " /foo:bar = line list of the object with identifier foo:bar");
+        sayi("ls " + LINE_LIST_COMMAND + " foo:bar = line list of the object with identifier foo:bar");
+        sayi("ls " + VERBOSE_COMMAND + " foo:bar = verbose list of the object with identifier foo:bar");
+    }
 
         protected final String LINE_LIST_COMMAND = "-l";
         protected final String ALL_LIST_COMMAND = "-E";
