@@ -51,6 +51,7 @@ public interface MonitoredStoreInterface<V extends Identifiable> {
      */
     // Fix for https://github.com/ncsa/security-lib/issues/34
     UpkeepResponse doUpkeep(AbstractEnvironment environment);
+    UpkeepResponse doUpkeep(UpkeepConfiguration upkeepConfiguration, AbstractEnvironment environment);
      long updateHook(String action, AbstractEnvironment environment,  List<Identifier> identifiers) ;
 
 

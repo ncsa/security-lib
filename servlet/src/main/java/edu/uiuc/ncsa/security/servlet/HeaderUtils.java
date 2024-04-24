@@ -118,7 +118,7 @@ public class HeaderUtils {
             header64 = getBearerAuthHeader(request);
         }
         if (header64 == null) {
-            throw new IllegalArgumentException("Error: Unknown authorization method.");
+            throwException("Missing/unknown authorization method.");
         }
         String[] out = new String[2];
 

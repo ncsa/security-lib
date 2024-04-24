@@ -9,7 +9,7 @@ cd $WEBSITE_ROOT/pdf
 echo "converting docs to PDF"
 
 lowriter --headless --convert-to pdf $NCSA_ROOT/sas-server/src/main/docs/SAS-protocol.odt
-lowriter --headless --convert-to pdf $NCSA_ROOT/security-lib/storage/src/main/docs/upkeep.odt
+lowriter --headless --convert-to pdf $NCSA_ROOT/storage/src/main/docs/upkeep.odt
 echo "done converting PDFs"
 
 

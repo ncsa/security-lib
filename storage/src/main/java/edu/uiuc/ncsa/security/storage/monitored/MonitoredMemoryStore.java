@@ -94,6 +94,11 @@ public abstract class MonitoredMemoryStore<V extends Identifiable> extends Memor
 
     @Override
     public UpkeepResponse doUpkeep(AbstractEnvironment environment) {
+        return doUpkeep(getUpkeepConfiguration(), environment);
+    }
+
+    @Override
+    public UpkeepResponse doUpkeep(UpkeepConfiguration upkeepConfiguration, AbstractEnvironment environment) {
         return null;
     }
 

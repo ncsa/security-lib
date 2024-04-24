@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DynamoDBConfiguration">
+    <option name="databaseConfigurations">
+      <map>
+        <entry key="a05a49c1-5109-4706-a824-2b3888179a6b">
+          <value>
+            <DatabaseConfigInternal>
+              <option name="credentialsType" value="Explicit access key and secret key" />
+              <option name="id" value="a05a49c1-5109-4706-a824-2b3888179a6b" />
+              <option name="label" value="DynamoDB" />
+              <option name="region" value="US East (Ohio) us-east-2" />
+              <option name="version" value="2" />
+            </DatabaseConfigInternal>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="version" value="2" />
+  </component>
+</project>

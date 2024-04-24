@@ -152,8 +152,12 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
 
     @Override
     public UpkeepResponse doUpkeep(AbstractEnvironment environment) {
+        return doUpkeep(getUpkeepConfiguration(), environment);
+    }
+
+    @Override
+    public UpkeepResponse doUpkeep(UpkeepConfiguration cfg, AbstractEnvironment environment) {
         UpkeepResponse upkeepResponse = new UpkeepResponse();
-        UpkeepConfiguration cfg = getUpkeepConfiguration();  // just keep it short.
         if (!cfg.isEnabled()) {
             return upkeepResponse;
         }
@@ -183,9 +187,9 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
                 skipVersions = ruleList.isSkipVersions();
             }
             String query = ruleList.toSQLQuery(keys, getTable().getFQTablename(), skipVersions);
-            if (cfg.isDebug()) {
+         /*   if (cfg.isDebug()) {
                 System.err.println("upkeep SQL query for rule " + ruleList.getName() + " is \"" + query + "\"");
-            }
+            }*/
             try {
                 PreparedStatement deletepStmt = null;
                 PreparedStatement archiveStmt = null;
@@ -207,9 +211,9 @@ public abstract class MonitoredSQLStore<V extends Identifiable> extends SQLStore
                     upkeepResponse.attempted++;
                     if (upkeepResponse.retainedList.contains(idString)) { // If a rule to retain is done, retain it
                         upkeepResponse.skipped++;
-                        if (cfg.isDebug()) {
+                   /*     if (cfg.isDebug()) {
                             System.err.println(getClass().getSimpleName() + " skipped:" + idString);
-                        }
+                        }*/
                         continue;                                 // even if another rule says not to.
                     }
                     switch (ruleList.getAction()) {

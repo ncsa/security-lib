@@ -27,20 +27,13 @@ import java.util.Vector;
  * on 8/15/22 at  2:48 PM
  */
 public class SASCommands extends StoreCommands {
-    public SASEnvironment getSatEnvironment() {
-        return SASEnvironment;
+    @Override
+    public SASEnvironment getEnvironment() {
+        return (SASEnvironment)super.getEnvironment();
     }
 
-    public void setSatEnvironment(SASEnvironment SASEnvironment) {
-        this.SASEnvironment = SASEnvironment;
-    }
-
-    SASEnvironment SASEnvironment;
-
-
-    protected SASCommands(MyLoggingFacade logger, SASEnvironment SASEnvironment) throws Throwable{
-        super(logger == null ? SASEnvironment.getMyLogger() : logger);
-        this.SASEnvironment = SASEnvironment;
+    protected SASCommands(SASEnvironment SASEnvironment) throws Throwable{
+        super( SASEnvironment);
         setStore(SASEnvironment.getClientStore());
     }
 
@@ -165,7 +158,7 @@ public class SASCommands extends StoreCommands {
         SASConfigurationLoader loader = new SASConfigurationLoader(node);
 
         SASEnvironment SASEnvironment1 = loader.load();
-        SASCommands SASCommands = new SASCommands(null, SASEnvironment1);
+        SASCommands SASCommands = new SASCommands(SASEnvironment1);
         CLIDriver driver = new CLIDriver(SASCommands);
 
         driver.start();

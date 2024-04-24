@@ -109,6 +109,11 @@ public abstract class MonitoredFileStore<V extends Identifiable> extends FileSto
 
     @Override
     public UpkeepResponse doUpkeep(AbstractEnvironment environment) {
+        return doUpkeep(getUpkeepConfiguration(), environment);
+    }
+
+    @Override
+    public UpkeepResponse doUpkeep(UpkeepConfiguration upkeepConfiguration, AbstractEnvironment environment) {
         return null;
     }
 

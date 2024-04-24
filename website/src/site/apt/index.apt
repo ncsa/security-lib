@@ -28,6 +28,14 @@ The NCSA CSD's library of very useful utilities.
 
  * {{{./cli/index.html}Command Line Interface}} Creating a command line interface.
 
+Useful Reference Manuals
+
+  * {{{./pdf/upkeep.pdf}Upkeep Reference}} For monitored stores, the facility that allows regular removal
+    of entries based on timestamps (e.g. never used), or identifier.
+
+  * {{{./pdf/SAS-protocol.pdf}The SAS Reference}} The reference for running sessions of applications on your
+    web server.     
+
 Javadocs
 
     *{{{./apidocs/index.html}Javadoc}}

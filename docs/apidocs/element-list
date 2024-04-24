@@ -1,5 +1,6 @@
 edu.uiuc.ncsa.sas
 edu.uiuc.ncsa.sas.admin
+edu.uiuc.ncsa.sas.cli
 edu.uiuc.ncsa.sas.client
 edu.uiuc.ncsa.sas.example
 edu.uiuc.ncsa.sas.exceptions
@@ -21,8 +22,10 @@ edu.uiuc.ncsa.security.servlet
 edu.uiuc.ncsa.security.servlet.mail
 edu.uiuc.ncsa.security.storage
 edu.uiuc.ncsa.security.storage.cli
-edu.uiuc.ncsa.security.storage.monitored
+edu.uiuc.ncsa.security.storage.data
 edu.uiuc.ncsa.security.storage.events
+edu.uiuc.ncsa.security.storage.monitored
+edu.uiuc.ncsa.security.storage.monitored.upkeep
 edu.uiuc.ncsa.security.storage.sql
 edu.uiuc.ncsa.security.storage.sql.derby
 edu.uiuc.ncsa.security.storage.sql.h2
@@ -30,6 +33,7 @@ edu.uiuc.ncsa.security.storage.sql.internals
 edu.uiuc.ncsa.security.storage.sql.mariadb
 edu.uiuc.ncsa.security.storage.sql.mysql
 edu.uiuc.ncsa.security.storage.sql.postgres
+edu.uiuc.ncsa.security.util
 edu.uiuc.ncsa.security.util.cli
 edu.uiuc.ncsa.security.util.cli.editing
 edu.uiuc.ncsa.security.util.cli.json_edit
