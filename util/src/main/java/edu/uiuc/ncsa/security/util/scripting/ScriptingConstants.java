@@ -47,6 +47,7 @@ public interface ScriptingConstants {
     String SRE_REQ_MAIL_CONFIG = "mail_cfg";
     String SRE_REQ_MAIL_MESSAGE = "mail_message";
     String SRE_REQ_EXTENDED_ATTRIBUTES = "eas";
+    String SRE_REQ_AUTH_HEADERS = "auth_headers";
     String[] SRE_PHASES = {
             SRE_EXEC_INIT,
             SRE_PRE_AUTH,

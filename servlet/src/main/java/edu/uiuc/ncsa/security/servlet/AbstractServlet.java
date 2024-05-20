@@ -302,7 +302,7 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
      * @param key
      * @return
      */
-    protected String getFirstParameterValue(HttpServletRequest request, String key) {
+/*    protected String getFirstParameterValue(HttpServletRequest request, String key) {
         Object obj = request.getParameter(key);
 
         if (obj == null) return null;
@@ -313,7 +313,7 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
         String[] values = (String[]) obj;
         if (values.length == 0) return null;
         return values[0];
-    }
+    }*/
 
     /**
      * This will print all parameters to standard err for this specific debugger during trace.

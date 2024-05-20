@@ -2,14 +2,14 @@ package edu.uiuc.ncsa.security.servlet;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -77,6 +77,7 @@ public class HeaderUtils {
 
     /**
      * This is the header itself that is base 64 encoded. To get the parsed header, use {@link #getCredentialsFromHeaders(HttpServletRequest)}
+     *
      * @param request
      * @return
      */
@@ -142,15 +143,15 @@ public class HeaderUtils {
 
         }
         String id = URLDecoder.decode(header.substring(0, lastColonIndex), "UTF-8");
-         out[ID_INDEX] = id;
+        out[ID_INDEX] = id;
 
-         String rawSecret = URLDecoder.decode(header.substring(lastColonIndex + 1), "UTF-8");
+        String rawSecret = URLDecoder.decode(header.substring(lastColonIndex + 1), "UTF-8");
 
-         out[SECRET_INDEX] = rawSecret;
-         if(deepDebugOn) {
-             ServletDebugUtil.trace(HeaderUtils.class, "getCredentialsFromHeaders: returning  " + id + ", " + rawSecret);
-         }
-         return out;
+        out[SECRET_INDEX] = rawSecret;
+        if (deepDebugOn) {
+            ServletDebugUtil.trace(HeaderUtils.class, "getCredentialsFromHeaders: returning  " + id + ", " + rawSecret);
+        }
+        return out;
     }
 
     public static String[] getCredentialsFromHeaders(HttpServletRequest request) throws UnsupportedEncodingException {
@@ -169,7 +170,81 @@ public class HeaderUtils {
         return BasicIdentifier.newID(creds[ID_INDEX]);
 
     }
-    protected static void throwException(String message){
+
+    protected static void throwException(String message) {
         throw new IllegalArgumentException(message);
+    }
+
+    public static JSONObject headerToJSON(HttpServletRequest httpServletRequest) {
+        return headerToJSON(httpServletRequest, new ArrayList<>());
+    }
+
+
+    /**
+     * Takes the request and converts it to JSON, normalizing the header names
+     * to lower case. Any name on the filter list is omitted.
+     * Note that the filter names are assumed to be lower case.
+     * This puts single values as strings and aggregates  as arrays of strings. Used in OA4MP!
+     * @param httpServletRequest
+     * @param filter
+     * @return
+     */
+    public static JSONObject headerToJSON(HttpServletRequest httpServletRequest, List<String> filter) {
+        Enumeration<String> names = httpServletRequest.getHeaderNames();
+        JSONObject json = new JSONObject();
+        while (names.hasMoreElements()) {
+            String name = names.nextElement();
+            Enumeration<String> values = httpServletRequest.getHeaders(name);
+            JSONArray array = new JSONArray();
+            while (values.hasMoreElements()) {
+                array.add(values.nextElement());
+            }
+            // As per RFC 7230#3.2 header names are case-insensitive. Normalize to lower case
+            // Next bit implicitly omits empty headers.
+            name = name.toLowerCase();
+            if(filter.isEmpty() || !filter.contains(name)){
+                if (array.size() == 1) {
+                    json.put(name.toLowerCase(), array.get(0));
+                }
+                if (1 < array.size()) {
+                    json.put(name.toLowerCase(), array);
+                }
+            }
+        }
+        return json;
+    }
+
+    /**
+     * Gets the first parameter value for the given key
+     * @param request
+     * @param key
+     * @return
+     */
+    public static String getFirstParameterValue(HttpServletRequest request, String key) {
+        Object obj = request.getParameter(key);
+
+        if (obj == null) return null;
+        if (!obj.getClass().isArray()) {
+            return obj.toString();
+        }
+        // If not null and not a singleton, this is an array of strings. Return the zero-th
+        String[] values = (String[]) obj;
+        if (values.length == 0) return null;
+        return values[0];
+    }
+    /**
+     * Utility to extract all of the parameters from a request. Since the parameters are all
+     * string arrays, this takes a little finagling. Generally we do not support multiple values
+     * for parameters, so taking the first is reasonable.
+     *
+     * @param req
+     * @return
+     */
+    public static Map<String, String> getFirstParameters(HttpServletRequest req) {
+        HashMap<String, String> map = new HashMap<>();
+        for (Object key : req.getParameterMap().keySet()) {
+            map.put(key.toString(), getFirstParameterValue(req, key.toString()));
+        }
+        return map;
     }
 }
