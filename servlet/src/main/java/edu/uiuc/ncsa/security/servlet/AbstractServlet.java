@@ -296,26 +296,6 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
     }
 
     /**
-     * Convenience to get the first (zero-th index) value of a parameter list from a servlet request.
-     *
-     * @param request
-     * @param key
-     * @return
-     */
-/*    protected String getFirstParameterValue(HttpServletRequest request, String key) {
-        Object obj = request.getParameter(key);
-
-        if (obj == null) return null;
-        if (!obj.getClass().isArray()) {
-            return obj.toString();
-        }
-        // If not null and not a singleton, this is an array of strings. Return the zero-th
-        String[] values = (String[]) obj;
-        if (values.length == 0) return null;
-        return values[0];
-    }*/
-
-    /**
      * This will print all parameters to standard err for this specific debugger during trace.
      * It gives a report on what is actually being passed in.
      *

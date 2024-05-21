@@ -70,7 +70,7 @@ public class LastAccessedThread extends MyThread {
                     return;
                 }
                 nextRun.setTime(nextRun.getTime() + nextCleanup);
-                info("next iteration for " + getName() + " scheduled for " + nextRun);
+             //   info("next iteration for " + getName() + " scheduled for " + nextRun);
                 sleep(nextCleanup);
 
                 if (lael.getIdsByStoreMap().isEmpty()) {
