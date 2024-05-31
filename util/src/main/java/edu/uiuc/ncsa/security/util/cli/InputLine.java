@@ -423,7 +423,7 @@ public class InputLine {
     }
 
     /**
-     * Returns the index of the target in the input line or a -1 if it does not occur.
+     * Returns the first index of the target in the input line or a -1 if it does not occur.
      *
      * @param arg
      * @return
@@ -578,7 +578,7 @@ public class InputLine {
          return true;
     }
     public static void main(String[] args) {
-        InputLine inputLine = new InputLine("foo -zero -one [2,3,4] -arf blarf -woof -two [abc,  def, g] -fnord 3455.34665 -three [  a,b,   c]");
+        InputLine inputLine = new InputLine("foo -zero -one [2,3,4] -arf blarf0 -arf blarf1 -arf blarf2 -woof -two [abc,  def, g] -fnord 3455.34665 -three [  a,b,   c]");
 
         System.out.println(inputLine.getArgList("-zero")); // should be empty
         System.out.println(inputLine.hasArgList("-arf")); // should be empty
@@ -586,6 +586,7 @@ public class InputLine {
         System.out.println(inputLine.getArgList("-one"));
         System.out.println(inputLine.getArgList("-two"));
         System.out.println(inputLine.getArgList("-three"));
+        System.out.println("-arf = " + inputLine.getNextArgFor("-arf"));
         System.out.println(inputLine);
         inputLine.removeSwitchAndValue("-two");
         System.out.println(inputLine);
