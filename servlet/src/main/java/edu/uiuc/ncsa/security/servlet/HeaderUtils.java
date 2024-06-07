@@ -72,7 +72,11 @@ public class HeaderUtils {
     }
 
     public static boolean hasBasicHeader(HttpServletRequest request) {
-        return getBasicHeader(request) != null;
+        return !getAuthHeader(request, "Basic").isEmpty();
+    }
+
+    public static boolean hasBearerHeader(HttpServletRequest request) {
+        return !getAuthHeader(request, "Bearer").isEmpty();
     }
 
     /**
@@ -185,6 +189,7 @@ public class HeaderUtils {
      * to lower case. Any name on the filter list is omitted.
      * Note that the filter names are assumed to be lower case.
      * This puts single values as strings and aggregates  as arrays of strings. Used in OA4MP!
+     *
      * @param httpServletRequest
      * @param filter
      * @return
@@ -202,7 +207,7 @@ public class HeaderUtils {
             // As per RFC 7230#3.2 header names are case-insensitive. Normalize to lower case
             // Next bit implicitly omits empty headers.
             name = name.toLowerCase();
-            if(filter.isEmpty() || !filter.contains(name)){
+            if (filter.isEmpty() || !filter.contains(name)) {
                 if (array.size() == 1) {
                     json.put(name.toLowerCase(), array.get(0));
                 }
@@ -216,6 +221,7 @@ public class HeaderUtils {
 
     /**
      * Gets the first parameter value for the given key
+     *
      * @param request
      * @param key
      * @return
@@ -232,6 +238,7 @@ public class HeaderUtils {
         if (values.length == 0) return null;
         return values[0];
     }
+
     /**
      * Utility to extract all of the parameters from a request. Since the parameters are all
      * string arrays, this takes a little finagling. Generally we do not support multiple values

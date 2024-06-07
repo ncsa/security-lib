@@ -1047,8 +1047,7 @@
       <change beforePath="$PROJECT_DIR$/docs/project-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/project-info.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/store_commands/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/store_commands/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/summary.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/InputLine.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/InputLine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/HeaderUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/HeaderUtils.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -1493,6 +1492,7 @@
       <workItem from="1716381199511" duration="3030000" />
       <workItem from="1716724872650" duration="7187000" />
       <workItem from="1717101988458" duration="636000" />
+      <workItem from="1717444243108" duration="5366000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>

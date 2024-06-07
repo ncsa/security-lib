@@ -23,6 +23,7 @@ edu.uiuc.ncsa.security.servlet.mail
 edu.uiuc.ncsa.security.storage
 edu.uiuc.ncsa.security.storage.cli
 edu.uiuc.ncsa.security.storage.data
+edu.uiuc.ncsa.security.storage.dynamodb
 edu.uiuc.ncsa.security.storage.events
 edu.uiuc.ncsa.security.storage.monitored
 edu.uiuc.ncsa.security.storage.monitored.upkeep
