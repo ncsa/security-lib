@@ -1,0 +1,1 @@
+The format of the configuration file -- in YAML -- is simple

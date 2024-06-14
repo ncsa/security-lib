@@ -10,8 +10,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-installer/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/ArgMap.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/DirectoryEntry.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/FileEntry.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/InstallConfiguration.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/InstallConfigurationImporter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-installer/src/main/resources/readme.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-installer/src/main/resources/test-cfg.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-installer/src/main/resources/test.cfg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web-installer/src/main/resources/test.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/alt-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/alt-index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/allclasses-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/allclasses-index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/allclasses.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/allclasses.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/allpackages-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/allpackages-index.html" afterDir="false" />
@@ -1016,38 +1029,16 @@
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/util/testing/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/util/testing/package-summary.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/util/testing/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/util/testing/package-tree.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/util/testing/package-use.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/util/testing/package-use.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/element-list" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/element-list" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/help-doc.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/help-doc.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/index-all.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/index-all.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/member-search-index.js" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/member-search-index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/member-search-index.zip" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/member-search-index.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/overview-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/overview-summary.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/overview-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/overview-tree.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/package-search-index.js" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/package-search-index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/package-search-index.zip" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/package-search-index.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/serialized-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/serialized-form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/type-search-index.js" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/type-search-index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/type-search-index.zip" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/type-search-index.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/cli/help.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/cli/help.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/cli/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/cli/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/configurations/overview.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/configurations/overview.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/configurations/single-inheritance.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/configurations/single-inheritance.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/dependencies.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/dependencies.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/dependency-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/dependency-info.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/distribution-management.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/distribution-management.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/faq.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/faq.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/markdown-velocity.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/markdown-velocity.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/markdown.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/markdown.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/SAS-protocol.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/SAS-protocol.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/pdf/upkeep.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/upkeep.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/plugin-management.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/plugin-management.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/plugins.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/plugins.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/project-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/project-info.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/store_commands/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/store_commands/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/summary.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/HeaderUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/HeaderUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -1105,35 +1096,35 @@
     <option name="sortByType" value="true" />
     <option name="sortKey" value="BY_TYPE" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;11 (2)&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/security-lib/storage/src/main/java/edu/uiuc/ncsa/security/storage/data&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "master",
+    "jdk.selected.JAVA_MODULE": "11 (2)",
+    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/security-lib/web-installer",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Libraries",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/web-installer" />
+      <recent name="$PROJECT_DIR$/web-installer/src/main/resources" />
       <recent name="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/data" />
       <recent name="$PROJECT_DIR$/util/src/main/resources" />
       <recent name="$PROJECT_DIR$/core/src/test/resources/cfg_loader" />
-      <recent name="$PROJECT_DIR$/website/src/site/xhtml/cli" />
-      <recent name="$PROJECT_DIR$/website/src/site/xhtml" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/util/src/main/resources" />
@@ -1158,7 +1149,7 @@
       <recent name="edu.uiuc.ncsa.security.util.mail" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.InputLine">
+  <component name="RunManager" selected="Application.WebInstaller">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -1194,20 +1185,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="StringUtils" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.util.StringUtils" />
-      <module name="core" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.core.util.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="UpkeepConfigUtils" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfigUtils" />
       <module name="storage" />
@@ -1217,6 +1194,25 @@
           <option name="PATTERN" value="edu.uiuc.ncsa.security.storage.monitored.upkeep.*" />
           <option name="ENABLED" value="true" />
         </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WebInstaller" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.installer.WebInstaller" />
+      <module name="web-installer" />
+      <option name="PROGRAM_PARAMETERS" value="remove -dir /tmp/oa4mp-test -v" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.installer.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
+        <option name="credential" />
+        <option name="region" />
+        <option name="useCurrentConnection" value="false" />
       </extension>
       <method v="2">
         <option name="Make" enabled="true" />
@@ -1349,8 +1345,8 @@
     </configuration>
     <list>
       <item itemvalue="Application.SAS Client" />
+      <item itemvalue="Application.WebInstaller" />
       <item itemvalue="Application.InputLine" />
-      <item itemvalue="Application.StringUtils" />
       <item itemvalue="Application.UpkeepConfigUtils" />
       <item itemvalue="Java Scratch.Scratch" />
       <item itemvalue="Java Scratch.App" />
@@ -1358,11 +1354,11 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.WebInstaller" />
         <item itemvalue="Application.InputLine" />
         <item itemvalue="Java Scratch.Scratch" />
         <item itemvalue="Java Scratch.App" />
         <item itemvalue="Application.UpkeepConfigUtils" />
-        <item itemvalue="Application.StringUtils" />
       </list>
     </recent_temporary>
   </component>
@@ -1492,7 +1488,7 @@
       <workItem from="1716381199511" duration="3030000" />
       <workItem from="1716724872650" duration="7187000" />
       <workItem from="1717101988458" duration="636000" />
-      <workItem from="1717444243108" duration="5366000" />
+      <workItem from="1717444243108" duration="46498000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -1837,7 +1833,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="70" />
+    <option name="localTasksCounter" value="72" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1846,7 +1842,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="https://github.com/ncsa/security-lib/issues/21 mke the build more portable #2." />
     <MESSAGE value="Wrong reference to crypt 8 library. Moved static utility to a class." />
     <MESSAGE value="Fixes for https://github.com/ncsa/security-lib/issues/21 and https://github.com/ncsa/security-lib/issues/22" />
     <MESSAGE value="Pre-travel checkin" />
@@ -1871,7 +1866,8 @@
     <MESSAGE value="Update before travel." />
     <MESSAGE value="Prepping for release." />
     <MESSAGE value="Mostly refactoring to make certain utilities more available in OA4MP." />
-    <option name="LAST_COMMIT_MESSAGE" value="Mostly refactoring to make certain utilities more available in OA4MP." />
+    <MESSAGE value="Mostly documentation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Mostly documentation" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -1884,17 +1880,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$APPLICATION_CONFIG_DIR$/scratches/scratch.java</url>
-          <line>131</line>
+          <line>111</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$APPLICATION_CONFIG_DIR$/scratches/scratch.java</url>
-          <line>175</line>
+          <line>155</line>
           <option name="timeStamp" value="10" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$APPLICATION_CONFIG_DIR$/scratches/scratch.java</url>
-          <line>212</line>
+          <line>192</line>
           <option name="timeStamp" value="11" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1948,7 +1944,7 @@
           <option name="timeStamp" value="51" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$APPLICATION_CONFIG_DIR$/scratches/scratch_1.java</url>
+          <url>file://$APPLICATION_CONFIG_DIR$/scratches/dynamo.java</url>
           <line>47</line>
           <option name="timeStamp" value="52" />
         </line-breakpoint>
@@ -1956,6 +1952,16 @@
           <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/InputLine.java</url>
           <line>588</line>
           <option name="timeStamp" value="53" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java</url>
+          <line>179</line>
+          <option name="timeStamp" value="61" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java</url>
+          <line>323</line>
+          <option name="timeStamp" value="62" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

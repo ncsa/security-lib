@@ -48,6 +48,7 @@
         <module>storage</module>
         <module>sas-server</module>
         <module>skin</module>
+        <module>web-installer</module>
     </modules>
     <build>
         <plugins>

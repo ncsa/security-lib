@@ -15,6 +15,8 @@
     <file url="file://$PROJECT_DIR$/storage/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/util/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/util/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/web-installer/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/web-installer/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/website/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/website/src/main/resources" charset="UTF-8" />
   </component>

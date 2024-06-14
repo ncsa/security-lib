@@ -20,6 +20,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="core" />
+        <module name="web-installer" />
         <module name="website" />
         <module name="util" />
         <module name="sas-server" />
@@ -28,5 +29,10 @@
         <module name="storage" />
       </profile>
     </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="web-installer" options="--add-modules java.se,java.desktop" />
+    </option>
   </component>
 </project>
