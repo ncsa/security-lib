@@ -47,22 +47,22 @@ public class ArgMap extends HashMap {
                     put(DEBUG_FLAG, true);
                     break;
                 case DIR_ARG:
-                    if ((i + 1) < args.length) {
-                        // if this is the very last argument on the line, skip it
-                        if (args[i + 1].startsWith("-")) {
-                            throw new IllegalArgumentException("missing directory");
-                        }
-                        put(DIR_ARG, new File(args[++i]));
-                    }
+                    i = getI(i, args, DIR_ARG);
+                    break;
+                case LOG_ARG:
+                    i = getI(i, args, LOG_ARG);
                     break;
                 case ALL_FLAG:
                     put(ALL_FLAG, true);
+                    break;
+                case NO_PACER_FLAG:
+                    put(NO_PACER_FLAG, false);
                     break;
                 case OA4MP_FLAG:
                     put(OA4MP_FLAG, true);
                     break;
                 case VERSION_FLAG:
-                    put(VERSION_FLAG, args[i]);
+                    put(VERSION_FLAG, args[++i]);
             }
         }
         if (!isShowHelp()) {
@@ -70,9 +70,27 @@ public class ArgMap extends HashMap {
                 throw new IllegalArgumentException("unknown operation \"" + getOperation() + "\"");
             }
         }
+        if(is(DEBUG_FLAG)){
+            put(NO_PACER_FLAG, true);
+        }else{
+            if(!containsKey(NO_PACER_FLAG)){
+                put(NO_PACER_FLAG, true); // default
+            }
+        }
     }
 
-public String getVersion(){
+    private int getI(int i, String[] args, String logArg) {
+        if ((i + 1) < args.length) {
+// if this is the very last argument on the line, skip it
+            if (args[i + 1].startsWith("-")) {
+                throw new IllegalArgumentException("missing directory");
+            }
+            put(logArg, new File(args[++i]));
+        }
+        return i;
+    }
+
+    public String getVersion(){
         if(containsKey(VERSION_FLAG)){
             return getString(VERSION_FLAG);
         }
@@ -121,6 +139,9 @@ public String getVersion(){
         return getOperation().equals(LIST_OPTION);
     }
 
+    public boolean isVersions() {
+        return getOperation().equals(VERSIONS_OPTION);
+    }
     public boolean hasRootDir() {
         return getRootDir() != null;
     }
@@ -132,6 +153,18 @@ public String getVersion(){
     public boolean isAll() {
         return is(ALL_FLAG);
     }
+    public boolean isPacerOn(){
+        return is(NO_PACER_FLAG);
+    }
 
+    public boolean isLoggingEnabled(){
+        return containsKey(LOG_ARG);
+    }
+    public File logFile(){
+        return (File) get(LOG_ARG);
+    }
 
+    public boolean isShowReleaseNotes(){
+        return getOperation().equals(NOTES_OPTION);
+    }
 }

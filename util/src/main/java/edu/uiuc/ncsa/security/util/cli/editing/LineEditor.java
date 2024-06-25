@@ -461,6 +461,19 @@ public class LineEditor extends AbstractEditor {
         say("      Note that if the range is omitted, the entire buffer is saved.");
     }
 
+    /**
+     * This sets a target file. If none is specified in the write command, this is used.
+     * @return
+     */
+    public File getTargetFile() {
+        return targetFile;
+    }
+
+    public void setTargetFile(File targetFile) {
+        this.targetFile = targetFile;
+    }
+
+    File targetFile = null;
     protected void doWrite(LineEditorInputLine eil) {
         if (showHelp(eil)) {
             doWriteHelp();
@@ -469,7 +482,17 @@ public class LineEditor extends AbstractEditor {
 
         List<String> list = getBuffer();
         try {
-            File f = new File(eil.getLastArg());
+            File f = null;
+            if(getTargetFile() != null){
+                f = getTargetFile();
+            }
+            if(eil.getArgCount()== 0 ){
+                if(f == null){
+                    say("no target file specified");
+                    return;
+                }
+                f = new File(eil.getLastArg());
+            }
             if (f.isDirectory()) {
                 say("Sorry, that is a directory.");
                 return;

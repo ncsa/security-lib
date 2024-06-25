@@ -82,11 +82,11 @@ public class ActionDeserializer implements SASConstants {
     /**
      * Options for format are
      * <pre>
-     *     {"sat":{simple action}}
+     *     {"sas":{simple action}}
      * </pre>
      * <b>or</b>
      * <pre>
-     *     {"sat":[{action0}, {action1},...]}
+     *     {"sas":[{action0}, {action1},...]}
      * </pre>
      * This method always returns a {@link List}.
      *

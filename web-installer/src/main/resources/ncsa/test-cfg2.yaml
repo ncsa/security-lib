@@ -1,0 +1,38 @@
+# Example of multiple directories
+---
+- sourceURL: https://github.com/ncsa/oa4mp/blob/v5.5/docs/pdf/
+  directories:
+  - files: [scopes.pdf, oa2-client.pdf, rfc7523_intro.pdf, filestore-migration.pdf,
+      qdl_clc_ini.pdf, token_handler_configuration.pdf, claim_source_examples.pdf,
+      creating_claim_sources2.pdf, qdl_oa4mp_store_access.pdf]
+    target_dir: /docs
+  type: file_set
+- sourceURL: https://github.com/ncsa/oa4mp/releases/download/v5.5/
+  directories:
+  - files:
+    - oa4mp-derby.sql
+    - oa4mp-mysql.sql
+    - oa4mp-mariadb.sql
+    - oa4mp-pg.sql
+    - oa4mp-mariadb.sql
+    - derby-migrate.sql
+    - jwt-scripts.tar
+    - {preprocess: true, update: false, source: cfg.xml}
+    - oidc-cm-scripts.tar
+    - {update: false, source: oa4mp-message.template}
+    - {update: false, source: oa4mp-subject.template}
+    target_dir: /etc
+  - files:
+    - {preprocess: true, source: cli, exec: true}
+    - {preprocess: true, source: jwt, exec: true}
+    - {preprocess: true, source: clc, exec: true}
+    - {preprocess: true, source: migrate, exec: true}
+    - qdl-installer.jar
+    target_dir: /bin
+  - files: [fs-migrate.jar, oauth2.war, jwt.jar, clc.jar, cli.jar]
+    target_dir: /lib
+  - {target_dir: /var/storage/server}
+  - {target_dir: /log}
+  - files: [version.txt]
+    target_dir: /
+  type: file_set

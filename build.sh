@@ -1,13 +1,13 @@
 
 NCSA_ROOT=$NCSA_DEV_INPUT/security-lib
 
-cd $NCSA_ROOT
+cd $NCSA_ROOT || exit
 echo 'building NCSA Sec-Lib'
 
 mvn clean install > maven.log
 
 if [[ $? -ne 0 ]] ; then
-    echo "NCSA maven build failed, exiting..."
+    echo "NCSA maven build failed, see $NCSA_ROOT/maven.log"
     exit 1
 fi
 echo '     ... done!'

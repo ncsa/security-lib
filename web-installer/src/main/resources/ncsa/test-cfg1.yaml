@@ -1,0 +1,8 @@
+---
+- sourceURL: https://github.com/ncsa/oa4mp/blob/v5.5/docs/pdf/
+  directories:
+  - files: [scopes.pdf, oa2-client.pdf, rfc7523_intro.pdf, filestore-migration.pdf,
+      qdl_clc_ini.pdf, token_handler_configuration.pdf, claim_source_examples.pdf,
+      creating_claim_sources2.pdf, qdl_oa4mp_store_access.pdf]
+    target_dir: /docs
+  type: file_set

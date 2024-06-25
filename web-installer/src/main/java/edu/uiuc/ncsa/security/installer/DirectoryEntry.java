@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.installer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,12 +15,25 @@ import java.util.List;
  */
 public class DirectoryEntry {
     String targetDir;
-    String source;
+
+    public String getSourceURL() {
+        return sourceURL;
+    }
+
+    public void setSourceURL(String sourceURL) {
+        this.sourceURL = sourceURL;
+    }
+
+    String sourceURL;
     Boolean executable = null;
     Boolean useTemplates = null;
     Boolean updateable = null;
-    List<FileEntry> files;
+    List<FileEntryInterface> files;
 
+    public int size() {
+        if (getFiles() == null) return 0;
+        return getFiles().size();
+    }
 
     public String getTargetDir() {
         return targetDir;
@@ -29,14 +43,20 @@ public class DirectoryEntry {
         this.targetDir = targetDir;
     }
 
-    public boolean hasExecutable(){
+    public boolean hasExecutable() {
         return executable != null;
     }
-    public boolean hasUseTemplates(){
+
+    public boolean hasUseTemplates() {
         return useTemplates != null;
     }
-    public boolean hasUpdateable(){
+
+    public boolean hasUpdateable() {
         return updateable != null;
+    }
+
+    public boolean hasFiles() {
+        return files != null && !files.isEmpty();
     }
 
     public Boolean isExecutable() {
@@ -63,11 +83,47 @@ public class DirectoryEntry {
         this.updateable = updateable;
     }
 
-    public List<FileEntry> getFiles() {
+    public List<FileEntryInterface> getFiles() {
         return files;
     }
 
-    public void setFiles(List<FileEntry> files) {
+    public void setFiles(List<FileEntryInterface> files) {
         this.files = files;
+    }
+
+    /**
+     * In jar archives, a list of files and directories to ignore
+     *
+     * @return
+     */
+    public List<String> getIgnoredFiles() {
+        return ignoredFiles;
+    }
+
+    public void setIgnoredFiles(List<String> ignoredFiles) {
+        this.ignoredFiles = ignoredFiles;
+    }
+
+    List<String> ignoredFiles = null;
+
+    public boolean hasExcludedFiles() {
+        return !(ignoredFiles == null || ignoredFiles.isEmpty());
+    }
+
+    /**
+     * Sniff through the excluded files and returns the ones that end in /,
+     * i.e., the directories. This is computed anew each time, so just stash it
+     * @return
+     */
+    public List<String> getIgnoredDirectories() {
+        List<String> out = new ArrayList<>();
+        if (hasExcludedFiles()) {
+            for (String f : getIgnoredFiles()) {
+                if (f.endsWith("/")) {
+                    out.add(f);
+                }
+            }
+        }
+        return out;
     }
 }

@@ -4,7 +4,7 @@ package edu.uiuc.ncsa.security.installer;
  * <p>Created by Jeff Gaynor<br>
  * on 6/13/24 at  11:24 AM
  */
-public class FileEntry {
+public class FileEntry implements FileEntryInterface {
     Boolean executable = null;
     Boolean useTemplate = null;
     Boolean updateable = null;
@@ -58,10 +58,12 @@ public class FileEntry {
         this.updateable = updateable;
     }
 
+    @Override
     public String getSourceName() {
         return sourceName;
     }
 
+    @Override
     public void setSourceName(String sourceName) {
         this.sourceName = sourceName;
     }

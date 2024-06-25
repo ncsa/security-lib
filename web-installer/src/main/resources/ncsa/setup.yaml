@@ -1,0 +1,11 @@
+---
+- app_name: NCSA sec-lib
+  help: {arg: /app_help.txt, installer: /help.txt, success: /success.txt}
+  versions:
+  - {file: /ncsa/test-cfg1.yaml, name: v1, description: single script set, notes: /ncsa/readme.txt}
+  - {file: /ncsa/test-cfg2.yaml, name: v2, description: two script sets}
+  - {file: /ncsa/jar-test.yaml, name: jar, description: test a jar archive}
+  - {file: v1, name: latest, description: latest release}
+  cleanup_on_fail: false
+  fail_on_error: false
+  type: setup

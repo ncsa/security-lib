@@ -28,6 +28,9 @@ The NCSA CSD's library of very useful utilities.
 
  * {{{./cli/index.html}Command Line Interface}} Creating a command line interface.
 
+ * {{{./pdf/installer.pdf}The Web installer.}} A tool for installing distributions hosted on GitHub or other
+   such sites.
+
 Useful Reference Manuals
 
   * {{{./pdf/upkeep.pdf}Upkeep Reference}} For monitored stores, the facility that allows regular removal

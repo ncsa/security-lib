@@ -1,0 +1,6 @@
+- sourceURL: https://github.com/ncsa/qdl/releases/download/v1.5.5
+  directories:
+  - files: [qdl-installer.jar]
+    target_dir: /
+    ignore: [/META-INF/, /edu/, /dir_list.txt, /file_list.txt]
+  type: zip
