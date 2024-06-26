@@ -80,7 +80,8 @@ public class ConnectionPool<T extends ConnectionRecord> extends Pool<T> {
             if (DEEP_DEBUG) {
                 t.printStackTrace();
             }
-            throw new PoolException("could not register MySQL driver:" + t.getMessage(), t);
+            // Fix for https://github.com/ncsa/security-lib/issues/40
+         //   throw new PoolException("could not register MySQL driver:" + t.getMessage(), t);
         }
 
     }
