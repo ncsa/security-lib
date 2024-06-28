@@ -9,6 +9,7 @@ edu.uiuc.ncsa.sas.storage
 edu.uiuc.ncsa.sas.thing
 edu.uiuc.ncsa.sas.thing.action
 edu.uiuc.ncsa.sas.thing.response
+edu.uiuc.ncsa.sas.watcher
 edu.uiuc.ncsa.sas.webclient
 edu.uiuc.ncsa.security.core
 edu.uiuc.ncsa.security.core.cache
@@ -18,6 +19,7 @@ edu.uiuc.ncsa.security.core.exceptions
 edu.uiuc.ncsa.security.core.inheritance
 edu.uiuc.ncsa.security.core.ipc
 edu.uiuc.ncsa.security.core.util
+edu.uiuc.ncsa.security.installer
 edu.uiuc.ncsa.security.servlet
 edu.uiuc.ncsa.security.servlet.mail
 edu.uiuc.ncsa.security.storage
