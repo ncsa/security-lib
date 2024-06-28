@@ -22,6 +22,18 @@ public class CLIDriver {
      */
     public static final String EXIT_COMMAND = "/exit";
 
+    public String getLineCommentStart() {
+        return lineCommentStart;
+    }
+
+    public void setLineCommentStart(String lineCommentStart) {
+        this.lineCommentStart = lineCommentStart;
+    }
+
+    protected String lineCommentStart = null;
+    public boolean hasComments(){
+        return lineCommentStart != null;
+    }
     public static final int OK_RC = 0;
     public static final int ABNORMAL_RC = -1;
     public static final int USER_EXIT_RC = 10;
@@ -380,6 +392,11 @@ public class CLIDriver {
                     say("");
                 }
                 cmdLine = readline(prompt);
+                if(hasComments()){
+                    if(cmdLine.trim().startsWith(getLineCommentStart())){
+                        continue;
+                    }
+                }
                 if (hasEnv()) {
                     cmdLine = TemplateUtil.replaceAll(cmdLine, getEnv());
                 }

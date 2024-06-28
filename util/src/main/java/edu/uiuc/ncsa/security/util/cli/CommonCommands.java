@@ -19,6 +19,8 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
  * on 10/30/13 at  4:14 PM
  */
 public abstract class CommonCommands implements Commands {
+
+    //public static
     boolean batchMode = false;
 
     /**

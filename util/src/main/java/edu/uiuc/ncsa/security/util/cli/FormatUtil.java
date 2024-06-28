@@ -16,8 +16,26 @@ public class FormatUtil {
     static String DISPLAY_WIDTH_SWITCH = "-w";
     static String HELP_SWITCH= "--help";
 
+    public static IOInterface getIoInterface() {
+        if(ioInterface == null){
+            ioInterface = new BasicIO();
+        }
+        return ioInterface;
+    }
+
+    /**
+     * Allows to set the format utility to use the {@link IOInterface}. This is pretty specialized,
+     * but it can be done.
+     * @param ioInterface
+     */
+    public static void setIoInterface(IOInterface ioInterface) {
+        FormatUtil.ioInterface = ioInterface;
+    }
+
+    static IOInterface ioInterface;
     public static void say(String x) {
-        System.out.println(x);
+        getIoInterface().println(x);
+        //System.out.println(x);
     }
 
     public static void printFormatListHelp(IOInterface io, InputLine inputLine){

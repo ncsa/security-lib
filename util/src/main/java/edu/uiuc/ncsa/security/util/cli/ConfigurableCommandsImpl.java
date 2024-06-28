@@ -10,9 +10,7 @@ import org.apache.commons.cli.*;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -264,6 +262,11 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
     public static final String HELP_OPTION = "h";
     public static final String HELP_LONG_OPTION = "help";
 
+    public static final String INPUT_OPTION = "in";
+    public static final String OUTPUT_OPTION = "out";
+    public static final String COMMENT_START_OPTION = "comment";
+    public static  String COMMENT_START = "#";
+
 
     public static final String CONFIG_FILE_OPTION = "cfg";
     public static final String CONFIG_FILE_LONG_OPTION = "configFile";
@@ -368,7 +371,23 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
                     1000000, true, true, Level.FINEST);
         }
         logger = loggerProvider.get();
-
+        BasicIO basicIO = new BasicIO();
+        try {
+            if (hasOption(INPUT_OPTION, INPUT_OPTION)) {
+                basicIO.setInputStream(new FileInputStream(getCommandLine().getOptionValue(INPUT_OPTION)));
+            }
+            if (hasOption(OUTPUT_OPTION, OUTPUT_OPTION)) {
+                String f = getCommandLine().getOptionValue(OUTPUT_OPTION);
+                PrintStream printStream = new PrintStream(new FileOutputStream(f));
+                basicIO.setPrintStream(printStream);
+            }
+        }catch(Throwable throwable){
+            throwable.printStackTrace();
+        }
+        if(hasOption(COMMENT_START_OPTION, COMMENT_START_OPTION)){
+            COMMENT_START = getCommandLine().getOptionValue(COMMENT_START_OPTION, COMMENT_START);
+        }
+         setIOInterface(basicIO);
         info("Config name = " + cfgName);
 
         if (cfgName == null) {
@@ -537,6 +556,9 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         options.addOption(LOG_FILE_OPTION, LOG_FILE_LONG_OPTION, true, "Set the log file");
         options.addOption(USE_COMPONENT_OPTION, USE_COMPONENT_LONG_OPTION, true, "Specify the component to use.");
         options.addOption(ENV_OPTION, ENV_LONG_OPTION, true, "Specify the environment to use.");
+        options.addOption(INPUT_OPTION, INPUT_OPTION, true, "Specify the input file. All input is read from this file.");
+        options.addOption(OUTPUT_OPTION, OUTPUT_OPTION, true, "Specify the output file. All output goes to this file.");
+        options.addOption(COMMENT_START_OPTION, COMMENT_START_OPTION, true, "Specify a comment start. Any line that starts with this is ignored.");
         return options;
     }
 
