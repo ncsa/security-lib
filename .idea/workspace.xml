@@ -9,15 +9,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Update website">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/DirectoryEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/DirectoryEntry.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/FileEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/FileEntry.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/InstallConfigurationImporter.java" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/InstallConfigurationImporter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-installer/src/main/resources/ncsa/jar-test.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/src/main/resources/ncsa/jar-test.yaml" afterDir="false" />
-    </list>
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Update website" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -58,7 +50,7 @@
   &quot;associatedIndex&quot;: 2
 }</component>
   <component name="ProjectId" id="2L40iExtc4jFxuf0gN3ADT1vesV" />
-  <component name="ProjectLevelVcsManager">
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectReloadState">
@@ -83,6 +75,7 @@
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;jdk.selected.JAVA_MODULE&quot;: &quot;11 (2)&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/security-lib/web-installer&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -92,7 +85,7 @@
     &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.fileTypes&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -354,6 +347,14 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.18034.62" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-IU-241.18034.62" />
+      </set>
+    </attachedChunks>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration" maxAnnotateRevisions="500">
     <option name="USER" value="" />
@@ -489,6 +490,7 @@
       <workItem from="1719403896153" duration="71325000" />
       <workItem from="1719860165880" duration="2237000" />
       <workItem from="1719877805360" duration="2531000" />
+      <workItem from="1719954453289" duration="72000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
