@@ -162,7 +162,7 @@ public class WebInstaller {
         return totalBytes;
     }
 
-    protected long processZipFile(URL sourceURL, DirectoryEntry de) throws IOException {
+    protected long processZipFile(URL sourceURL, DirectoryEntry de, boolean isUpdate) throws IOException {
         long totalSize = 0L;
         HttpURLConnection connection = (HttpURLConnection) sourceURL.openConnection();
         DataInputStream dis = new DataInputStream(connection.getInputStream());
@@ -176,18 +176,21 @@ public class WebInstaller {
             while ((entry = stream.getNextEntry()) != null) {
                 String entryFileName = entry.getName();
                 System.out.println("entry name = " + entryFileName);
+                if (isUpdate && de.getFilePermissions().containsKey(entryFileName)) {
+                    continue;
+                }
                 boolean skip = false;
-                if(!ignoredDirectores.isEmpty()){
-                    for(String d : ignoredDirectores){
-                        if(("/"+ entryFileName).startsWith(d)){
+                if (!ignoredDirectores.isEmpty()) {
+                    for (String d : ignoredDirectores) {
+                        if (("/" + entryFileName).startsWith(d)) {
                             skip = true;
                             break;
                         }
                     }
                 }
-                if(skip) continue;
-                if(de.hasExcludedFiles()){
-                    if(de.getIgnoredFiles().contains(entryFileName)){
+                if (skip) continue;
+                if (de.hasExcludedFiles()) {
+                    if (de.getIgnoredFiles().contains(entryFileName)) {
                         continue;
                     }
                 }
@@ -196,24 +199,46 @@ public class WebInstaller {
                     outFile.mkdirs();
                     continue;
                 }
-                outFile.getParentFile().mkdirs();
-                FileOutputStream output = null;
+                if(entry.isDirectory()){
+                    outFile.getParentFile().mkdirs();
+                    outFile.setLastModified(entry.getLastModifiedTime().toMillis());
+                    continue;
+                }
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 try {
-                    output = new FileOutputStream(outFile);
                     int len = 0;
                     while ((len = stream.read(buffer)) > 0) {
-                        output.write(buffer, 0, len);
+                        baos.write(buffer, 0, len);
                     }
                 } catch (Throwable t) {
-                    t.printStackTrace();
+                    if (getInstallConfiguration().isFailOnError()) {
+                        throw t; // end of story.
+                    }
+                    if (isDebugOn()) {
+                        t.printStackTrace();
+                    }
                 } finally {
                     // we must always close the output file
-                    if (output != null) output.close();
+                    if (baos != null) baos.close();
                 }
+                String content = new String(baos.toByteArray(), StandardCharsets.UTF_8);
+                boolean setExec = false;
+                if (de.hasFilePermssions() && de.getFilePermissions().containsKey(entryFileName)) {
+                    FileEntry fei = de.getFilePermissions().get(entryFileName);
+                    if (fei.isUseTemplate()) {
+                        content = doReplace(content);
+                    }
+                    setExec = fei.isExecutable();
+                }
+                Files.writeString(outFile.toPath(), content);
+                if(setExec){
+                    outFile.setExecutable(true);
+                }
+                outFile.setLastModified(entry.getLastModifiedTime().toMillis());
                 totalSize = totalSize + outFile.length();
 
             }
-        }catch(Throwable t){
+        } catch (Throwable t) {
             t.printStackTrace();
         } finally {
             // we must always close the zip file.
@@ -550,6 +575,10 @@ public class WebInstaller {
         long startTime = System.currentTimeMillis();
         int doneCount = 0;
         int totalFileCount = getInstallConfiguration().getTotalFileCount();
+        if(totalFileCount == 0){
+            say("no files found to process");
+            return;
+        }
         for (SingleSourceSet sss : installConfiguration.getSourceSets()) {
             for (DirectoryEntry de : sss.getDirectories()) {
                 File target = new File(getRoot(), de.getTargetDir());
@@ -578,7 +607,7 @@ public class WebInstaller {
         }
         if (getArgMap().isPacerOn()) {
             pacer.pace(doneCount, " files processed  of " + totalFileCount + " (" + ((100 * doneCount) / totalFileCount) + "%)");
-            say("\n"); // spacer after pacer
+            say("\n"); // spacer after last pacer call
         }
         if (doneCount != totalFileCount) {
             if (getArgMap().isLoggingEnabled()) {
@@ -604,10 +633,10 @@ public class WebInstaller {
                                     int doneCount,
                                     int totalFileCount) throws IOException {
         String source = sss.getSourceURL();
-        source = source + (source.endsWith("/") ? " " : "/");
+        source = source + (source.endsWith("/") ? "" : "/");
         source = source + zfe.getSourceName();
         URL url = new URL(source);
-        processZipFile(url, de);
+        processZipFile(url, de, isUpdate);
 
         return doneCount + 1;
     }

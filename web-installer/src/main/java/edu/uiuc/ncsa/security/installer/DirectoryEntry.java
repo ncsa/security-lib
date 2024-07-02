@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.installer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This models a set of directory entries on the target system.
@@ -110,6 +111,23 @@ public class DirectoryEntry {
         return !(ignoredFiles == null || ignoredFiles.isEmpty());
     }
 
+    public boolean hasFilePermssions(){
+        return filePermissions != null;
+    }
+
+    /**
+     * These are only processed for zip archives.
+     * @return
+     */
+    public Map<String, FileEntry> getFilePermissions() {
+        return filePermissions;
+    }
+
+    public void setFilePermissions(Map<String, FileEntry> filePermissions) {
+        this.filePermissions = filePermissions;
+    }
+
+    Map<String, FileEntry> filePermissions = null;
     /**
      * Sniff through the excluded files and returns the ones that end in /,
      * i.e., the directories. This is computed anew each time, so just stash it

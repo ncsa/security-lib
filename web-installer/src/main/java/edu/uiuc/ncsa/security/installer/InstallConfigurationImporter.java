@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ public class InstallConfigurationImporter {
     public static String DIRECTORIES = "directories";
     public static String FILES = "files";
     public static String IGNORED_FILES = "ignore";
+    public static String PERMISSIONS_FILES = "permissions";
     public static String SOURCE_FILE = "source";
     public static String TARGET_FILE = "target";
     public static String TARGET_DIRECTORY = "target_dir";
@@ -213,13 +215,34 @@ public class InstallConfigurationImporter {
                 Object x = currentMap.get(IGNORED_FILES);
                 if (x instanceof List) {
                     List<String> ignoredFiles = new ArrayList<>();
-                    List list = (List)x;
-                    for(Object obj : list){
-                        if(obj instanceof String){
-                            ignoredFiles.add((String)obj);
+                    List list = (List) x;
+                    for (Object obj : list) {
+                        if (obj instanceof String) {
+                            ignoredFiles.add((String) obj);
                         }
                     }
                     directoryEntry.setIgnoredFiles(ignoredFiles);
+                }
+            }
+            if (currentMap.containsKey(PERMISSIONS_FILES)) {
+                Object x = currentMap.get(PERMISSIONS_FILES);
+                if (x instanceof List) {
+                    Map<String, FileEntry> flaggedFiles = new HashMap<>();
+                    List list = (List) x;
+                    FileEntry fe;
+                    for (Object obj : list) {
+                        if (obj instanceof String) {
+                            fe = new FileEntry((String) obj);
+                        } else {
+                            if (obj instanceof Map) {
+                                fe = new FileEntry((Map) obj);
+                            } else {
+                                throw new IllegalStateException("unknown " + PERMISSIONS_FILES + " entry of type " + obj.getClass().getCanonicalName());
+                            }
+                        }
+                        flaggedFiles.put(fe.getSourceName(), fe);
+                    }
+                    directoryEntry.setFilePermissions(flaggedFiles);
                 }
             }
             directoryEntry.setTargetDir((String) currentMap.get(TARGET_DIRECTORY));
@@ -259,16 +282,7 @@ public class InstallConfigurationImporter {
                 fileEntry = new FileEntry((String) object);
             } else {
                 if ((object instanceof Map)) {
-                    Map currentMap = (Map) object;
-                    String source = (String) currentMap.get(SOURCE_FILE);
-                    String target = (String) currentMap.get(TARGET_FILE);
-                    if (target == null) target = source; // same name
-
-                    fileEntry = new FileEntry(source,
-                            target,
-                            getBoolean(currentMap, ATTR_EXECUTABLE), // can be null
-                            getBoolean(currentMap, ATTR_PREPROCESS), //   "   "
-                            getBoolean(currentMap, ATTR_UPDATEABLE)); // "    "
+                    fileEntry = new FileEntry((Map) object);
                 }
             }
             if (fileEntry != null) {
@@ -288,7 +302,7 @@ public class InstallConfigurationImporter {
      * @param key
      * @return
      */
-    protected Boolean getBoolean(Map map, String key) {
+    public static Boolean getBoolean(Map map, String key) {
         if (map.containsKey(key)) {
             Object obj = map.get(key);
             if (obj instanceof Boolean) {

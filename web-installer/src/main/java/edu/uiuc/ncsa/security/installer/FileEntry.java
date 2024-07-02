@@ -1,5 +1,9 @@
 package edu.uiuc.ncsa.security.installer;
 
+import java.util.Map;
+
+import static edu.uiuc.ncsa.security.installer.InstallConfigurationImporter.*;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 6/13/24 at  11:24 AM
@@ -11,13 +15,15 @@ public class FileEntry implements FileEntryInterface {
     String sourceName;
     String targetName;
 
-    public boolean isExecutableSet(){
+    public boolean isExecutableSet() {
         return executable != null;
     }
-    public boolean isUseTemplateSet(){
+
+    public boolean isUseTemplateSet() {
         return useTemplate != null;
     }
-    public boolean isUpdateableSet(){
+
+    public boolean isUpdateableSet() {
         return updateable != null;
     }
 
@@ -32,16 +38,19 @@ public class FileEntry implements FileEntryInterface {
     public boolean isUseTemplate() {
         return useTemplate;
     }
-    public boolean hasUseTemplate(){
+
+    public boolean hasUseTemplate() {
         return useTemplate != null;
     }
 
-    public boolean hasUpdateable(){
-        return updateable!= null;
+    public boolean hasUpdateable() {
+        return updateable != null;
     }
-    public boolean hasExecutale(){
+
+    public boolean hasExecutale() {
         return executable != null;
     }
+
     public Boolean getUseTemplate() {
         return useTemplate;
     }
@@ -69,7 +78,7 @@ public class FileEntry implements FileEntryInterface {
     }
 
     public String getTargetName() {
-        if(targetName == null){
+        if (targetName == null) {
             targetName = getSourceName();
         }
         return targetName;
@@ -81,6 +90,16 @@ public class FileEntry implements FileEntryInterface {
 
     public FileEntry(String sourceName) {
         this(sourceName, sourceName, false, false, false);
+    }
+
+    public FileEntry(Map currentMap) {
+        this((String) currentMap.get(SOURCE_FILE));
+        String source = (String) currentMap.get(SOURCE_FILE);
+        String target = (String) currentMap.get(TARGET_FILE);
+        setTargetName(target == null ? target = source : target); // same name
+        setExecutable(getBoolean(currentMap, ATTR_EXECUTABLE) == Boolean.TRUE);
+        setUpdateable(getBoolean(currentMap, ATTR_UPDATEABLE) == Boolean.TRUE);
+        setUseTemplate(getBoolean(currentMap, ATTR_PREPROCESS)== Boolean.TRUE);
     }
 
     public FileEntry(String sourceName,
