@@ -6,11 +6,13 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -860,4 +862,37 @@ public class WebInstaller {
     public boolean applySkipUpdate(File file) {
         return false;
     }
+
+    SecureRandom secureRandom = new SecureRandom();
+
+    /**
+     * Creates a random secret that is url-encoding safe.
+     * @param length The number of bytes for the secret
+     * @return
+     */
+    protected String createSecret(int length) {
+        byte[] ba = new byte[length];
+        secureRandom.nextBytes(ba);
+        String out = Base64.getEncoder().encodeToString(ba);
+        /*
+        a URL-safe
+         */
+        out = out.replace("+","-");
+        out = out.replace("/","_");
+        out = out.replace("=","");
+        return out;
+    }
+
+    /**
+     * A hexadecimal identifier, all upper case
+     * @param length the number of bytes for this identifier
+     * @return
+     */
+    protected String createID(int length) {
+        byte[] ba = new byte[length];
+        secureRandom.nextBytes(ba);
+        BigInteger bi = new BigInteger(ba);
+        return bi.toString(16).toUpperCase();
+    }
+
 }

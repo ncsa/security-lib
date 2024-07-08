@@ -22,7 +22,7 @@ public class DerbyConnectionPoolProvider extends ConnectionPoolProvider<Connecti
         driver = "org.apache.derby.jdbc.EmbeddedDriver";
         port = 1527;
         host = "localhost";
-        schema = "oauth2";
+        schema = DERBY_FS_DEFAULT_SCHEMA;
     }
 
     /**
