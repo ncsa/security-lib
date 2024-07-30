@@ -42,9 +42,10 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         if ((1 < inputLine.size()) && inputLine.getArg(1).equals("--help")) return true;
         return false;
     }
-     @Override
+
+    @Override
     public IOInterface getIOInterface() {
-        if(ioInterface == null){
+        if (ioInterface == null) {
             ioInterface = new BasicIO();
         }
         return ioInterface;
@@ -56,6 +57,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
     }
 
     IOInterface ioInterface;
+
     protected void say(String x) {
         //System.out.println(x);
         getIOInterface().println(x);
@@ -111,7 +113,16 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
 
         if (2 < inputLine.size()) {
             fileName = inputLine.getArg(2);
-
+            File f = new File(fileName);
+            if (!f.exists()) {
+                throw new MyConfigurationException("sorry, file does not exist: " + fileName);
+            }
+            if (f.isDirectory()) {
+                throw new MyConfigurationException("sorry, \" + fileName + \" is a directory");
+            }
+            if(!f.canRead()){
+                throw new MyConfigurationException("sorry, \" + fileName + \" is not readable");
+            }
         } else {
             fileName = getConfigFile();
         }
@@ -144,7 +155,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
 
     protected String FILE_SWITCH = "-file";
 
-    protected  void listConfigs(InputLine inputLine) throws Exception {
+    protected void listConfigs(InputLine inputLine) throws Exception {
 
         String targetFilename = getConfigFile();
         if (inputLine.hasArg(FILE_SWITCH)) {
@@ -168,26 +179,28 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         List<String> names = doListNames(target);
 
         if (names.isEmpty()) {
-             say("no configurations found.");
-         } else {
-             FormatUtil.formatList(inputLine, names);
-             say("found " + names.size() + " entries. Done!");
-         }
+            say("no configurations found.");
+        } else {
+            FormatUtil.formatList(inputLine, names);
+            say("found " + names.size() + " entries. Done!");
+        }
     }
 
     /**
      * Figures out by file extension what to list. Override as needed. Default is .xml.
+     *
      * @param target
      * @return
      * @throws Exception
      */
-    protected List<String> doListNames(File target) throws Exception{
+    protected List<String> doListNames(File target) throws Exception {
         List<String> names = new ArrayList<>();
-        if(target.getName().endsWith(".xml")) {
+        if (target.getName().endsWith(".xml")) {
             names = listXMLConfigs(target);
         }
-         return names;
+        return names;
     }
+
     protected List<String> listXMLConfigs(File target) throws Exception {
 
         XMLConfiguration xmlConfiguration = Configurations.getConfiguration(target);
@@ -243,6 +256,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
     public abstract String getComponentName();
 
     public abstract ConfigurationLoader<? extends AbstractEnvironment> getLoader();
+
     public abstract void setLoader(ConfigurationLoader<? extends AbstractEnvironment> loader);
 
 
@@ -265,7 +279,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
     public static final String INPUT_OPTION = "in";
     public static final String OUTPUT_OPTION = "out";
     public static final String COMMENT_START_OPTION = "comment";
-    public static  String COMMENT_START = "#";
+    public static String COMMENT_START = "#";
 
 
     public static final String CONFIG_FILE_OPTION = "cfg";
@@ -381,13 +395,13 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
                 PrintStream printStream = new PrintStream(new FileOutputStream(f));
                 basicIO.setPrintStream(printStream);
             }
-        }catch(Throwable throwable){
+        } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
-        if(hasOption(COMMENT_START_OPTION, COMMENT_START_OPTION)){
+        if (hasOption(COMMENT_START_OPTION, COMMENT_START_OPTION)) {
             COMMENT_START = getCommandLine().getOptionValue(COMMENT_START_OPTION, COMMENT_START);
         }
-         setIOInterface(basicIO);
+        setIOInterface(basicIO);
         info("Config name = " + cfgName);
 
         if (cfgName == null) {
@@ -414,7 +428,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         if (filename == null) {
             throw new MyConfigurationException("Error: no configuration file specified");
         }
-       setLoader(figureOutLoader(filename, configName));
+        setLoader(figureOutLoader(filename, configName));
         setEnvironment(null); //so it gets loaded next time it's needed.
         getEnvironment(); // reload it
         this.configName = configName;
@@ -424,6 +438,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
 
     /**
      * This is done so configurations can be loaded by inheritors.
+     *
      * @param fileName
      * @param configName
      * @return

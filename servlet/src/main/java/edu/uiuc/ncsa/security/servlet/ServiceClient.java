@@ -322,7 +322,8 @@ public class ServiceClient {
     protected String doBearerRequest(HttpRequestBase httpRequestBase, String token) {
         return doBearerRequest(httpRequestBase, token, false);
     }
-
+public static boolean ECHO_REQUEST = false;
+public static boolean ECHO_RESPONSE = false;
     /**
      * Do the request. The response will be the response of the server if there was a success.
      * Otherwise, the response will be (a) constructed if not JSON or (b) the JSON if the server response
@@ -336,9 +337,20 @@ public class ServiceClient {
         HttpClient client = clientPool.pop();
         HttpResponse response = null;
         try {
+            if(ECHO_REQUEST){
+                System.out.println("\n----- Echo request -----");
+                System.out.println(httpRequestBase);
+                System.out.println("----- End echo request -----\n");
+            }
             response = client.execute(httpRequestBase);
             clientPool.push(client);  // put it back as soon as done.
         } catch (Throwable t) {
+            if(ECHO_RESPONSE){
+                System.out.println("\n----- Echo response -----");
+                System.out.println("ERROR!");
+                System.out.println(t.getMessage());
+                System.out.println("----- End echo response -----\n");
+            }
             // Fix https://github.com/ncsa/security-lib/issues/37
             clientPool.doDestroy(client); // if it failed, get rid of connection
             ServletDebugUtil.trace(this, "Error  invoking execute for client", t);
@@ -347,10 +359,19 @@ public class ServiceClient {
             }
             throw new GeneralException("Error invoking client:" + t.getMessage(), t);
         }
+        if(ECHO_RESPONSE){
+            System.out.println("\n----- Echo response -----");
+        }
         try {
             if (response.getEntity() != null && response.getEntity().getContentType() != null) {
+                if(ECHO_RESPONSE){
+                    System.out.println("Content Type: " + response.getEntity().getContentType().getValue());
+                }
                 ServletDebugUtil.trace(this, "Raw response, content type:" + response.getEntity().getContentType());
             } else {
+                if(ECHO_RESPONSE){
+                    System.out.println("Content Type: (none)" );
+                }
                 ServletDebugUtil.trace(this, "No response entity or no content type.");
             }
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT) {
@@ -359,6 +380,11 @@ public class ServiceClient {
 
             HttpEntity entity1 = response.getEntity();
             String x = EntityUtils.toString(entity1, StandardCharsets.UTF_8);
+            if(ECHO_RESPONSE){
+                System.out.println("Status: " + response.getStatusLine().getStatusCode());
+                System.out.println("Raw Response: \n" + x);
+                System.out.println("----- End echo response -----\n");
+            }
             if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                 // If there was a proper error thrown on the server then we should be able to parse the contents of the
                 // response.
