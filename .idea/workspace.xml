@@ -9,11 +9,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Update website">
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Commit website">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServiceClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServiceClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -516,7 +513,7 @@
       <workItem from="1720351584263" duration="1908000" />
       <workItem from="1720441587559" duration="40272000" />
       <workItem from="1721308487000" duration="27170000" />
-      <workItem from="1722356566317" duration="3224000" />
+      <workItem from="1722356566317" duration="4135000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -861,17 +858,26 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="78" />
+    <option name="localTasksCounter" value="80" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Adoption of JOSE to do Elliptic Curve cryptography." />
-    <MESSAGE value="https://github.com/ncsa/security-lib/issues/25" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/26 Updated the mail utilities since they were out of date and made using them a lot easier. Need to upgrade to Java Mail 1.6.7 to get support for anything after 2008. This probably should have been done in our update from Java 1.8 to Java 11." />
     <MESSAGE value="needed to set the scope for the Java mail jar to provided." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/26 final changes." />
@@ -895,7 +901,9 @@
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/40" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/41 Let the comnfigurable commnads (for the CLC) specify -in and -out files for batch processing." />
     <MESSAGE value="Update website" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update website" />
+    <MESSAGE value="Pre 5.6 checkin" />
+    <MESSAGE value="Commit website" />
+    <option name="LAST_COMMIT_MESSAGE" value="Commit website" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
