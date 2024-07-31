@@ -177,7 +177,6 @@ public class WebInstaller {
             ZipEntry entry;
             while ((entry = stream.getNextEntry()) != null) {
                 String entryFileName = entry.getName();
-                System.out.println("entry name = " + entryFileName);
                 if (isUpdate && de.getFilePermissions().containsKey(entryFileName)) {
                     continue;
                 }
@@ -302,7 +301,44 @@ public class WebInstaller {
         return outList;
     }
 
-    public InstallConfiguration getInstallConfiguration() {
+    /**
+     * Prints a message (e.g. post install instructions, post update). This takes
+     * the path as a resource. Note that this does replacements on the contents of the
+     * message unless skipTemplates is false
+     * @param resourcePath
+     * @param skipTemplates
+     * @return
+     * @throws IOException
+     */
+    protected String getMessage(String resourcePath, boolean skipTemplates) throws IOException {
+        InputStream setupStream = getClass().getResourceAsStream(resourcePath);
+        if (setupStream == null) {
+            return "";
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        copyStream(setupStream, baos);
+        String inString = baos.toString(StandardCharsets.UTF_8);
+        setupStream.close();
+        baos.close();
+        if(!skipTemplates) {
+            inString = doReplace(inString);
+        }
+        return inString;
+    }
+
+    /**
+     * Prints a message from a resource, doing all template replacements on the content.
+     * @param resourcePath
+     * @return
+     * @throws IOException
+     */
+    protected String getMessage(String resourcePath) throws IOException {
+        return getMessage(resourcePath, false);
+
+
+    }
+
+        public InstallConfiguration getInstallConfiguration() {
         return installConfiguration;
     }
 
