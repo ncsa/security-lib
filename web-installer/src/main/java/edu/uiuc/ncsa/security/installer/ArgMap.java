@@ -128,7 +128,7 @@ public class ArgMap extends HashMap {
     }
 
     public boolean isUpgrade() {
-        return getOperation().equals(UPDATE_OPTION);
+        return getOperation().equals(UPDATE_OPTION) || getOperation().equals(UPGRADE_OPTION);
     }
 
     public boolean isShowHelp() {

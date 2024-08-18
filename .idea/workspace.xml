@@ -12,9 +12,9 @@
     <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Update website">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServiceClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServiceClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/ArgMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/ArgMap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,6 +87,7 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;Application.WebClientConfig.executor&quot;: &quot;Run&quot;,
+    &quot;Application.WebInstaller.executor&quot;: &quot;Run&quot;,
     &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
     &quot;Java Scratch.Scratch.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
@@ -142,7 +143,7 @@
       <recent name="edu.uiuc.ncsa.security.util.mail" />
     </key>
   </component>
-  <component name="RunManager" selected="Java Scratch.Scratch">
+  <component name="RunManager" selected="Application.WebInstaller">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -517,6 +518,13 @@
       <workItem from="1720441587559" duration="40272000" />
       <workItem from="1721308487000" duration="27170000" />
       <workItem from="1722356566317" duration="3224000" />
+      <workItem from="1722602735597" duration="3218000" />
+      <workItem from="1722857691875" duration="2452000" />
+      <workItem from="1722953720652" duration="599000" />
+      <workItem from="1723048219698" duration="1337000" />
+      <workItem from="1723058559780" duration="22001000" />
+      <workItem from="1723637907803" duration="28541000" />
+      <workItem from="1723841045029" duration="3562000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -963,7 +971,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServiceClient.java</url>
-          <line>278</line>
+          <line>281</line>
           <option name="timeStamp" value="50" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -987,31 +995,6 @@
           <option name="timeStamp" value="71" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java</url>
-          <line>752</line>
-          <option name="timeStamp" value="74" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java</url>
-          <line>769</line>
-          <option name="timeStamp" value="77" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java</url>
-          <line>775</line>
-          <option name="timeStamp" value="81" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java</url>
-          <line>566</line>
-          <option name="timeStamp" value="83" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java</url>
-          <line>396</line>
-          <option name="timeStamp" value="84" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/InstallConfigurationImporter.java</url>
           <line>226</line>
           <option name="timeStamp" value="90" />
@@ -1020,21 +1003,6 @@
           <url>file://$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/InstallConfigurationImporter.java</url>
           <line>214</line>
           <option name="timeStamp" value="91" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java</url>
-          <line>578</line>
-          <option name="timeStamp" value="92" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java</url>
-          <line>601</line>
-          <option name="timeStamp" value="93" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java</url>
-          <line>174</line>
-          <option name="timeStamp" value="98" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

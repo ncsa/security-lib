@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.servlet;
 
+import edu.uiuc.ncsa.security.core.exceptions.ConnectionException;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -21,7 +22,9 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -340,6 +343,22 @@ public static boolean ECHO_RESPONSE = false;
             if(ECHO_REQUEST){
                 System.out.println("\n----- Echo request -----");
                 System.out.println(httpRequestBase);
+                if(httpRequestBase instanceof HttpPost){
+                    HttpPost httpPost= (HttpPost) httpRequestBase;
+                    System.out.println("    Content-Type: "+httpPost.getEntity().getContentType());
+                    System.out.println("Content-Encoding: "+httpPost.getEntity().getContentEncoding());
+                    System.out.println("  Content-Length: "+httpPost.getEntity().getContentLength());
+                    InputStream inputStream = httpPost.getEntity().getContent();
+                    // We must tread carefully here or the stream will be consumed and un-usable.
+                    // If it's a byte array, we can do this safely
+                    if(inputStream instanceof ByteArrayInputStream){
+                        String content = new String(((ByteArrayInputStream)inputStream).readAllBytes(),"UTF-8");
+                        System.out.println("         Content:\n"+content);
+                    }else{
+                        System.out.println("         Content: (cannot read " + inputStream.getClass().getCanonicalName() + ")");
+                    }
+                }
+
                 System.out.println("----- End echo request -----\n");
             }
             response = client.execute(httpRequestBase);
@@ -357,7 +376,7 @@ public static boolean ECHO_RESPONSE = false;
             if (ServletDebugUtil.isEnabled()) {
                 t.printStackTrace();
             }
-            throw new GeneralException("Error invoking client:" + t.getMessage(), t);
+            throw new ConnectionException("Error invoking client:" + t.getMessage(), t);
         }
         if(ECHO_RESPONSE){
             System.out.println("\n----- Echo response -----");

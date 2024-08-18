@@ -27,6 +27,7 @@ import java.util.zip.ZipInputStream;
 public class WebInstaller {
     // This is boiler-plated from the QDL HTTP module.
     static protected final String UPDATE_OPTION = "update";
+    static protected final String UPGRADE_OPTION = "upgrade"; // synonym for update
     static protected final String HELP_FLAG = "--help";
     static protected final String NO_PACER_FLAG = "-noPace";
     static protected final String HELP_OPTION = "help";
@@ -47,6 +48,7 @@ public class WebInstaller {
     static public final Boolean UPDATEABLE_DEFAULT = true;
 
     static List<String> allOps = Arrays.asList(UPDATE_OPTION,
+            UPGRADE_OPTION,
             REMOVE_OPTION,
             NOTES_OPTION,
             HELP_OPTION,
@@ -82,13 +84,13 @@ public class WebInstaller {
             say(NOTES_OPTION + " = show the release notes (if any) for a version. If you do not use the " + VERSION_FLAG + ", ");
             say("          you will get the notes  for the latest version.");
             say(REMOVE_OPTION + " = remove");
-            say(UPDATE_OPTION + " = upgrade");
+            say(UPDATE_OPTION + " | " + UPGRADE_OPTION + " = upgrade/update existing distribution");
             say(VERSIONS_OPTION + " = list all the versions available for install. Nothing is done.");
             say("--------------");
             say("arguments are:");
             say(DIR_ARG + " root = install to the given directory. If omitted, you will be prompted.");
             say(LOG_ARG + " file = file for logging. It will be overwritten as needed.");
-            say(VERSION_FLAG + " = Specify a version" + getAppName());
+            say(VERSION_FLAG + " = Specify a version for " + getAppName());
             printMoreArgHelp();
             say("--------------");
             say("Flags are:");
@@ -177,7 +179,6 @@ public class WebInstaller {
             ZipEntry entry;
             while ((entry = stream.getNextEntry()) != null) {
                 String entryFileName = entry.getName();
-                System.out.println("entry name = " + entryFileName);
                 if (isUpdate && de.getFilePermissions().containsKey(entryFileName)) {
                     continue;
                 }
@@ -302,7 +303,44 @@ public class WebInstaller {
         return outList;
     }
 
-    public InstallConfiguration getInstallConfiguration() {
+    /**
+     * Prints a message (e.g. post install instructions, post update). This takes
+     * the path as a resource. Note that this does replacements on the contents of the
+     * message unless skipTemplates is false
+     * @param resourcePath
+     * @param skipTemplates
+     * @return
+     * @throws IOException
+     */
+    protected String getMessage(String resourcePath, boolean skipTemplates) throws IOException {
+        InputStream setupStream = getClass().getResourceAsStream(resourcePath);
+        if (setupStream == null) {
+            return "";
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        copyStream(setupStream, baos);
+        String inString = baos.toString(StandardCharsets.UTF_8);
+        setupStream.close();
+        baos.close();
+        if(!skipTemplates) {
+            inString = doReplace(inString);
+        }
+        return inString;
+    }
+
+    /**
+     * Prints a message from a resource, doing all template replacements on the content.
+     * @param resourcePath
+     * @return
+     * @throws IOException
+     */
+    protected String getMessage(String resourcePath) throws IOException {
+        return getMessage(resourcePath, false);
+
+
+    }
+
+        public InstallConfiguration getInstallConfiguration() {
         return installConfiguration;
     }
 
@@ -448,12 +486,17 @@ public class WebInstaller {
     public static void main(String[] args) {
         WebInstaller webInstaller = new WebInstaller();
         try {
+            System.out.println(webInstaller.getID(1));
+            System.out.println(webInstaller.getID(2));
+            System.out.println(webInstaller.getID(3));
+/*
             if (webInstaller.init(args)) {
                 webInstaller.process();
                 webInstaller.shutdown();
             } else {
                 webInstaller.showHelp();
             }
+*/
         } catch (Throwable t) {
             System.out.println(t.getMessage());
             if (webInstaller.isDebugOn()) {
@@ -551,6 +594,7 @@ public class WebInstaller {
             case INSTALL_OPTION:
                 doInstallOrUpdate(false);
                 break;
+            case UPGRADE_OPTION:
             case UPDATE_OPTION:
                 doInstallOrUpdate(true);
                 break;
@@ -884,15 +928,39 @@ public class WebInstaller {
     }
 
     /**
-     * A hexadecimal identifier, all upper case
-     * @param length the number of bytes for this identifier
+     * A hexadecimal identifier, all upper case. May start with a digit.
+     * @param length the number of bytes for this identifier. size is 2*length.
      * @return
      */
     protected String createID(int length) {
         byte[] ba = new byte[length];
         secureRandom.nextBytes(ba);
         BigInteger bi = new BigInteger(ba);
-        return bi.toString(16).toUpperCase();
+        return bi.abs().toString(16).toUpperCase();
     }
 
+    /**
+     * Creates a base 64 encoded, URL safe secret. The length refers to bytes so the
+     * size of the secret is at most ⌈4*length/3. Does not pad.
+     * @param length
+     * @return
+     */
+    protected String getSecret(int length) {
+        byte[] ba = new byte[length];
+        secureRandom.nextBytes(ba);
+        return org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(ba);
+    }
+
+    /**
+     * Creates a hexadecimal identifier. The length is the number of bytes and the size
+     * of the ID is 2*length.
+     * @param length
+     * @return
+     */
+    protected String getID(int length) {
+        byte[] ba = new byte[length];
+        secureRandom.nextBytes(ba);
+        BigInteger bi = new BigInteger(ba);
+        return bi.abs().toString(16).toUpperCase();
+    }
 }
