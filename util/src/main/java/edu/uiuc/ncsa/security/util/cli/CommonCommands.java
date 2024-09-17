@@ -47,7 +47,7 @@ public abstract class CommonCommands implements Commands {
         bootstrap();
     }
 
-    protected MyLoggingFacade logger;
+    transient protected MyLoggingFacade logger;
 
     @Override
     public void debug(String x) {

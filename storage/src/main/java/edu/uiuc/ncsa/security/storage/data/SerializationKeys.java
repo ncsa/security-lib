@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.storage.data;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,7 +28,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 4/13/12 at  3:03 PM
  */
-public class SerializationKeys {
+public class SerializationKeys implements Serializable {
     String identifier = "identifier";
 
     /**

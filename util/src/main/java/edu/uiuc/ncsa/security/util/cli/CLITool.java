@@ -413,7 +413,7 @@ public abstract class CLITool implements Logable {
         return logger;
     }
 
-    MyLoggingFacade logger;
+   transient MyLoggingFacade logger;
 
     public void debug(String x) {
         if (isVerbose() && isDebugOn()) {

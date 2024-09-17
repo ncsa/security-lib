@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.security.util.cli;
 
 import edu.uiuc.ncsa.security.core.Logable;
 
+import java.io.Serializable;
+
 /**
  * All sets of commands implement this interface. Each command you want to have found in the interface should fulfill the
  * following contract;<br/>
@@ -17,7 +19,7 @@ import edu.uiuc.ncsa.security.core.Logable;
  *
  * @author Jeff Gaynor
  */
-public interface Commands extends Logable{
+public interface Commands extends Logable, Serializable {
     /**
      * The prompt displayed to the user. This allows it to change based on context.
      * @return java.lang.String

@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.core.util;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
@@ -7,7 +8,7 @@ import java.util.HashMap;
  * <p>Created by Jeff Gaynor<br>
  * on 3/19/12 at  4:39 PM
  */
-public interface ConfigurationLoader<T extends AbstractEnvironment> {
+public interface ConfigurationLoader<T extends AbstractEnvironment> extends Serializable {
 
     /**
      * load the configuration. Normally the specifics of the configuration (e.g. a property

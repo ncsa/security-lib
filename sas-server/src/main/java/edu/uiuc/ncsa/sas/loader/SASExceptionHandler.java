@@ -14,7 +14,7 @@ import java.io.IOException;
  * on 8/15/22 at  4:02 PM
  */
 public class SASExceptionHandler implements ExceptionHandler {
-    MyLoggingFacade logger;
+   transient   MyLoggingFacade logger;
     @Override
     public MyLoggingFacade getLogger() {
              return logger;

@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.core.util;
 
 import edu.uiuc.ncsa.security.core.Logable;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on Nov 5, 2010 at  10:17:04 AM
  */
-public abstract class AbstractEnvironment implements Logable {
+public abstract class AbstractEnvironment implements Logable, Serializable {
     protected AbstractEnvironment(MyLoggingFacade myLogger) {
         this(myLogger, null);
     }
@@ -52,7 +53,7 @@ public abstract class AbstractEnvironment implements Logable {
         getMyLogger().debug(x);
     }
 
-    MyLoggingFacade myLogger;
+    transient MyLoggingFacade myLogger;
 
     public void error(String x) {
         getMyLogger().error(x);

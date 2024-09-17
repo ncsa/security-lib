@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.core.util;
 
 import edu.uiuc.ncsa.security.core.Logable;
 
+import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,7 +11,7 @@ import java.util.logging.Logger;
  * <p>Created by Jeff Gaynor<br>
  * on Nov 9, 2010 at  10:59:40 AM
  */
-public class MyLoggingFacade implements Logable {
+public class MyLoggingFacade implements Logable, Serializable {
    public static final Level DEFAULT_LOG_LEVEL = Level.INFO;
 
     public Level getLogLevel() {

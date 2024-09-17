@@ -591,7 +591,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         return logger;
     }
 
-    MyLoggingFacade logger;
+    transient MyLoggingFacade logger;
 
     @Override
     public void debug(String x) {

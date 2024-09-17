@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -41,7 +42,7 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
         return identifiableProvider.get();
     }
 
-    public static class MSInitializer implements Initializable {
+    public static class MSInitializer implements Initializable, Serializable {
         MemoryStore memoryStore;
 
         public MSInitializer(MemoryStore memoryStore) {
