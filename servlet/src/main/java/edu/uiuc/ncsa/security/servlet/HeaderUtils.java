@@ -254,4 +254,41 @@ public class HeaderUtils {
         }
         return map;
     }
+
+    /**
+     * This will get all the parameters for a given key. It is possible that there are delimiters for these, and it
+     * the supplied delimiter is not null, these will be further split. E.g.
+     * <pre>
+     *     scope=openid&scope=profile&scope=org.oa4mp%3Auserinfo%20read%3A%2Fpublic%2Fbob&...
+     * </pre>
+     * Then invoking this with a delimiter of " " (a blank) yields the scope list of
+     *<pre>
+     *     [openid,profile,org.oa4mp:userinfo,read:/public/bob]
+     *</pre>
+     * Note that this returns faithfully what was passed, so if a value is repeated, that is returned too.
+     * @param req
+     * @param key
+     * @param delimiter
+     * @return
+     */
+    public static List<String> getParameters(HttpServletRequest req, String key, String delimiter) {
+        List<String> output = new ArrayList<>();
+        String[] values = req.getParameterValues(key);
+        if(values == null){
+            return new ArrayList<>();
+        }
+        //String[] values = new String[]{"openid","   profile   ", "  org.oa4mp:userinfo   read:/public/bob   "};
+        boolean trivialDelimiter = delimiter == null || delimiter.isEmpty();
+        for(String value : values) {
+            if(!trivialDelimiter) {
+                StringTokenizer st = new StringTokenizer(value, delimiter);
+                while(st.hasMoreTokens()) {
+                    output.add(st.nextToken().trim());
+                }
+            }else{
+                output.add(value.trim());
+            }
+        }
+        return output;
+    }
 }
