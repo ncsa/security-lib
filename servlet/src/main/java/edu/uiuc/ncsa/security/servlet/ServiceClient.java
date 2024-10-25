@@ -32,10 +32,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class is a client that talks to a server. It manages a client pool and does a get based on
@@ -95,7 +92,7 @@ public class ServiceClient {
         @Override
         public HttpClient create() {
             try {
-                HttpClient x= getF().getClient(address.getHost()); // otherwise the client has the *entire* address.
+                HttpClient x = getF().getClient(address.getHost()); // otherwise the client has the *entire* address.
                 totalCreated++;
                 return x;
             } catch (IOException | NoSuchAlgorithmException | KeyStoreException e) {
@@ -159,11 +156,19 @@ public class ServiceClient {
     }
 
     public String doGet(Map m, String id, String secret) {
-        return doGet(convertToStringRequest(host().toString(), m), id, secret);
+        Map headers = getHeaders(m);
+        HttpGet httpGet = new HttpGet(convertToStringRequest(host().toString(), m));
+        addHeaders(httpGet, headers); // Fix https://github.com/ncsa/security-lib/issues/43
+        return doRequest(httpGet, id, secret);
+        //return doGet(convertToStringRequest(host().toString(), m), id, secret);
     }
 
     public String doGet(Map m) {
-        return doGet(convertToStringRequest(host().toString(), m));
+        Map headers = getHeaders(m);
+        HttpGet httpGet = new HttpGet(convertToStringRequest(host().toString(), m));
+        addHeaders(httpGet, headers); //Fix https://github.com/ncsa/security-lib/issues/43
+        return doRequest(httpGet);
+        //return doGet(convertToStringRequest(host().toString(), m));
     }
 
     /**
@@ -175,6 +180,7 @@ public class ServiceClient {
      */
     public String doPost(Map m) {
         HttpPost post = new HttpPost(host().toString());
+        addHeadersFromParameters(post, m);
         List<NameValuePair> params = getNameValuePairs(m);
         try {
             post.setEntity(new UrlEncodedFormEntity(params));
@@ -219,8 +225,8 @@ public class ServiceClient {
      */
     public String doPost(Map<String, Object> parameters, String id, String secret) {
         HttpPost post = new HttpPost(host().toString());
+        addHeadersFromParameters(post, parameters); // Fix https://github.com/ncsa/security-lib/issues/43
         List<NameValuePair> params = getNameValuePairs(parameters);
-
         try {
             post.setEntity(new UrlEncodedFormEntity(params));
         } catch (UnsupportedEncodingException e) {
@@ -230,15 +236,56 @@ public class ServiceClient {
         return doRequest(post, id, secret);
     }
 
+    /**
+     * Removes the headers from the parameter request for the map. This is destructive in the
+     * sense that the headers are no longer in the parameter map, so it is a one-time use call.
+     * @param parameters
+     * @return
+     */
+    protected Map getHeaders(Map parameters) {
+        if (parameters.containsKey(HEADER_KEY)) {
+            Map<String, String> headers = (Map<String, String>) parameters.get(HEADER_KEY);
+            parameters.remove(HEADER_KEY);
+            return headers;
+        }
+        return new HashMap();
+    }
+
+    /**
+     * Peels off the headers (if any) from the parameter map and adds them to the request. This returns the header map.
+     * The parameter map will not contain the headers once this call completes.
+     * @param httpRequestBase
+     * @param parameters
+     * @return
+     */
+    protected Map addHeadersFromParameters(HttpRequestBase httpRequestBase, Map parameters) {
+        return addHeaders(httpRequestBase, getHeaders(parameters));
+    }
+
+    /**
+     * Adds the headers from an existing header map.
+     * @param httpRequestBase
+     * @param headers
+     * @return
+     */
+    protected Map addHeaders(HttpRequestBase httpRequestBase, Map<String,String> headers) {
+        if(headers != null) {return headers;}
+        for (String key : headers.keySet()) {
+            httpRequestBase.addHeader(key, headers.get(key));
+        }
+        return headers;
+    }
 
     /**
      * Do post using a bearer token
+     *
      *
      * @param bearerToken
      * @return
      */
     public String doPost(Map<String, Object> parameters, String bearerToken) {
         HttpPost post = new HttpPost(host().toString());
+        addHeadersFromParameters(post, parameters); //Fix https://github.com/ncsa/security-lib/issues/43
         List<NameValuePair> params = getNameValuePairs(parameters);
 
         try {
@@ -255,11 +302,11 @@ public class ServiceClient {
         for (String key : parameters.keySet()) {
             if (parameters.get(key) != null) {
 
-                if(parameters.get(key) instanceof Collection){
-                    for(Object obj : (Collection)parameters.get(key)) {
+                if (parameters.get(key) instanceof Collection) {
+                    for (Object obj : (Collection) parameters.get(key)) {
                         params.add(new BasicNameValuePair(key, obj.toString()));
                     }
-                }else {
+                } else {
                     params.add(new BasicNameValuePair(key, parameters.get(key).toString()));
                 }
             }
@@ -325,8 +372,10 @@ public class ServiceClient {
     protected String doBearerRequest(HttpRequestBase httpRequestBase, String token) {
         return doBearerRequest(httpRequestBase, token, false);
     }
-public static boolean ECHO_REQUEST = false;
-public static boolean ECHO_RESPONSE = false;
+
+    public static boolean ECHO_REQUEST = false;
+    public static boolean ECHO_RESPONSE = false;
+
     /**
      * Do the request. The response will be the response of the server if there was a success.
      * Otherwise, the response will be (a) constructed if not JSON or (b) the JSON if the server response
@@ -340,21 +389,21 @@ public static boolean ECHO_RESPONSE = false;
         HttpClient client = clientPool.pop();
         HttpResponse response = null;
         try {
-            if(ECHO_REQUEST){
+            if (ECHO_REQUEST) {
                 System.out.println("\n----- Echo request -----");
                 System.out.println(httpRequestBase);
-                if(httpRequestBase instanceof HttpPost){
-                    HttpPost httpPost= (HttpPost) httpRequestBase;
-                    System.out.println("    Content-Type: "+httpPost.getEntity().getContentType());
-                    System.out.println("Content-Encoding: "+httpPost.getEntity().getContentEncoding());
-                    System.out.println("  Content-Length: "+httpPost.getEntity().getContentLength());
+                if (httpRequestBase instanceof HttpPost) {
+                    HttpPost httpPost = (HttpPost) httpRequestBase;
+                    System.out.println("    Content-Type: " + httpPost.getEntity().getContentType());
+                    System.out.println("Content-Encoding: " + httpPost.getEntity().getContentEncoding());
+                    System.out.println("  Content-Length: " + httpPost.getEntity().getContentLength());
                     InputStream inputStream = httpPost.getEntity().getContent();
                     // We must tread carefully here or the stream will be consumed and un-usable.
                     // If it's a byte array, we can do this safely
-                    if(inputStream instanceof ByteArrayInputStream){
-                        String content = new String(((ByteArrayInputStream)inputStream).readAllBytes(),"UTF-8");
-                        System.out.println("         Content:\n"+content);
-                    }else{
+                    if (inputStream instanceof ByteArrayInputStream) {
+                        String content = new String(((ByteArrayInputStream) inputStream).readAllBytes(), "UTF-8");
+                        System.out.println("         Content:\n" + content);
+                    } else {
                         System.out.println("         Content: (cannot read " + inputStream.getClass().getCanonicalName() + ")");
                     }
                 }
@@ -364,7 +413,7 @@ public static boolean ECHO_RESPONSE = false;
             response = client.execute(httpRequestBase);
             clientPool.push(client);  // put it back as soon as done.
         } catch (Throwable t) {
-            if(ECHO_RESPONSE){
+            if (ECHO_RESPONSE) {
                 System.out.println("\n----- Echo response -----");
                 System.out.println("ERROR!");
                 System.out.println(t.getMessage());
@@ -378,18 +427,18 @@ public static boolean ECHO_RESPONSE = false;
             }
             throw new ConnectionException("Error invoking client:" + t.getMessage(), t);
         }
-        if(ECHO_RESPONSE){
+        if (ECHO_RESPONSE) {
             System.out.println("\n----- Echo response -----");
         }
         try {
             if (response.getEntity() != null && response.getEntity().getContentType() != null) {
-                if(ECHO_RESPONSE){
+                if (ECHO_RESPONSE) {
                     System.out.println("Content Type: " + response.getEntity().getContentType().getValue());
                 }
                 ServletDebugUtil.trace(this, "Raw response, content type:" + response.getEntity().getContentType());
             } else {
-                if(ECHO_RESPONSE){
-                    System.out.println("Content Type: (none)" );
+                if (ECHO_RESPONSE) {
+                    System.out.println("Content Type: (none)");
                 }
                 ServletDebugUtil.trace(this, "No response entity or no content type.");
             }
@@ -399,7 +448,7 @@ public static boolean ECHO_RESPONSE = false;
 
             HttpEntity entity1 = response.getEntity();
             String x = EntityUtils.toString(entity1, StandardCharsets.UTF_8);
-            if(ECHO_RESPONSE){
+            if (ECHO_RESPONSE) {
                 System.out.println("Status: " + response.getStatusLine().getStatusCode());
                 System.out.println("Raw Response: \n" + x);
                 System.out.println("----- End echo response -----\n");
@@ -419,24 +468,39 @@ public static boolean ECHO_RESPONSE = false;
                 }
                 xx.setContent(x);
                 xx.setStatus(response.getStatusLine().getStatusCode());
-             //   clientPool.destroy(client);
+                //   clientPool.destroy(client);
                 throw xx;
             }
-          //  clientPool.push(client);
+            //  clientPool.push(client);
             return x;
         } catch (IOException e) {
             throw new GeneralException("Error invoking http client", e);
         }
     }
 
-    public String doGet(String requestString, String id, String secret) {
+    /** Do a GET with a specifically constructed request string
+     *
+     * @param requestString
+     * @param headers
+     * @param id
+     * @param secret
+     * @return
+     */
+    public String doGet(String requestString, Map<String,String> headers, String id, String secret) {
         HttpGet httpGet = new HttpGet(requestString);
+        if(headers != null) {
+            addHeaders(httpGet, headers);
+        }
         return doRequest(httpGet, id, secret);
     }
 
-    public String doGet(String requestString) {
+    public String doGet(String requestString, Map<String,String> headers) {
         HttpGet httpGet = new HttpGet(requestString);
+        if(headers != null) {
+            addHeaders(httpGet, headers);
+        }
         return doRequest(httpGet);
     }
 
+    public static final String HEADER_KEY = "__headers";
 }
