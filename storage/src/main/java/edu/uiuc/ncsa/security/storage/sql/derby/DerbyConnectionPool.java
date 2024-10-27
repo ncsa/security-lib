@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.storage.sql.derby;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
 import edu.uiuc.ncsa.security.storage.sql.StackMap;
@@ -112,6 +113,10 @@ public class DerbyConnectionPool extends ConnectionPool {
             }
             Statement stmt = c.createStatement();
             for (String s : createScript) {
+                // executing blank lines throws and exception, so skip.
+                if(StringUtils.isTrivial(s)){
+                    continue;
+                }
                 dbg(" executing:\n" + s);
                 boolean rc = stmt.execute(s);
                 dbg("update count = " + stmt.getUpdateCount());

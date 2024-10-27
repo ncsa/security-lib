@@ -630,7 +630,12 @@ public class WebInstaller {
                 File target = new File(getRoot(), de.getTargetDir());
                 if (!target.exists()) {
                     trace("creating directory " + target);
-                    if (!target.mkdirs()) {
+                    // don't check for return value in next call since it returns false if any of the path existed
+                    // E.g. /home/user/apps/oa4mp returns false since the user's home directory exists.
+                    target.mkdirs();
+                    if (target.exists()) {
+                        trace("created " + target);
+                    }else{
                         say("warning: could not create \"" + target.getAbsolutePath() + "\". Do you have permission to do this?");
                     }
                 }
