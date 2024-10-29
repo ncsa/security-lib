@@ -630,12 +630,22 @@ public class WebInstaller {
                 File target = new File(getRoot(), de.getTargetDir());
                 if (!target.exists()) {
                     trace("creating directory " + target);
-                    if (!target.mkdirs()) {
+                    // don't check for return value in next call since it returns false if any of the path existed
+                    // E.g. /home/user/apps/oa4mp returns false since the user's home directory exists.
+                    target.mkdirs();
+                    if (target.exists()) {
+                        trace("created " + target);
+                    }else{
                         say("warning: could not create \"" + target.getAbsolutePath() + "\". Do you have permission to do this?");
                     }
                 }
                 if (!de.hasFiles()) {
                     continue;
+                }
+                if (getArgMap().isPacerOn()) {
+                    // start the pacer so there is something on screen while first file downloads
+                    pacer.pace(doneCount, " files done of " + totalFileCount);
+
                 }
                 for (FileEntryInterface fe2 : de.getFiles()) {
                     if (fe2 instanceof FileEntry) {
@@ -703,11 +713,13 @@ public class WebInstaller {
         try {
             long t = download(url, targetFile);
             if (getArgMap().isPacerOn()) {
-                pacer.pace(doneCount, " files processed  of " + totalFileCount + " (" + ((100 * doneCount) / totalFileCount) + "%)");
+                String m = " files processed  of " + totalFileCount + " (" + ((100 * doneCount) / totalFileCount) + "%)";
+                if(isDebugOn()){
+                    m = m + " " + url + " --> " + targetFile.getAbsolutePath() + " (" + StringUtils.formatByteCount(t) + ")";
+                }
+                pacer.pace(doneCount, m);
                 doneCount++;
             }
-            trace("  downloaded " + url + " --> " + targetFile.getAbsolutePath() +
-                    " (" + StringUtils.formatByteCount(t) + ")");
         } catch (IOException iox) {
             if (getInstallConfiguration().isFailOnError()) {
                 if (getInstallConfiguration().isCleanupOnFail()) {
