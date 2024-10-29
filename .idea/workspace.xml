@@ -9,11 +9,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Regenerate website">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java" afterDir="false" />
-    </list>
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Small change for modularity in the client installer" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -525,7 +521,7 @@
       <workItem from="1723637907803" duration="28541000" />
       <workItem from="1723841045029" duration="35071000" />
       <workItem from="1726149482721" duration="7229000" />
-      <workItem from="1726656908364" duration="61111000" />
+      <workItem from="1726656908364" duration="61735000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -870,7 +866,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="91" />
+    <option name="localTasksCounter" value="92" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -879,7 +875,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Tiny optimization: If adding an empty list of objects to an SQL store, just return -- don't set up the entire connection and try to access the database." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/34" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/35&#10;https://github.com/ncsa/security-lib/issues/36" />
     <MESSAGE value="Backing out of lucene experiment. Neet tool, but way to much work when we already have an SQL database (Derby) that does it all." />
@@ -904,7 +899,8 @@
     <MESSAGE value="6.0 release" />
     <MESSAGE value="tweak to installer" />
     <MESSAGE value="Regenerate website" />
-    <option name="LAST_COMMIT_MESSAGE" value="Regenerate website" />
+    <MESSAGE value="Small change for modularity in the client installer" />
+    <option name="LAST_COMMIT_MESSAGE" value="Small change for modularity in the client installer" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
