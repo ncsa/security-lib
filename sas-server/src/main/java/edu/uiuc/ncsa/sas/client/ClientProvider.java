@@ -29,6 +29,7 @@ public class ClientProvider<V extends SASClient> implements IdentifiableProvider
 
     public static boolean isClientID(String x){
         if(StringUtils.isTrivial(x)) return false;
-        return x.startsWith(CLIENT_ID_HEAD);
+      //  return x.startsWith(CLIENT_ID_HEAD);
+        return true;
     }
 }

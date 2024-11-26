@@ -16,7 +16,9 @@ import java.io.FileOutputStream;
 
 /**
  * Configure the SAS web client. This reads/writes the configuration file (very simple XML).
- * It takes an optional existing file as the argument.
+ * It takes an optional existing file as the argument. This is the configuration that the client
+ * loads in order to connect to the server. If you are looking for the (server) admin CLI, that is in
+ * {@link edu.uiuc.ncsa.sas.admin.SASCommands} and is text only.
  * <p>Created by Jeff Gaynor<br>
  * on 8/26/22 at  6:15 AM
  */

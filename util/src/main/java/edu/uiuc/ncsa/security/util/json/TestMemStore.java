@@ -79,11 +79,16 @@ public class TestMemStore<V extends JSONEntry> extends HashMap<Identifier, V> im
     }
 
     @Override
-    public boolean remove(List<Identifiable> objects) {
+    public boolean remove(List<V> objects) {
         for(Identifiable identifiable : objects){
              remove(identifiable);
         }
         return true;
+    }
+
+    @Override
+    public boolean removeByID(List<Identifier> objects) {
+        return false;
     }
 
     @Override

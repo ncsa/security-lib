@@ -550,8 +550,43 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         return null;
     }
 
-    public boolean remove(List<Identifiable> objects) {
+    /**
+     * remove a collection of items by primary key. This uses SQL batching and should be used for large
+     * sets. {@link #remove(List)} takes a list of objects and makes a very long list of things to remove.
+     * @param ids
+     * @return
+     */
+    @Override
+    public boolean removeByID(List<Identifier> ids) {
+        String query = "DELETE FROM " + getTable().getFQTablename() + " WHERE " + getTable().getPrimaryKeyColumnName() + "=?";
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+        try {
+            PreparedStatement stmt = c.prepareStatement(query);
+            for (Identifier id : ids) {
+                // Reminder that parameters have index origin 1
+                stmt.setString( 1, id.toString());
+                stmt.addBatch();
+            }
+            int[] rcs = stmt.executeBatch();
+            stmt.close();
+            releaseConnection(cr);
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error removing list", e);
+        }
+        return true;
+
+    }
+    // Fix https://github.com/ncsa/security-lib/issues/44
+    public boolean remove(List<V> objects) {
         if(objects.size() == 0) return true; // do nothing
+        List<Identifier> ids = new ArrayList<>(objects.size());
+        for(int i = 0; i < objects.size(); i++) {
+            ids.add(objects.get(i).getIdentifier());
+        }
+        return removeByID(ids); // do it as a batch call.
+/*
         String inSql = String.join(",", Collections.nCopies(objects.size(), "?"));
         inSql = "(" + inSql + ")";
         String query = "DELETE FROM " + getTable().getFQTablename() + " WHERE " + getTable().getPrimaryKeyColumnName() + " IN " + inSql;
@@ -572,7 +607,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             throw new GeneralException("Error removing list", e);
         }
         return true;
-
+*/
     }
 
     public V remove(Object key) {

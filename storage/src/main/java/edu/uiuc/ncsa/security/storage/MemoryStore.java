@@ -165,7 +165,17 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
     }
 
     @Override
-    public boolean remove(List<Identifiable> objects) {
+    public boolean removeByID(List<Identifier> identifiers) {
+        for(Identifier id : identifiers){
+            if(containsKey(id)){
+                remove(id);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean remove(List<V> objects) {
         for (Identifiable identifiable : objects) {
             remove(identifiable.getIdentifier());
         }

@@ -96,11 +96,14 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
     public int size(boolean includeVersions);
 
     /**
-     * Removes a list of identifiable object from the store by ID.
+     * Removes a list of identifiable objects.
      * @param objects
      * @return
      */
-     boolean remove(List<Identifiable> objects);
+     boolean remove(List<V> objects);
+
+     boolean removeByID(List<Identifier> objects);
+
 
      List<V> getMostRecent(int n, List<String> attributes);
 

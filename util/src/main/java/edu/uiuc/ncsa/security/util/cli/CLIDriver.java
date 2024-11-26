@@ -31,6 +31,12 @@ public class CLIDriver {
     }
 
     protected String lineCommentStart = null;
+
+    /**
+     * If a comment delimiter has been set for this component. If so, then lines that
+     * start with this are ignored.
+     * @return
+     */
     public boolean hasComments(){
         return lineCommentStart != null;
     }
@@ -97,6 +103,7 @@ public class CLIDriver {
     public void addCommands(Commands... cci) {
         for (Commands xxx : cci) {
             // Set exactly one instance of the component manager
+            // This should be the zero-th element in cci
             if (xxx instanceof ComponentManager && componentManager == null) {
                 componentManager = (ComponentManager) xxx;
             }
@@ -369,6 +376,29 @@ public class CLIDriver {
      */
 
     public void start() {
+        OLDstart();
+    }
+    protected void NEWstart() throws Exception {
+        String prompt = commands[0].getPrompt();
+        String cmdLine;
+        while (!isDone) {
+           try{
+               cmdLine = readline(prompt);
+               processLine(cmdLine);
+
+           }catch(ExitException ee){
+               return;
+           }catch (Throwable t){
+               if (debug) {
+                   t.printStackTrace();
+               }
+               say("Internal error reading line:" + (StringUtils.isTrivial(t.getMessage()) ? "\n" + t.getMessage() : ""));
+
+           }
+        }
+
+    }
+    protected void OLDstart() {
         //commands[0].about(null);
         String cmdLine;
         String prompt = commands[0].getPrompt();
@@ -392,6 +422,7 @@ public class CLIDriver {
                     say("");
                 }
                 cmdLine = readline(prompt);
+                // start process line
                 if(hasComments()){
                     if(cmdLine.trim().startsWith(getLineCommentStart())){
                         continue;
@@ -495,10 +526,112 @@ public class CLIDriver {
                     ioe.printStackTrace();
                 }
                 say("Internal error reading line:" + (StringUtils.isTrivial(ioe.getMessage()) ? "\n" + ioe.getMessage() : ""));
-            }
+            } // end process line
         }
     }
 
+    protected void processLine(String cmdLine) throws Throwable {
+
+        if(hasComments()){
+            if(cmdLine.trim().startsWith(getLineCommentStart())){
+               return;
+            }
+        }
+        if (hasEnv()) {
+            cmdLine = TemplateUtil.replaceAll(cmdLine, getEnv());
+        }
+        boolean storeLine = true;
+        int commandType = getCommandType(cmdLine);
+        switch (commandType) {
+            case REPEAT_COMMAND_VALUE:
+                cmdLine = doRepeatCommand(cmdLine);
+                storeLine = cmdLine == null; // if there is nothing in the buffer, cmdLine is null, don't store it.
+                break;
+            case HISTORY_COMMAND_VALUE:
+                cmdLine = doHistory(cmdLine);
+                if (cmdLine == null) {
+                    break;// if there is nothing in the buffer, cmdLine is null, don't store it.
+                }
+                storeLine = false;
+                break;
+            case WRITE_BUFFER_COMMAND_VALUE:
+                doBufferWrite(cmdLine);
+                break;
+            case READ_BUFFER_COMMAND_VALUE:
+                doBufferRead(cmdLine);
+                break;
+            case CLEAR_BUFFER_COMMAND_VALUE:
+                if (cmdLine.contains(HELP_SWITCH)) {
+                    say(CLEAR_BUFFER_COMMAND + " = clear the entire command history.");
+                    break;
+                }
+                commandHistory = new LinkedList<>();
+                say("Command history cleared.");
+                break;
+            case SHORT_EXIT_COMMAND_VALUE:
+                quit(null);
+                return;
+            case PRINT_HELP_COMMAND_VALUE:
+                printHelp();
+                break;
+            case LIST_ALL_METHODS_COMMAND_VALUE:
+                InputLine inputLine = new InputLine(CLT.tokenize(cmdLine));
+                listCLIMethods(inputLine);
+                break;
+            case ONLINE_HELP_COMMAND_VALUE:
+                inputLine = new InputLine(CLT.tokenize(cmdLine));
+                doHelp(inputLine);
+                break;
+            case TRACE_COMMAND_VALUE:
+                doTrace(cmdLine);
+                break;
+
+            case NO_OP_VALUE:
+                break;
+            case USER_DEFINED_COMMAND:
+            default:
+        }
+        if (commandType == NO_OP_VALUE) {
+            // The user entered a blank line or nothing but blanks. Skip it all.
+            return;
+        }
+        if (storeLine) {
+            // Store it if it was not retrieved from the command history.
+            commandHistory.add(0, cmdLine);
+        }
+        if (cmdLine.startsWith(COMPONENT_COMMAND)) {
+            // execute a single command in another component.
+            if (componentManager == null) {
+                say("Sorry, this does not have components.");
+            } else {
+                cmdLine = "use " + cmdLine.substring(COMPONENT_COMMAND.length());
+                InputLine inputLine = new InputLine(CLT.tokenize(cmdLine));
+                componentManager.use(inputLine);
+            }
+        } else {
+            switch (execute(cmdLine)) {
+                case HELP_RC:
+                    InputLine inputLine = new InputLine(CLT.tokenize(cmdLine));
+                    listCLIMethods(inputLine);
+                    break;
+                case SHUTDOWN_RC:
+                    isDone = false; // just in case.
+                    quit(null);
+                    return;
+                case USER_EXIT_RC:
+                    say("User exit encountered");
+                    throw new ExitException();
+                case OK_RC:
+                    // do nix.
+                    break;
+                case ABNORMAL_RC:
+                default:
+                    say("Command not found/understood. Try typing help or exit.");
+                    say("To see all commands currently available, type " + LIST_ALL_METHODS_COMMAND);
+            }
+        }
+
+    }
     public boolean isTraceOn() {
         return traceOn;
     }

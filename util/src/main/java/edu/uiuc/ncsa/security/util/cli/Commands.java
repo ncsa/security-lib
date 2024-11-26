@@ -24,12 +24,13 @@ public interface Commands extends Logable, Serializable {
      * The prompt displayed to the user. This allows it to change based on context.
      * @return java.lang.String
      */
-    public String getPrompt();
-    public void print_help() throws Exception;  // replaced by CLI Driver /help facility which is much better.
+    String getPrompt();
+    void print_help() throws Exception;  // replaced by CLI Driver /help facility which is much better.
 
-    public void bootstrap() throws Throwable;
+    void bootstrap() throws Throwable;
 
-    public HelpUtil getHelpUtil();
+    HelpUtil getHelpUtil();
     IOInterface getIOInterface();
     void setIOInterface(IOInterface io);
+    String getName();
 }

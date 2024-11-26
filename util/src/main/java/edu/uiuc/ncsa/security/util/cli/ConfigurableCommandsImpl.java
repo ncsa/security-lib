@@ -25,7 +25,7 @@ import java.util.logging.Level;
  * <p>Created by Jeff Gaynor<br>
  * on 5/20/13 at  11:35 AM
  */
-public abstract class ConfigurableCommandsImpl implements Commands, ComponentManager {
+public abstract class ConfigurableCommandsImpl implements Commands {
     protected ConfigurableCommandsImpl(MyLoggingFacade logger) {
         this.logger = logger;
     }

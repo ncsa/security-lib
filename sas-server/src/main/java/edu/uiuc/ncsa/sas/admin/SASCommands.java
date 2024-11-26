@@ -65,6 +65,8 @@ public class SASCommands extends StoreCommands {
                 KeyPair keyPair = KeyUtil.generateKeyPair();
                 say(KeyUtil.toPKCS1PEM(keyPair.getPrivate()));
                 SASClient.setPublicKey(keyPair.getPublic());
+                say("  >> Note that the public key has been set, and the private key is displayed");
+                say("     so that it may be given to the client. The server only uses the public key.");
             } else {
                 if (isOk(getInput("specify PKCS 8 file (y/n)?", "n"))) {
                     String f = getInput("enter file path", "");

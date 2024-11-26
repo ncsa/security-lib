@@ -3,21 +3,22 @@ package edu.uiuc.ncsa.sas;
 import edu.uiuc.ncsa.sas.client.ClientProvider;
 import edu.uiuc.ncsa.sas.client.SASClient;
 import edu.uiuc.ncsa.sas.example.EchoExecutable;
-import edu.uiuc.ncsa.sas.loader.SASExceptionHandler;
+import edu.uiuc.ncsa.sas.loader.SASConfigurationLoader;
 import edu.uiuc.ncsa.sas.thing.action.*;
 import edu.uiuc.ncsa.sas.thing.response.*;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
-import edu.uiuc.ncsa.security.servlet.AbstractServlet;
-import edu.uiuc.ncsa.security.servlet.ExceptionHandlerThingie;
-import edu.uiuc.ncsa.security.servlet.HeaderUtils;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.servlet.*;
 import edu.uiuc.ncsa.security.util.cli.ExitException;
 import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -25,20 +26,93 @@ import java.security.SecureRandom;
 import java.security.interfaces.RSAPublicKey;
 import java.util.*;
 
+import static edu.uiuc.ncsa.security.servlet.AbstractServlet.getEnvironment;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 8/15/22 at  8:29 AM
  */
-public class SASServlet extends AbstractServlet {
+public class SASServlet extends HttpServlet implements Logable {
     JSONWebKeys jsonWebKeys;
 
-    @Override
+    /*
+      A lot of what comes next is boiler plated from the AbstractServlet. This is because
+      we need to have it peacefully co-exist as part of the deployment with, say OA4MP
+      and the monolithic static nature of the Environment (OA2SE) precluded that. Since this
+      is a largely self-contained class (so really not much cause to extend it) this should
+      work. Until, of course, it does not.
+     */
+    SASConfigurationLoader<? extends SASEnvironment> configurationLoader;
+
+    public Initialization getInitialization() {
+        return initialization;
+    }
+
+    public void setInitialization(Initialization initialization) {
+        this.initialization = initialization;
+    }
+
+    protected Initialization initialization;
+
+    public SASConfigurationLoader<? extends SASEnvironment> getConfigurationLoader() {
+        return configurationLoader;
+    }
+
+    public void setConfigurationLoader(SASConfigurationLoader<? extends SASEnvironment> b) {
+        configurationLoader = b;
+    }
+
+
+    public void setSASE(SASEnvironment env) {
+        sase = env;
+    }
+
+    protected SASEnvironment sase;
+
+
     public void loadEnvironment() throws IOException {
-        setEnvironment(getConfigurationLoader().load());
+        setSASE(getConfigurationLoader().load());
     }
 
     protected SASEnvironment getSASE() {
         return (SASEnvironment) getEnvironment();
+    }
+
+
+    public boolean isDebugOn() {
+        return getMyLogger().isDebugOn();
+    }
+
+    public void setDebugOn(boolean setOn) {
+        getMyLogger().setDebugOn(setOn);
+    }
+
+    protected MyLoggingFacade getMyLogger() {
+        if (sase != null) {
+            return sase.getMyLogger();
+        }
+        // always return one so even if things blow up some record remains...
+        return new MyLoggingFacade("oa4mp");
+    }
+
+    public void debug(String x) {
+        getMyLogger().debug(x);
+    }
+
+    public void error(String x) {
+        getMyLogger().error(x);
+    }
+
+    public void error(String x, Throwable t) {
+        getMyLogger().error(x, t);
+    }
+
+    public void info(String x) {
+        getMyLogger().info(x);
+    }
+
+    public void warn(String x) {
+        getMyLogger().warn(x);
     }
 
     String ACTION_TAG = "action=";
@@ -79,6 +153,7 @@ public class SASServlet extends AbstractServlet {
 
     /**
      * Create the appropriate executable.
+     *
      * @param executableName name to allow you to choose which executable to create
      * @return
      */
@@ -108,12 +183,11 @@ public class SASServlet extends AbstractServlet {
         }
     }
 
-    @Override
     protected void doIt(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Throwable {
         // Either there is basic auth (to do logon) or there is a session id. The payload is always a blob.
-        if(getSASE().hasAccessList()){
-            String ipAddress =  httpServletRequest.getRemoteAddr();
-            if(!getSASE().getAccessList().contains(ipAddress)){
+        if (getSASE().hasAccessList()) {
+            String ipAddress = httpServletRequest.getRemoteAddr();
+            if (!getSASE().getAccessList().contains(ipAddress)) {
                 httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
@@ -178,7 +252,7 @@ public class SASServlet extends AbstractServlet {
                     case SASConstants.ACTION_EXECUTE:
                         try {
                             response = doExecute(sessionRecord, actions.get(i));
-                        }catch(ExitException xx){
+                        } catch (ExitException xx) {
                             // Shutdown hook. An application can throw this to signal logging off. In this way
                             // a user does not need to know about the SAS, but can simply exit their application
                             // normally and the effect is the same.
@@ -191,8 +265,7 @@ public class SASServlet extends AbstractServlet {
             sessionRecord.lastAccessed = new Date();
             getSASE().getResponseSerializer().serialize(responses, httpServletResponse, sessionRecord);
 
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             handleException(new SASExceptionHandlerThingie(t, httpServletRequest, httpServletResponse, sessionRecord));
         }
 
@@ -261,8 +334,12 @@ public class SASServlet extends AbstractServlet {
         public SessionRecord sessionRecord;
     }
 
-    @Override
-    public SASExceptionHandler getExceptionHandler() {
-        return (SASExceptionHandler) super.getExceptionHandler();
+    ExceptionHandler exceptionHandler = null;
+
+    public ExceptionHandler getExceptionHandler() {
+        if (exceptionHandler == null) {
+            exceptionHandler = new BasicExceptionHandler(getMyLogger());
+        }
+        return exceptionHandler;
     }
 }

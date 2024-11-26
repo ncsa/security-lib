@@ -20,6 +20,8 @@ import java.util.StringTokenizer;
 /**
  * Very straightforward servlet wrapper. This sets up logging and debug. All posts and gets
  * are intercepted and routed to a single doIt method.<br><br></br></br>
+ * This has the environment, loader and initialization static hence shared between
+ * all instances of this.
  * 3/23/2012: Added simple bootstrapping mechanism. This requires you set a context
  * listener in your web.xml deployment descriptor. See the documentation in
  * {@link Bootstrapper} for more details.

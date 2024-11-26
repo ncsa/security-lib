@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.sas.thing.action;
 
 import edu.uiuc.ncsa.sas.SASConstants;
 import edu.uiuc.ncsa.sas.SessionRecord;
-import edu.uiuc.ncsa.sas.Subject;
 import edu.uiuc.ncsa.sas.exceptions.EncryptionException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.crypto.DecryptUtils;
@@ -151,84 +150,4 @@ public class ActionDeserializer implements SASConstants {
        // JSONObject api = json.getJSONObject(KEYS_SAT);
         return json.getString(KEYS_ACTION);
     }
-
-/*    public String getArg(JSONObject json) {
-        //JSONObject api = json.getJSONObject(KEYS_SAT);
-        String object = json.getString(KEYS_ARGUMENT);        // always a base64 encoded string
-        if (object == null) {
-            return null;
-        }
-        try {
-            return new String(Base64.getDecoder().decode(object), "UTF-8");
-        } catch (UnsupportedEncodingException unsupportedEncodingException) {
-            throw new NFWException("UTF-8 is not a supported encoding in Java");
-        }
-    }*/
-
-    /**
-     * For an invoke action, get the method name
-     *
-     * @param json
-     * @return
-     */
-/*    public String getMethod(JSONObject json) {
-       // JSONObject api = json.getJSONObject(KEYS_SAT);
-        return json.getString(KEYS_METHOD);
-    }
-
-    public String getPrompt(JSONObject json) {
-        //JSONObject api = json.getJSONObject(KEYS_SAT);
-        String object = json.getString(KEYS_PROMPT);        // always a base64 encoded string
-        if (object == null) {
-            return null;
-        }
-        try {
-            return new String(Base64.getDecoder().decode(object), "UTF-8");
-        } catch (UnsupportedEncodingException unsupportedEncodingException) {
-            throw new NFWException("UTF-8 is not a supported encoding in Java");
-        }
-    }*/
-
-    /**
-     * Session {@link Subject} is JSON encoded as
-     * <pre>
-     *    {"{@link SASConstants#KEYS_SUBJECT}":
-     *     {"{@link SASConstants#KEYS_SUBJECT_ID}":"id_string",
-     *      "{@link SASConstants#KEYS_SUBJECT_SESSION_ID}":"session_uuid"
-     *      }
-     *    }
-     * </pre>
-     * <b>OR</b>
-     * <pre>
-     *    {"{@link SASConstants#KEYS_SUBJECT}": "id_string"}
-     *    }
-     * </pre>
-     * Alternate
-     *
-     * @param jsonObject
-     * @return
-     */
- /*   public Subject getSubject(JSONObject jsonObject) {
-        Subject subject = new Subject();
-        JSONObject api = jsonObject.getJSONObject(KEYS_SAT);
-        Object object = api.get(KEYS_SUBJECT);
-        String id = null;
-        String uuid = null;
-        if (object instanceof JSONObject) {
-            JSONObject sub = (JSONObject) object;
-            id = sub.getString(KEYS_SUBJECT_ID);
-            if (StringUtils.isTrivial(id)) {
-                return subject;
-            }
-            uuid = jsonObject.getString(KEYS_SUBJECT_SESSION_ID);
-        } else {
-            // try to interpret it as the id
-            id = object.toString();
-        }
-        subject.identifier = BasicIdentifier.newID(id);
-        if (uuid != null) {
-            subject.sessionID = UUID.fromString(uuid);
-        }
-        return subject;
-    }*/
 }

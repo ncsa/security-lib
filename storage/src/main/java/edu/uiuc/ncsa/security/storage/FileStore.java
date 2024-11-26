@@ -430,6 +430,14 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         return count;
     }
 
+    @Override
+    public boolean removeByID(List<Identifier> objects) {
+        for(Identifier id : objects) {
+           remove(id);
+        }
+        return true;
+    }
+
     class IdentifierFileFilter implements FilenameFilter {
         public boolean accept(File dir, String name) {
             return name.equals(id);
@@ -483,12 +491,13 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
      * @return
      */
     @Override
-    public boolean remove(List<Identifiable> objects) {
+    public boolean remove(List<V> objects) {
         for (Identifiable identifiable : objects) {
             delete(identifiable.getIdentifierString());
         }
         return true;
     }
+
 
     public boolean delete(String identifier) {
         V t = loadByIdentifier(identifier);
@@ -531,6 +540,9 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
             return null;
         }
         V t = (V) loadByIdentifier(key.toString());
+        if(t == null){// nix to do. Object is not in the store.
+            return null;
+        }
         V x = realRemove(t);
         return x;
     }

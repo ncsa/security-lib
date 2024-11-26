@@ -257,7 +257,7 @@ public abstract class StoreCommands extends CommonCommands {
 
 
     // The name that will be shown in the prompt.
-    public abstract String getName();
+    //public abstract String getName();
 
 
     @Override

@@ -4,12 +4,12 @@ edu.uiuc.ncsa.sas.cli
 edu.uiuc.ncsa.sas.client
 edu.uiuc.ncsa.sas.example
 edu.uiuc.ncsa.sas.exceptions
+edu.uiuc.ncsa.sas.io
 edu.uiuc.ncsa.sas.loader
 edu.uiuc.ncsa.sas.storage
 edu.uiuc.ncsa.sas.thing
 edu.uiuc.ncsa.sas.thing.action
 edu.uiuc.ncsa.sas.thing.response
-edu.uiuc.ncsa.sas.watcher
 edu.uiuc.ncsa.sas.webclient
 edu.uiuc.ncsa.security.core
 edu.uiuc.ncsa.security.core.cache
@@ -25,7 +25,6 @@ edu.uiuc.ncsa.security.servlet.mail
 edu.uiuc.ncsa.security.storage
 edu.uiuc.ncsa.security.storage.cli
 edu.uiuc.ncsa.security.storage.data
-edu.uiuc.ncsa.security.storage.dynamodb
 edu.uiuc.ncsa.security.storage.events
 edu.uiuc.ncsa.security.storage.monitored
 edu.uiuc.ncsa.security.storage.monitored.upkeep

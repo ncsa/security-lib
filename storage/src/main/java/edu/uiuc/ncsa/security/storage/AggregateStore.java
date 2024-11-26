@@ -27,6 +27,11 @@ public class AggregateStore<V extends Store> implements Store {
         }
     }
 
+    @Override
+    public boolean removeByID(List objects) {
+        throw new NotImplementedException("Error: This is not yet implemented for aggregate stores");
+    }
+
     protected List<V> stores = new ArrayList<V>();
 
     /**

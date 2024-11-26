@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.sas.watcher;
+package edu.uiuc.ncsa.sas.io;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import java.nio.file.*;
 import static java.nio.file.StandardWatchEventKinds.*;
 
 /**
- * For watcher SAS.
+ * For io SAS.
  * <p>Created by Jeff Gaynor<br>
  * on 6/21/24 at  4:35 PM
  */
@@ -48,7 +48,7 @@ public class SASWatcher {
         sasWatcher.doIt();
     }
     protected static void watchEG() throws IOException, InterruptedException {
-        // Set up watcher
+        // Set up io
         String dir = "/home/ncsa/temp/watched";
         WatchService watchService = FileSystems.getDefault().newWatchService();
         Path path = Paths.get(dir);

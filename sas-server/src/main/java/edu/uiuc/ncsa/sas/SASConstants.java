@@ -52,7 +52,7 @@ public interface SASConstants {
     /**
      * For the header in the HTTP request. Used only in logon
      */
-     String CLIENT_ID_HEAD = "sas:client/";
+     String CLIENT_ID_HEAD = "sas:";
 
     // Header seesion ID. Used in every other request after logon.
     // NOTE that Session-id is a reserved header for HTTP, so ours has to

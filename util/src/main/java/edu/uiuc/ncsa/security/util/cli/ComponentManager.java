@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.security.util.cli;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -8,5 +8,5 @@ import java.util.List;
  */
 public interface ComponentManager {
     boolean use(InputLine inputLine) throws Throwable;
-    List<String> listComponents();
+    Set<String> listComponents();
 }
