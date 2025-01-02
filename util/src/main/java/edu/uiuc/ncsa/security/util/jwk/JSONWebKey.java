@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.security.util.jwk;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.OctetSequenceKey;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 
 import java.io.Serializable;
@@ -23,6 +24,8 @@ public class JSONWebKey implements Serializable {
 
     boolean rsaKey = true;
     boolean ecKey = false;
+    boolean octetKey = false;
+    byte[] octet = null;
     /**
      * Is this an RSA key?
      * @return
@@ -34,7 +37,11 @@ return rsaKey;    }
 return ecKey;
     }
 
+    public boolean isOctetKey() {
+        return octetKey;
+    }
     public JSONWebKey(JWK jwk) {
+        this.JOSEJWK = jwk;
         id = jwk.getKeyID();
         // Fix https://github.com/ncsa/security-lib/issues/28
         // Be more forgiving of possibly missing values, since this also allows
@@ -48,14 +55,22 @@ return ecKey;
         if(jwk.getKeyType() != null) {
             type = jwk.getKeyType().getValue();
             try {
+                if(jwk instanceof OctetSequenceKey) {
+                    OctetSequenceKey key = (OctetSequenceKey) jwk;
+                    octet = key.toByteArray();
+                    octetKey = true;
+                    rsaKey = false;
+                    ecKey = false;
+                    return;
+                }
                 if (jwk.getKeyType().getValue().equals("RSA")) {
-                    rsaKey = true; ecKey=false;
+                    rsaKey = true; ecKey=false;octetKey=false;
                     privateKey = jwk.toRSAKey().toPrivateKey();
                     publicKey = jwk.toRSAKey().toPublicKey();
                     return;
                 }
                 if (jwk.getKeyType().getValue().equals("EC")) {
-                    rsaKey = false; ecKey = true;
+                    rsaKey = false; ecKey = true;octetKey=false;
                     privateKey = jwk.toECKey().toPrivateKey();
                     publicKey = jwk.toECKey().toPublicKey();
                     return;
@@ -74,7 +89,6 @@ return ecKey;
         if (jwk instanceof ECKey) {
             curve = ((ECKey) jwk).getCurve().getName();
         }
-        this.JOSEJWK = jwk;
     }
 
     public JWK getJOSEJWK() {
