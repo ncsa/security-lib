@@ -20,6 +20,7 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.KeyPair;
+import java.security.KeyStore;
 import java.util.Vector;
 
 /**
@@ -63,7 +64,7 @@ public class SASCommands extends StoreCommands {
         if (SASClient.getPublicKey() == null) {
             if (isOk(getPropertyHelp(keys.publicKey(), "create new keys?", "n"))) {
                 KeyPair keyPair = KeyUtil.generateKeyPair();
-                say(KeyUtil.toPKCS1PEM(keyPair.getPrivate()));
+                say(KeyUtil.toPKCS8PEM(keyPair.getPrivate()));
                 SASClient.setPublicKey(keyPair.getPublic());
                 say("  >> Note that the public key has been set, and the private key is displayed");
                 say("     so that it may be given to the client. The server only uses the public key.");

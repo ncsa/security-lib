@@ -9,21 +9,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="6.0.2 checkin">
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/CLI_IO.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/SASCLIDriver.DC.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/SASCLIDriver.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/class-use/CLI_IO.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/class-use/SASCLIDriver.DC.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/class-use/SASCLIDriver.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/Data.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/SASWatcher.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/class-use/Data.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/class-use/SASWatcher.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/package-summary.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/package-tree.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/package-use.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/jquery/jquery-3.7.1.min.js" afterDir="false" />
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Rerolled website">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/alt-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/alt-index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/allclasses-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/allclasses-index.html" afterDir="false" />
@@ -52,7 +38,13 @@
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/class-use/SessionRecord.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/class-use/SessionRecord.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/class-use/StringIO.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/class-use/StringIO.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/class-use/Subject.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/class-use/Subject.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/CLI_IO.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/CLI_IO.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/SASCLIDriver.DC.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/SASCLIDriver.DC.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/SASCLIDriver.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/SASCLIDriver.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/SASServerSideCLiDriver.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/SASServerSideCLiDriver.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/class-use/CLI_IO.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/class-use/CLI_IO.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/class-use/SASCLIDriver.DC.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/class-use/SASCLIDriver.DC.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/class-use/SASCLIDriver.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/class-use/SASCLIDriver.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/class-use/SASServerSideCLiDriver.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/class-use/SASServerSideCLiDriver.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/package-summary.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/cli/package-tree.html" afterDir="false" />
@@ -84,6 +76,13 @@
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/exceptions/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/exceptions/package-summary.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/exceptions/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/exceptions/package-tree.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/exceptions/package-use.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/exceptions/package-use.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/Data.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/Data.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/SASWatcher.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/SASWatcher.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/class-use/Data.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/class-use/Data.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/class-use/SASWatcher.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/class-use/SASWatcher.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/package-summary.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/package-tree.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/package-use.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/package-use.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/ClientFSStoreProvider.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/ClientFSStoreProvider.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/SASBootstrapper.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/SASBootstrapper.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/SASConfigurationLoader.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/SASConfigurationLoader.html" afterDir="false" />
@@ -1054,7 +1053,6 @@
       <change beforePath="$PROJECT_DIR$/docs/apidocs/help-doc.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/help-doc.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/index-all.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/index-all.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/member-search-index.js" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/member-search-index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/member-search-index.zip" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/member-search-index.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/overview-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/overview-summary.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/overview-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/overview-tree.html" afterDir="false" />
@@ -1081,9 +1079,8 @@
       <change beforePath="$PROJECT_DIR$/docs/store_commands/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/store_commands/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/summary.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sas-server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/admin/SASCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/admin/SASCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JSONWebKey.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JSONWebKey.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/pkcs/MyCertUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/pkcs/MyCertUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/pom.xml" afterDir="false" />
     </list>
@@ -1970,7 +1967,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="87" />
+    <option name="localTasksCounter" value="88" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1979,7 +1976,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="https://github.com/ncsa/security-lib/issues/30" />
     <MESSAGE value="Refactoring client configurations to allow for using a QDL ini file. Trying to decouple XML from configurations." />
     <MESSAGE value="Getting fix for https://github.com/ncsa/security-lib/issues/32 from 5.4.3" />
     <MESSAGE value="Tiny optimization: If adding an empty list of objects to an SQL store, just return -- don't set up the entire connection and try to access the database." />
@@ -2004,7 +2000,8 @@
     <MESSAGE value="Added utility to get all HTTP header parameters properly parsed." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/43 and website" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/44" />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/44" />
+    <MESSAGE value="Rerolled website" />
+    <option name="LAST_COMMIT_MESSAGE" value="Rerolled website" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
