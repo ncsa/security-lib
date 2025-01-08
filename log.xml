@@ -1,4 +1,4 @@
 Nov 06, 2024 11:11:10 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
 INFO: default logging:Logging to file /home/ncsa/dev/ncsa-git/security-lib/log.xml
 Nov 06, 2024 11:11:10 AM edu.uiuc.ncsa.security.core.util.MyLoggingFacade info
-INFO: default logging:SAS Configuration loader version: 6.x-SNAPSHOT startup on Wed Nov 06 11:11:10 CST 2024
+INFO: default logging:SAS Configuration loader version: 6.0.3 startup on Wed Nov 06 11:11:10 CST 2024
