@@ -614,4 +614,9 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         return search(key, condition, isRegEx, null);
     }
 
+    @Override
+    public void update(List<Identifier> ids, Map<String, Object> values) throws UnregisteredObjectException {
+         GenericStoreUtils.update(this, ids, values);
+    }
+    // https://github.com/ncsa/oa4mp/releases/download/mutable/qdl-installer.jar
 }

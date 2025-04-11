@@ -134,15 +134,15 @@ public abstract class StoreCommands extends CommonCommands {
         );
         int width = 8;
 
-    say(StringUtils.RJustify(UPKEEP_FLAG_TEST, width) + " = true or false, all rules are tun in test mode only. This overrides individual rules settings." );
-    say(StringUtils.RJustify(UPKEEP_FLAG_SHOW, width) + " = print the current configuration" );
-    say(StringUtils.RJustify(UPKEEP_FLAG_CFG, width) + " = the full path to an XML configuration. This is exactly the upkeep block for a store, nothing else." );
-    say(StringUtils.RJustify(UPKEEP_FLAG_RUN, width) + " = flag, if present, run upkeep for thr current store with the current configuration. A report is printed" );
-    say(StringUtils.RJustify(UPKEEP_FLAG_ENABLE, width) + " = true or false, enable or disable the entire current configuration" );
-    say("Note that you cannot change the stored upkeep for the store, with this utility,");
-    say( "though you may load different one and " + UPKEEP_FLAG_RUN + "  it.");
-    say();
-    say("");
+        say(StringUtils.RJustify(UPKEEP_FLAG_TEST, width) + " = true or false, all rules are tun in test mode only. This overrides individual rules settings.");
+        say(StringUtils.RJustify(UPKEEP_FLAG_SHOW, width) + " = print the current configuration");
+        say(StringUtils.RJustify(UPKEEP_FLAG_CFG, width) + " = the full path to an XML configuration. This is exactly the upkeep block for a store, nothing else.");
+        say(StringUtils.RJustify(UPKEEP_FLAG_RUN, width) + " = flag, if present, run upkeep for thr current store with the current configuration. A report is printed");
+        say(StringUtils.RJustify(UPKEEP_FLAG_ENABLE, width) + " = true or false, enable or disable the entire current configuration");
+        say("Note that you cannot change the stored upkeep for the store, with this utility,");
+        say("though you may load different one and " + UPKEEP_FLAG_RUN + "  it.");
+        say();
+        say("");
         /*
     UPKEEP_FLAG_TEST
     UPKEEP_FLAG_SHOW
@@ -189,12 +189,12 @@ public abstract class StoreCommands extends CommonCommands {
         if (inputLine.hasArg(UPKEEP_FLAG_TEST)) {
             String raw = inputLine.getNextArgFor(UPKEEP_FLAG_TEST);
             boolean testOnly = "true".equals(raw);
-            if(!testOnly){
+            if (!testOnly) {
                 // spellcheck, basically. since if we only test fopr "true" and they mistype it
                 // we don't want to toggle testing and have something run that should not.
-                if( !"false".equals(raw)){
-                     say("unknown option \"" + raw + "\" for " + UPKEEP_FLAG_TEST);
-                     return;
+                if (!"false".equals(raw)) {
+                    say("unknown option \"" + raw + "\" for " + UPKEEP_FLAG_TEST);
+                    return;
                 }
 
             }
@@ -221,16 +221,16 @@ public abstract class StoreCommands extends CommonCommands {
         }
 
         if (inputLine.hasArg(UPKEEP_FLAG_SHOW)) {
-             if (upkeepConfiguration== null) {
-                 say("no upkeep configuration");
-                 return;
-             }
-             say(upkeepConfiguration.toString(true));
-             return;
-         }
+            if (upkeepConfiguration == null) {
+                say("no upkeep configuration");
+                return;
+            }
+            say(upkeepConfiguration.toString(true));
+            return;
+        }
 
         if (inputLine.hasArg(UPKEEP_FLAG_RUN)) {
-            if(getEnvironment() == null){
+            if (getEnvironment() == null) {
                 say("No runtime environment for this store has been set.");
                 return;
             }
@@ -415,6 +415,10 @@ public abstract class StoreCommands extends CommonCommands {
     public static final String SEARCH_DEBUG_FLAG = "-debug";
     public static final String SEARCH_RETURNED_ATTRIBUTES_FLAG = "-out";
     public static final String SEARCH_RESULT_SET_NAME = "-rs";
+    /**
+     * Used as a command line switch to name a result set.
+     */
+    public static final String SEARCH_RESULT_ARG_KEY = "-rs";
     public static final String SEARCH_BEFORE_TS_FLAG = "-before";
     public static final String SEARCH_AFTER_TS_FLAG = "-after";
     public static final String SEARCH_DATE_FLAG = "-date";
@@ -523,7 +527,10 @@ public abstract class StoreCommands extends CommonCommands {
             }
         }
         try {
-            values = getSearchValues(list_n, hasListN, hasDate, dateField, afterDate, beforeDate, key, values, returnedAttributes, condition, isRegEx, hasKey);
+            values = getSearchValues(list_n, hasListN,
+                    hasDate, dateField, afterDate, beforeDate,
+                    key, values,
+                    returnedAttributes, condition, isRegEx, hasKey);
 
             if (values == null) {
                 String kk = getKeyArg(inputLine);
@@ -1308,13 +1315,26 @@ public abstract class StoreCommands extends CommonCommands {
         }
         boolean forceRemove = inputLine.hasArg(RM_FORCE_FLAG);
         inputLine.removeSwitch(RM_FORCE_FLAG);
-        if (inputLine.hasArg(SEARCH_RESULT_SET_NAME)) {
-            RSRecord rsRecord = resultSets.get(inputLine.getNextArgFor(SEARCH_RESULT_SET_NAME));
+        String key = getAndCheckKeyArg(inputLine);
+
+        if (inputLine.hasArg(SEARCH_RESULT_ARG_KEY)) {
+            RSRecord rsRecord = resultSets.get(inputLine.getNextArgFor(SEARCH_RESULT_ARG_KEY));
             if (rsRecord == null) {
                 say("no such stored result.");
                 return;
             }
+            List<Identifier> identifiers = new ArrayList<>(rsRecord.rs.size());
+            for (Identifiable identifiable : rsRecord.rs) {
+                identifiers.add(identifiable.getIdentifier());
+            }
+            if (key != null || inputLine.hasArg(KEYS_FLAG)) {
+                say("removal of specific keys for result set not yet supported");
+                return;
+            }
+            say("removing " + identifiers.size() + " objects..");
 
+            getStore().remove(identifiers);
+            say("done!");
             return;
         }
         if (forceRemove) {
@@ -1328,7 +1348,6 @@ public abstract class StoreCommands extends CommonCommands {
             say("Object not found");
             return;
         }
-        String key = getAndCheckKeyArg(inputLine);
         // if the request does not have new stuff, do old stuff.
         if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
             oldrm(inputLine);
@@ -1766,11 +1785,12 @@ public abstract class StoreCommands extends CommonCommands {
     public static String KEY_SHORTHAND_PREFIX = ">";
     public static String RANDOM_ID_FLAG = "-random_id";
     public static String FORCE_COPY_FLAG = "-f";
+    public static String UPDATE_PERMISSIONS_FLAG = "-p";
 
     /**
      * resolves key shorthand of &amp;key_name or -key key_name
      * returns null if no such key OR if it is not valid in the
-     * key list.
+     * key list. Does <b>not</b> remove the argument from the inputLine!
      *
      * @param inputLine
      * @return
@@ -1886,6 +1906,18 @@ public abstract class StoreCommands extends CommonCommands {
         sayi("Note: The argument idiom '-key key_name' may be replaced with '" + KEY_SHORTHAND_PREFIX + "key_name' as a shorthand");
     }
 
+    /**
+     * Override this as needed to update any permissions for this store.
+     *
+     * @param newID
+     * @param oldID
+     * @param copy  - if true copy the permissions with the new ID. If false, create new ones
+     * @return
+     */
+    protected int updateStorePermissions(Identifier newID, Identifier oldID, boolean copy) {
+        return 0;
+    }
+
     public void copy(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             showCopyHelp();
@@ -1893,8 +1925,10 @@ public abstract class StoreCommands extends CommonCommands {
         }
         boolean forceIt = inputLine.hasArg(FORCE_COPY_FLAG);
         boolean randomID = inputLine.hasArg(RANDOM_ID_FLAG);
+        boolean updatePermissions = inputLine.hasArg(UPDATE_PERMISSIONS_FLAG);
         inputLine.removeSwitch(FORCE_COPY_FLAG);
         inputLine.removeSwitch(RANDOM_ID_FLAG);
+        inputLine.removeSwitch(UPDATE_PERMISSIONS_FLAG);
 
         String sourceString = inputLine.getArg(1); // zero-th arg is name of command.
         String targetString = null;
@@ -1931,8 +1965,15 @@ public abstract class StoreCommands extends CommonCommands {
         }
 
         Identifier newID = doCopy(source, targetId, randomID);
+        int updatedPermissionCount = 0;
+        if (updatePermissions) {
+            updatedPermissionCount = updateStorePermissions(targetId, sourceId, true);
+        }
         if (randomID) {
             say("new copy with id \"" + newID.toString() + "\" created.");
+        }
+        if (updatePermissions) {
+            say(updatedPermissionCount + " permissions updated.");
         }
     }
 
@@ -1966,10 +2007,11 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     private void showCopyHelp() {
-        say("copy source target [" + FORCE_COPY_FLAG + "] [" + RANDOM_ID_FLAG + "] [new_id]");
+        say("copy source target [" + FORCE_COPY_FLAG + "] [" + RANDOM_ID_FLAG + "] [" + UPDATE_PERMISSIONS_FLAG + "] [new_id]");
         sayi("Usage: Copy source to target");
         sayi(FORCE_COPY_FLAG + " - force it, so overwrite if the target exists.");
         sayi(RANDOM_ID_FLAG + " - create a random id for the target.");
+        sayi(UPDATE_PERMISSIONS_FLAG + " - copy any permissions for the target.");
         sayi("new_id - specify the new id. Note if this is present, " + RANDOM_ID_FLAG + " is ignored.");
         sayi("This will create a complete copy of source and store it with the id of target.");
         sayi("Note: This will refuse to do this if target exists.");
@@ -2163,7 +2205,6 @@ public abstract class StoreCommands extends CommonCommands {
         sayi("If you save a result set using the " + SEARCH_RESULT_SET_NAME + " flag in the search");
         sayi("command, you can display it, here or remove it.");
         sayi("Other commands will allow for using the result set ");
-//        sayi(RS_REMOVE_KEY + " remove the stored result set. This does not touch the entries.");
         sayi(RS_LIST_INFO_KEY + " list information about the results sets, such as count and fields");
         sayi(RS_REMOVE_KEY + " remove a set or if a * is given, clear all stored result sets.");
         sayi(RS_SHOW_KEY + " show the given result set. You may give an integer to show that number, a list of ");
@@ -3024,7 +3065,7 @@ public abstract class StoreCommands extends CommonCommands {
     public static String RM_FORCE_FLAG = "-force";
 
     protected void showRMHelp() {
-        say("rm [" + KEY_FLAG + " | " + KEYS_FLAG + " lst] [" + RM_FORCE_FLAG + "] id");
+        say("rm [" + KEY_FLAG + " | " + KEYS_FLAG + " list] [" + RM_FORCE_FLAG + "] id");
         sayi("Usage: remove an object or removes a property (or list of them) from an object.");
         sayi("If you supply a list, all of the properties in the list will be removed");
         sayi("No list of keys means to remove the entire object from the store (!)");
@@ -3033,15 +3074,16 @@ public abstract class StoreCommands extends CommonCommands {
         sayi("     Only use this if the store itself cannot load the object and removing it is the only path forward.");
         showKeyShorthandHelp();
         say("E.g.");
-        sayi("rm " + KEY_SHORTHAND_PREFIX + "error_uri /foo:bar");
+        sayi("rm " + KEY_SHORTHAND_PREFIX + "error_uri foo:bar");
         sayi("Removes the value of the property 'error_uri' from the object with id foo:bar");
         say("E.g.");
         sayi("rm /foo:bar");
         sayi("removes the object with id foo:bar completely from the store");
         say("E.g.");
-        sayi("rm " + KEYS_FLAG + " [error_uri,home_uri] /foo:bar");
+        sayi("rm " + KEYS_FLAG + " [error_uri,home_uri] foo:bar");
         sayi("removes the values of the properties error_uri and home_uri from the object with id");
         sayi("equal to foo:bar");
+        sayi("rm " + RS_REMOVE_KEY);
     }
 
     /**
@@ -3075,6 +3117,90 @@ public abstract class StoreCommands extends CommonCommands {
             say("done");
         } else {
             say("clear store skipped!");
+        }
+    }
+
+    public static class ChangeIDRecord {
+        public Identifiable identifiable;
+        public Identifier newID;
+        public Identifier oldID;
+        public boolean updatePermissions = true;
+        public int updateCount = 0;
+    }
+
+    /**
+     * Does the work of changing the ID for an object. This returns the state object from basic changes (so the
+     * object and it runs the {@link #updateStorePermissions(Identifier, Identifier, boolean)} method,
+     * which you should override as needed. A typical use would be to change the ID's for a client, then use the
+     * returned record to change the approval record.
+     * @param identifiable
+     * @param newID
+     * @param updatePermissions
+     * @return
+     */
+    // Fix https://github.com/ncsa/security-lib/issues/45
+    public ChangeIDRecord doChangeID(Identifiable identifiable, Identifier newID, boolean updatePermissions) {
+        ChangeIDRecord changeIDRecord = new ChangeIDRecord();
+        changeIDRecord.identifiable = identifiable;
+        changeIDRecord.newID = newID;
+        changeIDRecord.updatePermissions = updatePermissions;
+        Identifier oldID = identifiable.getIdentifier();
+        changeIDRecord.oldID = oldID;
+
+        // update the object
+        identifiable.setIdentifier(newID);
+        getStore().save(identifiable);
+        getStore().remove(oldID);
+        // update the state in the CLI
+        if (id != null) {
+            if (id.equals(oldID)) {
+                id = newID;
+            }
+        }
+        // update any permissions
+        if (updatePermissions) {
+            changeIDRecord.updateCount = updateStorePermissions(newID, oldID, false);
+        }
+        return changeIDRecord;
+    }
+
+    /**
+     * Allows changing the identifier for an object. This also updates the permissions that
+     * refer to this if the  {@link #UPDATE_PERMISSIONS_FLAG} is set.
+     *
+     * @param inputLine
+     */
+
+    public void change_id(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            say("change_id new [" + UPDATE_PERMISSIONS_FLAG + " on|off] [old] - change the identifier for a client.");
+            say(UPDATE_PERMISSIONS_FLAG + " if on, change the identifier in any permissions too. Default is on");
+            say("This will update all permissions. At the end of this operations, the");
+            say("old identifier will not be in the system any longer.");
+            return;
+        }
+
+        Boolean updatePermissions = true;
+        if (inputLine.hasArg(UPDATE_PERMISSIONS_FLAG)) {
+            updatePermissions = inputLine.getBooleanNextArgFor(UPDATE_PERMISSIONS_FLAG);
+            if (updatePermissions == null) {
+                say("unrecognized argument for " + UPDATE_PERMISSIONS_FLAG);
+                return;
+            }
+            inputLine.removeSwitch(UPDATE_PERMISSIONS_FLAG);
+        }
+        Identifier newID = BasicIdentifier.newID(inputLine.getArg(1));
+        Identifiable identifiable = findItem(inputLine);
+        Identifier oldID = identifiable.getIdentifier();
+        if (newID.equals(identifiable.getIdentifier())) {
+            say("the source and target are the same, no changes made.");
+            return;
+        }
+        ChangeIDRecord changeIDRecord = doChangeID(identifiable, newID, updatePermissions);
+        say(oldID + " has been changed to " + newID);
+        // update any permissions
+        if (updatePermissions) {
+            say(changeIDRecord.updateCount + " permissions have been updated");
         }
     }
 }

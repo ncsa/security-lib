@@ -3,6 +3,8 @@ package edu.uiuc.ncsa.security.storage.sql.internals;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 
+import java.util.List;
+
 import static java.sql.Types.LONGVARCHAR;
 
 /**
@@ -182,6 +184,32 @@ public abstract class Table  {
                 if (isFirst) {
                     isFirst = false;
                 }
+            }
+        }
+        // finally, add in the primary key.
+        out = out + " WHERE " + getPrimaryKeyColumnName() + "=?";
+        return out;
+    }
+
+    /**
+     * Create a limited update statement from a column map. This will only update those values. Returns
+     * <pre>
+     *     UPDATE fqtable_name SET key1=?, key2=?, ... WHERE primary_key=?;
+     * </pre>
+     * <b>Note</b> you pass in the list of keys because you have to preserve order when setting them.
+     * Maps in Java generally do not guarantee the same key order in loops, so if you do not manage this
+     * directly, you can get random value updates! Note, do not pass in the primary key as one of the keys.
+     * This is set from the table itself.
+     * @param keys
+     * @return
+     */
+    public String createUpdateStatement(List<String> keys) {
+        String out = "UPDATE " + getFQTablename() + " SET ";
+        boolean isFirst = true;
+        for(String key : keys) {
+            out = out + (isFirst ? "" : ", ") + key + "=?";
+            if (isFirst) {
+                isFirst = false;
             }
         }
         // finally, add in the primary key.

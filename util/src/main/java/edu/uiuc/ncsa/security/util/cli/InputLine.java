@@ -36,6 +36,7 @@ public class InputLine {
 
     /**
      * Better constructor with a parameter.
+     *
      * @param v
      */
     public InputLine(List<String> v) {
@@ -67,14 +68,14 @@ public class InputLine {
         Vector<String> vector = new Vector<>();
         while (stringTokenizer.hasMoreTokens()) {
             String token = stringTokenizer.nextToken();
-            if(token.startsWith(LIST_START_DELIMITER)){
+            if (token.startsWith(LIST_START_DELIMITER)) {
                 String x = token;
-                while(!token.contains(LIST_END_DELIMITER)){
+                while (!token.contains(LIST_END_DELIMITER)) {
                     token = stringTokenizer.nextToken();
-                    x =x + token;
+                    x = x + token;
                 }
                 vector.add(x);
-            }else {
+            } else {
                 vector.add(token);
             }
         }
@@ -91,15 +92,16 @@ public class InputLine {
      * <br/><br/>
      * would create 3 arguments "a, b, c". Instead use this with<br/></br>
      * new InputLine("set_param", "-a", "scopes", "a b c");
+     *
      * @param strings
      */
     public InputLine(String... strings) {
-             parsedInput = new ArrayList<>();
-             originalLine = "";
-             for(int i = 0; i < strings.length; i++){
-                 parsedInput.add(strings[i]);
-                 originalLine = originalLine + (i==0?"":" ") +strings[i];
-             }
+        parsedInput = new ArrayList<>();
+        originalLine = "";
+        for (int i = 0; i < strings.length; i++) {
+            parsedInput.add(strings[i]);
+            originalLine = originalLine + (i == 0 ? "" : " ") + strings[i];
+        }
     }
 
     public String getOriginalLine() {
@@ -126,7 +128,7 @@ public class InputLine {
             for (int i = 1; i < parsedInput.size(); i++) {
                 out[i - 1] = parsedInput.get(i);
             }
-        }else{
+        } else {
             return new String[0]; // do not return a null, just an empty array.
         }
         return out;
@@ -161,7 +163,7 @@ public class InputLine {
             return;
         }
         String x = getNextArgFor(value);
-        if(StringUtils.isTrivial(x)){
+        if (StringUtils.isTrivial(x)) {
             // case is that they asked to remove a switch and value but there is no value.
             removeSwitch(value);
             return;
@@ -465,10 +467,33 @@ public class InputLine {
         }
         return getArg(1 + index); // finally, a result!
     }
-      public static final String  SWITCH = "-";
+
+    public static final String SWITCH = "-";
+
+    /**
+     * Converts the argument to a boolean. If the argument is missing or cannot be determined to be a boolean,
+     * a null is returned. This accepts "true", "on", "false", "off" as arguments.
+     *
+     * @param key
+     * @return
+     */
+    public Boolean getBooleanNextArgFor(String key) {
+        String raw = getNextArgFor(key);
+        if (StringUtils.isTrivial(raw)) {
+            return null;
+        }
+        if (raw.equalsIgnoreCase("true") || raw.equalsIgnoreCase("on")) {
+            return Boolean.TRUE;
+        }
+        if (raw.equalsIgnoreCase("false") || raw.equalsIgnoreCase("off")) {
+            return Boolean.FALSE;
+        }
+        return null;
+    }
 
     /**
      * checks if the very next component is an argument, not a switch.
+     *
      * @param key
      * @return
      */
@@ -507,6 +532,7 @@ public class InputLine {
      * Embedded commas are not allowed between list elements. Elements have whitespace trimmed.
      * Note that this processes the <i>entire</i> input line, so that it finds the flag
      * and starts snooping for the start delimeter.
+     *
      * @param flag
      * @return
      */
@@ -520,7 +546,7 @@ public class InputLine {
         // Next bit checks if rather than a list, a single value is passed in.
         // Fixes https://github.com/ncsa/security-lib/issues/29
         String partial = getNextArgFor(flag);
-        if(!partial.startsWith(LIST_START_DELIMITER)){
+        if (!partial.startsWith(LIST_START_DELIMITER)) {
             // then the edge case is that the next argument is not a list,
             // but should be treated as a single argument.
             list.add(partial);
@@ -528,9 +554,9 @@ public class InputLine {
         }
         // The list may have embedded blanks and such, so more parsing is needed
         int ndx = rawLine.indexOf(flag);
-        int nextSwitch = rawLine.indexOf("-",ndx+1);
+        int nextSwitch = rawLine.indexOf("-", ndx + 1);
         int startListIndex = rawLine.indexOf(LIST_START_DELIMITER, ndx);
-        if((-1 < nextSwitch) && (nextSwitch < startListIndex)){
+        if ((-1 < nextSwitch) && (nextSwitch < startListIndex)) {
             // -1 for next switch means this is the last argument
             // -1 < nextSwitch means that there is another switch with a list, like
             // foo -zero -one [a,b,c]
@@ -552,31 +578,33 @@ public class InputLine {
 
     /**
      * Checks if the given flag's argument is a list.
+     *
      * @param flag
      * @return
      */
-    public boolean hasArgList(String flag){
+    public boolean hasArgList(String flag) {
         List<String> list = new ArrayList<>();
-         String rawLine = getOriginalLine();
+        String rawLine = getOriginalLine();
 
-         if (rawLine == null || rawLine.isEmpty()) {
-             return false;
-         }
-         int ndx = rawLine.indexOf(flag);
-         int nextSwitch = rawLine.indexOf("-",ndx+1);
-         int startListIndex = rawLine.indexOf(LIST_START_DELIMITER, ndx);
-         if(startListIndex == -1){
-             return false; // end of story -- no lists anywhere.
-         }
-         if((-1 < nextSwitch) && (nextSwitch < startListIndex)){
-             // -1 for next switch means this is the last argument
-             // -1 < nextSwitch means that there is another switch with a list, like
-             // foo -zero -one [a,b,c]
-             // We don't want a request for -zero to just return the next list.
-             return false;
-         }
-         return true;
+        if (rawLine == null || rawLine.isEmpty()) {
+            return false;
+        }
+        int ndx = rawLine.indexOf(flag);
+        int nextSwitch = rawLine.indexOf("-", ndx + 1);
+        int startListIndex = rawLine.indexOf(LIST_START_DELIMITER, ndx);
+        if (startListIndex == -1) {
+            return false; // end of story -- no lists anywhere.
+        }
+        if ((-1 < nextSwitch) && (nextSwitch < startListIndex)) {
+            // -1 for next switch means this is the last argument
+            // -1 < nextSwitch means that there is another switch with a list, like
+            // foo -zero -one [a,b,c]
+            // We don't want a request for -zero to just return the next list.
+            return false;
+        }
+        return true;
     }
+
     public static void main(String[] args) {
         InputLine inputLine = new InputLine("foo -zero -one [2,3,4] -arf blarf0 -arf blarf1 -arf blarf2 -woof -two [abc,  def, g] -fnord 3455.34665 -three [  a,b,   c]");
 

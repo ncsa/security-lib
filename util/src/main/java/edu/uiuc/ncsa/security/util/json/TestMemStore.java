@@ -3,11 +3,9 @@ package edu.uiuc.ncsa.security.util.json;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
+import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * This is used in various places for testing and debugging. It ends up here because of test re-usability
@@ -16,6 +14,10 @@ import java.util.List;
  * on 6/6/19 at  6:23 PM
  */
 public class TestMemStore<V extends JSONEntry> extends HashMap<Identifier, V> implements JSONStore<V> {
+    @Override
+    public void update(List<Identifier> ids, Map<String, Object> values) throws UnregisteredObjectException {
+
+    }
 
     @Override
     public List<V> getAll() {

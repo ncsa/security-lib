@@ -28,6 +28,11 @@ public class AggregateStore<V extends Store> implements Store {
     }
 
     @Override
+    public void update(List ids, Map values) throws UnregisteredObjectException {
+       throw new NotImplementedException("implement me!");
+    }
+
+    @Override
     public boolean removeByID(List objects) {
         throw new NotImplementedException("Error: This is not yet implemented for aggregate stores");
     }

@@ -100,8 +100,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
      * @param value
      */
     public void update(V value) {
-            update(value, false);
+        update(value, false);
     }
+
     public void update(V value, boolean existenceChecked) {
 
         if (!existenceChecked && !containsValue(value)) {
@@ -124,30 +125,84 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         }
     }
 
+    @Override
+    public void update(List<Identifier> ids, Map<String, Object> map) throws UnregisteredObjectException {
+        List<String> keys = new ArrayList<>(map.size());
+        // we peel the keys off since we have to manage the order of them and it is not guaranteed in Java
+        keys.addAll(map.keySet());
+        List<Object> values = new ArrayList<>(map.size());
+        for(String key : keys){
+            // lay them out in order and make sure SQL can understand them
+            values.add(getAsSQLObject(map.get(key)));
+        }
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+        /*
+        String insertEmployeeSQL = "INSERT INTO EMPLOYEE(ID, NAME, DESIGNATION) "
+ + "VALUES (?,?,?)";
+PreparedStatement employeeStmt = connection.prepareStatement(insertEmployeeSQL);
+for(int i = 0; i < EMPLOYEES.length; i++){
+    String employeeId = UUID.randomUUID().toString();
+    employeeStmt.setString(1,employeeId);
+    employeeStmt.setString(2,EMPLOYEES[i]);
+    employeeStmt.setString(3,DESIGNATIONS[i]);
+    employeeStmt.addBatch();
+}
+employeeStmt.executeBatch();
+         */
+        try {
+
+            PreparedStatement stmt = c.prepareStatement(getTable().createUpdateStatement(keys));
+            for(int i = 0; i < ids.size(); i++){
+                for(int j = 0; j < values.size(); j++){
+                    stmt.setObject(j+1, values.get(j));
+                }
+                stmt.setString(values.size(), ids.get(i).toString());
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
+            stmt.close();
+            releaseConnection(cr);
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error in mass update :"   + e.getMessage() , e);
+        }
+
+    }
+
     public void setUpdateValues(V value, PreparedStatement stmt) throws SQLException {
         ColumnMap map = depopulate(value);
         int i = 1;
         for (ColumnDescriptorEntry cde : getTable().getColumnDescriptor()) {
             // now we loop through the table and set each and every one of these
             if (!cde.isPrimaryKey()) {
-                Object obj = map.get(cde.getName());
-                // Dates confuse setObject, so turn it into an SQL Timestamp object.
-                boolean gotOne = false;
-                if (obj instanceof Date) {
-                    obj = new Timestamp(((Date) obj).getTime());
-                }
-                if (obj instanceof BasicIdentifier) {
-                    obj = obj.toString();
-                }
-                if (obj instanceof StatusValue) {
-                    obj = ((StatusValue) obj).getStatus();
-                }
-                    stmt.setObject(i++, obj);
+                Object obj = getAsSQLObject(map.get(cde.getName()));
+                stmt.setObject(i++, obj);
             }
         }
 
         // now set the primary key
         stmt.setString(i++, value.getIdentifierString());
+    }
+
+    /**
+     * Turn into an object that can be set in an SQL statement.
+     * @param oldObject
+     * @return
+     */
+    private static Object getAsSQLObject(Object oldObject) {
+        Object obj = oldObject;
+        // Dates confuse setObject, so turn it into an SQL Timestamp object.
+        if (obj instanceof Date) {
+            obj = new Timestamp(((Date) obj).getTime());
+        }
+        if (obj instanceof BasicIdentifier) {
+            obj = obj.toString();
+        }
+        if (obj instanceof StatusValue) {
+            obj = ((StatusValue) obj).getStatus();
+        }
+        return obj;
     }
 
 
@@ -191,6 +246,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     /**
      * Sets the values in the {@link PreparedStatement} to those in the value. This allows
      * other utilities to create batch statements for this store.
+     *
      * @param stmt
      * @param value
      * @throws SQLException
@@ -211,9 +267,10 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         }
 
     }
+
     public void register(V value) {
-        if(value.isReadOnly()){
-        throw  new IllegalAccessException(value.getIdentifierString() + " is read only");
+        if (value.isReadOnly()) {
+            throw new IllegalAccessException(value.getIdentifierString() + " is read only");
         }
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
@@ -553,6 +610,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     /**
      * remove a collection of items by primary key. This uses SQL batching and should be used for large
      * sets. {@link #remove(List)} takes a list of objects and makes a very long list of things to remove.
+     *
      * @param ids
      * @return
      */
@@ -565,7 +623,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             PreparedStatement stmt = c.prepareStatement(query);
             for (Identifier id : ids) {
                 // Reminder that parameters have index origin 1
-                stmt.setString( 1, id.toString());
+                stmt.setString(1, id.toString());
                 stmt.addBatch();
             }
             int[] rcs = stmt.executeBatch();
@@ -578,36 +636,15 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         return true;
 
     }
+
     // Fix https://github.com/ncsa/security-lib/issues/44
     public boolean remove(List<V> objects) {
-        if(objects.size() == 0) return true; // do nothing
+        if (objects.size() == 0) return true; // do nothing
         List<Identifier> ids = new ArrayList<>(objects.size());
-        for(int i = 0; i < objects.size(); i++) {
+        for (int i = 0; i < objects.size(); i++) {
             ids.add(objects.get(i).getIdentifier());
         }
         return removeByID(ids); // do it as a batch call.
-/*
-        String inSql = String.join(",", Collections.nCopies(objects.size(), "?"));
-        inSql = "(" + inSql + ")";
-        String query = "DELETE FROM " + getTable().getFQTablename() + " WHERE " + getTable().getPrimaryKeyColumnName() + " IN " + inSql;
-        ConnectionRecord cr = getConnection();
-        Connection c = cr.connection;
-
-        try {
-            PreparedStatement stmt = c.prepareStatement(query);
-            for (int i = 0; i < objects.size(); i++) {
-                // Reminder that parameters have index origin 1
-                stmt.setString(i + 1, objects.get(i).getIdentifierString());
-            }
-            stmt.execute();
-            stmt.close();
-            releaseConnection(cr);
-        } catch (SQLException e) {
-            destroyConnection(cr);
-            throw new GeneralException("Error removing list", e);
-        }
-        return true;
-*/
     }
 
     public V remove(Object key) {
@@ -872,11 +909,11 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
 
     @Override
     public List<V> getMostRecent(int n, List<String> attr) {
-        if(getCreationTSField() == null){
+        if (getCreationTSField() == null) {
             throw new UnsupportedOperationException("This store does not support this operation.");
         }
         List<V> values = new ArrayList<>();
-        if(n==0){
+        if (n == 0) {
             return values;
         }
         String attributes;
@@ -897,7 +934,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         Connection c = cr.connection;
         V t = null;
         try {
-            PreparedStatement stmt = c.prepareStatement(getMostRecentStatement(attributes, 0<n));
+            PreparedStatement stmt = c.prepareStatement(getMostRecentStatement(attributes, 0 < n));
             stmt.setInt(1, Math.abs(n));
             stmt.executeQuery();
             ResultSet rs = stmt.getResultSet();
@@ -914,19 +951,20 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             releaseConnection(cr);
         } catch (SQLException e) {
             destroyConnection(cr);
-            throw new GeneralException("Error getting " + (0<n?" first ":" last ") + Math.abs(n) + " objects", e);
+            throw new GeneralException("Error getting " + (0 < n ? " first " : " last ") + Math.abs(n) + " objects", e);
         }
         return values;
     }
 
-    protected String getMostRecentStatement(String attributes, boolean desc){
+    protected String getMostRecentStatement(String attributes, boolean desc) {
         if (getConnectionPool().getType() == ConnectionPool.CONNECTION_TYPE_DEBRY) {
-             return getDerbyMostRecent(attributes, desc);
+            return getDerbyMostRecent(attributes, desc);
         }
-        return "select " + attributes + " from " + getTable().getFQTablename()  + " order by " + getCreationTSField() + (desc?" desc ": " asc ") + "  limit ?";
+        return "select " + attributes + " from " + getTable().getFQTablename() + " order by " + getCreationTSField() + (desc ? " desc " : " asc ") + "  limit ?";
     }
-    protected String getDerbyMostRecent(String attrbutes, boolean desc){
-        return "select " + attrbutes + " from " + getTable().getFQTablename() + " order by " +  getCreationTSField() + (desc?" desc ": " asc ") + " fetch first ? rows only";
+
+    protected String getDerbyMostRecent(String attrbutes, boolean desc) {
+        return "select " + attrbutes + " from " + getTable().getFQTablename() + " order by " + getCreationTSField() + (desc ? " desc " : " asc ") + " fetch first ? rows only";
     }
 
     /**
@@ -935,11 +973,12 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
      * and anything that ends with a ; is a statement. Mostly the assumption
      * is that this is a set of table create statements and ceate index statements.
      * Anything else is at your own risk.
-     * @param fileName  either the name of a resource or the fully qualified path to the file.
+     *
+     * @param fileName either the name of a resource or the fully qualified path to the file.
      * @return
      * @throws Throwable
      */
-    public static List<String> crappySQLParser(String fileName)  {
+    public static List<String> crappySQLParser(String fileName) {
         try {
             // try to get it as a resource first. Then as a file
             ClassLoader classloader = Thread.currentThread().getContextClassLoader();
@@ -958,48 +997,49 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
                 br.close();
             }
             return crappySQLParser(raw);
-        }catch (Throwable t){
-            if(t instanceof RuntimeException){
-                throw (RuntimeException)t;
+        } catch (Throwable t) {
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
             }
             throw new GeneralException("error reading SQL script \"" + fileName + "\" (" + t.getClass().getSimpleName() + "):" + t.getMessage());
         }
     }
-    public static List<String> crappySQLParser(List<String> script){
-          String stmtEnd = ";";
-          String lineComment = "--";
-          String startMLC = "/*";
-          String endMLC = "*/";
-          StringBuilder currentStatement = new StringBuilder();
-          boolean inMultilineComment = false;
-          ArrayList<String> statements = new ArrayList<>();
-          for(String x : script){
-             x = x.trim();
-             // skip any comments
-              if(x.endsWith(endMLC)){
-                  inMultilineComment = false;
-                  continue;
-              }
-             if(x.startsWith(lineComment) || inMultilineComment){
-                 continue;
-             }
-             if(x.startsWith(startMLC)){
-                 inMultilineComment = true;
-                 continue;
-             }
 
-             if(x.isEmpty() || x.isBlank()){
-                 continue;
-             }
-             // finally, start accumulating things
-             if(x.endsWith(stmtEnd)){
-                 currentStatement.append(x.substring(0,x.length()-1)); // when executing SQL statements, JDBC requires they do NOT end in ;, so strip it.
-                   statements.add(currentStatement.toString());
-                   currentStatement = new StringBuilder();
-             }else{
-                 currentStatement.append(x + "\n");
-             }
-          }
-          return statements;
-      }
+    public static List<String> crappySQLParser(List<String> script) {
+        String stmtEnd = ";";
+        String lineComment = "--";
+        String startMLC = "/*";
+        String endMLC = "*/";
+        StringBuilder currentStatement = new StringBuilder();
+        boolean inMultilineComment = false;
+        ArrayList<String> statements = new ArrayList<>();
+        for (String x : script) {
+            x = x.trim();
+            // skip any comments
+            if (x.endsWith(endMLC)) {
+                inMultilineComment = false;
+                continue;
+            }
+            if (x.startsWith(lineComment) || inMultilineComment) {
+                continue;
+            }
+            if (x.startsWith(startMLC)) {
+                inMultilineComment = true;
+                continue;
+            }
+
+            if (x.isEmpty() || x.isBlank()) {
+                continue;
+            }
+            // finally, start accumulating things
+            if (x.endsWith(stmtEnd)) {
+                currentStatement.append(x.substring(0, x.length() - 1)); // when executing SQL statements, JDBC requires they do NOT end in ;, so strip it.
+                statements.add(currentStatement.toString());
+                currentStatement = new StringBuilder();
+            } else {
+                currentStatement.append(x + "\n");
+            }
+        }
+        return statements;
+    }
 }

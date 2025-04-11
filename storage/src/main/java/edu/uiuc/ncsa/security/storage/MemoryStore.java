@@ -6,10 +6,7 @@ import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * An in-memory store. This is useful in several different ways and is in effect
@@ -182,4 +179,8 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
         return true;
     }
 
+    @Override
+    public void update(List<Identifier> ids, Map<String, Object> values) throws UnregisteredObjectException {
+     GenericStoreUtils.update(this, ids, values);
+    }
 }

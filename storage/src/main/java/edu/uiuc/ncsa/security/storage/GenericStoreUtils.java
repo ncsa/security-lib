@@ -1,8 +1,7 @@
 package edu.uiuc.ncsa.security.storage;
 
-import edu.uiuc.ncsa.security.core.DateComparable;
-import edu.uiuc.ncsa.security.core.Identifiable;
-import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.*;
+import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 
 import java.util.*;
@@ -170,5 +169,28 @@ public class GenericStoreUtils {
 
     public static void fromXMLAndSave(Store store, XMLMap map){
         store.save(fromXML(store, map));
+    }
+
+    /**
+     * Generic implementation of {@link Store#update(List, Map)} and will loop through the elements doing the update
+     * one at a time. If the store has the capability at all for batch processing, implement it. This is for things
+     * like {@link MemoryStore}s and {@link FileStore}s that have no such ability. Note that part of the contract is
+     * that the element must exist and an exception is thrown of there is no such element.
+     * @param store
+     * @param ids
+     * @param values
+     */
+    public static <V extends Identifiable> void  update(Store<V>  store, List<Identifier> ids, Map<String, Object>  values){
+        XMLConverter<V> xmlConverter = store.getXMLConverter();
+        for(Identifier id : ids){
+            V v = store.get(id);
+              if(v==null){
+                  throw new UnregisteredObjectException("No object in the store with id "+id+" found for update");
+              }
+              Map<String, Object> oldObject = new HashMap<>();
+              xmlConverter.toMap(v, oldObject);
+              oldObject.putAll(values);
+              store.save(xmlConverter.fromMap(oldObject, null)); // creates a new object
+        }
     }
 }

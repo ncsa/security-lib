@@ -41,6 +41,15 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
     public void update(V value);
 
     /**
+     * Mass update. For each id, update the keys with the new values. At the end of this operation, every entry in the id list
+     * has the same (key, value) pairs. This is used in processing StoreCommands RSRecords.
+     * @param ids
+     * @param values
+     * @throws UnregisteredObjectException
+     */
+    public void update(List<Identifier> ids, Map<String, Object>  values) throws UnregisteredObjectException;
+
+    /**
      * Almost Identical to put(K,V) but since the object should have an identifier, passing along the key is redundant.
      * This persists the object in the store. Note that this returns void since the contract assumes that this is not
      * registered. If the object is registered an exception should be thrown. Generally use save(V).
@@ -96,7 +105,8 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
     public int size(boolean includeVersions);
 
     /**
-     * Removes a list of identifiable objects.
+     * Removes a list of identifiable objects. I.e., it will grab the {@link Identifier}s
+     * from the objects and pass this to {@link #removeByID(List)}.
      * @param objects
      * @return
      */

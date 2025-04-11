@@ -37,12 +37,10 @@ public class ColumnMap extends HashMap<String, Object> implements ConversionMap<
     }
 
     public String getString(String key) {
-
         Object obj = get(key);
         if (obj == null) return null;
         if (obj instanceof String) return (String) obj;
         return obj.toString();
-
     }
 
     /**
