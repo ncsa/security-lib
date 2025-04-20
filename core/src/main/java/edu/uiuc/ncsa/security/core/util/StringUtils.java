@@ -965,4 +965,7 @@ public class StringUtils {
         int padLeft = (width - text.length()) / 2;
         return getBlanks(padLeft) + text + getBlanks(width - text.length() - padLeft);
     }
+    public static String center(Integer value, int width) {
+        return center(value.toString(), width);
+    }
 }

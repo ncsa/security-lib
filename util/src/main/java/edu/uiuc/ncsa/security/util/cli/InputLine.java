@@ -35,7 +35,8 @@ public class InputLine {
     }*/
 
     /**
-     * Better constructor with a parameter.
+     * Better constructor with a parameter. This takes an already parsed list of strings
+     * and creates an instance of this class from it.
      *
      * @param v
      */
@@ -64,7 +65,14 @@ public class InputLine {
      */
     public InputLine(String unparsedString) {
         originalLine = unparsedString;
-        StringTokenizer stringTokenizer = new StringTokenizer(unparsedString, DELIMITER);
+        reparse();
+    }
+
+    /**
+     * If the original line is altered, reparse it.
+     */
+    public void reparse(){
+        StringTokenizer stringTokenizer = new StringTokenizer(originalLine, DELIMITER);
         Vector<String> vector = new Vector<>();
         while (stringTokenizer.hasMoreTokens()) {
             String token = stringTokenizer.nextToken();
@@ -83,9 +91,9 @@ public class InputLine {
     }
 
     /**
-     * For use with constructing more complex command lines. The issue with {@link #InputLine(String)}
+     * (Special case.) For use with constructing more complex command lines. The issue with {@link #InputLine(String)}
      * is that the assumed control flow is from the command line, where Java will parse the input then
-     * call {@link #InputLine(Vector)}. So it is not possible to create a command line with components.
+     * call {@link #InputLine(List)}. So it is not possible to create a command line with components.
      * <br/><br/>
      * E.g.
      * new InputLine("set_param -a scopes \"a b c\"");
@@ -108,6 +116,11 @@ public class InputLine {
         return originalLine;
     }
 
+    /**
+     * Sets the original line. This is useful if there has to be some specialized processing of
+     * it. Be sure to call {@link #reparse()} if you update it.
+     * @param originalLine
+     */
     public void setOriginalLine(String originalLine) {
         this.originalLine = originalLine;
     }
@@ -233,6 +246,12 @@ public class InputLine {
         return this;
     }
 
+    public InputLine removeLastArg() {
+        if (parsedInput != null) {
+            removeArgAt(getArgCount());
+        }
+        return this;
+    }
     @Override
 
     public String toString() {

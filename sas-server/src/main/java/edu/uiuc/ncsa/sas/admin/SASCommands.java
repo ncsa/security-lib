@@ -20,7 +20,7 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.KeyPair;
-import java.security.KeyStore;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -165,5 +165,10 @@ public class SASCommands extends StoreCommands {
         CLIDriver driver = new CLIDriver(SASCommands);
 
         driver.start();
+    }
+
+    @Override
+    protected List processList(InputLine inputLine, String key) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

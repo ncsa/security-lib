@@ -707,7 +707,7 @@ public class CLIDriver {
                             return USER_EXIT_RC;
                         }
                         if (itx.getCause() != null) {
-                            say("Exception. The cause is: " + itx.getCause().getMessage());
+                            say(itx.getCause().getMessage());
                         } else {
                             say("Invocation target exception encountered:" + itx.getTargetException());
                         }

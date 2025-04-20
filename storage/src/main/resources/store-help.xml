@@ -96,7 +96,7 @@ List the keys for all the properties of this object.]]>
 List the current object or other objects.]]>
     </body>
     </entry>
-    <entry id="rename">
+    <entry id="change_id">
     <body>
     <![CDATA[Command.
 Change the id of the current object. Note that this should only be done with
@@ -121,8 +121,11 @@ See also: results]]>
     </entry>
     <entry id="results">
     <body>
-    <![CDATA[Results are sets of output from a search that are named and may be
-queried separately. You create them in searches using the -rs name flag, e.g.
+    <![CDATA[Results are static sets of output from a search that are named and may be
+queried separately.
+Creation and management
+-----------------------
+You create them in searches using the -rs name flag, e.g.
 
 admins> search >admin_id -r .*caltech.* -rs ligo
 
@@ -130,17 +133,17 @@ would search (in the admins store) the property name admin_id for any entry incl
 and stash the results in a result set named "ligo". You may now use the rs command
 to navigate this result set. You may have as many result sets as you like.
 
-You may also restrict the results to a subset of properties with the -out flag.
+You may also restrict the results to a subset of properties with the -attr flag.
 
-admins> search >admin_id -out [allow_qdl,name] -r .*caltech.* -rs qdl_check
+admins> search >admin_id -attr [allow_qdl,name] -r .*caltech.* -rs qdl_check
 
 would search on the admin_id and the result set would have the two properties
 listed. Showing the result set then only has those.
 
-admins>rs -list foo
+admins>rs list foo
   foo: 56 entries,  fields=[allow_qdl, name]
 
-admins> rs -show [11,17] foo
+admins> rs show [11,17] foo
     11. true  | Test admin client caltech-IGWN
     12. true  | Test admin client caltech/LIGO
     13. false | IGWN admin for VIRGO 1
@@ -154,6 +157,37 @@ the end of the list, whichever comes first).
 The -show flag also allows for displaying subsets but be warned that if you searched for
 a subset of properties, then only those are available. You may restrict to a subset of those,
 but cannot display properties you do not have.
+
+Result sets as arguments
+------------------------
+Most commands allow you to specify a result set or subset as an argument. The basic syntax is
+-rs name (-- | -range) (list | integer)
+where name is the name and the range is either a single integer giving the index in the set or a
+list of them. Be aware that some commands only accept a single object (e.g. changing and id, which
+would give multiple objects the same id.)
+
+Lists
+-----
+Lists are actually valid QDL, though are restricted to being un-nested. You could
+therefore list the elements of a result set named X from 1 through 6 as
+
+rs show -range [1;7] X
+
+Negative indices are allowed, which reference element from the end of the set
+
+rs show -range -1 X
+
+references the last element of the set X.
+
+Similarly you could do a mass update as
+
+update >debug_on -value false -rs X
+
+would set the debug_on flag to false for every element in X
+
+Caveat: Result sets are static! This means that an update will update the stored
+        objects that the result set references. If you alter the stored object(s)
+        you will need to refresh your result set accordingly.
 ]]>
     </body>
     </entry>

@@ -6,6 +6,8 @@ import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
+import net.sf.json.JSON;
+import net.sf.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
@@ -115,5 +117,37 @@ public class MapConverter<V extends Identifiable> implements XMLConverter<V> {
         System.err.print("MapConverter.toMap(): failed for " + data);
         throw new NotImplementedException("Error: not implement for non ConversionMap objects");
 
+    }
+
+    /**
+     * Convenience method to stash the map in a JSON object.
+     * @param v
+     * @return
+     */
+    public JSON toJSON(V v) {
+        ColumnMap cMap = new ColumnMap();
+
+        toMap(v, cMap);
+        JSONObject json = new JSONObject();
+        json.putAll(cMap);
+        return json;
+    }
+
+    /**
+     * Convenience method to take a JSON object (made with {@link #toJSON(Identifiable)}!) and
+     * return on object of the given type.
+     * @param json
+     * @param v
+     * @return
+     */
+    public V fromJSON(JSONObject json, V v) {
+        ColumnMap cMap = new ColumnMap();
+        cMap.putAll(json);
+        fromMap(cMap, v);
+        return v;
+    }
+    public boolean isA(Object object){
+        V v = createIfNeeded(null);
+        return object.getClass().isInstance(v);
     }
 }

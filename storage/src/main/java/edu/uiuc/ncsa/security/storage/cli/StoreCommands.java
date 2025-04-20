@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
+import edu.uiuc.ncsa.security.core.exceptions.ObjectNotFoundException;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.storage.MonitoredStoreInterface;
 import edu.uiuc.ncsa.security.storage.XMLMap;
@@ -314,20 +315,17 @@ public abstract class StoreCommands extends CommonCommands {
         say("serialize  [-file path] index");
         sayi("Usage: XML serializes an object and either shows it on the ");
         sayi("   command line or put it in a file. Cf. deserialize.");
+        printIndexHelp(true);
         sayi("See also: deserialize.");
     }
 
-    public void serialize(InputLine inputLine) {
+    public void serialize(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showSerializeHelp();
             return;
         }
-        Identifiable x = findItem(inputLine);
-        if (x == null) {
-            say("object not found");
-            return;
-        }
-        serialize(inputLine, x);
+
+        serialize(inputLine, findSingleton(inputLine));
     }
 
     protected void showDeserializeHelp() {
@@ -413,12 +411,12 @@ public abstract class StoreCommands extends CommonCommands {
     public static final String SEARCH_SHORT_REGEX_FLAG = "-r";
     public static final String SEARCH_SIZE_FLAG = "-size";
     public static final String SEARCH_DEBUG_FLAG = "-debug";
-    public static final String SEARCH_RETURNED_ATTRIBUTES_FLAG = "-out";
+    public static final String SEARCH_RETURNED_ATTRIBUTES_FLAG = "-attr";
     public static final String SEARCH_RESULT_SET_NAME = "-rs";
     /**
      * Used as a command line switch to name a result set.
      */
-    public static final String SEARCH_RESULT_ARG_KEY = "-rs";
+    public static final String RESULT_SET_KEY = "-rs";
     public static final String SEARCH_BEFORE_TS_FLAG = "-before";
     public static final String SEARCH_AFTER_TS_FLAG = "-after";
     public static final String SEARCH_DATE_FLAG = "-date";
@@ -431,7 +429,7 @@ public abstract class StoreCommands extends CommonCommands {
         this.resultSets = resultSets;
     }
 
-    protected HashMap<String, RSRecord> resultSets = new HashMap<>();
+    protected static HashMap<String, RSRecord> resultSets = new HashMap<>();
     String tzOffset = null;
 
     public void search(InputLine inputLine) {
@@ -539,7 +537,7 @@ public abstract class StoreCommands extends CommonCommands {
             }
             if (storeRS) {
                 if (returnedAttributes == null) {
-                    returnedAttributes = getSerializationKeys().allKeys(); // no attributes specified means get them all.
+                    returnedAttributes = getKeys().allKeys(); // no attributes specified means get them all.
                 }
                 resultSets.put(rsName, new RSRecord(values, returnedAttributes));
                 say("got " + values.size() + " match" + (values.size() == 1 ? "." : "es."));
@@ -599,8 +597,7 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     /**
-     * If limits is empty or null, show everything. If limits has an element, that is the number of things to show
-     * starting at 0. If it has two elements, the zeroth is the start, the 1st is that stop index.
+     * If limits is empty or null, show everything. Limits contains the indices to show.
      *
      * @param inputLine
      * @param values
@@ -611,7 +608,7 @@ public abstract class StoreCommands extends CommonCommands {
     public boolean printRS(InputLine inputLine,
                            List<Identifiable> values,
                            List<String> returnedAttributes,
-                           List<Integer> limits) {
+                           List limits) {
         if (values.isEmpty()) {
             say("no matches");
             return true;
@@ -621,23 +618,42 @@ public abstract class StoreCommands extends CommonCommands {
             return true;
         }
         boolean hasAttributes = !(returnedAttributes == null || returnedAttributes.isEmpty());
-        int start = 0;
-        int stop = values.size();
-        if (limits != null && !limits.isEmpty()) {
-            if (limits.size() == 1) {
-                stop = Math.min(values.size(), limits.get(0));
-            } else {
-                start = Math.max(0, limits.get(0));
-                stop = Math.min(values.size(), limits.get(1));
-            }
-        }
         boolean longFormat = inputLine.hasArg(VERBOSE_COMMAND) || inputLine.hasArg(LINE_LIST_COMMAND);
         List<List<String>> table = null;
         if (hasAttributes) {
             table = new ArrayList<>();
         }
+        int start = 0;
+        if (limits == null) {
+            limits = new ArrayList<>(values.size());
+            for (int i = 0; i < values.size(); i++) {
+                limits.add(i);
+            } // makes an iterator so show everything
+        } else {
 
-        for (int i = start; i < stop; i++) {
+            start = ((Long) limits.get(0)).intValue();
+        }
+        // get start in the right range
+        while (start < 0) {
+            start = start + values.size();
+        }
+        for (Object key : limits) {
+
+            int i;
+            if (key instanceof Integer) {
+                i = ((Integer) key).intValue();
+            } else {
+                if (key instanceof Long) {
+                    i = ((Long) key).intValue();
+                } else {
+                    throw new IllegalArgumentException("list values must be integers");
+                }
+            }
+            int ii = i;
+            while (ii < 0) {
+                ii = ii + values.size(); // get in the right range
+            }
+            i = ii;
             Identifiable identifiable = values.get(i);
             if (longFormat) {
                 longFormat(identifiable, returnedAttributes, inputLine.hasArg(VERBOSE_COMMAND));
@@ -664,7 +680,7 @@ public abstract class StoreCommands extends CommonCommands {
                 }
 
             }
-        }
+        } //end for loop
         if (hasAttributes) {
             List<String> formattedTable = StringUtils.formatTable(returnedAttributes, table, 40, true);
             // **(%@ Java and its Math functions.
@@ -702,14 +718,32 @@ public abstract class StoreCommands extends CommonCommands {
 
         public List<Identifiable> rs;
         public List<String> fields;
+
+        public List<Identifiable> getSubset(List indices) {
+            List<Identifiable> out = new ArrayList<>(rs.size());
+            for (Object key : indices) {
+                if (key instanceof Integer) {
+                    out.add(rs.get((Integer) key));
+                } else {
+                    if (key instanceof Long) {
+                        out.add(rs.get(((Long) key).intValue()));
+
+                    } else {
+                        throw new IllegalArgumentException("list values must be integers");
+                    }
+                }
+            }
+            return out;
+        }
     }
 
 
-    public void edit(InputLine inputLine) {
+    public void edit(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("edit [id | index]");
-            sayi("Usage: Edit an object in an external editor.");
+            say("edit index");
+            sayi("Usage: Edit a single object in an external editor.");
             sayi("Note that this will update the object on exiting the editor");
+            printIndexHelp(true);
         }
         File tempFile;
         try {
@@ -721,11 +755,7 @@ public abstract class StoreCommands extends CommonCommands {
             say("could not open file:" + iox.getMessage());
             return;
         }
-        Identifiable x = findItem(inputLine);
-        if (x == null) {
-            say("sorry, but that object was not found -- please check the id.");
-            return;
-        }
+        Identifiable x = findSingleton(inputLine);
         XMLMap c = new XMLMap();
         getStore().getXMLConverter().toMap(x, c);
         try {
@@ -785,42 +815,27 @@ public abstract class StoreCommands extends CommonCommands {
      * @param inputLine
      * @throws IOException
      */
-    protected void oldUpdate(InputLine inputLine) throws IOException {
+    protected void oldUpdate(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showUpdateHelp();
             return;
         }
+        List<Identifiable> identifiables = findItem(inputLine);
 
-        Identifiable identifiable = findItem(inputLine);
-        if (identifiable == null) {
+        if (identifiables == null) {
             say("You must supply the index or id of the item to update");
             return;
         }
-        for (int i = 0; i < inputLine.size(); i++) {
-            // now that people can specify keys and values, there are types. if there
-            // is a type, don't make the user jump through every property of their object.
-            if (inputLine.getArg(i).startsWith("-")) {
-                say("Unknown command line switch. Aborting.");
-                return;
-            }
+        // Note that the contract should be that a clone is passed in and that is saved if the user
+        // decides to. This allows rollbacks.
+        Identifiable identifiable1 = identifiables.get(0).clone();
+        if (update(identifiable1)) {
+            getStore().save(identifiable1);
+            clearEntries(); // CIL-240: Remove entries so the updated item is displayed.
         }
-        if (identifiable != null) {
-            // Note that the contract should be that a clone is passed in and that is saved if the user
-            // decides to.
-            Identifiable identifiable1 = identifiable.clone();
-            if (update(identifiable1)) {
-                getStore().save(identifiable1);
-                clearEntries(); // CIL-240: Remove entries so the updated item is displayed.
-            }
-            return;
-        }
+        return;
 
-        say("no object with that index or id found. Please try again");
 
-    }
-
-    public Identifiable createNew() {
-        return this.getStore().create();
     }
 
     /**
@@ -861,7 +876,7 @@ public abstract class StoreCommands extends CommonCommands {
         Identifier oldID = identifiable.getIdentifier();
 
         identifiable.setDescription(getPropertyHelp(keys.description(), "enter description", identifiable.getDescription()));
-        extraUpdates(identifiable, magicNumber);
+        extraUpdates(identifiable, magicNumber); // all the other properties
         say("here is the complete object:");
         longFormat(identifiable);
         if (!newIdentifier.equals(identifiable.getIdentifierString())) {
@@ -1161,15 +1176,30 @@ public abstract class StoreCommands extends CommonCommands {
             showSetIDHElp();
             return;
         }
-        String rawID = inputLine.getLastArg();
+        String lastArg = inputLine.getLastArg();
+        List<Identifiable> identifiables = findItem(inputLine);
+        Identifier rawID = null;
+        // handle getting it from a result set first.
+        if (identifiables != null) {
+            if (1 < identifiables.size()) {
+                say("too many arguments, only one may be set.");
+                return;
+            }
+            rawID = identifiables.get(0).getIdentifier();
+            setID(rawID);
+            return;
+        }
+        // try to get it directly
         if (rawID.equals("set_id")) {
             // they forgot an argument
             say("sorry, but you have to supply an id to set.");
             return;
         }
+
+
         int index = -1;
         try {
-            index = Integer.parseInt(rawID);
+            index = Integer.parseInt(lastArg);
             if (0 <= index && allEntries.size() < index) {
                 setID(allEntries.get(index).getIdentifier());
             } else {
@@ -1177,28 +1207,16 @@ public abstract class StoreCommands extends CommonCommands {
                 return;
             }
         } catch (NumberFormatException nfx) {
-            if (rawID.startsWith("/")) {
-                rawID = rawID.substring(1);
+            if (lastArg.startsWith("/")) {
+                lastArg = lastArg.substring(1);
             }
-            setID(BasicIdentifier.newID(rawID));
+            setID(BasicIdentifier.newID(lastArg));
             if (!getStore().containsKey(getID())) {
                 say("warning: unknown id ");
             }
             // alles ok...
         }
-        // Identifier set, check that if it exists.
-/*
-        Identifiable thingy = findItem(inputLine);
-        if (thingy != null) {
-            rawID = thingy.getIdentifierString();
-        } else {
-            rawID = inputLine.getLastArg();
-            if (rawID.startsWith("/")) {
-                rawID = rawID.substring(1);
-            }
-        }
-        id = BasicIdentifier.newID(rawID);
-*/
+
         if (id == null) {
             say("warning: no identifier set");
             return;
@@ -1213,10 +1231,12 @@ public abstract class StoreCommands extends CommonCommands {
         say("use this identifier unless it is cleared or you explicitly override it.");
         say("The arguments may be the id, the escaped version (commonly used elsewhere, starts with \"/\") or the index.");
         say("The result will be the actual id of the object.");
+        printIndexHelp(true);
         say("E.g.");
         say("set_id 3 --  sets the id to the 3rd object in the most recent ls command");
         say("set_id /foo:bar -- sets the id to foo:bar");
         say("set_id foo:bar -- sets the id to foo:bar");
+        say("set_id " + RESULT_SET_KEY + " ligo " + RS_RANGE_KEY + " 2 -- sets the id to the second entry of the result set.");
         say("See also: clear_id, get_id");
     }
 
@@ -1239,14 +1259,129 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     /**
+     * This will find an object <b><i>in the given store</i></b> assuming the name is an identifier.
+     * Failing that, it tries to find a result set with that name. If there is no such element,
+     * a null is returned, rather than raising an error, so you can, e.g. prompt the user
+     * or some such.
+     * <p>
+     * This is used for positional argument, like
+     * </p>
+     * <pre>
+     *     link_clients my_rs foo:/bar/baz
+     * </pre>
+     * which allows the command to get the result set my_rs and iterate over it, applying the operation
+     * with the other argument.
+     *
+     * @param name
+     * @return
+     */
+    // Nota Bene: This is not used in the class, but in subclasses.
+    protected List<Identifiable> findByIDOrRS(Store store, String name) {
+        Identifiable identifiable = (Identifiable) store.get(BasicIdentifier.newID(name));
+        if (identifiable == null) {
+            RSRecord rs = getResultSets().get(name);
+            if (rs == null) {
+                return null;
+            } else {
+                return rs.rs;
+            }
+        } else {
+            List<Identifiable> out = new ArrayList<>(1);
+            out.add(identifiable);
+            return out;
+        }
+    }
+
+    /**
+     * See {@link #findItem(InputLine, boolean)}. This calls that with a default of true.
+     *
+     * @param inputLine
+     * @return
+     * @throws Throwable
+     */
+    protected List<Identifiable> findItem(InputLine inputLine) throws Throwable {
+        return findItem(inputLine, true);
+    }
+
+    /**
      * Resolves the first argument of a command line into either a unique identifier
      * The contract is that <b>IF</b> there is an ID set (with {@link #set_id(InputLine)})
      * then use that. Otherwise, take the last argument of the input line and try to find that.
+     * <p><b>Note:</b> If there is no such item, such as an empty set, this will return a null.
+     * Therefore, either the result is a null or has at least one element.</p>
+     * <p>This removes the arguments for this from the {@link InputLine} since that
+     * might mess up parsing it later. Properly, if this is needed for a command, it
+     * should be called as early as practical.</p>
      *
      * @param inputLine
      * @return
      */
-    protected Identifiable findItem(InputLine inputLine) {
+
+    protected List<Identifiable> findItem(InputLine inputLine, boolean allowResultSets) throws Throwable {
+        Identifier localID = null;
+        int index = -1;
+        List<Identifiable> out;
+        // In order of likelihood
+        // Case 1: ID has been set. Use it.
+        if (hasID()) {
+            out = new ArrayList<>();
+            Identifiable x = (Identifiable) getStore().get(localID);
+            if (x == null) {
+                return null;
+            }
+            out.add(x);
+            return out;
+        }
+        // case 2: Explicit identifier given
+        String lastArg = inputLine.getLastArg();
+        Identifiable identifiable = (Identifiable) getStore().get(BasicIdentifier.newID(lastArg));
+        if (identifiable != null) {
+            out = new ArrayList<>(1);
+            out.add(identifiable);
+            return out;
+        }
+        // case 3: a result set is given
+        RSRecord rs = getResultSets().get(lastArg);
+
+        if (rs != null) {
+            String key = null;
+            if (inputLine.hasArg(RS_RANGE_KEY)) {
+                key = RS_RANGE_KEY;
+            } else if (inputLine.hasArg(RS_RANGE_SHORT_KEY)) {
+                key = RS_RANGE_SHORT_KEY;
+            }
+            if (key != null) {
+                List indices = processList(inputLine, key);
+                List<Identifiable> identifiables = rs.getSubset(indices);
+                if (identifiables.isEmpty()) {
+                    return null;
+                }
+                return identifiables;
+            }else {
+                if(rs.rs == null || rs.rs.isEmpty()){
+                    return null;
+                }
+                return rs.rs;
+            }
+        }
+        try {
+            index = Integer.parseInt(lastArg);
+            if (allEntries == null || allEntries.isEmpty()) {
+                loadAllEntries(); // just in case...
+            }
+            if (index < 0 || allEntries.size() < index) {
+                return null;
+            }
+            out = new ArrayList(1);
+            out.add(allEntries.get(index));
+            return out;
+        } catch (Throwable t) {
+            // nothing to do. Assume its a result set.
+        }
+        return null;
+    }
+
+    protected List<Identifiable> oldfindItem(InputLine inputLine, boolean allowResultSets) throws Throwable {
         // first case is one in which this does not apply since there is no argument.
         // Second case is to try and interpret the last argument as an index or id.
         // First look for overrides to local id
@@ -1255,6 +1390,36 @@ public abstract class StoreCommands extends CommonCommands {
         if (hasID()) {
             localID = getID();
         } else {
+            if (inputLine.hasArg(SEARCH_RESULT_SET_NAME)) {
+                if (!allowResultSets) {
+                    return null;
+                }
+                String rsName = inputLine.getNextArgFor(SEARCH_RESULT_SET_NAME);
+                if (!getResultSets().containsKey(rsName)) {
+                    return null;
+                }
+                inputLine.removeSwitchAndValue(SEARCH_RESULT_SET_NAME);
+                RSRecord rs = getResultSets().get(rsName);
+                String key = null;
+                if (inputLine.hasArg(RS_RANGE_KEY)) {
+                    key = RS_RANGE_KEY;
+                } else if (inputLine.hasArg(RS_RANGE_SHORT_KEY)) {
+                    key = RS_RANGE_SHORT_KEY;
+                }
+                if (key != null) {
+                    List indices = processList(inputLine, key);
+                    List<Identifiable> identifiables = rs.getSubset(indices);
+                    if (identifiables.isEmpty()) {
+                        return null;
+                    }
+                    return identifiables;
+                } else {
+                    if (rs.rs == null || rs.rs.isEmpty()) {
+                        return null;
+                    }
+                    return rs.rs;
+                }
+            }
             try {
                 index = Integer.parseInt(inputLine.getLastArg());
                 if (allEntries == null || allEntries.isEmpty()) {
@@ -1263,7 +1428,9 @@ public abstract class StoreCommands extends CommonCommands {
                 if (index < 0 || allEntries.size() < index) {
                     return null;
                 }
-                return allEntries.get(index);
+                ArrayList<Identifiable> out = new ArrayList(1);
+                out.add(allEntries.get(index));
+                return out;
             } catch (Throwable t) {
                 // rock on
                 // Fixes https://github.com/ncsa/security-lib/issues/18
@@ -1273,7 +1440,6 @@ public abstract class StoreCommands extends CommonCommands {
                 } else {
                     localID = BasicIdentifier.newID(inputLine.getLastArg());
                     if (!localID.getUri().isAbsolute()) {
-                        say(localID.getUri() + " is not a valid identifier");
                         return null;
                     }
                 }
@@ -1281,34 +1447,41 @@ public abstract class StoreCommands extends CommonCommands {
         }
 
         if (localID != null) {
-            return (Identifiable) getStore().get(localID);
+            ArrayList<Identifiable> out = new ArrayList(1);
+            out.add((Identifiable) getStore().get(localID));
+            return out;
         }
 
         return null;
     }
 
-    protected void oldrm(InputLine inputLine) throws IOException {
-        if (showHelp(inputLine)) {
-            showRMHelp();
-            return;
-        }
-        Identifiable x = findItem(inputLine);
+    protected void oldrm(InputLine inputLine) throws Throwable {
+        List<Identifiable> identifiables = findItem(inputLine);
         //"Are you sure you want to remove this client(y/n)[n]:"
-        if (!"y".equals(getInput("Are you sure you want to remove this object(y/n)", "n"))) {
+        if (!"y".equals(getInput("Are you sure you want to remove " + (1 < identifiables.size() ? "these objects" : "this object") + "(y/n)", "n"))) {
             say("remove aborted.");
             return;
         }
-
-        getStore().remove(x.getIdentifier());
-        if (x.getIdentifier().equals(id)) {
-            id = null;
+        getStore().remove(identifiables); // batch remove
+        for (Identifiable identifiable : identifiables) {
+            // reset ID
+            if (id != null) {
+                if (identifiable.getIdentifier().equals(id)) {
+                    id = null;
+                }
+            }
+            rmCleanup(identifiable);
         }
-        say("Done. object with id = " + x.getIdentifierString() + " has been removed from the store.");
-        info("Removed object " + x.getClass().getSimpleName() + " with id " + x.getIdentifierString());
+        // work is done, print something
+        if (identifiables.size() == 1) {
+            say("Done. object with id = " + identifiables.get(0).getIdentifierString() + " has been removed from the store.");
+        } else {
+            say("Done. Removed = " + identifiables.size() + " objects have been removed from the store.");
+        }
         clearEntries();
     }
 
-    public void rm(InputLine inputLine) throws IOException {
+    public void rm(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showRMHelp();
             return;
@@ -1316,9 +1489,59 @@ public abstract class StoreCommands extends CommonCommands {
         boolean forceRemove = inputLine.hasArg(RM_FORCE_FLAG);
         inputLine.removeSwitch(RM_FORCE_FLAG);
         String key = getAndCheckKeyArg(inputLine);
+        boolean isRS = hasRS(inputLine);
+        List keys = processList(inputLine, KEYS_FLAG);
+        if (key != null && keys != null) {
+            say("both " + KEY_FLAG + " and " + KEYS_FLAG + " are set. Cannot resolve request, aborted.");
+            return;
+        }
+        // legacy case.
+        if (key == null && keys == null && !forceRemove) {
+            oldrm(inputLine);
+            return;
+        }
+        List<Identifiable> identifiables = findItem(inputLine);
+        if (identifiables == null || identifiables.isEmpty()) {
+            say("no such objects found. aborting...");
+            return;
+        }
+        if (forceRemove) {
+            getStore().remove(identifiables);
+            say(identifiables.size() + " objects have been removed from the store.");
+            return;
+        }
+        // By this point, exactly one of key or keys is not null
+        if (key != null) {
+            keys = new ArrayList();
+            keys.add(key);
+        }
+        for (int i = 0; i < identifiables.size(); i++) {
+            Identifiable identifiable = identifiables.get(i);
+            identifiable = removeEntries(identifiable, keys);
+            if (isRS) {
+                // if its result set, set the updated entry
+                identifiables.set(i, identifiable);
+            }
+        }
+    }
 
-        if (inputLine.hasArg(SEARCH_RESULT_ARG_KEY)) {
-            RSRecord rsRecord = resultSets.get(inputLine.getNextArgFor(SEARCH_RESULT_ARG_KEY));
+    /**
+     * Old version. Using it as a resource for rewrite.
+     *
+     * @param inputLine
+     * @throws IOException
+     */
+    protected void rm2(InputLine inputLine) throws Throwable {
+        if (showHelp(inputLine)) {
+            showRMHelp();
+            return;
+        }
+        boolean forceRemove = inputLine.hasArg(RM_FORCE_FLAG);
+        inputLine.removeSwitch(RM_FORCE_FLAG);
+        String key = getAndCheckKeyArg(inputLine);
+        boolean isRS = hasRS(inputLine);
+        if (isRS) {
+            RSRecord rsRecord = resultSets.get(inputLine.getNextArgFor(RESULT_SET_KEY));
             if (rsRecord == null) {
                 say("no such stored result.");
                 return;
@@ -1343,15 +1566,17 @@ public abstract class StoreCommands extends CommonCommands {
             getStore().remove(identifier);
             return;
         }
-        Identifiable identifiable = findItem(inputLine);
-        if (identifiable == null) {
+        List<Identifiable> identifiables = findItem(inputLine);
+        if (identifiables == null) {
             say("Object not found");
             return;
         }
         // if the request does not have new stuff, do old stuff.
         if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
             oldrm(inputLine);
-            rmCleanup(identifiable);
+            for (Identifiable identifiable : identifiables) {
+                rmCleanup(identifiable);
+            }
             return;
         }
         if (inputLine.hasArg(KEYS_FLAG)) {
@@ -1361,33 +1586,35 @@ public abstract class StoreCommands extends CommonCommands {
                 say("sorry, but this requires a list for this option.");
                 return;
             }
-            if (identifiable == null) {
+            if (identifiables == null) {
                 say("sorry, I could not find that object. Check your id.");
                 return;
             }
-            removeEntries(identifiable, array);
+            for (Identifiable identifiable : identifiables) {
+                removeEntries(identifiable, array);
+            }
         }
         if (key != null) {
-            if (identifiable == null) {
+            if (identifiables == null) {
                 say("sorry, I could not find that object. Check your id.");
                 return;
             }
+            for (Identifiable identifiable : identifiables) {
+                removeEntry(identifiable, key);
 
-            removeEntry(identifiable, key);
+            }
             say("removed attribute \"" + key + "\"");
         }
-        //    rmCleanup(identifiable);
     }
 
     protected void showLSHelp() {
-        say("ls [flags] [number]");
-        sayi("Usage: Show information about an object or objects.");
+        say("ls [flags] index");
+        sayi("Usage: Show information about an object or objects. Only a single object is supported.");
         sayi("flags are");
         sayi(StringUtils.RJustify(LINE_LIST_COMMAND, 4) + " = " + "line list of an object or all objects. Longer entries will be truncated.");
         sayi(StringUtils.RJustify(ALL_LIST_COMMAND, 4) + " = " + " list of **every** entry in the store. You have been warned.");
         sayi(StringUtils.RJustify(VERBOSE_COMMAND, 4) + " = " + "verbose list. All entries will be shown in their entirety.");
-        sayi("If you have listed all objects you may use the index number as the argument. Or you can supply");
-        sayi("the identifier escaped with a /");
+        printIndexHelp(true);
         say("E.g.");
         sayi("ls " + LINE_LIST_COMMAND + " " + ALL_LIST_COMMAND + " = line listing of entire store. This may be huge.");
         sayi("ls " + LINE_LIST_COMMAND + " = line list of the currently active object.");
@@ -1406,114 +1633,67 @@ public abstract class StoreCommands extends CommonCommands {
         return id != null;
     }
 
-    protected void oldls(InputLine inputLine) {
-        if (showHelp(inputLine)) {
-            showLSHelp();
-            return;
+    protected void oldls(InputLine inputLine) throws Throwable {
+        boolean isRS = hasRS(inputLine);
+        Identifiable identifiable = null;
+        try {
+            identifiable = findSingleton(inputLine);
+        } catch (ObjectNotFoundException userNotFoundException) {
+            // so nothing specified.
         }
-
-        // Any form of the all flag prints everything.
-        if (inputLine.hasArg(ALL_LIST_COMMAND)) {
-            if (inputLine.hasArg(LINE_LIST_COMMAND)) {
-                listAll(true, "");
-            } else {
-                listAll(false, "");
-            }
-            return;
-        }
-
+        boolean listAll = inputLine.hasArg(ALL_LIST_COMMAND);
+        boolean listLines = inputLine.hasArg(LINE_LIST_COMMAND);
         boolean isVerbose = inputLine.hasArg(VERBOSE_COMMAND);
-        if (hasId()) {
-            Identifiable identifiable = findItem(inputLine);
-            if (identifiable == null) {
-                say("Object not found.");
-                return;
+        inputLine.removeSwitch(ALL_LIST_COMMAND);
+        inputLine.removeSwitch(LINE_LIST_COMMAND);
+        inputLine.removeSwitch(VERBOSE_COMMAND);
+        // Any form of the all flag prints everything.
+        if (listAll) {
+            listAll(listLines, "");
+            return;
+        }
+
+        if (identifiable == null) {
+            if (inputLine.getArgCount() == 0) {
+                listAll(false, ""); // list it all
+            } else {
+                say("sorry, no such object. Check your id.");
             }
-            if (inputLine.hasArg(LINE_LIST_COMMAND)) {
+            return;
+        } else {// found something
+            if (isRS) { // list the stored version, not the one in the RS!
+                identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
+            }
+            if (listLines) {
                 longFormat(identifiable, false);
             } else {
                 if (isVerbose) {
                     longFormat(identifiable, true);
-
-                } else {
-                    say(format(identifiable));
-                }
-            }
-            return;
-        }
-
-        // No id set.
-
-        if (1 == inputLine.size()) {
-            // No id set , no args lists everything in short form
-            listAll(false, "");
-            return;
-        }
-
-
-        if (inputLine.getLastArg().startsWith("-")) {
-            // only possible case is if(in
-            if (inputLine.getLastArg().equalsIgnoreCase(LINE_LIST_COMMAND)) {
-                say("No id set. Please specify one or add the -a flag.");
-            }
-            return;
-        } else {
-            Identifiable identifiable = findItem(inputLine);
-            if (identifiable == null) {
-                say("Sorry, object not found.");
-                return;
-            }
-            if (inputLine.hasArg(LINE_LIST_COMMAND)) {
-                longFormat(identifiable, false);
-            } else {
-                if (isVerbose) {
-                    longFormat(identifiable, true);
-
                 } else {
                     say(format(identifiable));
                 }
             }
         }
-
     }
 
-    public void ls(InputLine inputLine) {
+    public void ls(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showLSHelp();
             return;
         }
-        if (inputLine.hasArg(NEXT_N_COMMAND)) {
-            say(NEXT_N_COMMAND + " not supported in ls. Use search.");
-            return;
-        }
+
         String key = getAndCheckKeyArg(inputLine);
         if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
             oldls(inputLine);
             return;
         }
         if (inputLine.hasArg(KEYS_FLAG)) {
-            List<String> array = inputLine.getArgList(KEYS_FLAG);
-
-            if (array == null) {
-                say("sorry, but this requires a list for this option.");
-                return;
-            }
-            Identifiable identifiable = findItem(inputLine);
-            if (identifiable == null) {
-                say("sorry, I could not find that object. Check your id.");
-                return;
-            }
-
-            showEntries(identifiable, array, inputLine.hasArg(VERBOSE_COMMAND));
+            List<String> array = processList(inputLine, KEYS_FLAG);
+            showEntries(findSingleton(inputLine), array, inputLine.hasArg(VERBOSE_COMMAND));
             return;
         }
         if (key != null) {
-            Identifiable identifiable = findItem(inputLine);
-            if (identifiable == null) {
-                say("sorry, I could not find that object. Check your id.");
-                return;
-            }
-            showEntry(identifiable, key, inputLine.hasArg(VERBOSE_COMMAND));
+            showEntry(findSingleton(inputLine), key, inputLine.hasArg(VERBOSE_COMMAND));
         }
 
     }
@@ -1592,9 +1772,9 @@ public abstract class StoreCommands extends CommonCommands {
             for (int i = 1; i < flowedtext.size(); i++) {
                 if (isFirstLine) {
                     isFirstLine = false;
-                    stringBuffer.append(StringUtils.getBlanks(dd + leftColumWidth) + flowedtext.get(i));
+                    stringBuffer.append(getBlanks(dd + leftColumWidth) + flowedtext.get(i));
                 } else {
-                    stringBuffer.append("\n" + StringUtils.getBlanks(dd + leftColumWidth) + flowedtext.get(i));
+                    stringBuffer.append("\n" + getBlanks(dd + leftColumWidth) + flowedtext.get(i));
                 }
             }
             return stringBuffer.toString();
@@ -1675,9 +1855,7 @@ public abstract class StoreCommands extends CommonCommands {
             // c now contains all the fields. We remove anything
             XMLMap subset = new XMLMap();
             // put in the identifier
-            MapConverter mc = (MapConverter) getStore().getXMLConverter();
-
-            subset.put(mc.getKeys().identifier(), x.getIdentifierString());
+            subset.put(getKeys().identifier(), x.getIdentifierString());
             for (String key : keys) {
                 if (c.containsKey(key)) {
                     subset.put(key, c.get(key));
@@ -1788,7 +1966,7 @@ public abstract class StoreCommands extends CommonCommands {
     public static String UPDATE_PERMISSIONS_FLAG = "-p";
 
     /**
-     * resolves key shorthand of &amp;key_name or -key key_name
+     * resolves key shorthand of &gt;key_name or -key key_name
      * returns null if no such key OR if it is not valid in the
      * key list. Does <b>not</b> remove the argument from the inputLine!
      *
@@ -2029,107 +2207,134 @@ public abstract class StoreCommands extends CommonCommands {
 
     }
 
-    public void rename(InputLine inputLine) throws Exception {
-        if (showHelp(inputLine)) {
-            say("rename source_id target_id");
-            sayi("Usage: Rename source_id to target_id, replacing it.");
-            say("E.g.\n");
-            sayi("rename dev:test dev:test/no_cfg\n");
-            sayi("(Note lead slashes on ids are optional) would rename dev:test to dev:test/no_cfg");
-            sayi("At the end of this operation, dev:test would not exist. ");
-            sayi("See also: copy, rm");
-            return;
-        }
-        if (inputLine.getArgCount() != 2) {
-            say("Sorry, you must supply both a source id and a target id");
-            return;
-        }
-        String src = inputLine.getArg(1);
-        if (src.startsWith("/")) {
-            src = src.substring(1);
-        }
-        if (isTrivial(src)) {
-            say("Sorry, but you must supply a valid source id");
-            return;
-        }
-        Identifier srcID;
-        try {
-            srcID = BasicIdentifier.newID(src);
-        } catch (Throwable t) {
-            say("Sorry, but the source id \"" + src + "\" you supplied is not a valid id");
-            return;
-        }
-        if (!getStore().containsKey(srcID)) {
-            say("Sorry, but the source is not in this store.");
-            return;
-        }
+    /**
+     * A placeholder. StoreCommands2 in OA4MP does this with QDL,
+     * but that dependency here would create a circularity.
+     * <p>
+     * This looks for <b>key [...]</b> and returns a list for what's between the [].
+     * If there is no such list, a null is returned. (E.g. the key is missing)
+     * </p>
+     * <p>
+     * Contract is that the input line will have this entry removed and will be reparsed.
+     * This is to prevent bad parsing later.
+     * </p>
+     *
+     * @param inputLine
+     * @param key
+     * @return
+     * @throws Exception
+     */
+    protected abstract List processList(InputLine inputLine, String key) throws Exception;
 
-        String target = inputLine.getArg(2);
-        if (target.startsWith("/")) {
-            target = target.substring(1);
-        }
-        if (isTrivial(target)) {
-            say("Sorry, but you must supply a valid target id");
-            return;
-        }
-        Identifier targetID;
-        try {
-            targetID = BasicIdentifier.newID(target);
-        } catch (Throwable t) {
-            say("Sorry, but the target id \"" + target + "\" you supplied is not a valid id");
-            return;
-        }
-        if (getStore().containsKey(targetID)) {
-            say("Sorry, but " + targetID.toString() + " already exists on this system.");
-            return;
-        }
-        doRename(srcID, targetID);
-    }
 
-    protected void doRename(Identifier srcID, Identifier targetID) {
-        Identifiable source = (Identifiable) getStore().get(srcID);
-        doCopy(source, targetID, false);  // always require an explicit id for the rename.
-        getStore().remove(srcID);
-    }
-
-    public void rs(InputLine inputLine) throws Exception {
+    public void rs(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showResultSetHelp();
             return;
         }
-        if (inputLine.hasArg(RS_SHOW_KEY)) {
+        if(inputLine.hasArg(RS_APPEND_ACTION)){
+            if(inputLine.getArgCount() == 1){
+                return;
+            }
+            String arg = inputLine.getArgs().get(1);
+            RSRecord a0 = getResultSets().get(arg);
+            if(a0 == null){
+                say("No record found with name " + arg);
+                return;
+            }
+            int pass = 0;
+            for(int i = 2; i < inputLine.getArgCount(); i++){
+                String an = inputLine.getArgs().get(i);
+                RSRecord a = getResultSets().get(an);
+                if(a == null){
+                    say(an + " not found, skipping...");
+                    continue;
+                }
+                pass++;
+                a0.rs.addAll(a.rs);
+            }
+            if(pass == 0){
+                say("No records appended to " + arg);
+                return;
+            }
+            say(pass +  "records appended to " + arg);
+            return;
+        }
+
+        if (inputLine.hasArg(RS_LIST_ACTION)) {
+            if (getResultSets().isEmpty()) {
+                say("No results found.");
+                return;
+            }
+            // print it pretty. The assumption is that this not thousands of entries
+            // so performance is not an issue, and we do two passes. One to get field size,
+            // the second to print it.
+            String nameTitle = "name";
+            String countTitle = "entry count";
+            int width = nameTitle.length();
+            int sizeWidth = countTitle.length();
+            for (String name : getResultSets().keySet()) {
+                width = Math.max(width, name.length());
+                sizeWidth = Math.max(getResultSets().get(name).rs.size(), sizeWidth);
+            }
+            width = width + 2;
+            sizeWidth = sizeWidth + 2;
+            say(StringUtils.center(nameTitle, width) + " : " + StringUtils.center(countTitle, sizeWidth));
+            for (String name : getResultSets().keySet()) {
+                say(StringUtils.center(name, width) + " : " + StringUtils.center(getResultSets().get(name).rs.size(), sizeWidth));
+            }
+            return;
+        }
+        if (inputLine.hasArg(RS_SIZE_ACTION)) {
+            //handles case there is a size action, but no result sets were named -- do them all.
+            inputLine.removeSwitch(RS_SIZE_ACTION);
+            if (inputLine.getArgCount() == 0) {
+                if (getResultSets().size() == 0) {
+                    say("no result sets.");
+                    return;
+                }
+                int width = 10;
+                say(center("name", width) + "|" + center("size", width));
+                say(getBlanks(10) + "|" + getBlanks(width));
+                for (String key : getResultSets().keySet()) {
+                    say(pad(key, width) + "|  " + pad(Integer.toString(getResultSets().get(key).rs.size()), width));
+                }
+                say("\n" + getResultSets().size() + " result sets processed");
+            }
+            return;
+        }
+        String name = inputLine.getLastArg();
+        if (!resultSets.containsKey(name)) {
+            say("result set named \"" + name + "\" not found");
+            return;
+        }
+        inputLine.removeLastArg();
+
+        if (inputLine.hasArg(RS_SHOW_ACTION)) {
             // The syntax is
             // -show name | index [start,stop]
             // so this takes a bit of special handling. Basically, everything at the end
             // of the line gets parsed in special cases.
-            String name = inputLine.getLastArg();
-            inputLine.removeArgAt(inputLine.getArgCount());
+            inputLine.removeSwitch(RS_SHOW_ACTION);
+
             int count = -1;
-            List<Integer> limits = new ArrayList<>();
-            if (inputLine.getArgCount() > 1) {
-                List<String> argsList = inputLine.getArgList(RS_SHOW_KEY);
-                if (argsList.isEmpty()) {
-                    limits.add(inputLine.getNextIntArg(RS_SHOW_KEY));
-                } else {
-                    for (String x : argsList) {
-                        try {
-                            limits.add(Integer.parseInt(x));
-                        } catch (Throwable nfx) {
-                            limits = null;
-                            break; // end the loop, no usable integers
-                        }
-                    }
-                }
+            //List<Integer> limits = new ArrayList<>();
+            List limits = null;
+            String key = null;
+
+            if (inputLine.hasArg(RS_RANGE_KEY)) {
+                key = RS_RANGE_KEY;
+            } else if (inputLine.hasArg(RS_RANGE_SHORT_KEY)) {
+                key = RS_RANGE_SHORT_KEY;
             }
-            inputLine.removeSwitchAndValue(RS_SHOW_KEY);
-            List<String> requestedKeys = null;
+            if (key != null) {
+                limits = processList(inputLine, key);
+            }
+            List requestedKeys = null;
             if (inputLine.hasArg(SEARCH_RETURNED_ATTRIBUTES_FLAG)) {
-                requestedKeys = inputLine.getArgList(SEARCH_RETURNED_ATTRIBUTES_FLAG); // might be empty
+                requestedKeys = processList(inputLine, SEARCH_RETURNED_ATTRIBUTES_FLAG);
+                //requestedKeys = inputLine.getArgList(SEARCH_RETURNED_ATTRIBUTES_FLAG); // might be empty
                 inputLine.removeSwitchAndValue(SEARCH_RETURNED_ATTRIBUTES_FLAG);
-            }
-            if (!resultSets.containsKey(name)) {
-                say("result set named \"" + name + "\" not found");
-                return;
             }
             List<String> foundKeys = resultSets.get(name).fields;
             if (requestedKeys != null && !requestedKeys.isEmpty()) {
@@ -2148,35 +2353,89 @@ public abstract class StoreCommands extends CommonCommands {
             printRS(inputLine, resultSets.get(name).rs, foundKeys, limits);
             return;
         }
-        if (inputLine.hasArg(RS_REMOVE_KEY)) {
-            String name = inputLine.getNextArgFor(RS_REMOVE_KEY);
-            if (name.equals("*")) {
-                if (getInput("clear all results(y|n)?", "n").equals("y")) {
-                    resultSets = new HashMap<>();
-                    say("all results cleared");
-                } else {
-                    say("remove aborted.");
-                }
+        if (inputLine.hasArg(RS_CLEAR_ACTION)) {
+            if (getInput("clear all results(y|n)?", "n").equals("y")) {
+                resultSets = new HashMap<>();
+                say("all results cleared");
             } else {
-                if (resultSets.containsKey(name)) {
-                    resultSets.remove(name);
-                    say("removed result set \"" + name + "\"");
-                } else {
-                    say("no such result set name \"" + name + "\"");
-                }
+                say("remove aborted.");
             }
             return;
         }
-/*
-        if (inputLine.hasArg(RS_REMOVE_KEY)) {
-            inputLine.removeSwitch(RS_REMOVE_KEY);
-            String name = inputLine.getLastArg();
-            resultSets.remove(name);
-            say("result set named \"" + name + "\" has been removed");
+        if (inputLine.hasArg(RS_DROP_ACTION)) {
+            if (resultSets.containsKey(name)) {
+                resultSets.remove(name);
+                say("removed result set \"" + name + "\"");
+            } else {
+                say("no such result set name \"" + name + "\"");
+            }
             return;
         }
-*/
-        if (inputLine.hasArg(RS_LIST_INFO_KEY)) {
+
+
+        if (inputLine.hasArg(RS_REMOVE_ACTION)) {
+            String rangeKey = null;
+            if (inputLine.hasArg(RS_RANGE_KEY)) {
+                rangeKey = RS_RANGE_KEY;
+            } else {
+                if (inputLine.hasArg(RS_RANGE_SHORT_KEY)) {
+                    rangeKey = RS_RANGE_SHORT_KEY;
+                } else {
+                    say("range required for " + RS_REMOVE_ACTION + " action");
+                    return;
+                }
+            }
+            if (!getResultSets().containsKey(name)) {
+                say("no such result set name \"" + name + "\"");
+                return;
+            }
+            List indices = processList(inputLine, rangeKey);
+            if (indices.isEmpty()) {
+                say("no elements in range.");
+                return;
+            }
+            List<Identifiable> items = getResultSets().get(name).rs;
+            // the trick is that not all of the indices might be distinct, and they may be in random
+            // order. Either very complex logic is needed for those cases, or we normalize the indices to
+            // a unique, ordered set and skip any in that set.
+            TreeSet<Integer> normalizedIndices = new TreeSet<>();
+
+            for (Object o : indices) {
+                if (o instanceof Integer) {
+                    normalizedIndices.add((Integer) o);
+                } else {
+                    if (o instanceof Long) {
+                        normalizedIndices.add(((Long) o).intValue());
+                    } else {
+                        say("unrecognized index: " + o + ", aborting");
+                        return;
+                    }
+                }
+            }
+            if (normalizedIndices.size() == items.size()) {
+                say("you cannot remove every element from a result set. Use " + RS_DROP_ACTION + " instead.");
+            }
+
+            List<Identifiable> out = new ArrayList<>(items.size() - normalizedIndices.size());
+            Iterator<Integer> iterator = normalizedIndices.iterator();
+            Integer currentPointerIndex = iterator.next();
+            boolean hasNextElement = true;
+            for (int i = 0; i < items.size(); i++) {
+                if (hasNextElement && i == currentPointerIndex) {
+                    hasNextElement = iterator.hasNext();
+                    if (hasNextElement) {
+                        currentPointerIndex = iterator.next();
+                    }
+                    continue;
+                }
+                out.add(items.get(i));
+            }
+            getResultSets().get(name).rs = out;
+            say("result set named \"" + name + "\" has had " + normalizedIndices.size() + " elements removed");
+            return;
+        }
+
+        if (inputLine.hasArg(RS_LIST_INFO_ACTION)) {
             if (resultSets.isEmpty()) {
                 return;
             }
@@ -2191,25 +2450,107 @@ public abstract class StoreCommands extends CommonCommands {
             }
             return;
         }
+        if (inputLine.hasArg(RS_SAVE_ACTION)) {
+            MapConverter mapConverter = (MapConverter) getStore().getXMLConverter();
+            RSRecord rsRecord = getResultSets().get(name);
+            JSONObject jsonObject = new JSONObject();
+            JSONArray fieldArray = new JSONArray();
+            fieldArray.addAll(rsRecord.fields);
+            jsonObject.put("fields", fieldArray);
+            JSONArray entries = new JSONArray();
+            for (Identifiable identifiable : rsRecord.rs) {
+                if (mapConverter.isA(identifiable)) {
+                    entries.add(mapConverter.toJSON(identifiable));
+                } else {
+                    System.out.println(identifiable.getClass().getSimpleName() + " is not convertible to this type");
+                }
+            }
+            jsonObject.put("entries", entries);
+            if (inputLine.hasArg(RS_FILE_KEY)) {
+                String fileName = inputLine.getNextArgFor(RS_FILE_KEY);
+                inputLine.removeSwitchAndValue(RS_FILE_KEY);
+                FileWriter fileWriter = new FileWriter(fileName);
+                fileWriter.write(jsonObject.toString(1));
+                fileWriter.flush();
+                fileWriter.close();
+            } else {
+                System.out.println(jsonObject.toString(1));
+            }
+            return;
+        }
+        if (inputLine.hasArg(RS_READ_ACTION)) {
+            if (getResultSets().containsKey(name)) {
+                say("the result set named \"" + name + "\" already exists. aborting...");
+                return;
+            }
+
+            if (!inputLine.hasArg(RS_FILE_KEY)) {
+                say("no file given. aborting...");
+                return;
+            }
+            String in = FileUtil.readFileAsString(inputLine.getNextArgFor(RS_FILE_KEY));
+            JSONObject jsonObject = JSONObject.fromObject(in);
+            JSONArray fields = jsonObject.getJSONArray("fields");
+            JSONArray entries = jsonObject.getJSONArray("entries");
+            List<Identifiable> x = new ArrayList<>(entries.size());
+            MapConverter mapConverter = (MapConverter) getStore().getXMLConverter();
+
+            for (int i = 0; i < entries.size(); i++) {
+                Identifiable identifiable = mapConverter.fromJSON(entries.getJSONObject(i), null);
+                x.add(identifiable);
+            }
+            RSRecord rsRecord = new RSRecord(x, fields);
+            getResultSets().put(name, rsRecord);
+            say("saved result set \"" + name + "\", " + rsRecord.rs.size() + " entries processed");
+        }
+
     }
 
-    public static String RS_SHOW_KEY = "-show";
-    public static String RS_REMOVE_KEY = "-rm";
-    public static String RS_CLEAR_KEY = "-clear";
-    public static String RS_LIST_INFO_KEY = "-info";
+    /*
+    Actions allowed for result sets.
+     */
+    public static String RS_APPEND_ACTION = "append";
+    public static String RS_CLEAR_ACTION = "clear";
+    public static String RS_DROP_ACTION = "drop";
+    public static String RS_LIST_INFO_ACTION = "info";
+    public static String RS_LIST_ACTION = "list";
+    public static String RS_READ_ACTION = "read";
+    public static String RS_REMOVE_ACTION = "rm";
+    public static String RS_SAVE_ACTION = "save";
+    public static String RS_SHOW_ACTION = "show";
+    public static String RS_SIZE_ACTION = "size";
+    public static String RS_RANGE_KEY = "-range";
+    public static String RS_RANGE_SHORT_KEY = "--";
+    public static String RS_FILE_KEY = "-file";
 
     protected void showResultSetHelp() {
-        sayi("rs flags [rs_name].");
-        sayi("Result set management. All of these require the name of the result");
-        sayi("set as the last argument.");
+        sayi("rs action [flags] rs_name.");
+        sayi("The list of actions is");
+        sayi(RS_APPEND_ACTION  +" A0 A1 ..  - append result sets A1... to A0.");
+        sayi(RS_CLEAR_ACTION + " - clear ALL results sets.");
+        sayi(RS_DROP_ACTION + " name - Remove the result set");
+        sayi(RS_LIST_INFO_ACTION + " name - List information about the result set, such as size and fields.");
+        sayi(RS_LIST_ACTION + " - list the current results sets.");
+        sayi(RS_READ_ACTION + " [" + RS_FILE_KEY + " file] name - Read the result set from the file, giving it the given name.");
+        sayi(RS_REMOVE_ACTION + " " + RS_RANGE_KEY + " range name - Remove the range of values from the given result");
+        sayi("        set. The elements will be reordered from 0. This is useful if you have done a search and");
+        say("         your result set has a couple of extra, unwanted entries.");
+        sayi(RS_SAVE_ACTION + " [" + RS_FILE_KEY + " file] name - Save the result set to the file. No file given will dump");
+        sayi("        it to the console.");
+        sayi(RS_SHOW_ACTION + " [" + RS_RANGE_KEY + " range] name - Show the result set, restricting to the given range.");
+        sayi("        No range means show the entire result set.");
+        sayi(RS_SIZE_ACTION + " [name] - Print just the size of the result set. No names prints them all.");
+        sayi("/nRanges follow QDL semantics for simple lists, though nesting and complex structures are not allowed.");
+/*
+        sayi("Result set management. All of these require the name of the result set.");
         sayi("If you save a result set using the " + SEARCH_RESULT_SET_NAME + " flag in the search");
         sayi("command, you can display it, here or remove it.");
         sayi("Other commands will allow for using the result set ");
-        sayi(RS_LIST_INFO_KEY + " list information about the results sets, such as count and fields");
-        sayi(RS_REMOVE_KEY + " remove a set or if a * is given, clear all stored result sets.");
-        sayi(RS_SHOW_KEY + " show the given result set. You may give an integer to show that number, a list of ");
+        sayi(RS_LIST_INFO_ACTION + " list information about the results sets, such as count and fields");
+        sayi(RS_REMOVE_ACTION + " remove a set or if a * is given, clear all stored result sets.");
+        sayi(RS_SHOW_ACTION + " show the given result set. You may give an integer to show that number, a list of ");
         sayi("   two integers for the start and stop limits, or no value which shows the entire set.");
-        sayi("The following switches are supported for the " + RS_SHOW_KEY + " command:");
+        sayi("The following switches are supported for the " + RS_SHOW_ACTION + " command:");*/
         showCommandLineSwitchesHelp();
     }
 
@@ -2256,8 +2597,7 @@ public abstract class StoreCommands extends CommonCommands {
     protected boolean hasKey(String key) {
         XMLConverter xmlConverter = getStore().getXMLConverter();
         if (xmlConverter instanceof MapConverter) {
-            MapConverter mc = (MapConverter) xmlConverter;
-            return mc.getKeys().allKeys().contains(key);
+            return getKeys().allKeys().contains(key);
         }
         return false;
     }
@@ -2450,7 +2790,15 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
 
-    protected void removeEntries(Identifiable identifiable, List<String> keys) {
+    /**
+     * Removes the list of properties from the {@link Identifiable} and returns an
+     * altered one.
+     *
+     * @param identifiable
+     * @param keys
+     * @return
+     */
+    protected Identifiable removeEntries(Identifiable identifiable, List<String> keys) {
         XMLMap object = toXMLMap(identifiable);
         boolean gotOne = false;
         for (String key : keys) {
@@ -2464,8 +2812,9 @@ public abstract class StoreCommands extends CommonCommands {
         if (gotOne) {
             getStore().save(fromXMLMap(object));
         }
-
+        return fromXMLMap(object);
     }
+
 
     protected void removeEntry(Identifiable identifiable, String key) {
         XMLMap object = toXMLMap(identifiable);
@@ -2479,7 +2828,15 @@ public abstract class StoreCommands extends CommonCommands {
         }
     }
 
-    protected boolean updateSingleValue(XMLMap map, String key) throws IOException {
+    /**
+     * Update a single value for a key, prompting the user for each value. This returns the value the user supplied
+     *
+     * @param map
+     * @param key
+     * @return
+     * @throws IOException
+     */
+    protected Object updateSingleValue(XMLMap map, String key) throws IOException {
         String currentValue = map.getString(key);
 
         JSON json = null;
@@ -2502,55 +2859,31 @@ public abstract class StoreCommands extends CommonCommands {
                 return false;
             }
             map.put(key, newValue);
-            return true;
+            return newValue;
         }
         if (json != null && (json instanceof JSONObject)) {
-            if (supportsQDL()) {
-        /* Editing QDL scripts this way is a PITA. Just skip it. Needs refactored
-        boolean loadQDL = getInput("Load only a QDL script or edit the full config? (q/f)", "f").equalsIgnoreCase("q");
-                if (loadQDL) {
-                    JSONObject oldCfg = (JSONObject) json;
-                    JSONObject qdlcfg = loadQDLScript(oldCfg);
 
-                    if (qdlcfg == null) {
-                        return false;
-                    } // they cancelled out of it
+            JSONObject newJSON = inputJSON((JSONObject) json, key);
+            if (newJSON == null) {
+                return false;
+            } // user cancelled
+            map.put(key, newJSON);
+            return newJSON;
 
-                    map.put(key, oldCfg.toString());
-                    return true;
-                } else {*/
-                JSONObject newConfig = (JSONObject) inputJSON((JSONObject) json, "client configuration");
-                if (newConfig == null) {
-                    return false;
-                } // user cancelled
-                map.put(key, newConfig);
-                return true;
-                //}
-            } else {
-                JSONObject newJSON = inputJSON((JSONObject) json, key);
-                if (newJSON == null) {
-                    return false;
-                } // user cancelled
-                map.put(key, newJSON);
-                return true;
-            }
         }
         if (json != null && (json instanceof JSONArray)) {
             JSONArray newArray = updateSingleValue(key, (JSONArray) json);
             // really hard to tell if the array is updated in the general case.
             // so just always save it.
             if (newArray == null) {
-                return false;
+                return null;
             }
             map.put(key, newArray);
-            return true;
+            return newArray;
         }
-        return false; // Just in case, do nothing.
+        return null; // Just in case, do nothing.
     }
 
-    protected boolean supportsQDL() {
-        return false;
-    }
 
     protected JSONArray updateSingleValue(String key, JSONArray currentValue) throws IOException {
         say("current value=" + currentValue);
@@ -2669,7 +3002,7 @@ public abstract class StoreCommands extends CommonCommands {
      * @throws Exception
      * @experimental
      */
-    public void archive(InputLine inputLine) throws Exception {
+    public void archive(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showArchiveHelp();
             return;
@@ -2694,7 +3027,6 @@ public abstract class StoreCommands extends CommonCommands {
 
             boolean doLatest = rawTargetVersion.equals(ARCHIVE_LATEST_VERSION_ARG);
             long targetVersion = 0;
-            //DoubleHashMap<URI, Long> versionNumbers = getVersions(rawID);
 
             if (doLatest) {
                 targetVersion = -1L;
@@ -2706,86 +3038,101 @@ public abstract class StoreCommands extends CommonCommands {
                     return;
                 }
             }
-            Identifiable identifiable = findItem(inputLine);
-            if (identifiable == null) {
+            List<Identifiable> identifiables = findItem(inputLine);
+            if (identifiables == null) {
                 say("sorry, no such object");
                 return;
             }
-            Identifiable storedVersion = getStoreArchiver().getVersion(identifiable.getIdentifier(), targetVersion);
-            if (storedVersion == null) {
-                say("sorry, but the version you requested for id \"" + rawID + "\" does not exist.");
+            boolean isSingleton = identifiables.size() == 1;
+            for (Identifiable identifiable : identifiables) {
+
+
+                Identifiable storedVersion = getStoreArchiver().getVersion(identifiable.getIdentifier(), targetVersion);
+                if (storedVersion == null) {
+                    say("sorry, but the version you requested for id \"" + rawID + "\" does not exist.");
+                }
+                if (isSingleton) {
+
+
+                    if (getInput("Are you sure that you want to replace the current version with version \"" + (targetVersion == -1 ? "latest" : targetVersion) + "\"?(y/n)", "n").equals("y")) {
+                        storedVersion.setIdentifier(identifiable.getIdentifier());
+                        getStore().save(storedVersion);
+                        say("done! Note: you may have to e.g. approve this again if it is a client.");
+                        return;
+                    } else {
+                        say("aborted.");
+                    }
+                } else {
+                    storedVersion.setIdentifier(identifiable.getIdentifier());
+                    getStore().save(storedVersion);
+                }
             }
-            if (getInput("Are you sure that you want to replace the current version with version \"" + (targetVersion == -1 ? "latest" : targetVersion) + "\"?(y/n)", "n").equals("y")) {
-                // TODO Maybe put some version information inside the object?????
-                // Practical problem is that there is no place to necessarily put it in the general case.
-                // So version number, timestamp for version?
-                // What to do with these if the version is restored?
-                storedVersion.setIdentifier(identifiable.getIdentifier());
-                getStore().save(storedVersion);
-                say("done! Note: you may have to e.g. approve this again if it is a client.");
-                return;
-            } else {
-                say("aborted.");
+            if (!isSingleton) {
+                say("done! " + identifiables.size() + " objects processed");
             }
             return;
         }
-        Identifiable identifiable = findItem(inputLine);
-
+        List<Identifiable> identifiables = findItem(inputLine);
+        if (identifiables == null) {
+            // they supplied non-existent id
+            say("object not found.");
+            return;
+        }
 
           /*
                   Contract is that identifiers never have fragments -- these are used by the system for information.
                   In this case, a fragment of the form version_x where x is a non-negative integer is added.
                    */
         if (inputLine.hasArg(ARCHIVE_VERSIONS_FLAG)) {
-            TreeMap<Long, Identifiable> sortedMap = getStoreArchiver().getVersionsMap(identifiable);
-            if (sortedMap == null) return;
-            for (Long index : sortedMap.keySet()) {
-                say(archiveFormat(sortedMap.get(index)));
+            for (Identifiable identifiable : identifiables) {
+                TreeMap<Long, Identifiable> sortedMap = getStoreArchiver().getVersionsMap(identifiable);
+                if (sortedMap == null) return;
+                for (Long index : sortedMap.keySet()) {
+                    say(archiveFormat(sortedMap.get(index)));
+                }
             }
+
             return;
         }
 
         if (isShow) {
-            Identifiable target = showVersion(inputLine, showArg, identifiable);
-            if (target == null) return;
-            longFormat(target, true); // show everything!
+            for (Identifiable identifiable : identifiables) {
+                Identifiable target = showVersion(inputLine, showArg, identifiable);
+                if (target == null) return;
+                longFormat(target, true); // show everything!
+            }
             return;
         }
+        boolean isSingleton = identifiables.size() == 1;
         // If we are at this point, then the user wants to version the object
-        if (identifiable == null) {
-            // they supplied non-existent id
-            say("object not found.");
-            return;
-        }
-        DoubleHashMap<URI, Long> versionNumbers = getStoreArchiver().getVersions(identifiable.getIdentifier());
-        long newIndex = 0L; // for first version if none found
-        if (versionNumbers != null && !versionNumbers.isEmpty()) {
-            newIndex = getStoreArchiver().getLatestVersionNumber(versionNumbers) + 1;
-        }
-        // archive /testScheme:oa4md,2018:/client_id/f25ffda14af7100284c0234c8fb836a
-        if (!getInput("Archive object \"" + identifiable.getIdentifierString() + "\"?(y/n)", "n").equals("y")) {
-            say("aborted.");
-            return;
-        }
-        // last check
-        if (newIndex < 0) {
-            say("internal error: check logs");
-            warn("error: in creating a version, a negative version number was encountered. This implies something is off with auto-numbering.");
-            return;
-        }
-        // to and from map are charged with being faithful at all times, so we use these to clone the
-        Identifiable newVersion = getStore().create();
-        XMLMap map = new XMLMap();
+        for (Identifiable identifiable : identifiables) {
+            DoubleHashMap<URI, Long> versionNumbers = getStoreArchiver().getVersions(identifiable.getIdentifier());
+            long newIndex = 0L; // for first version if none found
+            if (versionNumbers != null && !versionNumbers.isEmpty()) {
+                newIndex = getStoreArchiver().getLatestVersionNumber(versionNumbers) + 1;
+            }
+            if (isSingleton && !getInput("Archive object \"" + identifiable.getIdentifierString() + "\"?(y/n)", "n").equals("y")) {
+                say("aborted.");
+                return;
+            }
+            // last check
+            if (newIndex < 0) {
+                say("internal error: check logs");
+                warn("error: in creating a version, a negative version number was encountered. This implies something is off with auto-numbering.");
+                return;
+            }
+            // to and from map are charged with being faithful at all times, so we use these to clone the
+            Identifiable newVersion = getStore().create();
+            XMLMap map = new XMLMap();
 
-        MapConverter mc = getMapConverter();
+            MapConverter mc = getMapConverter();
+            mc.toMap(identifiable, map);
+            mc.fromMap(map, newVersion);
+            Identifier newID = getStoreArchiver().createVersionedID(identifiable.getIdentifier(), newIndex);
+            newVersion.setIdentifier(newID);
+            getStore().save(newVersion);
 
-        mc.toMap(identifiable, map);
-
-        mc.fromMap(map, newVersion);
-
-        Identifier newID = getStoreArchiver().createVersionedID(identifiable.getIdentifier(), newIndex);
-        newVersion.setIdentifier(newID);
-        getStore().save(newVersion);
+        }
 
 
     }
@@ -2865,7 +3212,7 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     protected void showArchiveHelp() {
-        say("archive [-versions] | [-restore version] | [-show] [id] - archive an object");
+        say("archive [-versions] | [-restore version] | [-show] [id | index | rs] - archive an object");
         say("Usage: This will either create a copy of the current version");
         sayi("   or restore a versioned object.");
         sayi("archive [id] - version the object, assigning it the last version.");
@@ -2895,8 +3242,7 @@ public abstract class StoreCommands extends CommonCommands {
     StoreArchiver storeArchiver;
 
 
-    public void update(InputLine inputLine) throws IOException {
-        Identifiable identifiable = findItem(inputLine);
+    public void update(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
             showUpdateHelp();
             return;
@@ -2905,33 +3251,23 @@ public abstract class StoreCommands extends CommonCommands {
             say("Sorry, you have specified both a value and a file for the value.");
             return;
         }
-        String key = getAndCheckKeyArg(inputLine);
-        if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
-            say("sorry, but that is not a recognized key.");
+        if (inputLine.hasArg(KEY_FLAG) && inputLine.hasArg(KEYS_FLAG)) {
+            say("both " + KEYS_FLAG + " and " + KEYS_FLAG + " are specified. Cannot resolved.");
             return;
         }
+        String key = getAndCheckKeyArg(inputLine);
         if (key == null && inputLine.hasArg(KEYS_FLAG)) {
             oldUpdate(inputLine);
             return;
         }
-
-        boolean hasFileFlag = inputLine.hasArg(FILE_FLAG);
-        XMLMap map = null;
-        // Since the value can be anything --like a path to a file. e.g. /tmp/foo or
-        // an integer, we *have* to remove arguments until we can see what the
-        // actual id is.
-        boolean gotOne = false;
-        String value = null;
-        if (key == null) {
-            say("sorry, but \"" + key + "\" is not a recognized attribute.");
-            return;
+        // Now we can do the more modern version of this.
+        List<String> keys = processList(inputLine, KEYS_FLAG);
+        Object value = null;
+        if (inputLine.hasArg(VALUE_FLAG)) {
+            value = inputLine.getNextArgFor(VALUE_FLAG);
+            inputLine.removeSwitchAndValue(VALUE_FLAG);
         } else {
-            // inputLine.removeSwitchAndValue(KEY_FLAG);
-            if (inputLine.hasArg(VALUE_FLAG)) {
-                value = inputLine.getNextArgFor(VALUE_FLAG);
-                inputLine.removeSwitchAndValue(VALUE_FLAG);
-            }
-            if (hasFileFlag) {
+            if (inputLine.hasArg(FILE_FLAG)) {
                 try {
                     value = FileUtil.readFileAsString(inputLine.getNextArgFor(FILE_FLAG));
                 } catch (Throwable throwable) {
@@ -2939,48 +3275,146 @@ public abstract class StoreCommands extends CommonCommands {
                     return;
                 }
                 inputLine.removeSwitchAndValue(FILE_FLAG);
+            }
+        }
+        boolean isRS = hasRS(inputLine);
+        List<Identifiable> identifiables = findItem(inputLine);
+        if (identifiables == null) {
+            throw new ObjectNotFoundException("sorry, I could not find that object. Check your id.");
+        }
+        if (keys == null) {
+            keys = new ArrayList<>();
+            keys.add(key);
+        }
+        for (int i = 0; i < identifiables.size(); i++) {
+            Identifiable identifiable = identifiables.get(i);
+            if (isRS) {
+                Identifiable oldI = identifiable;
+                // If we are using an RS this passes in the elements' identifiers we want to update
+                identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
+            }
+            XMLMap map = toXMLMap(identifiable);
 
-            }
-            identifiable = findItem(inputLine);
-            if (identifiable == null) {
-                say("sorry, I could not find that object. Check your id.");
-                return;
-            }
-            map = toXMLMap(identifiable);
             if (value == null) {
-                gotOne = updateSingleValue(map, key);
+                value = updateSingleValue(map, key); // won't prompt after first pass
             } else {
                 map.put(key, value);
-                gotOne = true;
             }
-        }
-        if (inputLine.hasArg(VALUE_FLAG)) {
-            say("Malformed update request. If you specify a value, you must specify a single key.");
-            return;
-        }
-
-
-        if (inputLine.hasArg(KEYS_FLAG)) {
-            List<String> keys = inputLine.getArgList(KEYS_FLAG);
-            inputLine.removeSwitchAndValue(KEYS_FLAG);
-            identifiable = findItem(inputLine);
-            if (identifiable == null) {
-                say("sorry, I could not find that object. Check your id.");
-                return;
+            Identifiable updatedI = fromXMLMap(map);
+            if (isRS) {
+                identifiables.set(i, updatedI);
             }
-            map = toXMLMap(identifiable);
-
-            for (String k : keys) {
-                gotOne = updateSingleValue(map, k) || gotOne; // order matters!
-            }
-        }
-
-        if (gotOne) {
-            getStore().save(fromXMLMap(map));
+            getStore().save(updatedI);
         }
 
     }
 
+    /*   protected void update2(InputLine inputLine) throws IOException {
+           if (showHelp(inputLine)) {
+               showUpdateHelp();
+               return;
+           }
+           if (inputLine.hasArg(VALUE_FLAG) && inputLine.hasArg(FILE_FLAG)) {
+               say("Sorry, you have specified both a value and a file for the value.");
+               return;
+           }
+           String key = getAndCheckKeyArg(inputLine);
+           if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
+               say("sorry, but that is not a recognized key.");
+               return;
+           }
+           if (key == null && inputLine.hasArg(KEYS_FLAG)) {
+               oldUpdate(inputLine);
+               return;
+           }
+
+           boolean hasFileFlag = inputLine.hasArg(FILE_FLAG);
+           XMLMap map = null;
+           // Since the value can be anything --like a path to a file. e.g. /tmp/foo or
+           // an integer, we *have* to remove arguments until we can see what the
+           // actual id is.
+           boolean gotOne = false;
+           String value = null;
+           if (key == null) {
+               say("sorry, but \"" + key + "\" is not a recognized attribute.");
+               return;
+           } else {
+               // inputLine.removeSwitchAndValue(KEY_FLAG);
+               if (inputLine.hasArg(VALUE_FLAG)) {
+                   value = inputLine.getNextArgFor(VALUE_FLAG);
+                   inputLine.removeSwitchAndValue(VALUE_FLAG);
+               }
+               if (hasFileFlag) {
+                   try {
+                       value = FileUtil.readFileAsString(inputLine.getNextArgFor(FILE_FLAG));
+                   } catch (Throwable throwable) {
+                       say("Sorry, but I could not seem to read the file named \"" + inputLine.getNextArgFor(FILE_FLAG) + "\"");
+                       return;
+                   }
+                   inputLine.removeSwitchAndValue(FILE_FLAG);
+
+               }
+               List<Identifiable> identifiables = findItem(inputLine);
+               boolean isSingleton = identifiables.size() == 1;
+               if (identifiables == null) {
+                   say("sorry, I could not find that object. Check your id.");
+                   return;
+               }
+               if (isSingleton) {
+                   Identifiable identifiable = identifiables.get(0);
+               }
+               map = toXMLMap(identifiable);
+               if (value == null) {
+                   gotOne = updateSingleValue(map, key);
+               } else {
+                   map.put(key, value);
+                   gotOne = true;
+               }
+           }
+           if (inputLine.hasArg(VALUE_FLAG)) {
+               say("Malformed update request. If you specify a value, you must specify a single key.");
+               return;
+           }
+
+
+           if (inputLine.hasArg(KEYS_FLAG)) {
+               List<String> keys = inputLine.getArgList(KEYS_FLAG);
+               inputLine.removeSwitchAndValue(KEYS_FLAG);
+               identifiable = findItem(inputLine);
+               if (identifiable == null) {
+                   say("sorry, I could not find that object. Check your id.");
+                   return;
+               }
+               map = toXMLMap(identifiable);
+
+               for (String k : keys) {
+                   gotOne = updateSingleValue(map, k) || gotOne; // order matters!
+               }
+           }
+
+           if (gotOne) {
+               getStore().save(fromXMLMap(map));
+           }
+
+       } //end update
+   */
+    public SerializationKeys getKeys() {
+        return mapConverter.getKeys();
+    }
+
+    /**
+     * The contract is that each of the identifiables is updated
+     *
+     * @param identifiables
+     * @param key
+     */
+    protected void doRSUpdate(List<Identifiable> identifiables, String key, Object value) {
+        for (Identifiable identifiable : identifiables) {
+            XMLMap map = toXMLMap(identifiable);
+
+
+        }
+    }
 
     /**
      * The contract is that this gets the entire current config and updates <i>exactly</i>
@@ -3065,14 +3499,15 @@ public abstract class StoreCommands extends CommonCommands {
     public static String RM_FORCE_FLAG = "-force";
 
     protected void showRMHelp() {
-        say("rm [" + KEY_FLAG + " | " + KEYS_FLAG + " list] [" + RM_FORCE_FLAG + "] id");
+        say("rm [" + KEY_FLAG + " | " + KEYS_FLAG + " list] [" + RM_FORCE_FLAG + "] index");
         sayi("Usage: remove an object or removes a property (or list of them) from an object.");
         sayi("If you supply a list, all of the properties in the list will be removed");
         sayi("No list of keys means to remove the entire object from the store (!)");
         sayi(RM_FORCE_FLAG + " = if included, the identifier is removed from the store directly");
         sayi("     without trying to load the object first. This means no checks are done before hand");
-        sayi("     Only use this if the store itself cannot load the object and removing it is the only path forward.");
+        sayi("     Only use this if e.g. the store itself cannot load the object and removing it is the only path forward.");
         showKeyShorthandHelp();
+        printIndexHelp(false);
         say("E.g.");
         sayi("rm " + KEY_SHORTHAND_PREFIX + "error_uri foo:bar");
         sayi("Removes the value of the property 'error_uri' from the object with id foo:bar");
@@ -3083,7 +3518,7 @@ public abstract class StoreCommands extends CommonCommands {
         sayi("rm " + KEYS_FLAG + " [error_uri,home_uri] foo:bar");
         sayi("removes the values of the properties error_uri and home_uri from the object with id");
         sayi("equal to foo:bar");
-        sayi("rm " + RS_REMOVE_KEY);
+        sayi("rm " + RS_DROP_ACTION);
     }
 
     /**
@@ -3133,6 +3568,7 @@ public abstract class StoreCommands extends CommonCommands {
      * object and it runs the {@link #updateStorePermissions(Identifier, Identifier, boolean)} method,
      * which you should override as needed. A typical use would be to change the ID's for a client, then use the
      * returned record to change the approval record.
+     *
      * @param identifiable
      * @param newID
      * @param updatePermissions
@@ -3171,12 +3607,13 @@ public abstract class StoreCommands extends CommonCommands {
      * @param inputLine
      */
 
-    public void change_id(InputLine inputLine) throws Exception {
+    public void change_id(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("change_id new [" + UPDATE_PERMISSIONS_FLAG + " on|off] [old] - change the identifier for a client.");
+            say("change_id new [" + UPDATE_PERMISSIONS_FLAG + " on|off] index - change the identifier for a single client.");
             say(UPDATE_PERMISSIONS_FLAG + " if on, change the identifier in any permissions too. Default is on");
             say("This will update all permissions. At the end of this operations, the");
             say("old identifier will not be in the system any longer.");
+            printIndexHelp(true);
             return;
         }
 
@@ -3189,8 +3626,9 @@ public abstract class StoreCommands extends CommonCommands {
             }
             inputLine.removeSwitch(UPDATE_PERMISSIONS_FLAG);
         }
+
         Identifier newID = BasicIdentifier.newID(inputLine.getArg(1));
-        Identifiable identifiable = findItem(inputLine);
+        Identifiable identifiable = findSingleton(inputLine);
         Identifier oldID = identifiable.getIdentifier();
         if (newID.equals(identifiable.getIdentifier())) {
             say("the source and target are the same, no changes made.");
@@ -3202,6 +3640,57 @@ public abstract class StoreCommands extends CommonCommands {
         if (updatePermissions) {
             say(changeIDRecord.updateCount + " permissions have been updated");
         }
+    }
+
+    protected boolean hasRS(InputLine inputLine) {
+        return inputLine.hasArg(RESULT_SET_KEY);
+    }
+
+    /**
+     * Does all the checks for a command that accepts a single store object.
+     * Throws an exception
+     *
+     * @param inputLine
+     * @return
+     */
+    protected Identifiable findSingleton(InputLine inputLine, String errorMessage) throws Throwable {
+        List<Identifiable> ii = findItem(inputLine);
+        if (ii == null || ii.isEmpty()) {
+            throw new ObjectNotFoundException(errorMessage);
+        }
+        if (ii.size() > 1) {
+            throw new ObjectNotFoundException("too many objects. Only a single object is supported.");
+        }
+        return ii.get(0);
+    }
+
+    protected Identifiable findSingleton(InputLine inputLine) throws Throwable {
+        return findSingleton(inputLine, "object not found");
+    }
+
+    protected void printIndexHelp(boolean singletonsOnly) {
+        say(" index - Supports a set id, the index from a listing or a result set. If present it is always");
+        say("the last argument.");
+        if (singletonsOnly) {
+            say("Note: This component only allows for a single object");
+        }
+        say("You may get an index by");
+        say("1. using the set_id command to set it globally. The index is then optional.");
+        say("2. Explicitly give the unique identifier.");
+        say("3. You may use the name of a result set. You may also restrict the elements used (see below).");
+        say("4. IF you have listed the entire contents with ls, you may give the numeric index of the object");
+        say();
+        say("How to specify the range of indices used in a result set.");
+        say("(" + RS_RANGE_KEY + " | " + RS_RANGE_SHORT_KEY + ") (integer | list | iterator)");
+
+        say("Examples of ranges are: 5 (integer), [2,4,5] (a list), [2;7] integers from to through 6 inclusive.");
+        say("Negative indices are allowed and mean to take from the end of the list, so");
+        say("my_command " + RS_RANGE_KEY + " -1  my_set ");
+        say("returns the last element in the result set name my_set.");
+        say("Note that while you may specify arguments this way, result sets are static and operations will");
+        say("be carried out on the actual stored object. ");
+        say("For operations on result sets proper, see --help for the rs command.");
+        say();
     }
 }
 
