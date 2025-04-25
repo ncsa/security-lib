@@ -22,7 +22,6 @@ import java.util.Map;
  */
 public interface Store<V extends Identifiable> extends Map<Identifier, V> {
       public static final String VERSION_TAG = "#version";
-
     /**
      * Create a new object of the given type. This is not in the store until it is registered. Attempts
      * to update the object should throw an exception. Note that this allows for a separation of creation

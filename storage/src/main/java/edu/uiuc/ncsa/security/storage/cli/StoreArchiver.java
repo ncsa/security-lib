@@ -60,6 +60,16 @@ public class StoreArchiver {
     static public String ARCHIVE_VERSION_SEPARATOR_TAG = "=";
 
     /**
+     * Static utility that checks if the supplied identifier represents a versioned item.
+     * @param id
+     * @return
+     */
+    public static boolean isVersioned(Identifier id) {
+        if(null == id) return false;
+        if(StringUtils.isTrivial(id.getUri().getFragment())) return false;
+        return id.getUri().getFragment().contains(ARCHIVE_VERSION_TAG +ARCHIVE_VERSION_SEPARATOR_TAG);
+    }
+    /**
      * Given a version id (of form URI#version=number), return the number. If the item is not versioned
      * this returns a -1.
      *
@@ -147,10 +157,11 @@ public class StoreArchiver {
      */
     protected DoubleHashMap<URI, Long> getVersions(Identifier identifier) {
         MapConverter mc = getMapConverter();
-        //  identifierString = escapeRegex(identifierString);
+        // identifierString = escapeRegex(identifierString);
+        // "\\Q$money\\E"
         List<Identifiable> values = getStore().search
                 (mc.getKeys().identifier(),
-                        identifier.toString() + ".*",
+                        "\\Q" + identifier.toString() + "\\E.*",
                         true);
 
         // now we have to look through the list of clients and determine which is the one we want
@@ -195,7 +206,7 @@ public class StoreArchiver {
         // Grab each client and run through information about them
         List<Identifiable> values = getStore().search
                 (mc.getKeys().identifier(),
-                        identifiable.getIdentifierString() + ".*",
+                        "\\Q"+identifiable.getIdentifierString() + "\\E.*",
                         true);
 
         TreeMap<Long, Identifiable> sortedMap = new TreeMap<>();

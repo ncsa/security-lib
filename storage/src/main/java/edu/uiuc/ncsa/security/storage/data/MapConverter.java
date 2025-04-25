@@ -4,11 +4,14 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -25,8 +28,10 @@ public class MapConverter<V extends Identifiable> implements XMLConverter<V> {
         return keys;
     }
 
-    public IdentifiableProvider<V> getProvider(){return provider;}
-    
+    public IdentifiableProvider<V> getProvider() {
+        return provider;
+    }
+
     public MapConverter(SerializationKeys keys, IdentifiableProvider<V> provider) {
         this.keys = keys;
         this.provider = provider;
@@ -52,7 +57,7 @@ public class MapConverter<V extends Identifiable> implements XMLConverter<V> {
     public V fromMap(ConversionMap<String, Object> map, V v) {
         v = createIfNeeded(v);
         v.setIdentifier(map.getIdentifier(keys.identifier()));
-        if(map.containsKey(keys.identifier())){
+        if (map.containsKey(keys.identifier())) {
             v.setDescription(map.getString(keys.description()));
         }
         return v;
@@ -69,7 +74,7 @@ public class MapConverter<V extends Identifiable> implements XMLConverter<V> {
      */
     public void toMap(V value, ConversionMap<String, Object> data) {
         data.put(keys.identifier(), value.getIdentifierString());
-        if(!StringUtils.isTrivial(value.getDescription())){
+        if (!StringUtils.isTrivial(value.getDescription())) {
             data.put(keys.description(), value.getDescription());
         }
     }
@@ -121,21 +126,33 @@ public class MapConverter<V extends Identifiable> implements XMLConverter<V> {
 
     /**
      * Convenience method to stash the map in a JSON object.
+     *
      * @param v
      * @return
      */
     public JSON toJSON(V v) {
         ColumnMap cMap = new ColumnMap();
-
         toMap(v, cMap);
         JSONObject json = new JSONObject();
-        json.putAll(cMap);
+        for (String attribute : cMap.keySet()) {
+            Object value = cMap.get(attribute);
+            if (value instanceof Date) {
+                json.put(attribute, Iso8601.date2String((Date) value));
+            } else {
+                if (value instanceof Calendar) {
+                    json.put(attribute, Iso8601.date2String((Calendar) value));
+                } else {
+                    json.put(attribute, value);
+                }
+            }
+        }
         return json;
     }
 
     /**
      * Convenience method to take a JSON object (made with {@link #toJSON(Identifiable)}!) and
      * return on object of the given type.
+     *
      * @param json
      * @param v
      * @return
@@ -143,10 +160,11 @@ public class MapConverter<V extends Identifiable> implements XMLConverter<V> {
     public V fromJSON(JSONObject json, V v) {
         ColumnMap cMap = new ColumnMap();
         cMap.putAll(json);
-        fromMap(cMap, v);
+        v = fromMap(cMap, v);
         return v;
     }
-    public boolean isA(Object object){
+
+    public boolean isA(Object object) {
         V v = createIfNeeded(null);
         return object.getClass().isInstance(v);
     }

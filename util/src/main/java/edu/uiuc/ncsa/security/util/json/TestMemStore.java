@@ -19,12 +19,13 @@ public class TestMemStore<V extends JSONEntry> extends HashMap<Identifier, V> im
 
     }
 
-    @Override
+     @Override
     public List<V> getAll() {
         LinkedList<V> returnValues = new LinkedList<>();
         returnValues.addAll(values());
         return returnValues;
     }
+
 
     @Override
     public V create() {

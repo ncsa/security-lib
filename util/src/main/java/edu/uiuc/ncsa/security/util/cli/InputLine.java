@@ -10,6 +10,21 @@ import java.util.*;
  * as a String (default from {@link #getArg(int)}) or as an integer (from {@link #getIntArg(int)}.
  * Supplying an empty command line will throw a {@link CommandNotFoundException} if you try to get it,
  * so check that the command line is not empty.
+ * <h3>Use</h3>
+ * <p>The basic idea is to "whittle while you work", meaning you process keys and values,
+ * which may be in any position, and as
+ * soon as you have them, remove them from the input line. This makes parsing simpler. The last
+ * thing then to process are positional arguments. So a command like</p>
+ * <pre>
+ *     search ^gt;client_id -r .*fnal.*  -out [client_id, email, strict_scopes] -rs f_clients
+ * </pre>
+ * Would be processed by
+ * <ol>
+ *     <li>get the -out attribute and list</li>
+ *     <li>get the key value (starts with &gt;)</li>
+ *     <li>get the -r and -rs values</li>
+ * </ol>
+ * <p>Then there would be unambigious processing.</p>
  * <p>Created by Jeff Gaynor<br>
  * on 5/17/13 at  11:10 AM
  */
@@ -71,7 +86,7 @@ public class InputLine {
     /**
      * If the original line is altered, reparse it.
      */
-    public void reparse(){
+    public void reparse() {
         StringTokenizer stringTokenizer = new StringTokenizer(originalLine, DELIMITER);
         Vector<String> vector = new Vector<>();
         while (stringTokenizer.hasMoreTokens()) {
@@ -98,7 +113,7 @@ public class InputLine {
      * E.g.
      * new InputLine("set_param -a scopes \"a b c\"");
      * <br/><br/>
-     * would create 3 arguments "a, b, c". Instead use this with<br/></br>
+     * would create 3 arguments "a, b, c". Instead, use this with<br/></br>
      * new InputLine("set_param", "-a", "scopes", "a b c");
      *
      * @param strings
@@ -119,6 +134,7 @@ public class InputLine {
     /**
      * Sets the original line. This is useful if there has to be some specialized processing of
      * it. Be sure to call {@link #reparse()} if you update it.
+     *
      * @param originalLine
      */
     public void setOriginalLine(String originalLine) {
@@ -252,6 +268,7 @@ public class InputLine {
         }
         return this;
     }
+
     @Override
 
     public String toString() {
@@ -528,7 +545,7 @@ public class InputLine {
 
     /**
      * Returns the number of arguments for this input line. This does <b>not</b> include the original
-     * command, so e.g. a value fo zero means no arguments were passed.
+     * command, so e.g. a value of zero means no arguments were passed.
      *
      * @return
      */
@@ -550,12 +567,31 @@ public class InputLine {
      * </pre>
      * Embedded commas are not allowed between list elements. Elements have whitespace trimmed.
      * Note that this processes the <i>entire</i> input line, so that it finds the flag
-     * and starts snooping for the start delimeter.
-     *
+     * and starts snooping for the start delimiter.
+     * <p>At the end, the key and list are removed. See {@link #getArgList(String, boolean)}
+     * This is because a list is merely bookends with comma between elements, so a list like</p>
+     * <pre>
+     *     -key [-key, -id, 42]
+     * </pre>
+     * <p>where the key is -key which is also an element in the list. If we did not remove it, then
+     * thedictum that keys are unique in an input line is vilated and parsing may or may not
+     * work as expected. To avoid ambiguity, grab the lists from an input line first.</p>
      * @param flag
      * @return
      */
     public List<String> getArgList(String flag) {
+        return getArgList(flag, true);
+    }
+
+    /**
+     * If whittle is true, then the key and its value are moved from the input line and the
+     * input line is reparsed if needed.
+     *
+     * @param key
+     * @param whittle
+     * @return
+     */
+    public List<String> getArgList(String key, boolean whittle) {
         List<String> list = new ArrayList<>();
         String rawLine = getOriginalLine();
 
@@ -564,17 +600,15 @@ public class InputLine {
         }
         // Next bit checks if rather than a list, a single value is passed in.
         // Fixes https://github.com/ncsa/security-lib/issues/29
-        String partial = getNextArgFor(flag);
-        if (!partial.startsWith(LIST_START_DELIMITER)) {
-            // then the edge case is that the next argument is not a list,
-            // but should be treated as a single argument.
-            list.add(partial);
-            return list;
-        }
+        String partial = getNextArgFor(key);
+/*        if(partial.trim().startsWith("-") ) {
+            throw new IllegalArgumentException("The key \"" + key + "\" has an unparseable list, \"" + partial+"\"");
+        }*/
+
         // The list may have embedded blanks and such, so more parsing is needed
-        int ndx = rawLine.indexOf(flag);
-        int nextSwitch = rawLine.indexOf("-", ndx + 1);
-        int startListIndex = rawLine.indexOf(LIST_START_DELIMITER, ndx);
+        int keyIndex = rawLine.indexOf(key);
+        int nextSwitch = rawLine.indexOf("-", keyIndex + 1);
+        int startListIndex = rawLine.indexOf(LIST_START_DELIMITER, keyIndex);
         if ((-1 < nextSwitch) && (nextSwitch < startListIndex)) {
             // -1 for next switch means this is the last argument
             // -1 < nextSwitch means that there is another switch with a list, like
@@ -582,7 +616,16 @@ public class InputLine {
             // We don't want a request for -zero to just return the next list.
             return list;
         }
-        int endListIndex = rawLine.indexOf(LIST_END_DELIMITER, ndx);
+        if (!partial.startsWith(LIST_START_DELIMITER)) {
+            // then the edge case is that the next argument is not a list,
+            // but should be treated as a single argument.
+            list.add(partial);
+            if (whittle) {
+                removeSwitchAndValue(key);
+            }
+            return list;
+        }
+        int endListIndex = rawLine.indexOf(LIST_END_DELIMITER, keyIndex);
         if (startListIndex == -1 || endListIndex == -1) {
             return list;
         }
@@ -591,7 +634,11 @@ public class InputLine {
         while (st.hasMoreElements()) {
             list.add(st.nextToken().trim());
         }
-
+        if (whittle) {
+            rawLine = rawLine.substring(0, keyIndex) + rawLine.substring(endListIndex + 1);
+            setOriginalLine(rawLine);
+            reparse();
+        }
         return list;
     }
 
@@ -625,7 +672,7 @@ public class InputLine {
     }
 
     public static void main(String[] args) {
-        InputLine inputLine = new InputLine("foo -zero -one [2,3,4] -arf blarf0 -arf blarf1 -arf blarf2 -woof -two [abc,  def, g] -fnord 3455.34665 -three [  a,b,   c]");
+        InputLine inputLine = new InputLine("foo -zero -one [2,   3,4   ] -arf blarf0 -arf blarf1 -arf blarf2 -woof -two [abc,  def, g] -fnord 3455.34665 -three [  a,b,   c]");
 
         System.out.println(inputLine.getArgList("-zero")); // should be empty
         System.out.println(inputLine.hasArgList("-arf")); // should be empty
@@ -634,15 +681,15 @@ public class InputLine {
         System.out.println(inputLine.getArgList("-two"));
         System.out.println(inputLine.getArgList("-three"));
         System.out.println("-arf = " + inputLine.getNextArgFor("-arf"));
+
+        System.out.println("inputLine after removing lists:");
         System.out.println(inputLine);
-        inputLine.removeSwitchAndValue("-two");
-        System.out.println(inputLine);
-        inputLine.removeSwitchAndValue("-one");
-        System.out.println(inputLine);
+
 
         InputLine inputLine1 = new InputLine("set_param", "-a", "scope", "a b c d");
         System.out.println(inputLine1);
         inputLine1 = new InputLine("set_param", "-a", "scope", "read: write: x.y:");
         System.out.println(inputLine1);
     }
+
 }

@@ -563,6 +563,18 @@ public class StringUtils {
      * @return
      */
 
+    /**
+     * See {@link #formatMap(Map, List, boolean, boolean, int, int, boolean)}. This just sets
+     * tryJSON true and passes the rest of the arguments along.
+     *
+     * @param map
+     * @param keySubset
+     * @param sortKeys
+     * @param multiLine
+     * @param indent
+     * @param displayWidth
+     * @return
+     */
 
     public static List<String> formatMap(Map map,
                                          List<String> keySubset,

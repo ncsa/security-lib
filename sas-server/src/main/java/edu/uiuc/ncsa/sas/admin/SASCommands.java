@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.sas.client.ClientKeys;
 import edu.uiuc.ncsa.sas.client.SASClient;
 import edu.uiuc.ncsa.sas.loader.SASConfigurationLoader;
 import edu.uiuc.ncsa.security.core.Identifiable;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -170,5 +171,10 @@ public class SASCommands extends StoreCommands {
     @Override
     protected List processList(InputLine inputLine, String key) throws Exception {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    protected int updateStorePermissions(Identifier newID, Identifier oldID, boolean copy) {
+        throw new UnsupportedOperationException("write me!");
     }
 }
