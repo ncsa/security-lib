@@ -283,6 +283,11 @@ public class AggregateStore<V extends Store> implements Store {
     }
 
     @Override
+    public List search(String key, boolean isNull) {
+        throw new NotImplementedException("Error: This is not yet implemented for aggregate stores");
+    }
+
+    @Override
     public boolean remove(List objects) {
         throw new NotImplementedException("Error: This is not yet implemented for aggregate stores");
     }

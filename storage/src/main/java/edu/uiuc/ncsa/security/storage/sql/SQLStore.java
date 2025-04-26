@@ -491,6 +491,39 @@ employeeStmt.executeBatch();
 
     }
 
+    // Fix https://github.com/ncsa/security-lib/issues/49
+    @Override
+    public List<V> search(String key, boolean isNull) {
+        String searchString = "select *  from " + getTable().getFQTablename() +
+                " where ? is " + (isNull ? "" : " not ") + " null " ;
+
+        List<V> values = new ArrayList<>();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+        V t = null;
+        try {
+            PreparedStatement stmt = c.prepareStatement(searchString);
+            stmt.setString(1, key);
+            stmt.executeQuery();
+            ResultSet rs = stmt.getResultSet();
+            // Now we have to pull in all the values.
+            while (rs.next()) {
+                ColumnMap map = rsToMap(rs);
+                t = create();
+                populate(map, t);
+                values.add(t);
+            }
+
+            rs.close();
+            stmt.close();
+            releaseConnection(cr);
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error getting object with identifier \"" + key + "\"", e);
+        }
+        return values;
+    }
+
     public List<V> search(String key, String condition, boolean isRegEx) {
         return search(key, condition, isRegEx, null);
     }

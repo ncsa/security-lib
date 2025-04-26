@@ -85,6 +85,15 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
     public List<V> search(String key, String condition, boolean isRegEx);
 
     /**
+     * Searches if a single column and returns all of the null or non-null elements
+     * @param key
+     * @param isNull
+     * @return
+     */
+    // Fix https://github.com/ncsa/security-lib/issues/49
+    public List<V> search(String key,  boolean isNull);
+
+    /**
      * Return a subset of all the attributes. For non-SQL stores performance may be slow.
      * @param key
      * @param condition

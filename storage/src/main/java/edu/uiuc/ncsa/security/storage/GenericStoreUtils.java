@@ -193,4 +193,23 @@ public class GenericStoreUtils {
               store.save(xmlConverter.fromMap(oldObject, null)); // creates a new object
         }
     }
+    public static <V extends Identifiable> List<V> search(Store<V>  store, String key, boolean isNull) {
+        ArrayList<V> results = new ArrayList();
+        Collection<V> values = store.values();
+        Iterator iterator = values.iterator();
+        while (iterator.hasNext()) {
+            V v = (V) iterator.next();
+            XMLMap map = new XMLMap();
+
+            store.getXMLConverter().toMap(v, map);
+            if(isNull && !map.containsKey(key)){
+                results.add(store.getXMLConverter().fromMap(map, null));
+            }
+
+            if(!isNull && map.containsKey(key)){
+                results.add(store.getXMLConverter().fromMap(map, null));
+            }
+        }// end while
+        return results;
+    }
 }

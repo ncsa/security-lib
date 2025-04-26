@@ -82,6 +82,11 @@ public class TestMemStore<V extends JSONEntry> extends HashMap<Identifier, V> im
     }
 
     @Override
+    public List<V> search(String key, boolean isNull) {
+        return null;
+    }
+
+    @Override
     public boolean remove(List<V> objects) {
         for(Identifiable identifiable : objects){
              remove(identifiable);

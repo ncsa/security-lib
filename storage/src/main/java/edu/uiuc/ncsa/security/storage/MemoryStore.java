@@ -183,4 +183,10 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
     public void update(List<Identifier> ids, Map<String, Object> values) throws UnregisteredObjectException {
      GenericStoreUtils.update(this, ids, values);
     }
+
+    @Override
+    public List<V> search(String key, boolean isNull) {
+        return GenericStoreUtils.search(this, key, isNull);
+    }
+
 }

@@ -18,6 +18,7 @@ import edu.uiuc.ncsa.security.storage.monitored.MonitoredKeys;
 import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
 import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepResponse;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
+import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.cli.editing.EditorEntry;
 import edu.uiuc.ncsa.security.util.cli.editing.EditorUtils;
@@ -424,6 +425,7 @@ public abstract class StoreCommands extends CommonCommands {
     public static final String SEARCH_BEFORE_TS_FLAG = "-before";
     public static final String SEARCH_AFTER_TS_FLAG = "-after";
     public static final String SEARCH_DATE_FLAG = "-date";
+    public static final String SEARCH_IS_NULL_FLAG = "-isNull";
 
     public HashMap<String, RSRecord> getResultSets() {
         return resultSets;
@@ -450,6 +452,17 @@ public abstract class StoreCommands extends CommonCommands {
                 return;
             }
         }
+        Boolean isNullCase = null;
+        boolean checkNullCase = inputLine.hasArg(SEARCH_IS_NULL_FLAG);
+        if (checkNullCase) {
+            isNullCase = inputLine.getBooleanNextArgFor(SEARCH_IS_NULL_FLAG);
+            inputLine.removeSwitchAndValue(SEARCH_IS_NULL_FLAG);
+            if (isNullCase == null) {
+                say("unrecognized argument for " + SEARCH_IS_NULL_FLAG + ". aborting...");
+                return;
+            }
+        }
+
         // Fix https://github.com/ncsa/security-lib/issues/48
         boolean hasVersions = inputLine.hasArg(SEARCH_VERSIONS_FLAG);
         boolean searchVersions = false;
@@ -552,10 +565,16 @@ public abstract class StoreCommands extends CommonCommands {
             }
         }
         try {
-            values = getSearchValues(list_n, hasListN,
-                    hasDate, dateField, afterDate, beforeDate,
-                    key, values,
-                    returnedAttributes, condition, isRegEx, hasKey);
+            if (checkNullCase) {
+                // Fix https://github.com/ncsa/security-lib/issues/49
+                values = getStore().search(key, isNullCase);
+            } else {
+                values = getSearchValues(list_n, hasListN,
+                        hasDate, dateField, afterDate, beforeDate,
+                        key, values,
+                        returnedAttributes, condition, isRegEx, hasKey);
+
+            }
 
             if (values == null) {
                 String kk = getKeyArg(inputLine);
@@ -2097,6 +2116,7 @@ public abstract class StoreCommands extends CommonCommands {
         sayi("[(" + SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG + ") regex] ");
         sayi("[" + SEARCH_SIZE_FLAG + "] ");
         sayi("[" + SEARCH_DEBUG_FLAG + "] ");
+        sayi("[" + SEARCH_IS_NULL_FLAG + " true | false] ");
         sayi("[" + LINE_LIST_COMMAND + " | " + VERBOSE_COMMAND + "]");
         sayi("[" + SEARCH_DATE_FLAG + " date_field (" + SEARCH_BEFORE_TS_FLAG + " time | " + SEARCH_AFTER_TS_FLAG + " time)] ");
         sayi("[" + SEARCH_RESULT_SET_NAME + " name] ");
@@ -2121,6 +2141,9 @@ public abstract class StoreCommands extends CommonCommands {
         say(StringUtils.RJustify(SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG + " regex", w) + link + "attempt to interpret regex as a regular expression");
         say(StringUtils.RJustify(SEARCH_RESULT_SET_NAME + " name", w) + link + "save the result as the name.");
         say(StringUtils.RJustify(SEARCH_DEBUG_FLAG, w) + link + "show stack traces. Only use this if you really need it.");
+        say(StringUtils.RJustify(SEARCH_IS_NULL_FLAG, w) + link + "Searches for null (i.e. unset values). true returns all objects that have the property null (unset)");
+        say(blanks + "while false returns objects that are not null (i.e. have been set). Very useful when looking for ");
+        say(blanks + "cases where some value is missing. E.g. in transactions, missing access tokens means the flow might be abandoned.");
         sayi(StringUtils.RJustify(NEXT_N_COMMAND + " = [n]", w) + link + "lists most recent n (0<n) or first n (n<0) entries. No argument implies n = 10.");
         // Fix https://github.com/ncsa/security-lib/issues/48
         say(StringUtils.RJustify(SEARCH_VERSIONS_FLAG, w) + link + "return or ignore versions. Options are");
@@ -2451,7 +2474,7 @@ public abstract class StoreCommands extends CommonCommands {
      * @return
      * @throws Exception
      */
-    protected  List processList(InputLine inputLine, String key) throws Exception{
+    protected List processList(InputLine inputLine, String key) throws Exception {
         return inputLine.getArgList(key);
     }
 
@@ -2703,7 +2726,12 @@ public abstract class StoreCommands extends CommonCommands {
                         .filter(requestedKeys::contains)
                         .collect(Collectors.toSet());
                 foundKeys = new ArrayList<>();
-                foundKeys.addAll(result);
+                // Add them back in, in the order requested.
+                for (Object ob : requestedKeys) {
+                    if (result.contains(ob.toString())) {
+                        foundKeys.add(ob.toString());
+                    }
+                }
             }
         }
         printRS(inputLine, resultSets.get(name).rs, foundKeys, limits);
@@ -2933,6 +2961,7 @@ public abstract class StoreCommands extends CommonCommands {
      */
     protected boolean showEntry(Identifiable identifiable, String key, boolean isVerbose) {
         if (hasKey(key)) {
+            ColumnMap c;
             XMLMap object = toXMLMap(identifiable);
             if (object.containsKey(key)) {
                 Object v = object.get(key);
@@ -4084,6 +4113,7 @@ public abstract class StoreCommands extends CommonCommands {
         say("For operations on result sets proper, see --help for the rs command.");
         say();
     }
+
     /**
      * Assumes there is a key and the original line is of the form -key [x, y, ... ].
      * This extracts everything between the [ and ] inclusive, truncates the original line
@@ -4092,6 +4122,7 @@ public abstract class StoreCommands extends CommonCommands {
      * which does this. The difference is that the {@link #processList(InputLine, String)}
      * function in this class should allow for executing the lists as QDL later</p>
      * <p>This utility is used in other implementations of {@link #processList(InputLine, String)}</p>
+     *
      * @param inputLine
      * @param key
      * @return
