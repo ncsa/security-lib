@@ -3050,7 +3050,8 @@ public abstract class StoreCommands extends CommonCommands {
         sayi(blanks + "your result set has a couple of extra, unwanted entries.");
         sayi(RS_SAVE_ACTION + " [" + RS_FILE_KEY + " file] name - Save the result set to the backing store. This overwrites");
         say(blanks + "the current object with the result set. Since result sets are static, this provides a way to rollback");
-        say(blanks + "to a previous state. You will always be prompted.");
+        say(blanks + "to a previous state. You will always be prompted. Note that " + RS_WRITE_ACTION + " writes the result");
+        say(blanks + "set to a file and has nothing to do with the store.");
         sayi(RS_SHOW_ACTION + " [" + RS_RANGE_KEY + " range] [" + SEARCH_RETURNED_ATTRIBUTES_FLAG + " list ] name - Show the result set, restricting to the given range");
         sayi(blanks + "(if given) and given fields (if given).");
         sayi(blanks + "No range means show the entire result set. No attributes means show all fields.");
