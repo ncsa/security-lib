@@ -32,25 +32,7 @@ public class InputLine {
     public static final String DELIMITER = " "; // what's between commands
 
     /**
-     * Ancient constructor. This class precedes the arrival of parameterized classes in Java
-     * and there are any number of applications that still instantiate it with a {@link Vector},
-     * so this has to stay. Better to use the more modern constructor {@link #InputLine(List)}.
-     * @param v
-     */
-/*    public InputLine(Vector v) {
-        parsedInput = v;
-        originalLine = "";
-        boolean isFirstPass = true;
-        for (Object obj : v) {
-            originalLine = originalLine + (isFirstPass ? "" : DELIMITER) + obj;
-            if (isFirstPass) {
-                isFirstPass = false;
-            }
-        }
-    }*/
-
-    /**
-     * Better constructor with a parameter. This takes an already parsed list of strings
+     * Constructor with a parameter. This takes an already parsed list of strings
      * and creates an instance of this class from it.
      *
      * @param v
@@ -222,6 +204,16 @@ public class InputLine {
         }
     }
 
+    /**
+     * removes a list of switches and their values. This may be used for related switchs, e.g.
+     * <pre>
+     *     removeSwitchAndValue(MY_SWITCH, MY_SHORT_SWITCH, MY_SHORTER_SWITCH);
+     * </pre>
+     * or unrelated ones as well.
+     * <p>See also: {@link #hasArg(String...)}, {@link #getNextArgFor(String...)}, {@link #removeSwitch(String...)};</p>
+     *
+     * @param values
+     */
     public void removeSwitchAndValue(String... values) {
         for (String value : values) {
 
@@ -247,6 +239,14 @@ public class InputLine {
         }
     }
 
+    /**
+     * Removes several switches without touching anything else. Use for removing flags
+     * (i.e., values that are there or not, no arguments).
+     * <p>See also: {@link #hasArg(String...)}, {@link #removeSwitchAndValue(String...)}, {@link #getNextArgFor(String...)};</p>
+     *
+     *
+     * @param value
+     */
     public void removeSwitch(String... value) {
         if (parsedInput != null) {
             for (String v : value) {
@@ -426,6 +426,8 @@ public class InputLine {
      * Check a list of args, e.g.
      * hasArg(SWITCH, SHORT_SWITCH, SHORTER_SWITCH)
      *
+     * <p>See also: {@link #getNextArgFor(String...)} (String...)}, {@link #removeSwitchAndValue(String...)}, {@link #removeSwitch(String...)};</p>
+     *
      * @param args
      * @return
      */
@@ -439,6 +441,23 @@ public class InputLine {
             }
         }
         return false;
+    }
+
+    /**
+     * For a list of keys, return the first one it finds, null if no such key.
+     * @param keys
+     * @return
+     */
+    public String whichArg(String... keys) {
+        if (keys.length == 0) {
+            return null;
+        }
+        for (String arg : keys) {
+            if (indexOf(arg) != -1) {
+                return arg;
+            }
+        }
+        return null;
     }
 
     /**
@@ -504,6 +523,41 @@ public class InputLine {
         return getArg(1 + index); // finally, a result!
     }
 
+    /**
+     * Analog of {@link #hasArg(String...)}, where one of several (related) switches is checked.
+     * First hit wins.
+     * <p>See also: {@link #hasArg(String...)}, {@link #removeSwitchAndValue(String...)}, {@link #removeSwitch(String...)};</p>
+     *
+     * @param keys
+     * @return
+     */
+    public String getNextArgFor(String... keys) {
+        if (keys.length == 0) {
+            return null;
+        }
+        for (String arg : keys) {
+            int index = indexOf(arg);
+            if (index != -1) {
+                if (index == getArgs().size()) { // so it is the last arg in the string and there cannot be another
+                    return null;
+                }
+                return getArg(1 + index);
+            }
+        }
+        return null;
+    }
+
+    /*
+         if (args.length == 0) {
+            return false;
+        }
+        for (String arg : args) {
+            if (indexOf(arg) != -1) {
+                return true;
+            }
+        }
+        return false;
+     */
     public static final String SWITCH = "-";
 
     /**
@@ -576,6 +630,7 @@ public class InputLine {
      * <p>where the key is -key which is also an element in the list. If we did not remove it, then
      * thedictum that keys are unique in an input line is vilated and parsing may or may not
      * work as expected. To avoid ambiguity, grab the lists from an input line first.</p>
+     *
      * @param flag
      * @return
      */
@@ -607,35 +662,43 @@ public class InputLine {
 
         // The list may have embedded blanks and such, so more parsing is needed
         int keyIndex = rawLine.indexOf(key);
-        int nextSwitch = rawLine.indexOf("-", keyIndex + 1);
+        int nextSwitch = rawLine.indexOf("-", keyIndex + key.length());
         int startListIndex = rawLine.indexOf(LIST_START_DELIMITER, keyIndex);
-        if ((-1 < nextSwitch) && (nextSwitch < startListIndex)) {
-            // -1 for next switch means this is the last argument
-            // -1 < nextSwitch means that there is another switch with a list, like
-            // foo -zero -one [a,b,c]
-            // We don't want a request for -zero to just return the next list.
-            return list;
-        }
-        if (!partial.startsWith(LIST_START_DELIMITER)) {
-            // then the edge case is that the next argument is not a list,
-            // but should be treated as a single argument.
+        if(startListIndex == -1){
+            //Assume single value to be taken as a list
             list.add(partial);
             if (whittle) {
                 removeSwitchAndValue(key);
             }
             return list;
         }
-        int endListIndex = rawLine.indexOf(LIST_END_DELIMITER, keyIndex);
-        if (startListIndex == -1 || endListIndex == -1) {
-            return list;
+        int endListIndex;
+        String rawList;
+        if(nextSwitch == -1){
+            // this is the rest of the line.
+            // just in case, use that
+            endListIndex = rawLine.length();
+            rawList = rawLine.substring(startListIndex);
+            rawLine = rawLine.substring(0, keyIndex);
+        }else{
+            if (nextSwitch < startListIndex) {
+                // means no list between this and next flag, so return empty list
+                // foo -zero -one [a,b,c]
+                // We don't want a request for -zero to just return the next list.
+                return list;
+            }
+            endListIndex = rawLine.indexOf(LIST_END_DELIMITER, keyIndex);
+             rawList = rawLine.substring(startListIndex,endListIndex+1); // include end list delimiter
+            rawLine = rawLine.substring(0, keyIndex) + rawLine.substring(endListIndex + 1);
         }
-        String rawList = rawLine.substring(startListIndex + 1, endListIndex);
+        //String rawList = rawLine.substring(startListIndex + 1, endListIndex);
+        // Now, chop off bookends
+        rawList = rawList.substring(rawList.indexOf(LIST_START_DELIMITER) + 1, rawList.indexOf(LIST_END_DELIMITER));
         StringTokenizer st = new StringTokenizer(rawList, LIST_SEPARATOR);
         while (st.hasMoreElements()) {
             list.add(st.nextToken().trim());
         }
         if (whittle) {
-            rawLine = rawLine.substring(0, keyIndex) + rawLine.substring(endListIndex + 1);
             setOriginalLine(rawLine);
             reparse();
         }
@@ -644,6 +707,8 @@ public class InputLine {
 
     /**
      * Checks if the given flag's argument is a list.
+     *
+     * <p>See also: {@link #getArgList(String)}</p>
      *
      * @param flag
      * @return
@@ -656,7 +721,7 @@ public class InputLine {
             return false;
         }
         int ndx = rawLine.indexOf(flag);
-        int nextSwitch = rawLine.indexOf("-", ndx + 1);
+        int nextSwitch = rawLine.indexOf("-", ndx + flag.length());
         int startListIndex = rawLine.indexOf(LIST_START_DELIMITER, ndx);
         if (startListIndex == -1) {
             return false; // end of story -- no lists anywhere.
@@ -672,16 +737,20 @@ public class InputLine {
     }
 
     public static void main(String[] args) {
-        InputLine inputLine = new InputLine("foo -zero -one [2,   3,4   ] -arf blarf0 -arf blarf1 -arf blarf2 -woof -two [abc,  def, g] -fnord 3455.34665 -three [  a,b,   c]");
+        String originalLine ="foo -zero -one [2,   3,4   ] -arf blarf0  -woof -two [abc,  def, g] -fnord 3455.34665 -- [  a,b,   c]";
+        InputLine inputLine = new InputLine(originalLine);
 
         System.out.println(inputLine.getArgList("-zero")); // should be empty
         System.out.println(inputLine.hasArgList("-arf")); // should be empty
         System.out.println(inputLine.hasArg("-one"));
         System.out.println(inputLine.getArgList("-one"));
         System.out.println(inputLine.getArgList("-two"));
-        System.out.println(inputLine.getArgList("-three"));
+        System.out.println(inputLine.getArgList("--"));
+        System.out.println(inputLine.getArgList("-arf")); // should return values as list
         System.out.println("-arf = " + inputLine.getNextArgFor("-arf"));
 
+        System.out.println("original line before removing lists:");
+        System.out.println(originalLine);
         System.out.println("inputLine after removing lists:");
         System.out.println(inputLine);
 

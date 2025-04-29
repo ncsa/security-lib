@@ -5,11 +5,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <title>The Store Commands CLI</title>
-    <!--#include virtual="../head.html" -->
 </head>
 
 <body class="composite">
-<!--#include virtual="../header.html"-->
 <h2>Overview</h2>
 <p>The Store Command class allows you to manage a store (possibly more)
 with a primary key but how
@@ -71,14 +69,15 @@ stores, or to serialize an object, edit it then restore it.</p>
     <li>deserialize</li>
     <li>serialize</li>
 </ul>
-<h3>CRUD Operations on objects.</h3>
+<h3>CRUD (and Other) Operations on Objects.</h3>
 <ul>
     <li>copy</li>
     <li>create</li>
     <li>list_keys</li>
     <li>ls</li>
-    <li>rename</li>
+    <li>change_id</li>
     <li>rm</li>
+    <li>search</li>
     <li>update</li>
 </ul>
 <h3>Working with a single object</h3>
@@ -89,6 +88,19 @@ stores, or to serialize an object, edit it then restore it.</p>
     <li>edit -- edit the current object with the identifier</li>
     <li>set_id -- set the current default identifier</li>
 </ul>
+<h3>Working with multiple objects: result sets</h3>
+<p>For many operations, you may get results, e.g. from the search command. You
+can save these in a <i>result set</i>, which is jus a list of objects.
+These may be used as arguments to other commands and for the vast majority
+of commands, you may operate on results sets en masse, e.g. update a value
+for every element in a result set.</p>
+<p><i>A Caveat</i>. result sets are static, meaning when you create one,
+it does nto change. Running the update command ona result set will change
+all of the backing objects, but the result set itself will not be altered, you
+must recreate it to get the changes.</p>
+<p>To read up the details, issue</p>
+<pre>/help index</pre>
+<p>in the CLI.</p>
 <h3>Archiving objects.</h3>
 <p>Objects may be archived in the store and restored. This is done by making a
 complete copy of the object and saving it with an overloaded identifier.
@@ -118,6 +130,5 @@ use something like a bash or QDL script, but a wide variety of cases can be hand
     <li>size -- show the size of the store, i.e., the number of entries</li>
     <li>version --print out the version string for store commands</li>
 </ul>
-<!--#include virtual="../footer.html" -->
 </body>
 </html>

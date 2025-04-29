@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.ObjectNotFoundException;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.storage.MonitoredStoreInterface;
@@ -38,8 +39,7 @@ import java.util.stream.Collectors;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
 import static edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfigUtils.processUpkeep;
-import static edu.uiuc.ncsa.security.util.cli.CLIDriver.CLEAR_BUFFER_COMMAND;
-import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
+import static edu.uiuc.ncsa.security.util.cli.CLIDriver.*;
 
 /**
  * This also has the machinery for parsing configurations since the user should be able
@@ -279,26 +279,48 @@ public abstract class StoreCommands extends CommonCommands {
 
 
     protected void showUpdateHelp() {
-        say("update [" + KEY_FLAG + " key [" + VALUE_FLAG + " value | " + FILE_FLAG + " file_path " + JSON_FLAG + "]]" +
-                "[" + KEYS_FLAG + " array] [id | index] ");
+        String blanks = getBlanks(5);
+        say("update [" + KEY_FLAG + " key | list ] [" + VALUE_FLAG + " value | " + FILE_FLAG + " file_path ]" +
+                "[index] ");
         sayi("Usage: Update the properties of the object.");
-        sayi("This has three modes. Just an id will prompt you for every value to update.");
+        sayi(RJustify(KEY_FLAG, 8) + " - specify a single property for update");
+        sayi(blanks + "You may use the " + KEY_SHORTHAND_PREFIX + " for a single property, but a list requires the flag");
+        sayi(RJustify(VALUE_FLAG, 8) + " - specify a value or list of them for the propert(ies)");
+        sayi(RJustify(FILE_FLAG, 8) + " - specify a file containing a *single* value for the propert(ies)");
+
+        sayi("This has three modes. Just an id will prompt you for every value to update. This only works on");
+        say("single objects and will be rejected for a set of them.");
         sayi("Alternately, you may either specify a single key + value OR you may specify an array of keys");
         sayi("of the form [key0,key1,...]. (The list_keys command will tell what the keys are.)");
-        sayi("The " + KEYS_FLAG + " will act on all the keys supplied.");
         showKeyShorthandHelp();
         say("E.g.");
-        sayi("update /foo:bar");
-        sayi("no arguments means to interactively ask for every attribute. /foo:bar is the identifier for this object.");
-        say("E.g.");
-        sayi("update -key cfg -file /path/to/file /foo:bar");
-        sayi("read the contents of the file (as a string) into the attribute");
-        say("E.g.");
-        sayi("update " + KEY_SHORTHAND_PREFIX + "name " + VALUE_FLAG + " \"My client\" /foo:bar");
+        sayi("update foo:bar");
+        sayi("no arguments means to interactively ask for every attribute. foo:bar is the identifier for this object.");
+        say("E.g. Update a property from a file");
+        sayi("update >cfg -file /path/to/file /foo:bar");
+        sayi("read the contents of the file (as a string) into the attribute. The shorthand for a single  ");
+        sayi(blanks + "property was used here.");
+        say("E.g. Mass update #1");
+        sayi("update -key cfg -file /path/to/file my_result_set");
+        sayi("read the contents of the file (as a string) into the attribute for every elements in the");
+        sayi("result set named my_result_set.");
+        say("E.g. Mass update #2, specify a file");
+        sayi("update " + KEY_SHORTHAND_PREFIX + "cfg -file /path/to/file " + RS_RANGE_SHORT_KEY + " [2,5,6] my_result_set");
+        sayi("Update items 2, 5 and 6 in the given result set.");
+        say("E.g. Mass update #3, specify values");
+        sayi("update -key [allow_qdl,allow_custom_ids] -value [true,false] " + RS_RANGE_SHORT_KEY + " [2,5,6] my_result_set");
+        sayi("Update items 2, 5 and 6 in the given result set with the given values.");
+        say("E.g. Mass update #4, entering values");
+        sayi("update -key [allow_qdl,allow_custom_ids] " + RS_RANGE_SHORT_KEY + " [2,5,6] my_result_set");
+        sayi("Update items 2, 5 and 6. Since no values are specified, you will be prompted for the first");
+        say(blanks + "pass and these will be applied to all other objects.");
+
+        say("E.g. Update with explicit value");
+        sayi("update " + KEY_SHORTHAND_PREFIX + "name " + VALUE_FLAG + " \"My client\" foo:bar");
         sayi("This changes the value of the 'name' attribute to 'My client' for the object with id 'foo:bar'");
         sayi("Note that no prompting is done! The value will be updated.");
-        say("E.g.");
-        sayi("update " + KEYS_FLAG + " [name,callback_uri] /foo:bar");
+        say("E.g. Update selected proeprties, being prompted for each");
+        sayi("update " + KEYS_FLAG + " [name,callback_uri] foo:bar");
         sayi("This would prompt to update the values for the 'name' and 'callback_uri' properties");
         sayi("of the object with id 'foo:bar'");
         sayi("A few notes.");
@@ -708,8 +730,11 @@ public abstract class StoreCommands extends CommonCommands {
                 limits.add(i);
             } // makes an iterator so show everything
         } else {
-
-            start = ((Long) limits.get(0)).intValue();
+            if (limits.get(0) instanceof Long) {
+                start = ((Long) limits.get(0)).intValue();
+            } else {
+                throw new IllegalArgumentException("limit must be a number.");
+            }
         }
         // get start in the right range
         while (start < 0) {
@@ -789,6 +814,9 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     public static class RSRecord {
+        public RSRecord() {
+        }
+
         public RSRecord(List<Identifiable> rs, List<String> fields) {
             this.rs = rs;
             this.fields = fields;
@@ -829,6 +857,8 @@ public abstract class StoreCommands extends CommonCommands {
         if (showHelp(inputLine)) {
             say("edit index");
             sayi("Usage: Edit a single object in an external editor.");
+            say("You must have configured an editor in the configuration for this to work.");
+            say("If you have not, the default line editor will be used.");
             sayi("Note that this will update the object on exiting the editor");
             printIndexHelp(true);
         }
@@ -1090,9 +1120,10 @@ public abstract class StoreCommands extends CommonCommands {
     protected void showCreateHelp() {
         say("create [id]\n");
         sayi("Usage: Create a new entry in the currently active store.");
-        sayi("where the id is a unique uri which will identify the object. (Note that there is not a lead slash! ");
-        sayi("Just enter the identifier if you want to set it. Be sure it is a valid uri.) If you do not specify an");
+        sayi("where the id is a unique identifier for the object.");
+        sayi("If you do not specify an");
         sayi("identifier, you will be prompted for one. You may also elect to have a new, random one created and assigned.");
+        sayi("This will *not* use the current set index.");
     }
 
 
@@ -1206,7 +1237,6 @@ public abstract class StoreCommands extends CommonCommands {
     public static final int DEFAULT_MAGIC_NUMBER = 0;
 
     protected Identifiable create(Identifiable c, int magicNumber) throws IOException {
-        Identifier id = null;
         c = preCreation(c, magicNumber);
         info("Created object " + c.getClass().getSimpleName() + " with identifier " + c.getIdentifierString());
         if (isOk(readline("object created, edit (y/n)?"))) {
@@ -1224,10 +1254,10 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
 
-    Identifier id = null;
+    List<Identifier> idList = null;
 
     public boolean hasID() {
-        return id != null;
+        return idList != null;
     }
 
     /**
@@ -1235,12 +1265,12 @@ public abstract class StoreCommands extends CommonCommands {
      *
      * @return
      */
-    public Identifier getID() {
-        return id;
+    public List<Identifier> getID() {
+        return idList;
     }
 
-    public void setID(Identifier id) {
-        this.id = id;
+    public void setID(List<Identifier> id) {
+        this.idList = id;
     }
 
     public void clear_id(InputLine inputLine) {
@@ -1248,7 +1278,7 @@ public abstract class StoreCommands extends CommonCommands {
             showClearIDHelp();
             return;
         }
-        id = null;
+        idList = null;
     }
 
     private void showClearIDHelp() {
@@ -1262,54 +1292,126 @@ public abstract class StoreCommands extends CommonCommands {
             showSetIDHElp();
             return;
         }
+        String originalLine = inputLine.getOriginalLine(); // might need later
+        // case 1: Set with an id or
         String lastArg = inputLine.getLastArg();
+        List<Identifier> oldIDs = idList;
+        idList = null; // ull it or the next call just finds whatever is set.
         List<Identifiable> identifiables = findItem(inputLine);
-        Identifier rawID = null;
-        // handle getting it from a result set first.
         if (identifiables != null) {
-            if (1 < identifiables.size()) {
-                say("too many arguments, only one may be set.");
-                return;
+            List<Identifier> ids = new ArrayList<>(identifiables.size());
+            for (Identifiable x : identifiables) {
+                ids.add(x.getIdentifier());
             }
-            rawID = identifiables.get(0).getIdentifier();
-            setID(rawID);
+            setID(ids);
             return;
+        } else {
+            idList = oldIDs; // set it back in case this bombs later, don't just zero it.
         }
         // try to get it directly
-        if (rawID.equals("set_id")) {
-            // they forgot an argument
-            say("sorry, but you have to supply an id to set.");
-            return;
-        }
 
+        // case 2: There is a list of some sort, but no result set.
+        // Allow for
+        // set_id -- [my:id, -1]
+        // So explicit list, relative index in allEntries
 
-        int index = -1;
-        try {
-            index = Integer.parseInt(lastArg);
-            if (0 <= index && allEntries.size() < index) {
-                setID(allEntries.get(index).getIdentifier());
-            } else {
-                say("warning: no such index");
+        InputLine inputLine2 = new InputLine(originalLine);
+        if (inputLine2.hasArg(RS_RANGE_KEY, RS_RANGE_SHORT_KEY)) {
+            List list = processList(inputLine2, inputLine2.whichArg(RS_RANGE_KEY, RS_RANGE_SHORT_KEY));
+            if (list != null && list.size() > 0) {
+                // then this is a list of strings, or integers. The strings are ids, the
+                // integers are indices in allEntries
+                HashSet<Identifier> idsSet = new HashSet<>(list.size()); // make sure they are unique
+                for (Object x : list) {
+
+                    Identifier y = getIdentifierfromIndex(x);
+                    if (y != null) {
+                        idsSet.add(y);
+                    }
+                } //end for
+                List<Identifier> ids = new ArrayList<>(idsSet.size());
+                ids.addAll(idsSet);
+                idList = ids;
                 return;
             }
+        }
+        // case 3: Maybe an integer, not a list?
+        int index = -1;
+        try {
+            int ndx = Integer.parseInt(lastArg);
+            while (ndx < 0) {
+                ndx = ndx + allEntries.size(); // get in right range
+            }
+            while (allEntries.size() <= ndx) {
+                ndx = ndx - allEntries.size();
+            }
+            idList = new ArrayList<>(1);
+            idList.add(allEntries.get(index).getIdentifier());
         } catch (NumberFormatException nfx) {
             if (lastArg.startsWith("/")) {
                 lastArg = lastArg.substring(1);
             }
-            setID(BasicIdentifier.newID(lastArg));
-            if (!getStore().containsKey(getID())) {
-                say("warning: unknown id ");
+            try {
+                Identifier id = BasicIdentifier.newID(lastArg);
+                idList = new ArrayList<>(1);
+                idList.add(id);
+                if (!getStore().containsKey(getID())) {
+                    say("warning: unknown id. ");
+                }
+                // alles ok...
+            } catch (Throwable t) {
+                say("Could not parse identifier \"" + lastArg + "\", aborting...");
+                return;
             }
-            // alles ok...
         }
 
-        if (id == null) {
+        if (idList == null) {
             say("warning: no identifier set");
             return;
         }
 
-        say("Identifier set to " + id);
+        say("Identifier set to " + idList);
 
+    }
+
+    /**
+     * If there is a list of objects, this will try to ferret out the
+     * identifier for the object.
+     *
+     * @param x
+     * @return
+     */
+    protected Identifier getIdentifierfromIndex(Object x) {
+        Integer ndx = null;
+        if (x instanceof Long) {
+            ndx = ((Long) x).intValue();
+        } else {
+            if (x instanceof Integer) {
+                ndx = ((Integer) x).intValue();
+            } else {
+                if (x instanceof String) {
+                    try {
+                        ndx = Integer.parseInt((String) x);
+                    } catch (Throwable t) {
+                        return BasicIdentifier.newID((String) x);
+                    }
+                }
+            }
+        }
+        if (ndx == null) {
+            throw new NFWException("illegal list element type:" + x);
+        }
+        if (allEntries == null) {
+            throw new NFWException("all entries not set. Run ls first if the store is not huge.");
+        } else {
+            while (ndx < 0) {
+                ndx = ndx + allEntries.size(); // get in right range
+            }
+            while (allEntries.size() <= ndx) {
+                ndx = ndx - allEntries.size();
+            }
+            return allEntries.get(ndx).getIdentifier();
+        }
     }
 
     private void showSetIDHElp() {
@@ -1331,11 +1433,11 @@ public abstract class StoreCommands extends CommonCommands {
             showGetIDHelp();
             return;
         }
-        if (id == null) {
+        if (idList == null) {
             say("no id set");
             return;
         }
-        say(id.toString());
+        say(idList.toString());
     }
 
     private void showGetIDHelp() {
@@ -1391,6 +1493,7 @@ public abstract class StoreCommands extends CommonCommands {
 
     /**
      * Resolves the first argument of a command line into either a unique identifier
+     * against the ambient store.
      * The contract is that <b>IF</b> there is an ID set (with {@link #set_id(InputLine)})
      * then use that. Otherwise, take the last argument of the input line and try to find that.
      * <p><b>Note:</b> If there is no such item, such as an empty set, this will return a null.
@@ -1404,6 +1507,19 @@ public abstract class StoreCommands extends CommonCommands {
      */
 
     protected FoundIdentifiables findItem(InputLine inputLine, boolean allowResultSets) throws Throwable {
+        return findItem(getStore(), inputLine, allowResultSets);
+    }
+
+    /**
+     * General case for finding items from a store. Pass in the store.
+     *
+     * @param store
+     * @param inputLine
+     * @param allowResultSets
+     * @return
+     * @throws Throwable
+     */
+    protected FoundIdentifiables findItem(Store store, InputLine inputLine, boolean allowResultSets) throws Throwable {
         Identifier localID = null;
         int index = -1;
         FoundIdentifiables out;
@@ -1411,12 +1527,14 @@ public abstract class StoreCommands extends CommonCommands {
         // Case 1: ID has been set. Use it.
         if (hasID()) {
             out = new FoundIdentifiables(false);
-            Identifiable x = (Identifiable) getStore().get(getID());
-            if (x == null) {
-                return null;
+            for (Identifier id : idList) {
+                Identifiable x = (Identifiable) store.get(id);
+                if (x == null) {
+                    continue; // or throw object nor found exception???
+                }
+                out.setLocalID(true);
+                out.add(x);
             }
-            out.setLocalID(true);
-            out.add(x);
             return out;
         }
         // case 2: Explicit identifier given
@@ -1428,7 +1546,7 @@ public abstract class StoreCommands extends CommonCommands {
             if (lastArg.startsWith("/")) {
                 lastArg = lastArg.substring(1);
             }
-            identifiable = (Identifiable) getStore().get(BasicIdentifier.newID(lastArg));
+            identifiable = (Identifiable) store.get(BasicIdentifier.newID(lastArg));
             out = new FoundIdentifiables(false);
             if (identifiable != null) {
                 out.setGivenID(true);
@@ -1483,84 +1601,23 @@ public abstract class StoreCommands extends CommonCommands {
             out.setNumericIndex(index);
             return out;
         } catch (Throwable t) {
-            // nothing to do. Assume its a result set.
+        }
+        // last possible case, it's some sort of list?
+        if (!inputLine.hasArg(RS_RANGE_KEY, RS_RANGE_SHORT_KEY)) {
+            return null;
+        }
+        List list = processList(inputLine, inputLine.whichArg(RS_RANGE_KEY, RS_RANGE_SHORT_KEY));
+        if (list != null && list.size() > 0) {
+            FoundIdentifiables identifiables = new FoundIdentifiables(false, list.size());
+
+            for (Object x : list) {
+                identifiables.add((Identifiable) store.get(getIdentifierfromIndex(x)));
+            }
+            return identifiables;
         }
         return null;
     }
 
-    protected List<Identifiable> oldfindItem(InputLine inputLine, boolean allowResultSets) throws Throwable {
-        // first case is one in which this does not apply since there is no argument.
-        // Second case is to try and interpret the last argument as an index or id.
-        // First look for overrides to local id
-        Identifier localID = null;
-        int index = -1;
-        if (hasID()) {
-            localID = getID();
-        } else {
-            if (inputLine.hasArg(SEARCH_RESULT_SET_NAME)) {
-                if (!allowResultSets) {
-                    return null;
-                }
-                String rsName = inputLine.getNextArgFor(SEARCH_RESULT_SET_NAME);
-                if (!getResultSets().containsKey(rsName)) {
-                    return null;
-                }
-                inputLine.removeSwitchAndValue(SEARCH_RESULT_SET_NAME);
-                RSRecord rs = getResultSets().get(rsName);
-                String key = null;
-                if (inputLine.hasArg(RS_RANGE_KEY)) {
-                    key = RS_RANGE_KEY;
-                } else if (inputLine.hasArg(RS_RANGE_SHORT_KEY)) {
-                    key = RS_RANGE_SHORT_KEY;
-                }
-                if (key != null) {
-                    List indices = processList(inputLine, key);
-                    List<Identifiable> identifiables = rs.getSubset(indices);
-                    if (identifiables.isEmpty()) {
-                        return null;
-                    }
-                    return identifiables;
-                } else {
-                    if (rs.rs == null || rs.rs.isEmpty()) {
-                        return null;
-                    }
-                    return rs.rs;
-                }
-            }
-            try {
-                index = Integer.parseInt(inputLine.getLastArg());
-                if (allEntries == null || allEntries.isEmpty()) {
-                    loadAllEntries(); // just in case...
-                }
-                if (index < 0 || allEntries.size() < index) {
-                    return null;
-                }
-                ArrayList<Identifiable> out = new ArrayList(1);
-                out.add(allEntries.get(index));
-                return out;
-            } catch (Throwable t) {
-                // rock on
-                // Fixes https://github.com/ncsa/security-lib/issues/18
-                // If it starts with a / remove that. otherwise just try to turn non-integers into an id.
-                if (inputLine.getLastArg().startsWith("/")) {
-                    localID = BasicIdentifier.newID(inputLine.getLastArg().substring(1));
-                } else {
-                    localID = BasicIdentifier.newID(inputLine.getLastArg());
-                    if (!localID.getUri().isAbsolute()) {
-                        return null;
-                    }
-                }
-            }
-        }
-
-        if (localID != null) {
-            ArrayList<Identifiable> out = new ArrayList(1);
-            out.add((Identifiable) getStore().get(localID));
-            return out;
-        }
-
-        return null;
-    }
 
     protected void oldrm(InputLine inputLine) throws Throwable {
         FoundIdentifiables identifiables = findItem(inputLine);
@@ -1572,9 +1629,9 @@ public abstract class StoreCommands extends CommonCommands {
         getStore().remove(identifiables); // batch remove
         for (Identifiable identifiable : identifiables) {
             // reset ID
-            if (id != null) {
-                if (identifiable.getIdentifier().equals(id)) {
-                    id = null;
+            if (idList != null) {
+                if (identifiable.getIdentifier().equals(idList)) {
+                    idList = null;
                 }
             }
         }
@@ -1719,19 +1776,20 @@ public abstract class StoreCommands extends CommonCommands {
  */
 
     protected void showLSHelp() {
+        String blanks = getBlanks(5);
         say("ls [flags] [>key key | " + KEYS_FLAG + " list] index");
-        sayi("Usage: Show information about an object or objects. Only a single object is supported.");
+        sayi("Usage: Show information about an object or objects.");
         sayi("flags are");
         sayi(StringUtils.RJustify(LINE_LIST_COMMAND, 4) + " = " + "line list of an object or all objects. Longer entries will be truncated.");
         sayi(StringUtils.RJustify(ALL_LIST_COMMAND, 4) + " = " + " list of **every** entry in the store. You have been warned.");
         sayi(StringUtils.RJustify(VERBOSE_COMMAND, 4) + " = " + "verbose list. All entries will be shown in their entirety.");
         sayi(StringUtils.RJustify(LOAD_ONLY_COMMAND, 4) + " = " + "Loads the entire store into memory, displaying nothing.");
-        sayi("      Use with care! A really large store may swamp your machine and crash it.");
-        sayi("      Note: If you are going to refer to objects by their numerical index, you will need to");
-        say("             load the store explicitly first with this flag.");
+        sayi(blanks + "Use with care! A really large store may swamp your machine and crash it.");
+        sayi(blanks + "Note: If you are going to refer to objects by their numerical index, you will need to");
+        say(blanks + "       load the store explicitly first with this flag.");
         sayi(KEY_SHORTHAND_PREFIX + "key | " + KEY_FLAG + " key - a single key Only this property will be shown.");
         sayi(KEYS_FLAG + " list -  a list of properties to display. You amy specify list or verbose");
-        printIndexHelp(true);
+        printIndexHelp(false);
         say("E.g.'s");
         sayi("ls " + LINE_LIST_COMMAND + " " + ALL_LIST_COMMAND + " = line listing of entire store. This may be huge.");
         sayi("ls " + LINE_LIST_COMMAND + " = line list of the currently active object.");
@@ -1741,8 +1799,8 @@ public abstract class StoreCommands extends CommonCommands {
         sayi("ls " + LINE_LIST_COMMAND + " foo:bar = line list of the object with identifier foo:bar");
         sayi("ls " + VERBOSE_COMMAND + " foo:bar = verbose list of the object with identifier foo:bar");
         sayi("ls " + KEYS_FLAG + " [client_id, create_date] my_results = prints only the client ids and create date");
-        sayi("       from the result set my_results. Remember that this prints what is in the store, not the result set");
-        sayi("       To print the result set, use the rs command.");
+        sayi(blanks + "from the result set my_results. Remember that this prints what is in the store, not the result set");
+        sayi(blanks + "To print the result set, use the rs command.");
         sayi("ls " + KEY_SHORTHAND_PREFIX + "cfg foo:bar = show the value of the cfg property in the object with ID foo:bar");
     }
 
@@ -1752,7 +1810,7 @@ public abstract class StoreCommands extends CommonCommands {
     protected final String VERBOSE_COMMAND = "-v";
 
     protected boolean hasId() {
-        return id != null;
+        return idList != null;
     }
 
     protected void oldls1(InputLine inputLine) throws Throwable {
@@ -1842,14 +1900,24 @@ public abstract class StoreCommands extends CommonCommands {
             say("Sorry, no objects found.");
             return;
         }
-        String key = getAndCheckKeyArg(inputLine);
+        String key = getKeyArg(inputLine);
+
         if (key != null) {
+            if (!getKeys().allKeys().contains(key)) {
+                say("unrecognized key: " + key);
+                return;
+            }
             say(key + ":");
             for (Identifiable identifiable : identifiables) {
                 if (identifiables.isRS()) {
                     identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
                 }
                 showEntry(identifiable, key, inputLine.hasArg(VERBOSE_COMMAND));
+                if (1 < identifiables.size()) {
+                    say("------ end " + identifiable.getIdentifierString()); // spacer when listing multiple
+                    say(); // add a blanks in between too...
+                }
+
             }
             return;
         }
@@ -2214,7 +2282,7 @@ public abstract class StoreCommands extends CommonCommands {
     public static String KEY_SHORTHAND_PREFIX = ">";
     public static String RANDOM_ID_FLAG = "-random_id";
     public static String FORCE_COPY_FLAG = "-f";
-    public static String UPDATE_PERMISSIONS_FLAG = "-p";
+    public static String SKIP_UPDATE_PERMISSIONS_FLAG = "-skipPermissions";
 
     /**
      * resolves key shorthand of &gt;key_name or -key key_name
@@ -2353,10 +2421,10 @@ public abstract class StoreCommands extends CommonCommands {
         }
         boolean forceIt = inputLine.hasArg(FORCE_COPY_FLAG);
         boolean randomID = inputLine.hasArg(RANDOM_ID_FLAG);
-        boolean updatePermissions = inputLine.hasArg(UPDATE_PERMISSIONS_FLAG);
+        boolean skipUpdatePermissions = inputLine.hasArg(SKIP_UPDATE_PERMISSIONS_FLAG);
         inputLine.removeSwitch(FORCE_COPY_FLAG);
         inputLine.removeSwitch(RANDOM_ID_FLAG);
-        inputLine.removeSwitch(UPDATE_PERMISSIONS_FLAG);
+        inputLine.removeSwitch(SKIP_UPDATE_PERMISSIONS_FLAG);
 
         String sourceString = inputLine.getArg(1); // zero-th arg is name of command.
         String targetString = null;
@@ -2367,6 +2435,10 @@ public abstract class StoreCommands extends CommonCommands {
         Identifier targetId = null;
         try {
             sourceId = BasicIdentifier.newID(sourceString);
+            if (!getStore().containsKey(sourceId)) {
+                say("The source object with id '" + sourceString + "' does not exist.");
+                return;
+            }
         } catch (Throwable t) {
             say("sorry, but the first argument \"" + sourceString + "\" is not a valid identifier");
             return;
@@ -2379,6 +2451,11 @@ public abstract class StoreCommands extends CommonCommands {
         } else {
             try {
                 targetId = BasicIdentifier.newID(targetString);
+                // check for existence later with -force flag
+                if (isBadID(targetId.getUri())) {
+                    say("Bad target ID: " + targetId.getUri());
+                    return;
+                }
             } catch (Throwable t) {
                 say("sorry, but the second argument \"" + targetString + "\" is not a valid identifier");
                 return;
@@ -2394,13 +2471,13 @@ public abstract class StoreCommands extends CommonCommands {
 
         Identifier newID = doCopy(source, targetId, randomID);
         int updatedPermissionCount = 0;
-        if (updatePermissions) {
+        if (!skipUpdatePermissions) {
             updatedPermissionCount = updateStorePermissions(targetId, sourceId, true);
         }
         if (randomID) {
             say("new copy with id \"" + newID.toString() + "\" created.");
         }
-        if (updatePermissions) {
+        if (!skipUpdatePermissions) {
             say(updatedPermissionCount + " permissions updated.");
         }
     }
@@ -2435,18 +2512,19 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     private void showCopyHelp() {
-        say("copy source target [" + FORCE_COPY_FLAG + "] [" + RANDOM_ID_FLAG + "] [" + UPDATE_PERMISSIONS_FLAG + "] [new_id]");
+        say("copy source target [" + FORCE_COPY_FLAG + "] [" + RANDOM_ID_FLAG + "] [" + SKIP_UPDATE_PERMISSIONS_FLAG + "]");
         sayi("Usage: Copy source to target");
         sayi(FORCE_COPY_FLAG + " - force it, so overwrite if the target exists.");
         sayi(RANDOM_ID_FLAG + " - create a random id for the target.");
-        sayi(UPDATE_PERMISSIONS_FLAG + " - copy any permissions for the target.");
+        sayi(SKIP_UPDATE_PERMISSIONS_FLAG + " - skip copying any permissions for the target. Default is to copy them.");
         sayi("new_id - specify the new id. Note if this is present, " + RANDOM_ID_FLAG + " is ignored.");
         sayi("This will create a complete copy of source and store it with the id of target.");
         sayi("Note: This will refuse to do this if target exists.");
         sayi("Note: If you do not specify to use a random id and do not supply one, this will abort.");
-        sayi("This only makes a simple copy. Except if this is a client, and the approval will be cloned too, though not permissions etc.");
-        sayi("Other objects may need to be updated (such as permissions).");
-        sayi("Note: source and target are identifiers (no lead /).");
+        sayi("This only makes a simple copy, with permissions (unless those are skipped).  If this is a client, ");
+        sayi("the approval will be copied too. ");
+        sayi("Other objects may need to be updated, depending on the object.");
+        sayi("Note: source and target are identifiers.");
         sayi("E.g. In the client store:\n");
         sayi("  client>copy dev:command.line dev:no_cfg\n");
         sayi("would take the client configuration with id dev:command.line and create a new client config. that is");
@@ -2475,6 +2553,9 @@ public abstract class StoreCommands extends CommonCommands {
      * @throws Exception
      */
     protected List processList(InputLine inputLine, String key) throws Exception {
+        if (key == null) {
+            return null;
+        }
         return inputLine.getArgList(key);
     }
 
@@ -2490,8 +2571,13 @@ public abstract class StoreCommands extends CommonCommands {
             case RS_APPEND_ACTION:
                 doRSAppend(inputLine);
                 return;
-            case RS_LIST_INFO_ACTION:
-                doRSListInfo();
+            case RS_CLEAR_ACTION:
+                int s = getResultSets().size();
+                getResultSets().clear();
+                say(s + " results have been cleared.");
+                return;
+            case RS_FIELDS_ACTION:
+                doRSListFieldsInfo(inputLine);
                 return;
             case RS_LIST_ACTION:
                 doRSList();
@@ -2524,12 +2610,31 @@ public abstract class StoreCommands extends CommonCommands {
             case RS_SAVE_ACTION:
                 doRSSave(inputLine, name);
                 break;
+            case RS_WRITE_ACTION:
+                doRSWrite(inputLine, name);
+                break;
             case RS_SHOW_ACTION:
                 doRSShow(inputLine, name);
                 break;
             default:
                 say("unknown action \"" + action + "\"");
         }
+    }
+
+    private void doRSSave(InputLine inputLine, String name) throws Throwable {
+        FoundIdentifiables foundIdentifiables = findItem(inputLine);
+        if (foundIdentifiables == null) {
+            say("no objects found.");
+            return;
+        }
+        if (!"y".equals(getInput("preparing to overwrite " + foundIdentifiables.size() + " objects in the store. Proceed(y/n)?", "n"))) {
+            say("aborted...");
+            return;
+        }
+        for (Identifiable identifiable : foundIdentifiables) {
+            getStore().save(identifiable);
+        }
+        say(foundIdentifiables.size() + " objects have been saved.");
     }
 
     /**
@@ -2565,7 +2670,7 @@ public abstract class StoreCommands extends CommonCommands {
         getResultSets().put(newName, newRecord);
     }
 
-    private void doRSSave(InputLine inputLine, String name) throws IOException {
+    private void doRSWrite(InputLine inputLine, String name) throws IOException {
         MapConverter mapConverter = (MapConverter) getStore().getXMLConverter();
         RSRecord rsRecord = getResultSets().get(name);
         JSONObject jsonObject = new JSONObject();
@@ -2595,20 +2700,41 @@ public abstract class StoreCommands extends CommonCommands {
         return;
     }
 
-    private void doRSListInfo() {
+    private void doRSListFieldsInfo(InputLine inputLine) {
         if (resultSets.isEmpty()) {
             return;
         }
-        for (String key : resultSets.keySet()) {
-            String out = key + ": " + resultSets.get(key).rs.size() + " entries";
-            if (resultSets.get(key).fields != null) {
-                out = out + ",  fields=" + resultSets.get(key).fields;
+        Set<String> keys;
+        if (inputLine.getArgCount() == 0) {
+            keys = resultSets.keySet();
+        } else {
+            keys = new HashSet<>(inputLine.getArgCount());
+            for (int i = 2; i <= inputLine.getArgCount(); i++) {
+                keys.add(inputLine.getArg(i));
             }
-            // Someday use this: StringUtils.formatMap()
-            // This however gets messy for clients where there are client approvals.
-            say(out);
         }
-        return;
+        for (String key : keys) {
+            if (!getResultSets().containsKey(key)) {
+                say(key + " not found");
+                continue;
+            }
+            String indent = getBlanks(2);
+            String out = key + resultSets.get(key).rs.size() + " entries, " + resultSets.get(key).fields.size() + " fields";
+            say(out);
+            say(hLine("-", out.length()));
+            if (resultSets.get(key).fields != null) {
+                for (String field : resultSets.get(key).fields) {
+                    say(indent + field);
+                }
+            } else {
+                say(indent + "(empty)");
+            }
+            if (1 < keys.size()) {
+                say();
+            }
+            // Someday use this: StringUtils.formatMap()???
+            // This however gets messy for clients where there are client approvals.
+        }
     }
 
     /**
@@ -2785,11 +2911,21 @@ public abstract class StoreCommands extends CommonCommands {
                 say("no result sets.");
                 return;
             }
-            int width = 10;
-            say(center("name", width) + "|" + center("size", width));
-            say(getBlanks(10) + "|" + getBlanks(width));
+            String nameTitle = "name";
+            String sizeTitle = "size";
+            int width = nameTitle.length();
+            int sizeWidth = sizeTitle.length();
+            for (String name : getResultSets().keySet()) {
+                width = Math.max(width, name.length());
+                sizeWidth = Math.max(getResultSets().get(name).rs.size(), sizeWidth);
+            }
+            width = width + 2;
+            sizeWidth = sizeWidth + 2;
+
+            say(center(nameTitle, width) + "|" + center(sizeTitle, sizeWidth));
+            say(hLine("-", width) + "+" + hLine("-", sizeWidth));
             for (String key : getResultSets().keySet()) {
-                say(pad(key, width) + "|  " + pad(Integer.toString(getResultSets().get(key).rs.size()), width));
+                say(center(key, width) + "|  " + center(Integer.toString(getResultSets().get(key).rs.size()), sizeWidth));
             }
             say("\n" + getResultSets().size() + " result sets processed");
         }
@@ -2825,14 +2961,16 @@ public abstract class StoreCommands extends CommonCommands {
         if (inputLine.getArgCount() == 1) {
             return;
         }
-        String arg = inputLine.getArgs().get(1);
-        RSRecord a0 = getResultSets().get(arg);
-        if (a0 == null) {
-            say("No record found with name " + arg);
+        String targetName = inputLine.getLastArg();
+        if (getResultSets().containsKey(targetName)) {
+            say("A result set with the name \"" + targetName + "\" already exists.");
             return;
         }
+        TreeSet<String> fields = new TreeSet<>();
+        RSRecord B = new RSRecord(new ArrayList<Identifiable>(), new ArrayList<>());
+
         int pass = 0;
-        for (int i = 2; i < inputLine.getArgCount(); i++) {
+        for (int i = 1; i < inputLine.getArgCount() - 1; i++) {
             String an = inputLine.getArgs().get(i);
             RSRecord a = getResultSets().get(an);
             if (a == null) {
@@ -2840,14 +2978,17 @@ public abstract class StoreCommands extends CommonCommands {
                 continue;
             }
             pass++;
-            a0.rs.addAll(a.rs);
+            fields.addAll(a.fields);
+            B.rs.addAll(a.rs);
         }
+        ArrayList<String> f = new ArrayList<>(fields);
+        B.fields = f;
+        getResultSets().put(targetName, B);
         if (pass == 0) {
-            say("No records appended to " + arg);
+            say("No records appended to " + targetName);
             return;
         }
-        say(pass + "records appended to " + arg);
-        return;
+        say(pass + " records appended to " + targetName);
     }
 
     /**
@@ -2881,7 +3022,7 @@ public abstract class StoreCommands extends CommonCommands {
     public static final String RS_APPEND_ACTION = "append";
     public static final String RS_CLEAR_ACTION = "clear";
     public static final String RS_DROP_ACTION = "drop";
-    public static final String RS_LIST_INFO_ACTION = "info";
+    public static final String RS_FIELDS_ACTION = "fields";
     public static final String RS_LIST_ACTION = "list";
     public static final String RS_READ_ACTION = "read";
     public static final String RS_REMOVE_ACTION = "rm";
@@ -2889,41 +3030,37 @@ public abstract class StoreCommands extends CommonCommands {
     public static final String RS_SHOW_ACTION = "show";
     public static final String RS_SIZE_ACTION = "size";
     public static final String RS_SUBSET_ACTION = "subset";
+    public static final String RS_WRITE_ACTION = "write";
     public static String RS_RANGE_KEY = "-range";
     public static String RS_RANGE_SHORT_KEY = "--";
     public static String RS_FILE_KEY = "-file";
 
     protected void showResultSetHelp() {
+        String blanks = getBlanks(5);
         sayi("rs action [flags] rs_name.");
         sayi("The list of actions is");
-        sayi(RS_APPEND_ACTION + " A0 A1 ..  - append result sets A1... to A0.");
+        sayi(RS_APPEND_ACTION + " A0 A1 ..  B - append result sets A0, A1... to B. B must not exist.");
         sayi(RS_CLEAR_ACTION + " - clear ALL results sets.");
         sayi(RS_DROP_ACTION + " name - Remove the named result set");
-        sayi(RS_LIST_INFO_ACTION + " name - List information about the result set, such as size and fields.");
+        sayi(RS_FIELDS_ACTION + " name - List information about the result set, such as number of elements and fields.");
         sayi(RS_LIST_ACTION + " - list the current results sets.");
         sayi(RS_READ_ACTION + " [" + RS_FILE_KEY + " file] name - Read the result set from the file, giving it the given name.");
         sayi(RS_REMOVE_ACTION + " " + RS_RANGE_KEY + " range name - Remove the range of values from the given result");
-        sayi("        set. The elements will be reordered from 0. This is useful if you have done a search and");
-        say("         your result set has a couple of extra, unwanted entries.");
-        sayi(RS_SAVE_ACTION + " [" + RS_FILE_KEY + " file] name - Save the result set to the file. No file given will dump");
-        sayi("        it to the console.");
-        sayi(RS_SHOW_ACTION + " [" + RS_RANGE_KEY + " range] name - Show the result set, restricting to the given range.");
-        sayi("        No range means show the entire result set.");
+        sayi(blanks + "set. The elements will be reordered from 0. This is useful if you have done a search and");
+        sayi(blanks + "your result set has a couple of extra, unwanted entries.");
+        sayi(RS_SAVE_ACTION + " [" + RS_FILE_KEY + " file] name - Save the result set to the backing store. This overwrites");
+        say(blanks + "the current object with the result set. Since result sets are static, this provides a way to rollback");
+        say(blanks + "to a previous state. You will always be prompted.");
+        sayi(RS_SHOW_ACTION + " [" + RS_RANGE_KEY + " range] [" + SEARCH_RETURNED_ATTRIBUTES_FLAG + " list ] name - Show the result set, restricting to the given range");
+        sayi(blanks + "(if given) and given fields (if given).");
+        sayi(blanks + "No range means show the entire result set. No attributes means show all fields.");
         sayi(RS_SIZE_ACTION + " [name] - Print just the size of the result set. No names prints them all.");
-        sayi("/nRanges follow QDL semantics for simple lists, though nesting and complex structures are not allowed.");
-        say(RS_SUBSET_ACTION + " [" + RM_FORCE_FLAG + "] new_name " + RS_RANGE_SHORT_KEY + " list rs_name = create a subset of rs_name");
-        say("         using the given list and save it to new_name. If there is no such existing set named new_name, the operation");
-        say("         is just done. If it exists, you are prompted, unless you supply the " + RM_FORCE_FLAG + " to force overwriting.");
-/*
-        sayi("Result set management. All of these require the name of the result set.");
-        sayi("If you save a result set using the " + SEARCH_RESULT_SET_NAME + " flag in the search");
-        sayi("command, you can display it, here or remove it.");
-        sayi("Other commands will allow for using the result set ");
-        sayi(RS_LIST_INFO_ACTION + " list information about the results sets, such as count and fields");
-        sayi(RS_REMOVE_ACTION + " remove a set or if a * is given, clear all stored result sets.");
-        sayi(RS_SHOW_ACTION + " show the given result set. You may give an integer to show that number, a list of ");
-        sayi("   two integers for the start and stop limits, or no value which shows the entire set.");
-        sayi("The following switches are supported for the " + RS_SHOW_ACTION + " command:");*/
+        sayi(blanks + "Ranges follow QDL semantics for simple lists. NOTE: Nesting and complex structures are not allowed.");
+        sayi(RS_SUBSET_ACTION + " [" + RM_FORCE_FLAG + "] new_name " + RS_RANGE_SHORT_KEY + " list rs_name = create a subset of rs_name");
+        sayi(blanks + "using the given list and save it to new_name. If there is no such existing set named new_name, the operation");
+        sayi(blanks + "is just done. If it exists, you are prompted, unless you supply the " + RM_FORCE_FLAG + " to force overwriting.");
+        sayi(RS_WRITE_ACTION + " [" + RS_FILE_KEY + " file] name - Write the result set to the file. No file given will dump");
+        sayi(blanks + "it to the console.");
         showCommandLineSwitchesHelp();
     }
 
@@ -2965,19 +3102,28 @@ public abstract class StoreCommands extends CommonCommands {
             XMLMap object = toXMLMap(identifiable);
             if (object.containsKey(key)) {
                 Object v = object.get(key);
-                try {
-                    JSON json = JSONSerializer.toJSON(v);
-                    say(json.toString(1));
+                if (v instanceof String) {
+                    try {
+                        JSON json = JSONSerializer.toJSON(v);
+                        say(json.toString(1));
 
-                } catch (Throwable t) {
-                    say(object.get(key).toString());
+                    } catch (Throwable t) {
+                        say(object.get(key).toString());
+                    }
+
+                } else {
+                    if (v instanceof JSON) {
+                        say(((JSON) v).toString(1));
+                    } else {
+                        say(v.toString());
+                    }
                 }
             } else {
                 say("(no value)");
                 return false;
             }
         } else {
-            say("sorry, but \"" + key + "\" is not a recognized key. Skipping...");
+            say("sorry, but \"" + key + "\" is not a recognized key.");
             return false;
         }
         return true;
@@ -3432,12 +3578,25 @@ public abstract class StoreCommands extends CommonCommands {
                 say("sorry, no such object");
                 return;
             }
+            // Give them one last chance
+            if (!identifiables.isSingleton()) {
+                if (!getInput("Are you sure that you want to restore " + identifiables.size() + " items?(y/n)", "n").equals("y")) {
+                    say("aborting...");
+                    return;
+                }
+
+            }
             for (Identifiable identifiable : identifiables) {
                 Identifiable storedVersion = getStoreArchiver().getVersion(identifiable.getIdentifier(), targetVersion);
                 if (storedVersion == null) {
                     say("sorry, but the version you requested for id \"" + rawID + "\" does not exist.");
                 }
+                if (StoreArchiver.isVersioned(identifiable.getIdentifier())) {
+                    say("object with id \"" + identifiable.getIdentifier() + "\" is an archived object. Cannot restore. skipping");
+                    continue;
+                }
                 if (identifiables.isSingleton()) {
+                    // A singleton can have a better message.
                     if (getInput("Are you sure that you want to replace the current version with version \"" + (targetVersion == -1 ? "latest" : targetVersion) + "\"?(y/n)", "n").equals("y")) {
                         storedVersion.setIdentifier(identifiable.getIdentifier());
                         getStore().save(storedVersion);
@@ -3484,11 +3643,35 @@ public abstract class StoreCommands extends CommonCommands {
 
         if (isShow) {
             for (Identifiable identifiable : identifiables) {
-                Identifiable target = showVersion(inputLine, showArg, identifiable);
-                if (target == null) return;
+                if (!identifiables.isSingleton()) {
+                    say("----- object: " + identifiable.getIdentifier() + " -----");
+                }
+                Identifiable target = getVersion(showArg, identifiable);
+                if (target == null) {
+                    if (showArg.equals(ARCHIVE_LATEST_VERSION_ARG)) {
+                        say("(no versions)");
+                    } else {
+                        say("no such version");
+                    }
+                    continue;
+                }
                 longFormat(target, true); // show everything!
+                if (!identifiables.isSingleton()) {
+                    say();
+                }
             }
             return;
+        }
+        if (identifiables.size() == 1) {
+            if (!getInput("Archive object \"" + identifiables.get(0).getIdentifierString() + "\"?(y/n)", "n").equals("y")) {
+                say("aborted.");
+                return;
+            }
+        } else {
+            if (!getInput("Archive object " + identifiables.size() + " objects?(y/n)", "n").equals("y")) {
+                say("aborted.");
+                return;
+            }
         }
         // If we are at this point, then the user wants to version the object
         for (Identifiable identifiable : identifiables) {
@@ -3497,10 +3680,7 @@ public abstract class StoreCommands extends CommonCommands {
             if (versionNumbers != null && !versionNumbers.isEmpty()) {
                 newIndex = getStoreArchiver().getLatestVersionNumber(versionNumbers) + 1;
             }
-            if (identifiables.isSingleton() && !getInput("Archive object \"" + identifiable.getIdentifierString() + "\"?(y/n)", "n").equals("y")) {
-                say("aborted.");
-                return;
-            }
+
             // last check
             if (newIndex < 0) {
                 say("internal error: check logs");
@@ -3517,63 +3697,31 @@ public abstract class StoreCommands extends CommonCommands {
             Identifier newID = getStoreArchiver().createVersionedID(identifiable.getIdentifier(), newIndex);
             newVersion.setIdentifier(newID);
             getStore().save(newVersion);
-
         }
-
-
     }
 
-    private Identifiable showVersion(InputLine inputLine, String showArg, Identifiable identifiable) {
+    /**
+     * Get the version. The arguments are the version number (as a string) and the object. Returns
+     * a null if there is no such version.
+     *
+     * @param versionString a string that is either a 0 < number, or the value {@link #ARCHIVE_LATEST_VERSION_ARG} for the latest
+     * @param identifiable
+     * @return
+     */
+    private Identifiable getVersion(String versionString, Identifiable identifiable) {
         long targetVersion = -1L;
-        URI uri = null;
-        String rawID = null;
-        if (inputLine.getArgCount() == 0) {
-            if (!hasID()) {
-                say("sorry, no id found. Either set it with set_id or supply it as the final argument");
-                return null;
-            }
-            rawID = getID().toString();
-        } else {
-            // possibly an argument that is the id.
-            // Supplying a final argument over-rides the id.
-            rawID = inputLine.getLastArg();
-
-            if (rawID.startsWith("/")) {
-                rawID = rawID.substring(1);
-            }
-            try {
-                uri = URI.create(rawID);
-            } catch (Throwable urx) {
-                // no argument, no set id.
-                if (!hasID()) {
-                    say("sorry, no id found. Either set it with set_id or supply it as the final argument");
-                    return null;
-                }
-            }
-
-        }
-        String ss = (uri == null) ? null : uri.getSchemeSpecificPart();
-        if (StringUtils.isTrivial(ss)) {
-            if (!hasID()) {
-                say("sorry, no id found. Either set it with set_id or supply it as the final argument");
-                return null;
-            }
-
-        }
 
         DoubleHashMap<URI, Long> versionNumbers = getStoreArchiver().getVersions(identifiable.getIdentifier());
-        if (showArg.equalsIgnoreCase(ARCHIVE_LATEST_VERSION_ARG)) {
+        if (versionString.equalsIgnoreCase(ARCHIVE_LATEST_VERSION_ARG)) {
             targetVersion = getStoreArchiver().getLatestVersionNumber(versionNumbers);
         } else {
             try {
-                targetVersion = Long.parseLong(showArg);
+                targetVersion = Long.parseLong(versionString);
             } catch (NumberFormatException nfx) {
-                say("sorry but the version number you supplied \"" + targetVersion + "\" is not a number.");
                 return null;
             }
         }
         if (versionNumbers.getByValue(targetVersion) == null) {
-            say("sorry, but " + targetVersion + " is not the number of a version for \"" + identifiable.getIdentifierString() + "\".");
             return null;
         }
         Identifiable target = (Identifiable) getStore().get(BasicIdentifier.newID(versionNumbers.getByValue(targetVersion)));
@@ -3587,29 +3735,22 @@ public abstract class StoreCommands extends CommonCommands {
     String ARCHIVE_LATEST_VERSION_ARG = "latest";
 
 
-    String[] regexSpeciaChars = new String[]{".", "^", "$", "*", "+", "-", "?", "(", ")", "[", "]", "{", "}", "\\", "|", "—", "/",};
-
-    protected String escapeRegex(String x) {
-        String y = x;
-        for (int i = 0; i < regexSpeciaChars.length; i++) {
-            y = y.replace(regexSpeciaChars[i], "\\" + regexSpeciaChars[i]);
-        }
-        return y;
-    }
-
     protected void showArchiveHelp() {
-        say("archive [-versions] | [-restore version] | [-show] [id | index | rs] - archive an object");
+        String blanks = StringUtils.getBlanks(5);
+        say("archive [" + ARCHIVE_VERSIONS_FLAG + "] | [" + ARCHIVE_RESTORE_FLAG + " version] | [" +
+                ARCHIVE_SHOW_FLAG + " number | " + ARCHIVE_LATEST_VERSION_ARG + "] [index] - archive an object");
         say("Usage: This will either create a copy of the current version");
-        sayi("   or restore a versioned object.");
-        sayi("archive [id] - version the object, assigning it the last version.");
-        sayi("archive -versions [id]  - list the versions of an object");
-        sayi("archive -latest - show the number of the latest version (-1 if no versions exist)");
+        sayi(blanks + "or restore a versioned object.");
+        sayi("(no argument) - version the object, assigning it the last version.");
+        sayi(ARCHIVE_VERSIONS_FLAG + " - list the versions of an object");
+        sayi("archive - show the number of the latest version (-1 if no versions exist)");
 
-        sayi("archive -restore (number | latest) [id] - restore the given version");
-        sayi("of this. If a number is given, use that. If the word \"latest\" (no quotes)");
-        sayi("is used, give back the latest version.");
-        sayi(ARCHIVE_SHOW_FLAG + " (number | latest) - show the given version. You may also use the word \"latest\"");
-        sayi("    to get the latest version.");
+        sayi(ARCHIVE_RESTORE_FLAG + " (number | " + ARCHIVE_LATEST_VERSION_ARG + ") - restore the given version");
+        sayi(blanks + "of this. If a number is given, use that. If the word \"" + ARCHIVE_LATEST_VERSION_ARG + "\" (no quotes)");
+        sayi(blanks + "is used, give back the latest version.");
+        sayi(ARCHIVE_SHOW_FLAG + " (number | " + ARCHIVE_LATEST_VERSION_ARG + ") - show the given version. " +
+                "You may also use the word \"" + ARCHIVE_LATEST_VERSION_ARG + "\"");
+        sayi(blanks + "to get the latest version.");
         sayi("Note that archive version numbers increase, so the highest number is the most recent.");
     }
 
@@ -3633,29 +3774,33 @@ public abstract class StoreCommands extends CommonCommands {
             showUpdateHelp();
             return;
         }
+        String key = getAndCheckKeyArg(inputLine);
+        List<String> keys;
+        if (key != null) {
+            keys = new ArrayList<>(1);
+            keys.add(key);
+        } else {
+            keys = processList(inputLine, KEY_FLAG);
+        }
+        boolean hasKeys = keys != null && !keys.isEmpty();
+
         if (inputLine.hasArg(VALUE_FLAG) && inputLine.hasArg(FILE_FLAG)) {
             say("Sorry, you have specified both a value and a file for the value.");
             return;
         }
-        if (inputLine.hasArg(KEY_FLAG) && inputLine.hasArg(KEYS_FLAG)) {
-            say("both " + KEYS_FLAG + " and " + KEYS_FLAG + " are specified. Cannot resolved.");
-            return;
-        }
-        String key = getAndCheckKeyArg(inputLine);
-        if (key == null && inputLine.hasArg(KEYS_FLAG)) {
+        if (!hasKeys) {
             oldUpdate(inputLine);
             return;
         }
         // Now we can do the more modern version of this.
-        List<String> keys = processList(inputLine, KEYS_FLAG);
-        Object value = null;
+        List value = null;
         if (inputLine.hasArg(VALUE_FLAG)) {
-            value = inputLine.getNextArgFor(VALUE_FLAG);
-            inputLine.removeSwitchAndValue(VALUE_FLAG);
+            value = processList(inputLine, VALUE_FLAG);
         } else {
             if (inputLine.hasArg(FILE_FLAG)) {
                 try {
-                    value = FileUtil.readFileAsString(inputLine.getNextArgFor(FILE_FLAG));
+                    value = new ArrayList<>(1);
+                    value.add(FileUtil.readFileAsString(inputLine.getNextArgFor(FILE_FLAG)));
                 } catch (Throwable throwable) {
                     say("Sorry, but I could not seem to read the file named \"" + inputLine.getNextArgFor(FILE_FLAG) + "\"");
                     return;
@@ -3667,9 +3812,16 @@ public abstract class StoreCommands extends CommonCommands {
         if (identifiables == null) {
             throw new ObjectNotFoundException("sorry, I could not find that object. Check your id.");
         }
-        if (keys == null) {
-            keys = new ArrayList<>();
-            keys.add(key);
+        if (keys.size() == 1) {
+            if (value != null && value.size() != 1) {
+                say("A single key with multiple values was found. Aborting...");
+                return;
+            }
+        } else {
+            if (value != null && keys.size() != value.size()) {
+                say("Key/values size mismatch. Aborting...");
+                return;
+            }
         }
         for (int i = 0; i < identifiables.size(); i++) {
             Identifiable identifiable = identifiables.get(i);
@@ -3680,9 +3832,16 @@ public abstract class StoreCommands extends CommonCommands {
             XMLMap map = toXMLMap(identifiable);
 
             if (value == null) {
-                value = updateSingleValue(map, key); // won't prompt after first pass
+                value = new ArrayList<>(keys.size());
+                for (String kk : keys) {
+                    // This makes it so only prompted on the first pass
+                    Object vv = updateSingleValue(map, kk); // map is updated in call
+                    value.add(vv);
+                }
             } else {
-                map.put(key, value);
+                for (int j = 0; j < keys.size(); j++) {
+                    map.put(keys.get(j), value.get(j));
+                }
             }
             Identifiable updatedI = fromXMLMap(map);
             if (identifiables.isRS()) {
@@ -3693,112 +3852,10 @@ public abstract class StoreCommands extends CommonCommands {
 
     }
 
-    /*   protected void update2(InputLine inputLine) throws IOException {
-           if (showHelp(inputLine)) {
-               showUpdateHelp();
-               return;
-           }
-           if (inputLine.hasArg(VALUE_FLAG) && inputLine.hasArg(FILE_FLAG)) {
-               say("Sorry, you have specified both a value and a file for the value.");
-               return;
-           }
-           String key = getAndCheckKeyArg(inputLine);
-           if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
-               say("sorry, but that is not a recognized key.");
-               return;
-           }
-           if (key == null && inputLine.hasArg(KEYS_FLAG)) {
-               oldUpdate(inputLine);
-               return;
-           }
-
-           boolean hasFileFlag = inputLine.hasArg(FILE_FLAG);
-           XMLMap map = null;
-           // Since the value can be anything --like a path to a file. e.g. /tmp/foo or
-           // an integer, we *have* to remove arguments until we can see what the
-           // actual id is.
-           boolean gotOne = false;
-           String value = null;
-           if (key == null) {
-               say("sorry, but \"" + key + "\" is not a recognized attribute.");
-               return;
-           } else {
-               // inputLine.removeSwitchAndValue(KEY_FLAG);
-               if (inputLine.hasArg(VALUE_FLAG)) {
-                   value = inputLine.getNextArgFor(VALUE_FLAG);
-                   inputLine.removeSwitchAndValue(VALUE_FLAG);
-               }
-               if (hasFileFlag) {
-                   try {
-                       value = FileUtil.readFileAsString(inputLine.getNextArgFor(FILE_FLAG));
-                   } catch (Throwable throwable) {
-                       say("Sorry, but I could not seem to read the file named \"" + inputLine.getNextArgFor(FILE_FLAG) + "\"");
-                       return;
-                   }
-                   inputLine.removeSwitchAndValue(FILE_FLAG);
-
-               }
-               List<Identifiable> identifiables = findItem(inputLine);
-               boolean isSingleton = identifiables.size() == 1;
-               if (identifiables == null) {
-                   say("sorry, I could not find that object. Check your id.");
-                   return;
-               }
-               if (isSingleton) {
-                   Identifiable identifiable = identifiables.get(0);
-               }
-               map = toXMLMap(identifiable);
-               if (value == null) {
-                   gotOne = updateSingleValue(map, key);
-               } else {
-                   map.put(key, value);
-                   gotOne = true;
-               }
-           }
-           if (inputLine.hasArg(VALUE_FLAG)) {
-               say("Malformed update request. If you specify a value, you must specify a single key.");
-               return;
-           }
-
-
-           if (inputLine.hasArg(KEYS_FLAG)) {
-               List<String> keys = inputLine.getArgList(KEYS_FLAG);
-               inputLine.removeSwitchAndValue(KEYS_FLAG);
-               identifiable = findItem(inputLine);
-               if (identifiable == null) {
-                   say("sorry, I could not find that object. Check your id.");
-                   return;
-               }
-               map = toXMLMap(identifiable);
-
-               for (String k : keys) {
-                   gotOne = updateSingleValue(map, k) || gotOne; // order matters!
-               }
-           }
-
-           if (gotOne) {
-               getStore().save(fromXMLMap(map));
-           }
-
-       } //end update
-   */
     public SerializationKeys getKeys() {
         return mapConverter.getKeys();
     }
 
-    /**
-     * The contract is that each of the identifiables is updated
-     *
-     * @param identifiables
-     * @param key
-     */
-    protected void doRSUpdate(List<Identifiable> identifiables, String key, Object value) {
-        for (Identifiable identifiable : identifiables) {
-            XMLMap map = toXMLMap(identifiable);
-
-
-        }
-    }
 
     /**
      * The contract is that this gets the entire current config and updates <i>exactly</i>
@@ -3929,7 +3986,7 @@ public abstract class StoreCommands extends CommonCommands {
             say("active store **unrecoverably**. Note this only works on precisely the current store,");
             say("so related stores (e.g. approvals for clients) have to be cleared separately.");
             say("This is inconvenient, but does prevent unwanted side effects.");
-            say("You will always be prompted before this operation");
+            say("You will always be prompted before this operation.");
             return;
         }
         if (getInput("Do you really want to clear every entry from this store?(YES/n)", "n").equals("YES")) {
@@ -3974,9 +4031,12 @@ public abstract class StoreCommands extends CommonCommands {
         getStore().save(identifiable);
         getStore().remove(oldID);
         // update the state in the CLI
-        if (id != null) {
-            if (id.equals(oldID)) {
-                id = newID;
+        if (idList != null) {
+            if (idList.size() != 1) {
+                throw new IllegalArgumentException("too many ids set. Can only change 1.");
+            }
+            if (idList.get(0).equals(oldID)) {
+                idList.set(0, newID);
             }
         }
         // update any permissions
@@ -3988,15 +4048,15 @@ public abstract class StoreCommands extends CommonCommands {
 
     /**
      * Allows changing the identifier for an object. This also updates the permissions that
-     * refer to this if the  {@link #UPDATE_PERMISSIONS_FLAG} is set.
+     * refer to this if the  {@link #SKIP_UPDATE_PERMISSIONS_FLAG} is set.
      *
      * @param inputLine
      */
 
     public void change_id(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("change_id new [" + UPDATE_PERMISSIONS_FLAG + " on|off] index - change the identifier for a single client.");
-            say(UPDATE_PERMISSIONS_FLAG + " if on, change the identifier in any permissions too. Default is on");
+            say("change_id new [" + SKIP_UPDATE_PERMISSIONS_FLAG + " on|off] index - change the identifier for a single client.");
+            say(SKIP_UPDATE_PERMISSIONS_FLAG + " if on, change the identifier in any permissions too. Default is on");
             say("This will update all permissions. At the end of this operations, the");
             say("old identifier will not be in the system any longer.");
             printIndexHelp(true);
@@ -4004,13 +4064,13 @@ public abstract class StoreCommands extends CommonCommands {
         }
 
         Boolean updatePermissions = true;
-        if (inputLine.hasArg(UPDATE_PERMISSIONS_FLAG)) {
-            updatePermissions = inputLine.getBooleanNextArgFor(UPDATE_PERMISSIONS_FLAG);
+        if (inputLine.hasArg(SKIP_UPDATE_PERMISSIONS_FLAG)) {
+            updatePermissions = inputLine.getBooleanNextArgFor(SKIP_UPDATE_PERMISSIONS_FLAG);
             if (updatePermissions == null) {
-                say("unrecognized argument for " + UPDATE_PERMISSIONS_FLAG);
+                say("unrecognized argument for " + SKIP_UPDATE_PERMISSIONS_FLAG);
                 return;
             }
-            inputLine.removeSwitch(UPDATE_PERMISSIONS_FLAG);
+            inputLine.removeSwitch(SKIP_UPDATE_PERMISSIONS_FLAG);
         }
 
         Identifiable identifiable = findSingleton(inputLine); // get it so the positional argument next is right!
@@ -4020,13 +4080,19 @@ public abstract class StoreCommands extends CommonCommands {
         } else {
             rawID = inputLine.getArg(1);
         }
-        URI uri = URI.create(rawID);
-        // really stupid check for a bad identifier. If they get their command line arguments out of whack this should catch it
-        if (isBadID(uri)) {
-            if (!"y".equals(getInput("The identifier you gave \"" + rawID + "\" is possibly incorrect. Proceed(y/n)?", "n"))) {
-                say("aborted...");
-                return;
+        URI uri;
+        try {
+            uri = URI.create(rawID);
+            // really stupid check for a bad identifier. If they get their command line arguments out of whack this should catch it
+            if (isBadID(uri)) {
+                if (!"y".equals(getInput("The identifier you gave \"" + rawID + "\" is possibly incorrect. Proceed(y/n)?", "n"))) {
+                    say("aborted...");
+                    return;
+                }
             }
+        } catch (IllegalArgumentException e) {
+            say("identifier is not a URI:" + e.getMessage());
+            return;
         }
         Identifier newID = BasicIdentifier.newID(uri);
         Identifier oldID = identifiable.getIdentifier();
@@ -4090,37 +4156,36 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     protected void printIndexHelp(boolean singletonsOnly) {
-        say(" index - Supports a set id, the index from a listing or a result set. If present it is always");
-        say("the last argument.");
         if (singletonsOnly) {
-            say("Note: This component only allows for a single object");
+            say("Note: This component only operates on a single object");
         }
-        say("You may get an index by");
-        say("1. using the set_id command to set it globally. The index is then optional.");
-        say("2. Explicitly give the unique identifier.");
-        say("3. You may use the name of a result set. You may also restrict the elements used (see below).");
-        say("4. IF you have listed the entire contents with ls, you may give the numeric index of the object");
-        say();
-        say("How to specify the range of indices used in a result set.");
-        say("(" + RS_RANGE_KEY + " | " + RS_RANGE_SHORT_KEY + ") (integer | list | iterator)");
-
-        say("Examples of ranges are: 5 (integer), [2,4,5] (a list), [2;7] integers from to through 6 inclusive.");
-        say("Negative indices are allowed and mean to take from the end of the list, so");
-        say("my_command " + RS_RANGE_KEY + " -1  my_set ");
-        say("returns the last element in the result set name my_set.");
-        say("Note that while you may specify arguments this way, result sets are static and operations will");
-        say("be carried out on the actual stored object. ");
-        say("For operations on result sets proper, see --help for the rs command.");
-        say();
+        say("To see help on how to specify an index, issue");
+        say(LIST_ALL_METHODS_COMMAND + " index");
     }
+
+    // Actually, any juxtaposed dyadic QDL operators (except ++, --) work,
+    // since if somehow it gets in the parser
+    // it will blow up. Monadic ones could be misinterpreted, e.g. !!
+    public static final String LIST_EOL_MARKER = "^^";
 
     /**
      * Assumes there is a key and the original line is of the form -key [x, y, ... ].
-     * This extracts everything between the [ and ] inclusive, truncates the original line
+     * *If the user has a more complex list they can terminate it with {@link #LIST_EOL_MARKER},
+     * e.g.
+     * <pre>
+     *     my_command -foo -my_list [3, 5, -1] !! -other_flag fnord
+     * </pre>
+     * <p>
+     * Tells this function that everything from -my_list to !! is a single expression.
+     * <p>
+     * Otherwise, this extracts everything between the [ and ] inclusive (most common case).
+     * It then truncates the original line
      * and reparses it. This allows for the "whittle while you work" approach to input lines.
+     * </p>
      * <p>Note that there is a call for getting a list, {@link InputLine#getArgList(String)}
-     * which does this. The difference is that the {@link #processList(InputLine, String)}
-     * function in this class should allow for executing the lists as QDL later</p>
+     * which does this, but with very simple logic.
+     * The difference is that the {@link #processList(InputLine, String)}
+     * function in this class should allow for executing the lists as QDL later. </p>
      * <p>This utility is used in other implementations of {@link #processList(InputLine, String)}</p>
      *
      * @param inputLine
@@ -4129,22 +4194,31 @@ public abstract class StoreCommands extends CommonCommands {
      */
     protected String extractRawList(InputLine inputLine, String key) {
         String keyArg = inputLine.getNextArgFor(key);
-        boolean isList = keyArg != null && keyArg.startsWith("[");
+        boolean isList = keyArg != null && keyArg.startsWith(LIST_START_DELIMITER);
         if (isList) {
             String originalLine = inputLine.getOriginalLine();
-            int startKey = originalLine.indexOf(key);
-            int endListIndex = originalLine.indexOf("]", startKey);
-            int startListIndex = originalLine.indexOf("[", startKey);
-            String list = originalLine.substring(startListIndex, endListIndex + 1);
-            if (list.isEmpty()) {
-                throw new ObjectNotFoundException("no list was found");
+            int startKeyIndex = originalLine.indexOf(key); // index where key is found
+            int startStmtIndex = startKeyIndex + key.length(); // index where the list statement begins
+            int endStmtIndex = -1;
+            int eolIndex = originalLine.indexOf(LIST_EOL_MARKER); // index of EOL, if present
+            String list;
+            if (eolIndex == -1) {
+                eolIndex = originalLine.indexOf(LIST_END_DELIMITER, startKeyIndex);
+                if (eolIndex == -1) {
+                    throw new ObjectNotFoundException("mal-formed list -- no end of list found");
+                }
+                endStmtIndex = eolIndex + LIST_END_DELIMITER.length(); // index of last char in list statement
+                list = originalLine.substring(startStmtIndex, eolIndex + 1); // include end delimiter
+            } else {
+                endStmtIndex = eolIndex + LIST_EOL_MARKER.length(); // index of last char in list statement
+                list = originalLine.substring(startStmtIndex, eolIndex); // exclude end delimiter
             }
             // clean up
-            String newOL = originalLine.substring(0, startKey) + " " + originalLine.substring(endListIndex + 1);
+            String newOL = originalLine.substring(0, startKeyIndex) + " " + originalLine.substring(endStmtIndex);
             inputLine.setOriginalLine(newOL);
+            inputLine.reparse();
             return list;
         }
-        inputLine.removeSwitchAndValue(key);
         return "[" + keyArg + "]";
     }
 

@@ -4,6 +4,7 @@ package edu.uiuc.ncsa.security.core.util;
 import net.sf.json.JSON;
 import net.sf.json.JSONSerializer;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -104,6 +105,23 @@ public class StringUtils {
     }
 
     /**
+     * Create a horizontal "line" of characters, repeating, for the given length.
+     * @param s
+     * @param length
+     * @return
+     */
+    public static String hLine(String s, int length){
+        double x = Math.ceil(length/(1.0d*s.length()));
+        BigDecimal bd = new BigDecimal(x);
+        int count = bd.intValue(); // number of time to run the loop.
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i<count; i++){
+            sb.append(s);
+        }
+        // might have added an extra character
+        return sb.toString().substring(0, length);
+    }
+    /**
      * If the string is either null or empty. This is a very common idiom for testing strings
      * but the built in {@link String#isEmpty()} of course cannot be used on a null object...
      *
@@ -127,6 +145,8 @@ public class StringUtils {
 
 
     private static void tableTest() {
+
+        System.out.println("hLine:\"" + hLine("-~", 15) + "\""); // 8 sec
         System.out.println("center:\"" + center("abcd", 10) + "\""); // 8 sec
         System.out.println("center:\"" + center("abcd", 15) + "\""); // 8 sec
         System.out.println("center:\"" + center("abcd", 6) + "\""); // 8 sec

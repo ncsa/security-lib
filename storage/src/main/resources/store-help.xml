@@ -216,4 +216,73 @@ each property, or update a specific property.]]>
     <entry id="version">
     <body><![CDATA[The current version of OA4MP is 6.x-SNAPSHOT.]]></body>
     </entry>
+    <entry id="index">
+        <body><![CDATA[
+index - Supports a set id (from set_id), the index from a listing, an explicit identifier,
+or a result set. If present it is always
+the last argument.
+You may get an index by
+1. using the set_id command to set it globally. The index is then optional.
+2. Explicitly give the unique identifier.
+3. You may use the name of a result set. You may also restrict the elements used (see below).
+4. IF you have listed the entire contents with ls, you may give the numeric index of the object
+How to specify the range of indices used in a result set.
+( -range  | -- ) (integer | list | iterator)
+Examples of ranges are: 5 (integer), [2,4,5] (a list), [2;7] integers from to through 6 inclusive.
+Negative indices are allowed and mean to take from the end of the list, so
+my_command -- -1  my_set
+returns the last element in the result set name my_set.
+Note that while you may specify arguments this way, result sets are static and operations will
+be carried out on the actual stored object.
+
+For operations on result sets proper, see --help for the rs command.
+]]></body>
+    </entry>
+
+    <entry id="qdl_lists">
+    <body><![CDATA[
+Note on QDL lists,
+All of the keys for the current store are put into QDL, assigning their name to the
+value, so you do not need to quote those.
+If there are lists, you may use arbitrary expressions. Now, since OA4MP needs a
+way to find the end of such statments (a thorny general parsing problem), just mark
+the end using the end of expression marker, ^^. E.g.
+
+rs show -attr [  'client_' + 'id' , 'desc' + 'ription'  ] ^^ c842
+
+would send the entire list to QDL. In such cases you are writing QDL which is often overkill.
+However, in conjunction with run_qdl, you may have arbitrarily complex statements for lists.
+Note that if you should terminate every list statement with ^^ if you do any.
+For the vast majority of lists, just use simple syntax, E.g.
+rs show -attr [client_id,description] c842]]>
+    </body>
+    </entry>
+    <entry id="set_id">
+        <body><![CDATA[You may set the id for this store for every operation that requires one
+using an index. This means that if your command is, say, serialize, the following are equivalent
+
+Note that if you set this, it overrides any argument you may give it as the index.
+Case 1: Direct
+cli>serialize my:unique:id
+(output)
+
+
+Case 2: Set the working id for the store
+cli>set_id my:unique:id
+cli>serialize
+(output)
+
+See also: index, clear_id, get_id]]>
+        </body>
+    </entry>
+    <entry id="clear_id">
+        <body><![CDATA[clear_id - removes any current]]>
+        </body>
+    </entry>
 </html>
+<!-- Template
+    <entry id="">
+        <body><![CDATA[]]>
+        </body>
+    </entry>
+-->
