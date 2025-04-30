@@ -3034,7 +3034,9 @@ public abstract class StoreCommands extends CommonCommands {
     public static String RS_RANGE_KEY = "-range";
     public static String RS_RANGE_SHORT_KEY = "--";
     public static String RS_FILE_KEY = "-file";
-
+     protected String rangeHelpSnippet(){
+         return "[(" + RS_RANGE_KEY + " | " + RS_RANGE_SHORT_KEY + ") (list|value)]";
+     }
     protected void showResultSetHelp() {
         String blanks = getBlanks(5);
         sayi("rs action [flags] rs_name.");
@@ -3042,25 +3044,24 @@ public abstract class StoreCommands extends CommonCommands {
         sayi(RS_APPEND_ACTION + " A0 A1 ..  B - append result sets A0, A1... to B. B must not exist.");
         sayi(RS_CLEAR_ACTION + " - clear ALL results sets.");
         sayi(RS_DROP_ACTION + " name - Remove the named result set");
-        sayi(RS_FIELDS_ACTION + " name - List information about the result set, such as number of elements and fields.");
+        sayi(RS_FIELDS_ACTION + " name0  name1 ... - List information about the named result sets, such as number of elements and fields.");
         sayi(RS_LIST_ACTION + " - list the current results sets.");
         sayi(RS_READ_ACTION + " [" + RS_FILE_KEY + " file] name - Read the result set from the file, giving it the given name.");
-        sayi(RS_REMOVE_ACTION + " " + RS_RANGE_KEY + " range name - Remove the range of values from the given result");
+        sayi(RS_REMOVE_ACTION + " " + rangeHelpSnippet() + " name - Remove the range of values from the given result");
         sayi(blanks + "set. The elements will be reordered from 0. This is useful if you have done a search and");
         sayi(blanks + "your result set has a couple of extra, unwanted entries.");
-        sayi(RS_SAVE_ACTION + " [" + RS_FILE_KEY + " file] name - Save the result set to the backing store. This overwrites");
+        sayi(RS_SAVE_ACTION + " " + rangeHelpSnippet() + " name - Save the result set to the backing store. This overwrites");
         say(blanks + "the current object with the result set. Since result sets are static, this provides a way to rollback");
         say(blanks + "to a previous state. You will always be prompted. Note that " + RS_WRITE_ACTION + " writes the result");
         say(blanks + "set to a file and has nothing to do with the store.");
-        sayi(RS_SHOW_ACTION + " [" + RS_RANGE_KEY + " range] [" + SEARCH_RETURNED_ATTRIBUTES_FLAG + " list ] name - Show the result set, restricting to the given range");
+        sayi(RS_SHOW_ACTION + " " + rangeHelpSnippet() + " [" + SEARCH_RETURNED_ATTRIBUTES_FLAG + " list ] name - Show the result set, restricting to the given range");
         sayi(blanks + "(if given) and given fields (if given).");
         sayi(blanks + "No range means show the entire result set. No attributes means show all fields.");
         sayi(RS_SIZE_ACTION + " [name] - Print just the size of the result set. No names prints them all.");
-        sayi(blanks + "Ranges follow QDL semantics for simple lists. NOTE: Nesting and complex structures are not allowed.");
-        sayi(RS_SUBSET_ACTION + " [" + RM_FORCE_FLAG + "] new_name " + RS_RANGE_SHORT_KEY + " list rs_name = create a subset of rs_name");
+        sayi(RS_SUBSET_ACTION + " [" + RM_FORCE_FLAG + "] new_name " + rangeHelpSnippet() + " rs_name = create a subset of rs_name");
         sayi(blanks + "using the given list and save it to new_name. If there is no such existing set named new_name, the operation");
         sayi(blanks + "is just done. If it exists, you are prompted, unless you supply the " + RM_FORCE_FLAG + " to force overwriting.");
-        sayi(RS_WRITE_ACTION + " [" + RS_FILE_KEY + " file] name - Write the result set to the file. No file given will dump");
+        sayi(RS_WRITE_ACTION + " [" + RS_FILE_KEY + " file] " + rangeHelpSnippet() + " name - Write the result set to the file. No file given will dump");
         sayi(blanks + "it to the console.");
         showCommandLineSwitchesHelp();
     }
