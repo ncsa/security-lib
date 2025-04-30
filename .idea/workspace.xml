@@ -9,7 +9,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Pre-release, checkin with website updates." />
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="6.1, RC0">
+      <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -31,7 +33,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="6.1.0" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -98,7 +100,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "6.1.0",
+    "git-widget-placeholder": "6.1-rc0",
     "jdk.selected.JAVA_MODULE": "11 (2)",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/home/ncsa/dev/ncsa-git/cilogon",
@@ -565,7 +567,7 @@
       <workItem from="1737204076707" duration="33401000" />
       <workItem from="1738930351801" duration="676000" />
       <workItem from="1738931425442" duration="21354000" />
-      <workItem from="1743939163168" duration="241230000" />
+      <workItem from="1743939163168" duration="241537000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -910,7 +912,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="96" />
+    <option name="localTasksCounter" value="97" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -919,7 +921,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Prepping for release." />
     <MESSAGE value="Mostly refactoring to make certain utilities more available in OA4MP." />
     <MESSAGE value="Mostly documentation" />
     <MESSAGE value="Wrote a proper installer." />
@@ -944,7 +945,8 @@
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/50 wide ranging audit of all help and access for stored objects. This uses the new machinery now consistently." />
     <MESSAGE value="Saw clarification for help comment. Added it." />
     <MESSAGE value="Pre-release, checkin with website updates." />
-    <option name="LAST_COMMIT_MESSAGE" value="Pre-release, checkin with website updates." />
+    <MESSAGE value="6.1, RC0" />
+    <option name="LAST_COMMIT_MESSAGE" value="6.1, RC0" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
