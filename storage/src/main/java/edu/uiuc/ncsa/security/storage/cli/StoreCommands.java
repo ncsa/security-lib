@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.ObjectNotFoundException;
 import edu.uiuc.ncsa.security.core.util.*;
@@ -767,7 +768,11 @@ public abstract class StoreCommands extends CommonCommands {
                 if (hasAttributes) {
                     List<String> row = new ArrayList<>();
                     XMLMap map = new XMLMap();
-                    getMapConverter().toMap(identifiable, map);
+                    try {
+                        getMapConverter().toMap(identifiable, map);
+                    } catch (ClassCastException e) {
+                        throw new GeneralException("Could not convert the result set object -- is this the right store type?");
+                    }
 
                     for (int j = 0; j < returnedAttributes.size(); j++) {
                         Object obj = map.get(returnedAttributes.get(j));
@@ -1085,7 +1090,6 @@ public abstract class StoreCommands extends CommonCommands {
         // now take care of this edge case. I am keeping the JIRA issue number here for future reference.
 
         allEntries = getStore().getAll();
-
         return allEntries;
     }
 
@@ -1895,12 +1899,30 @@ public abstract class StoreCommands extends CommonCommands {
             listEntries(loadAllEntries(), listSingleLines, listMultiLines); // list it all
             return;
         }
+        String key = getKeyArg(inputLine, true); // grab if there, remove it
+        List<String> keys = processList(inputLine, KEYS_FLAG);
+
+        // a this point, there should be nothing on the line except
+        // for the index. Therefore, if nothing comes back grom findItems
+        // they mean to do this on the whole store.
+        boolean useAll = (!hasID()) && inputLine.getArgCount() == 0;
         FoundIdentifiables identifiables = findItem(inputLine);
         if (identifiables == null) {
-            say("Sorry, no objects found.");
-            return;
+            if (useAll) {
+                if (allEntries == null || allEntries.size() == 0) {
+                    loadAllEntries();
+                }
+                if (allEntries == null || allEntries.size() == 0) {
+                    say("Sorry, no objects found.");
+                    return;
+                }
+                identifiables = new FoundIdentifiables(allEntries);
+                identifiables.setRS(false);
+            }else {
+                say("Sorry, no objects found.");
+                return;
+            }
         }
-        String key = getKeyArg(inputLine);
 
         if (key != null) {
             if (!getKeys().allKeys().contains(key)) {
@@ -1921,7 +1943,6 @@ public abstract class StoreCommands extends CommonCommands {
             }
             return;
         }
-        List<String> keys = processList(inputLine, KEYS_FLAG);
         if (keys != null) {
             int count = 0;
             shortForm = false;
@@ -1931,7 +1952,7 @@ public abstract class StoreCommands extends CommonCommands {
                 }
                 showEntrySubset(identifiable, keys, inputLine.hasArg(VERBOSE_COMMAND));
                 count++;
-                if (!shortForm && 1 < count) {
+                if (!shortForm && !identifiables.isSingleton()) {
                     say("------ end " + identifiable.getIdentifierString()); // spacer when listing multiple
                     say(); // add a blanks in between too...
                 }
@@ -2253,6 +2274,9 @@ public abstract class StoreCommands extends CommonCommands {
         sayi("clients>search " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year");
         say("Searches the creation_ts keys as dates, returning all that are before Jan 2, 20201.");
         say("This also stores the result under the name last_year. See also the rs command help");
+        say("E.g. search for all approvals by date and status");
+        say("search >status none -date approval_ts -after 2025-03-01T00:00:0");
+        say("searches for all approvals after the given date of March 1, 2025 at midnight.");
         say("E.g.");
         sayi("clients>search " + KEY_SHORTHAND_PREFIX + "email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\" " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year_email");
         say("Searches per date as in the previous example and further restricts it to matching the given key.");
@@ -2719,7 +2743,7 @@ public abstract class StoreCommands extends CommonCommands {
                 continue;
             }
             String indent = getBlanks(2);
-            String out = key + resultSets.get(key).rs.size() + " entries, " + resultSets.get(key).fields.size() + " fields";
+            String out = key + " has " + resultSets.get(key).rs.size() + " entries, " + resultSets.get(key).fields.size() + " fields";
             say(out);
             say(hLine("-", out.length()));
             if (resultSets.get(key).fields != null) {
@@ -3034,9 +3058,11 @@ public abstract class StoreCommands extends CommonCommands {
     public static String RS_RANGE_KEY = "-range";
     public static String RS_RANGE_SHORT_KEY = "--";
     public static String RS_FILE_KEY = "-file";
-     protected String rangeHelpSnippet(){
-         return "[(" + RS_RANGE_KEY + " | " + RS_RANGE_SHORT_KEY + ") (list|value)]";
-     }
+
+    protected String rangeHelpSnippet() {
+        return "[(" + RS_RANGE_KEY + " | " + RS_RANGE_SHORT_KEY + ") (list|value)]";
+    }
+
     protected void showResultSetHelp() {
         String blanks = getBlanks(5);
         sayi("rs action [flags] rs_name.");
@@ -3082,7 +3108,7 @@ public abstract class StoreCommands extends CommonCommands {
         XMLMap object = toXMLMap(identifiable);
         List<String> outputList = StringUtils.formatMap(object,
                 keys,
-                true,
+                false, // let them specify the order
                 isVerbose,
                 indentWidth(),
                 display_width);
@@ -3132,11 +3158,7 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     protected boolean hasKey(String key) {
-        XMLConverter xmlConverter = getStore().getXMLConverter();
-        if (xmlConverter instanceof MapConverter) {
-            return getKeys().allKeys().contains(key);
-        }
-        return false;
+        return getKeys().allKeys().contains(key);
     }
 
     /**
@@ -3855,7 +3877,7 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     public SerializationKeys getKeys() {
-        return mapConverter.getKeys();
+        return getMapConverter().getKeys();
     }
 
 

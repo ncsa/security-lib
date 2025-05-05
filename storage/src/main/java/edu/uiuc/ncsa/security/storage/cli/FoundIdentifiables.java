@@ -22,6 +22,10 @@ public class FoundIdentifiables extends ArrayList<Identifiable> {
         this.isRS = isRS;
     }
 
+    public FoundIdentifiables(List<Identifiable> allEntries) {
+        super(allEntries);
+    }
+
     /**
      * Is does this list have a single element?
      * @return

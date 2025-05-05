@@ -628,6 +628,18 @@ public class StringUtils {
                                          int indent,
                                          int displayWidth,
                                          boolean tryJSON) {
+        return formatMap(map, keySubset, sortKeys, multiLine, indent, displayWidth, tryJSON, false);
+    }
+
+    public static List<String> formatMap(Map map,
+
+                                         List<String> keySubset,
+                                         boolean sortKeys,
+                                         boolean multiLine,
+                                         int indent,
+                                         int displayWidth,
+                                         boolean tryJSON,
+                                         boolean omitLineNumbers) {
 
         List<String> outputList = new ArrayList<>();
         Map<String, Object> tMap;
@@ -659,7 +671,13 @@ public class StringUtils {
             width = Math.max(width, key.toString().length());
         }
         // Use the order of the tmap (so its sorted) but the XMLMap has information we need to get these.
-        for (Object key : tMap.keySet()) {
+        Collection keySet;
+        if(sortKeys) {
+            keySet = tMap.keySet();
+        }else{
+            keySet = keySubset;
+        }
+        for (Object key : keySet) {
             //String v = map.getString(key);
             Object rawValue = tMap.get(key);
             if (rawValue == null) {
@@ -687,7 +705,12 @@ public class StringUtils {
                     }
 
                 }
-                outputList.add(formatMapEntry(key.toString(), v, indent, displayWidth, width, multiLine));
+                if(omitLineNumbers) {
+                    outputList.add(formatMapEntry("", v, indent, displayWidth, width, multiLine));
+
+                }else{
+                    outputList.add(formatMapEntry(key.toString(), v, indent, displayWidth, width, multiLine));
+                }
             }
         }
         return outputList;
@@ -710,7 +733,7 @@ public class StringUtils {
      * justified within this field and hence all the colons will end up in the same place, making the output
      * extremely readable.
      *
-     * @param key            The key from the entry
+     * @param key            The key from the entry. If null, no key is used
      * @param value          The value of the entry
      * @param indentWidth    The indent on the left of the whole entry
      * @param displayWidth   The actual width that this is to fit in
@@ -726,6 +749,7 @@ public class StringUtils {
                                         boolean multiLine) {
         // the given indent plus space for the " : " in the middle
         indentWidth = indentWidth + 3;
+        boolean omitLineNumbers = key == null || key.equals("");
         if (displayWidth < 0) {
             multiLine = false; // displayWidth =-1 means infinite width, so truncate is not possible.
         }
@@ -737,7 +761,11 @@ public class StringUtils {
             List<String> flowedtext = wrap(0, StringUtils.toList(value), realWidth - leftColumWidth);
 
             StringBuffer stringBuffer = new StringBuffer();
-            stringBuffer.append(RJustify(key, leftColumWidth) + " : " + flowedtext.get(0) + ((flowedtext.size() <= 1 && shortLine) ? "" : "\n"));
+            if(omitLineNumbers) {
+                stringBuffer.append(flowedtext.get(0) + ((flowedtext.size() <= 1 && shortLine) ? "" : "\n"));
+            }else{
+                stringBuffer.append(RJustify(key, leftColumWidth) + " : " + flowedtext.get(0) + ((flowedtext.size() <= 1 && shortLine) ? "" : "\n"));
+            }
             boolean isFirstLine = true;
             for (int i = 1; i < flowedtext.size(); i++) {
                 if (isFirstLine) {
@@ -769,8 +797,12 @@ public class StringUtils {
                     truncate(value.replace("\n", "\n"+bbb).replace("\r", "\r"+bbb), realWidth);
         }
 */
-        return RJustify(key,indentWidth + leftColumWidth) + " : " +
-                truncate(value.replace("\n", "").replace("\r", ""), realWidth);
+        if(omitLineNumbers) {
+            return  truncate(value.replace("\n", "").replace("\r", ""), realWidth);
+        }else{
+            return RJustify(key,indentWidth + leftColumWidth) + " : " +
+                    truncate(value.replace("\n", "").replace("\r", ""), realWidth);
+        }
     }
 
     /**
