@@ -675,7 +675,7 @@ public class StringUtils {
         if(sortKeys) {
             keySet = tMap.keySet();
         }else{
-            keySet = keySubset;
+            keySet = map.keySet();
         }
         for (Object key : keySet) {
             //String v = map.getString(key);

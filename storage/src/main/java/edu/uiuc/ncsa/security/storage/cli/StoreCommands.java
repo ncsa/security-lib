@@ -463,10 +463,10 @@ public abstract class StoreCommands extends CommonCommands {
 
     public void search(InputLine inputLine) {
         if (showHelp(inputLine)) {
-            showSearchHelp();
-            if (inputLine.hasArg("--ex")) {
-                say(""); // give it a break in wall of text
+            if (inputLine.hasArg("-ex")) {
                 showSearchHelpExamples();
+            }else{
+                showSearchHelp();
             }
             return;
         } else {
@@ -546,6 +546,10 @@ public abstract class StoreCommands extends CommonCommands {
         if (hasDate) {
             dateField = inputLine.getNextArgFor(SEARCH_DATE_FLAG);
             inputLine.removeSwitchAndValue(SEARCH_DATE_FLAG);
+            if(!getKeys().allKeys().contains(dateField)) {
+                say("The date field \"" + dateField + "\" does not exist.");
+                return;
+            }
             try {
                 if (inputLine.hasArg(SEARCH_BEFORE_TS_FLAG)) {
                     beforeDate = getDateFromArg(inputLine, SEARCH_BEFORE_TS_FLAG);
@@ -2252,7 +2256,7 @@ public abstract class StoreCommands extends CommonCommands {
         say("Other supported options");
         showCommandLineSwitchesHelp();
         showKeyShorthandHelp();
-        sayi("If you want to see examples, invoke this with --ex.");
+        sayi("If you want to see examples, invoke help with -ex.");
     }
 
     protected void showSearchHelpExamples() {
