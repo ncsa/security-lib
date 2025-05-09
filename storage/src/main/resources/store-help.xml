@@ -166,6 +166,22 @@ where name is the name and the range is either a single integer giving the index
 list of them. Be aware that some commands only accept a single object (e.g. changing and id, which
 would give multiple objects the same id.)
 
+The rs command works on result sets proper. Other commands, such as ls will take the id of the
+object in a result set and fetch the current version of it the store. This lets you use result
+sets from one store with another with the understanding that the identifiers must match.
+
+E.g., searching an approval store for all pending clients.
+
+approvals> search >status none -date approval_ts -after 2025-04-30T00:00:00 -rs todo
+7 objects found
+
+then switch to the client store to, say, just list the emails,
+
+approvals> /q
+oa4mp>use clients
+clients> ls >email todo
+
+
 Lists
 -----
 Lists are actually valid QDL, though are restricted to being un-nested. You could

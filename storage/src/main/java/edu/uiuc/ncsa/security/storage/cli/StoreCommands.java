@@ -2363,7 +2363,7 @@ public abstract class StoreCommands extends CommonCommands {
             if (arg.startsWith(KEY_SHORTHAND_PREFIX)) {
                 String k = arg.substring(1);
                 if (removeIt) {
-                    inputLine.removeSwitchAndValue(arg);
+                    inputLine.removeSwitch(arg); // not switch and value!!
                 }
                 return k;
             }
@@ -3147,7 +3147,11 @@ public abstract class StoreCommands extends CommonCommands {
                     if (v instanceof JSON) {
                         say(((JSON) v).toString(1));
                     } else {
-                        say(v.toString());
+                        if(v == null){
+                            say("(no value)");
+                        }else {
+                            say(v.toString());
+                        }
                     }
                 }
             } else {
