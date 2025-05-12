@@ -244,7 +244,6 @@ public class InputLine {
      * (i.e., values that are there or not, no arguments).
      * <p>See also: {@link #hasArg(String...)}, {@link #removeSwitchAndValue(String...)}, {@link #getNextArgFor(String...)};</p>
      *
-     *
      * @param value
      */
     public void removeSwitch(String... value) {
@@ -377,19 +376,71 @@ public class InputLine {
      * @return
      */
     public int getIntArg(int index) {
+        return stringToInt(getArg(index));
+    }
+
+    /**
+     * Contract is to return an integer if it parses and a {@link ArgumentNotFoundException}
+     * if it does not rather than a {@link NumberFormatException}.
+     *
+     * @param value
+     * @return
+     */
+    protected int stringToInt(String value) {
+        if(value == null) {
+            throw new ArgumentNotFoundException("Error: missing value.");
+        }
         try {
-            return Integer.parseInt(getArg(index));
+            return Integer.parseInt(value);
         } catch (NumberFormatException nfx) {
-            throw new ArgumentNotFoundException("Error: the argument \"" + getArg(index) + "\" cannot be parsed. Did you forget the object index?");
+            throw new ArgumentNotFoundException("Error: the value \"" + value + "\" cannot be parsed as an integer.");
         }
     }
 
-    public int getNextIntArg(String key) {
+    protected boolean isStringAnInt(String value) {
         try {
-            return Integer.parseInt(getNextArgFor(key));
-        } catch (NumberFormatException nfx) {
-            throw new ArgumentNotFoundException("Error: the argument \"" + getNextArgFor(key) + "\" cannot be parsed. Did you forget the object index?");
+            stringToInt(value);
+            return true;
+        } catch (ArgumentNotFoundException nfx) {
+            return false;
         }
+    }
+
+    /**
+     * Get the next argument for the keys, returning an integer. This will
+     * throw a {@link ArgumentNotFoundException} if the value is not an integer.
+     * @param keys
+     * @return
+     */
+    public int getIntNextArg(String... keys) {
+        return stringToInt(getNextArgFor(keys));
+    }
+
+    /**
+     * Same as {@link #getIntNextArg(String...)}. Just regularlizing the naming of methods
+     * so they can be easily guessed.
+     * @param keys
+     * @return
+     * @deprecated
+     */
+    public int getNextIntArg(String... keys) {
+        return getIntNextArg();
+    }
+
+    public int getIntLastArg(String key) {
+        return stringToInt(getLastArg());
+    }
+
+    public boolean isIntLastArg(String key) {
+        return isStringAnInt(getLastArg());
+    }
+
+    public boolean isIntNextArg(String key) {
+        return isStringAnInt(getNextArgFor(key));
+    }
+
+    public boolean isBooleanNextArg(String key) {
+        return null != getBooleanNextArgFor(key);
     }
 
     /**
@@ -445,6 +496,7 @@ public class InputLine {
 
     /**
      * For a list of keys, return the first one it finds, null if no such key.
+     *
      * @param keys
      * @return
      */
@@ -547,28 +599,32 @@ public class InputLine {
         return null;
     }
 
-    /*
-         if (args.length == 0) {
-            return false;
-        }
-        for (String arg : args) {
-            if (indexOf(arg) != -1) {
-                return true;
-            }
-        }
-        return false;
-     */
     public static final String SWITCH = "-";
 
     /**
      * Converts the argument to a boolean. If the argument is missing or cannot be determined to be a boolean,
      * a null is returned. This accepts "true", "on", "false", "off" as arguments.
      *
-     * @param key
+     * @param keys
      * @return
      */
-    public Boolean getBooleanNextArgFor(String key) {
-        String raw = getNextArgFor(key);
+    public Boolean getBooleanNextArgFor(String... keys) {
+        for(String key : keys ){
+            String raw = getNextArgFor(key);
+            if(raw != null) {
+                return stringToBoolean(raw);
+            }
+        }
+        return null;
+    }
+    public boolean isBooleanNextArgFor(String... keys) {
+        return isStringABoolean(getNextArgFor(keys));
+    }
+    public boolean isBooleanLastArg(String key){
+        return isStringABoolean(getLastArg());
+    }
+
+    protected Boolean stringToBoolean(String raw) {
         if (StringUtils.isTrivial(raw)) {
             return null;
         }
@@ -579,6 +635,16 @@ public class InputLine {
             return Boolean.FALSE;
         }
         return null;
+    }
+    protected boolean isStringABoolean(String value){
+        return null != stringToBoolean(value);
+    }
+
+    public Boolean getBooleanLastArg() {
+        return stringToBoolean(getLastArg());
+    }
+    public Boolean getBooleanArgArg(int index) {
+        return stringToBoolean(getArg(index));
     }
 
     /**
@@ -664,7 +730,7 @@ public class InputLine {
         int keyIndex = rawLine.indexOf(key);
         int nextSwitch = rawLine.indexOf("-", keyIndex + key.length());
         int startListIndex = rawLine.indexOf(LIST_START_DELIMITER, keyIndex);
-        if(startListIndex == -1){
+        if (startListIndex == -1) {
             //Assume single value to be taken as a list
             list.add(partial);
             if (whittle) {
@@ -674,13 +740,13 @@ public class InputLine {
         }
         int endListIndex;
         String rawList;
-        if(nextSwitch == -1){
+        if (nextSwitch == -1) {
             // this is the rest of the line.
             // just in case, use that
             endListIndex = rawLine.length();
             rawList = rawLine.substring(startListIndex);
             rawLine = rawLine.substring(0, keyIndex);
-        }else{
+        } else {
             if (nextSwitch < startListIndex) {
                 // means no list between this and next flag, so return empty list
                 // foo -zero -one [a,b,c]
@@ -688,7 +754,7 @@ public class InputLine {
                 return list;
             }
             endListIndex = rawLine.indexOf(LIST_END_DELIMITER, keyIndex);
-             rawList = rawLine.substring(startListIndex,endListIndex+1); // include end list delimiter
+            rawList = rawLine.substring(startListIndex, endListIndex + 1); // include end list delimiter
             rawLine = rawLine.substring(0, keyIndex) + rawLine.substring(endListIndex + 1);
         }
         //String rawList = rawLine.substring(startListIndex + 1, endListIndex);
@@ -737,7 +803,7 @@ public class InputLine {
     }
 
     public static void main(String[] args) {
-        String originalLine ="foo -zero -one [2,   3,4   ] -arf blarf0  -woof -two [abc,  def, g] -fnord 3455.34665 -- [  a,b,   c]";
+        String originalLine = "foo -zero -one [2,   3,4   ] -arf blarf0  -woof -two [abc,  def, g] -fnord 3455.34665 -- [  a,b,   c]";
         InputLine inputLine = new InputLine(originalLine);
 
         System.out.println(inputLine.getArgList("-zero")); // should be empty
