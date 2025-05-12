@@ -18,7 +18,7 @@
   <skin>
     <groupId>edu.uiuc.ncsa.security.skin</groupId>
     <artifactId>skin</artifactId>
-    <version>6.1-rc1</version>
+    <version>6.1.0</version>
   </skin>
 
   <body>
