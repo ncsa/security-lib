@@ -650,17 +650,22 @@ public class InputLine {
     /**
      * checks if the very next component is an argument, not a switch.
      *
-     * @param key
+     * @param keys
      * @return
      */
-    public boolean hasNextArgFor(String key) {
-        int index = indexOf(key);
-        // NOTE that the indexOf command starts at 1, since the zeroth index is always omitted
-        if (index == getArgs().size()) { // so it is the last arg in the string and there cannot be another
-            return false;
+    public boolean hasNextArgFor(String... keys) {
+        for(String key : keys){
+            int index = indexOf(key);
+            if(index == -1) {
+                continue;
+            }
+            // NOTE that the indexOf command starts at 1, since the zeroth index is always omitted
+            if (index == getArgs().size()) { // so it is the last arg in the string and there cannot be another
+                return false;
+            }
+            return !getArg(1 + index).startsWith(SWITCH); // finally, a result!
         }
-
-        return !getArg(1 + index).startsWith(SWITCH); // finally, a result!
+        return false; // nothing found at all, so that's a false.
     }
 
     /**
