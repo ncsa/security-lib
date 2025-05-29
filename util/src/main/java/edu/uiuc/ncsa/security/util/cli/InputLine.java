@@ -292,6 +292,18 @@ public class InputLine {
         return out;
     }
 
+    /**
+     * Returns a list of the arguments. The zeroth element here is the
+     * first argument, not the name of the command. If the original line is
+     * <pre>
+     *     my_command arg0, arg1, ...
+     * </pre>
+     * this returns the list
+     * <pre>
+     *     [arg0, arg1, ...]
+     * </pre>
+     * @return
+     */
     public List<String> getArgs() {
         if (parsedInput.isEmpty() || parsedInput.size() == 1) {
             return new LinkedList<String>();
@@ -387,7 +399,7 @@ public class InputLine {
      * @return
      */
     protected int stringToInt(String value) {
-        if(value == null) {
+        if (value == null) {
             throw new ArgumentNotFoundException("Error: missing value.");
         }
         try {
@@ -409,6 +421,7 @@ public class InputLine {
     /**
      * Get the next argument for the keys, returning an integer. This will
      * throw a {@link ArgumentNotFoundException} if the value is not an integer.
+     *
      * @param keys
      * @return
      */
@@ -419,6 +432,7 @@ public class InputLine {
     /**
      * Same as {@link #getIntNextArg(String...)}. Just regularlizing the naming of methods
      * so they can be easily guessed.
+     *
      * @param keys
      * @return
      * @deprecated
@@ -609,18 +623,20 @@ public class InputLine {
      * @return
      */
     public Boolean getBooleanNextArgFor(String... keys) {
-        for(String key : keys ){
+        for (String key : keys) {
             String raw = getNextArgFor(key);
-            if(raw != null) {
+            if (raw != null) {
                 return stringToBoolean(raw);
             }
         }
         return null;
     }
+
     public boolean isBooleanNextArgFor(String... keys) {
         return isStringABoolean(getNextArgFor(keys));
     }
-    public boolean isBooleanLastArg(String key){
+
+    public boolean isBooleanLastArg(String key) {
         return isStringABoolean(getLastArg());
     }
 
@@ -636,13 +652,15 @@ public class InputLine {
         }
         return null;
     }
-    protected boolean isStringABoolean(String value){
+
+    protected boolean isStringABoolean(String value) {
         return null != stringToBoolean(value);
     }
 
     public Boolean getBooleanLastArg() {
         return stringToBoolean(getLastArg());
     }
+
     public Boolean getBooleanArgArg(int index) {
         return stringToBoolean(getArg(index));
     }
@@ -654,9 +672,9 @@ public class InputLine {
      * @return
      */
     public boolean hasNextArgFor(String... keys) {
-        for(String key : keys){
+        for (String key : keys) {
             int index = indexOf(key);
-            if(index == -1) {
+            if (index == -1) {
                 continue;
             }
             // NOTE that the indexOf command starts at 1, since the zeroth index is always omitted
@@ -832,4 +850,49 @@ public class InputLine {
         System.out.println(inputLine1);
     }
 
+    /**
+     * In some cases, the command line argument might turn into something that is not a string.
+     * This allows retrieval in specific cases. You must manage this pretty directly.
+     *
+     * @return
+     */
+    public boolean hasOtherValue(int index) {
+        return getOtherValues().containsKey(index);
+    }
+
+    public HashMap<Integer, Object> getOtherValues() {
+        if (otherValues == null) {
+            otherValues = new HashMap<>();
+        }
+        return otherValues;
+    }
+
+    public void setOtherValues(HashMap<Integer, Object> otherValues) {
+        this.otherValues = otherValues;
+    }
+
+    public boolean hasOtherValues() {
+        return otherValues != null && !otherValues.isEmpty();
+    }
+
+    HashMap<Integer, Object> otherValues = null;
+
+    /**
+     * Finds the first index of any of the given keys.
+     *
+     * @param keys
+     * @return
+     */
+    public int getIndexOfKey(String... keys) {
+        // Zero is the name of the command, so start loop at 1.
+        for (int index = 1; index < parsedInput.size(); index++) {
+            String v = parsedInput.get(index);
+            for (String k : keys) {
+                if (v.equals(k)) {
+                    return index;
+                }
+            }
+        }
+        return -1;
+    }
 }
