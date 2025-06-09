@@ -1900,7 +1900,8 @@ public abstract class StoreCommands extends CommonCommands {
                     return;
                 }
             }
-            listEntries(loadAllEntries(), listSingleLines, listMultiLines); // list it all
+            // Fix https://github.com/ncsa/security-lib/issues/52
+           allEntries = listEntries(loadAllEntries(), listSingleLines, listMultiLines); // list it all
             return;
         }
         String key = getKeyArg(inputLine, true); // grab if there, remove it
