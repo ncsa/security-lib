@@ -14,9 +14,6 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         KeyTest.class,
         TemplateTest.class,
-        FunctorParserTest.class,
-        JFunctorFactoryTests.class,
-        JFunctorTest.class,
         JSONPreprocessorTest.class,
         CacheTest.class,
         EditorTest.class,

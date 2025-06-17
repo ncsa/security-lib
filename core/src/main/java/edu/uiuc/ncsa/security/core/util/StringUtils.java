@@ -151,6 +151,7 @@ public class StringUtils {
         System.out.println("center:\"" + center("abcd", 15) + "\""); // 8 sec
         System.out.println("center:\"" + center("abcd", 6) + "\""); // 8 sec
 
+
         System.out.println(formatElapsedTime(8000)); // 8 sec
         System.out.println(formatElapsedTime(4 * 3600 * 1000));  //4 hours
         System.out.println(formatByteCount(1000000L));
@@ -196,6 +197,15 @@ public class StringUtils {
         System.out.println(LJustify("abc", 10) + ":");
         System.out.println(truncate("abcdefghijklmnopqrs", 10));
         System.out.println(truncate("abcdefghijklmnopqrs", 100));
+        String lineIn = "Twas bryllyg, and þe slythy toves " +
+                "Did gyre and gymble in þe wabe: " +
+                "All mimsy were þe borogoves; " +
+                "And þe mome raths outgrabe.";
+        System.out.println("Test break at spaces:\n-------------------------| 25\n"  + breakAtSpaces(lineIn, 25) );
+        // 26 a's, 54 b's
+        String lineIn2 = "Twas bryllyg, and þe aaaaaaaaaaaaaaaaaaaaaaaaaa slythy toves bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb        Did gyre and gymble         " ;
+        System.out.println("Test break at spaces 2:\n-------------------------| 25\n"  + breakAtSpaces(lineIn2, 25) );
+
         List<String> y = new ArrayList<>();
         y.add("       foo : azxz");
         y.add("foo bar afg: adfg sdfg sdfadgw546 rhg 54erthvbg sfgsdfg");
@@ -1031,5 +1041,73 @@ public class StringUtils {
     }
     public static String center(Integer value, int width) {
         return center(value.toString(), width);
+    }
+
+    /**
+     * Take a string and return a multiline version of it within the width, but
+     * breaking at spaces. E.g.
+     * <pre>breakAtSpace("mairzy doats and dozey doats and liddle lambsidivy",20)</pre>
+     * returns
+     * <pre>
+     *  mairzy doats and
+     *  dozey doats and
+     *  liddle lambsidivy
+     * </pre>
+     * N.B. that multiple spaces are converted to single spaces.
+     * @param input
+     * @param width
+     * @return
+     */
+    public static String breakAtSpaces(String input, int width) {
+      return fromList(breakAtSpacesList(input,width));
+    }
+
+    /**
+     * Same as {@link #breakAtSpaces(String, int)} but return a list.
+     * @param input
+     * @param width
+     * @return
+     */
+    public static List<String> breakAtSpacesList(String input, int width) {
+        List<String> output = new LinkedList<>();
+        StringTokenizer st = new StringTokenizer(input, " ");
+        StringBuilder sb = new StringBuilder();
+        boolean firstPass = true;
+        while (st.hasMoreTokens()) {
+            String token = st.nextToken();
+            if(width < token.length()) {
+                output.add(sb.toString());
+                sb = new StringBuilder();
+                int i = 0;
+                String lastToken = token.substring(i*width,(i+1)*width);
+                while(width <= lastToken.length()) {
+                    i++;
+                    output.add(lastToken);
+                    if(token.length() < (i+1)*width){
+                        lastToken = token.substring(i * width);
+                    }else{
+                        lastToken = token.substring(i * width, (i + 1) * width);
+                    }
+                }
+                output.add(lastToken);
+                continue;
+            }
+            if(width <= sb.length() + token.length()) {
+                output.add(sb.toString());
+                sb = new StringBuilder();
+                sb.append(token);
+            }else{
+                if(firstPass) {
+                    firstPass = false;
+                }else{
+                    if(0 < sb.length()) {
+                        sb.append(" ");
+                    }
+                }
+                sb.append(token);
+            }
+        }
+        output.add(sb.toString()); // add last token
+        return output;
     }
 }

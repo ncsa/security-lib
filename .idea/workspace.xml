@@ -9,10 +9,82 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Local commit to swtich branches">
-      <change afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreTester.java" afterDir="false" />
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Fix https://github.com/ncsa/security-lib/issues/52">
+      <change afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/batch/DDParser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/ANDLogicBlocks.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/FunctorType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/FunctorTypeImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/JFunctor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/JFunctorFactory.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/JFunctorImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/JMetaMetaFunctor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/JSONFunctor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/LogicBlock.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/LogicBlocks.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/ORLogicBlocks.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/XORLogicBlocks.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/FunctorMap.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/jAnd.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/jContains.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/jElse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/jEndsWith.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/jEquals.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/jExists.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/jFalse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/jIf.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/jMatch.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/jNot.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/jOr.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/jStartsWith.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/jStringComparisons.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/jThen.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/jTrue.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/logic/jXOr.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/package-info.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/AbstractHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/FunctorParser.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/FunctorScript.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/ParserError.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/Script.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/event/CommaEvent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/event/CommaListener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/event/ConditionalHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/event/DelimiterEvent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/event/DelimiterListener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/event/DoubleQuoteEvent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/event/DoubleQuoteListener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/event/EventDrivenParser.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/event/FunctorHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/event/ParserEvent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/event/ParserUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/event/SwitchHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/event/package.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/old/DefaultHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/old/FunctorHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/old/FunctorHandlerInterface.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/old/JSONHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/old/LogicBlockHandlerInterface.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/old/LogicBlocksHandlerInterface.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/old/TopHandlerInterface.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/parser/old/package.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/strings/jConcat.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/strings/jDrop.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/strings/jEcho.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/strings/jReplace.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/strings/jToArray.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/strings/jToLowerCase.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/strings/jToUpperCase.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/system/jRaiseError.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/system/jclearEnv.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/system/jgetEnv.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/system/jsetEnv.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/functor/user_defined/UserDefined.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/test/java/edu/uiuc/ncsa/security/util/FunctorParserTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/test/java/edu/uiuc/ncsa/security/util/JFunctorFactoryTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/test/java/edu/uiuc/ncsa/security/util/JFunctorTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/test/java/edu/uiuc/ncsa/security/util/TestSuite.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/test/java/edu/uiuc/ncsa/security/util/TestSuite.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -86,6 +158,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.CertUtil.executor": "Run",
+    "Application.DDParser.executor": "Run",
     "Application.HeaderUtils.executor": "Run",
     "Application.InputLine.executor": "Run",
     "Application.SAS Client.executor": "Run",
@@ -153,7 +226,7 @@
       <recent name="edu.uiuc.ncsa.security.util.mail" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.InputLine">
+  <component name="RunManager" selected="Application.DDParser">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -178,13 +251,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="InputLine" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.cli.InputLine" />
+    <configuration name="DDParser" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.cli.batch.DDParser" />
       <module name="util" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.util.cli.*" />
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.util.cli.batch.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -387,7 +460,7 @@
       <item itemvalue="Application.SASCLIDriver" />
       <item itemvalue="Application.SAS Client" />
       <item itemvalue="Application.WebInstaller" />
-      <item itemvalue="Application.InputLine" />
+      <item itemvalue="Application.DDParser" />
       <item itemvalue="Application.StoreArchiver" />
       <item itemvalue="Application.StringUtils" />
       <item itemvalue="Application.CertUtil" />
@@ -396,11 +469,11 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.DDParser" />
+        <item itemvalue="Application.StringUtils" />
         <item itemvalue="Application.SASCommands" />
         <item itemvalue="Application.CertUtil" />
-        <item itemvalue="Application.StringUtils" />
         <item itemvalue="Application.StoreArchiver" />
-        <item itemvalue="Application.InputLine" />
       </list>
     </recent_temporary>
   </component>
@@ -920,7 +993,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="97" />
+    <option name="localTasksCounter" value="98" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -929,7 +1002,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Mostly documentation" />
     <MESSAGE value="Wrote a proper installer." />
     <MESSAGE value="Checkin before system migration" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/40" />
@@ -954,7 +1026,8 @@
     <MESSAGE value="More tweaking formatting lists" />
     <MESSAGE value="Fixed NPE I found in an edge case for formatting output" />
     <MESSAGE value="Migrate to 17" />
-    <option name="LAST_COMMIT_MESSAGE" value="Migrate to 17" />
+    <MESSAGE value="Fix https://github.com/ncsa/security-lib/issues/52" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix https://github.com/ncsa/security-lib/issues/52" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -1077,13 +1150,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>3039</line>
+          <line>3040</line>
           <option name="timeStamp" value="105" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/InputLine.java</url>
           <line>753</line>
           <option name="timeStamp" value="106" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java</url>
+          <line>1076</line>
+          <option name="timeStamp" value="111" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
