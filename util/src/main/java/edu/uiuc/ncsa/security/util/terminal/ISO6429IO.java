@@ -174,7 +174,7 @@ public class ISO6429IO implements IOInterface {
 
                //     debug("postprint length = " + currentLine.length() + " position =" + position + " cursor=" + terminal.getCursorCol() + " my cursor=" + currentCol0);
                     terminal.setCursorCol(currentCol0);
-                    if (currentCol0 % width == 0) {
+                    if (width != 0 && currentCol0 % width == 0) {
                  //       debug("adding CR/LF");
                         // insert new line so it wraps. This  moves cursor to start of line  + a line feed .
                         print("\r\n");

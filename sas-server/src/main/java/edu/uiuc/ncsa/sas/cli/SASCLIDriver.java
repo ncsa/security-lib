@@ -31,6 +31,7 @@ public class SASCLIDriver extends CLIDriver implements Executable {
         CLI_IO cliIO = new CLI_IO(ioInterface, sasClient);
         setIO(cliIO);
     }
+
     public SASCLIDriver(IOInterface ioInterface) throws Exception {
         setIO(ioInterface);
     }
@@ -48,7 +49,7 @@ public class SASCLIDriver extends CLIDriver implements Executable {
                 if (rc == SHUTDOWN_RC || rc == USER_EXIT_RC) {
                     throw new ExitException();
                 }
-                if(rc == HELP_RC){
+                if (rc == HELP_RC) {
                     InputLine inputLine = new InputLine(executeAction.getArg());
                     listCLIMethods(inputLine);
                 }
@@ -73,72 +74,96 @@ public class SASCLIDriver extends CLIDriver implements Executable {
     protected void init() {
 
     }
-public static class DC implements Commands{
-    @Override
-    public String getPrompt() {
-        return getName() + ">";
+
+    public static class DC implements Commands {
+        @Override
+        public String getPrompt() {
+            return getName() + ">";
+        }
+
+        @Override
+        public String getName() {
+            return "sas";
+        }
+
+        @Override
+        public void print_help() throws Exception {
+
+        }
+
+        @Override
+        public void setDriver(CLIDriver driver) {
+            this.driver = driver;
+        }
+
+        CLIDriver driver;
+
+        @Override
+        public CLIDriver getDriver() {
+            return driver;
+        }
+
+        @Override
+        public void bootstrap() throws Throwable {
+
+        }
+
+        @Override
+        public boolean isBatchMode() {
+            return false;
+        }
+
+        @Override
+        public void setBatchMode(boolean batchMode) {
+
+        }
+
+        @Override
+        public HelpUtil getHelpUtil() {
+            return null;
+        }
+
+        @Override
+        public IOInterface getIOInterface() {
+            return null;
+        }
+
+        @Override
+        public void setIOInterface(IOInterface io) {
+
+        }
+
+        @Override
+        public boolean isDebugOn() {
+            return false;
+        }
+
+        @Override
+        public void setDebugOn(boolean setOn) {
+
+        }
+
+        @Override
+        public void debug(String x) {
+
+        }
+
+        @Override
+        public void info(String x) {
+
+        }
+
+        @Override
+        public void warn(String x) {
+
+        }
+
+        @Override
+        public void error(String x) {
+
+        }
     }
 
-    @Override
-    public String getName() {
-        return "sas";
-    }
-
-    @Override
-    public void print_help() throws Exception {
-
-    }
-
-    @Override
-    public void bootstrap() throws Throwable {
-
-    }
-
-    @Override
-    public HelpUtil getHelpUtil() {
-        return null;
-    }
-
-    @Override
-    public IOInterface getIOInterface() {
-        return null;
-    }
-
-    @Override
-    public void setIOInterface(IOInterface io) {
-
-    }
-
-    @Override
-    public boolean isDebugOn() {
-        return false;
-    }
-
-    @Override
-    public void setDebugOn(boolean setOn) {
-
-    }
-
-    @Override
-    public void debug(String x) {
-
-    }
-
-    @Override
-    public void info(String x) {
-
-    }
-
-    @Override
-    public void warn(String x) {
-
-    }
-
-    @Override
-    public void error(String x) {
-
-    }
-}
     public static void main(String[] args) {
         try {
             List argList = new ArrayList();

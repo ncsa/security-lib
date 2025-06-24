@@ -101,11 +101,28 @@ public class InputLine {
      * @param strings
      */
     public InputLine(String... strings) {
-        parsedInput = new ArrayList<>();
+        parsedInput = new ArrayList<>(strings.length);
         originalLine = "";
         for (int i = 0; i < strings.length; i++) {
             parsedInput.add(strings[i]);
             originalLine = originalLine + (i == 0 ? "" : " ") + strings[i];
+        }
+    }
+
+    /**
+     * Special constructor for running directly from a main(String[] args) method.
+     * Pass in a dummy command line name since java strips that off. This lets you
+     * set it to something you can predict (and ignore as needed ) later.
+     * @param commandName
+     * @param args
+     */
+    public InputLine(String commandName, String[] args) {
+        parsedInput = new ArrayList<>(args.length + 1);
+        originalLine = commandName + " ";
+        parsedInput.add(commandName);
+        for (int i = 0; i < args.length; i++) {
+            parsedInput.add(args[i]);
+            originalLine = originalLine + (i == 0 ? "" : " ") + args[i];
         }
     }
 

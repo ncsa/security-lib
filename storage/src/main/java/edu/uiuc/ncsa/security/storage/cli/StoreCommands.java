@@ -2935,15 +2935,15 @@ public abstract class StoreCommands extends CommonCommands {
     private void doRSSize(InputLine inputLine) {
         //handles case there is a size action, but no result sets were named -- do them all.
         inputLine.removeSwitch(RS_SIZE_ACTION);
+        String nameTitle = "name";
+        String sizeTitle = "size";
+        int width = nameTitle.length();
+        int sizeWidth = sizeTitle.length();
         if (inputLine.getArgCount() == 0) {
             if (getResultSets().size() == 0) {
                 say("no result sets.");
                 return;
             }
-            String nameTitle = "name";
-            String sizeTitle = "size";
-            int width = nameTitle.length();
-            int sizeWidth = sizeTitle.length();
             for (String name : getResultSets().keySet()) {
                 width = Math.max(width, name.length());
                 sizeWidth = Math.max(getResultSets().get(name).rs.size(), sizeWidth);
@@ -2957,6 +2957,19 @@ public abstract class StoreCommands extends CommonCommands {
                 say(center(key, width) + "|  " + center(Integer.toString(getResultSets().get(key).rs.size()), sizeWidth));
             }
             say("\n" + getResultSets().size() + " result sets processed");
+        }else{
+            // case of a single result set.
+            String name = inputLine.getLastArg();
+            if(!getResultSets().containsKey(name)){
+                say("no such result set \"" + name + "\"");
+                return;
+            }
+            getResultSets().get(name);
+            width = 2 + Math.max(width, name.length());
+            sizeWidth = 2 + Math.max(getResultSets().get(name).rs.size(), sizeWidth);
+            say(center(nameTitle, width) + "|" + center(sizeTitle, sizeWidth));
+            say(hLine("-", width) + "+" + hLine("-", sizeWidth));
+            say(center(name, width) + "|  " + center(Integer.toString(getResultSets().get(name).rs.size()), sizeWidth));
         }
         return;
     }

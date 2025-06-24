@@ -1,14 +1,25 @@
 package edu.uiuc.ncsa.security.util.cli;
 
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
-import edu.uiuc.ncsa.security.core.util.*;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.LoggerProvider;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
+import edu.uiuc.ncsa.security.util.cli.batch.DDParser;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
+import edu.uiuc.ncsa.security.util.terminal.ISO6429IO;
+import edu.uiuc.ncsa.security.util.terminal.ISO6429Terminal;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.logging.Level;
 
 import static edu.uiuc.ncsa.security.util.cli.CLIReflectionUtil.invokeMethod;
+import static edu.uiuc.ncsa.security.util.cli.CommonCommands.BATCH_FILE_MODE_FLAG;
+import static edu.uiuc.ncsa.security.util.cli.CommonCommands.BATCH_MODE_FLAG;
 
 /**
  * A driver program that does introspection on a set of CLICommands
@@ -21,6 +32,7 @@ public class CLIDriver {
      * is thrown.
      */
     public static final String EXIT_COMMAND = "/exit";
+    public static final String ECHO_COMMAND = "/echo";
 
     public String getLineCommentStart() {
         return lineCommentStart;
@@ -30,16 +42,18 @@ public class CLIDriver {
         this.lineCommentStart = lineCommentStart;
     }
 
-    protected String lineCommentStart = null;
+    protected String lineCommentStart = "#";
 
     /**
      * If a comment delimiter has been set for this component. If so, then lines that
      * start with this are ignored.
+     *
      * @return
      */
-    public boolean hasComments(){
+    public boolean hasComments() {
         return lineCommentStart != null;
     }
+
     public static final int OK_RC = 0;
     public static final int ABNORMAL_RC = -1;
     public static final int USER_EXIT_RC = 10;
@@ -47,6 +61,14 @@ public class CLIDriver {
     public static final int HELP_RC = 100;
     public static final String HELP_SWITCH = "--help";
 
+
+    public List<String> getCommandHistory() {
+        return commandHistory;
+    }
+
+    public void setCommandHistory(List<String> commandHistory) {
+        this.commandHistory = commandHistory;
+    }
 
     List<String> commandHistory = new LinkedList<>();
     public static final String PRINT_HELP_COMMAND = "/?";
@@ -97,7 +119,7 @@ public class CLIDriver {
 
 
     public CLIDriver(IOInterface ioInterface) {
-        this.ioInterface = ioInterface;
+        setIOInterface(ioInterface);
     }
 
     public void addCommands(Commands... cci) {
@@ -108,9 +130,13 @@ public class CLIDriver {
                 componentManager = (ComponentManager) xxx;
             }
             if (xxx instanceof CommonCommands) {
-                ((CommonCommands) xxx).setDriver(this);
+                CommonCommands commonCommands = ((CommonCommands) xxx);
+                commonCommands.setVerbose(isVerbose());
+                commonCommands.setPrintOuput(!isNoOutput());
             }
             xxx.setIOInterface(getIOInterface());
+            xxx.setDriver(this);
+
         }
         setCLICommands(cci);
 
@@ -370,34 +396,49 @@ public class CLIDriver {
     }
 
     /**
-     * Actual method that starts up this driver and sets out prompts etc.
+     * Actual method that starts up this driver and sets out prompts etc. for the user to use interactively.
      *
      * @throws Exception
      */
 
     public void start() {
-        OLDstart();
+        NEWstart();
     }
-    protected void NEWstart() throws Exception {
+
+    protected void NEWstart() {
+        if (hasBatchFileCommands()) {
+            try {
+                processBatchFile();
+                return;
+            } catch (Throwable e) {
+                e.printStackTrace();
+                return;
+            }
+        }
+        if (isRunLineMode()) {
+            processRunLine(); // contract is that it runs the single line, then continues.
+        }
+        if (commands == null || commands.length == 0) {
+            say("(empty command list, exiting...)");
+            return;
+        }
         String prompt = commands[0].getPrompt();
         String cmdLine;
         while (!isDone) {
-           try{
-               cmdLine = readline(prompt);
-               processLine(cmdLine);
-
-           }catch(ExitException ee){
-               return;
-           }catch (Throwable t){
-               if (debug) {
-                   t.printStackTrace();
-               }
-               say("Internal error reading line:" + (StringUtils.isTrivial(t.getMessage()) ? "\n" + t.getMessage() : ""));
-
-           }
+            try {
+                cmdLine = readline(prompt);
+                processLine(cmdLine);
+            } catch (ExitException ee) {
+                return;
+            } catch (Throwable t) {
+                if (debug) {
+                    t.printStackTrace();
+                }
+                say("Internal error reading line:" + (StringUtils.isTrivial(t.getMessage()) ? "\n" + t.getMessage() : ""));
+            }
         }
-
     }
+
     protected void OLDstart() {
         //commands[0].about(null);
         String cmdLine;
@@ -423,8 +464,8 @@ public class CLIDriver {
                 }
                 cmdLine = readline(prompt);
                 // start process line
-                if(hasComments()){
-                    if(cmdLine.trim().startsWith(getLineCommentStart())){
+                if (hasComments()) {
+                    if (cmdLine.trim().startsWith(getLineCommentStart())) {
                         continue;
                     }
                 }
@@ -532,79 +573,82 @@ public class CLIDriver {
 
     protected void processLine(String cmdLine) throws Throwable {
 
-        if(hasComments()){
-            if(cmdLine.trim().startsWith(getLineCommentStart())){
-               return;
+        if (hasComments()) {
+            if (cmdLine.trim().startsWith(getLineCommentStart())) {
+                return;
             }
         }
         if (hasEnv()) {
             cmdLine = TemplateUtil.replaceAll(cmdLine, getEnv());
         }
         boolean storeLine = true;
-        int commandType = getCommandType(cmdLine);
-        switch (commandType) {
-            case REPEAT_COMMAND_VALUE:
+        cmdLine = cmdLine.trim();
+
+        StringTokenizer st = new StringTokenizer(cmdLine, " ");
+        String command = st.nextToken().trim();
+        if (StringUtils.isTrivial(command)) {
+            return;
+        }
+        switch (command) {
+            case REPEAT_LAST_COMMAND:
                 cmdLine = doRepeatCommand(cmdLine);
                 storeLine = cmdLine == null; // if there is nothing in the buffer, cmdLine is null, don't store it.
-                break;
-            case HISTORY_COMMAND_VALUE:
+                return;
+            case HISTORY_LIST_COMMAND:
                 cmdLine = doHistory(cmdLine);
                 if (cmdLine == null) {
-                    break;// if there is nothing in the buffer, cmdLine is null, don't store it.
+                    return;// if there is nothing in the buffer, cmdLine is null, don't store it.
                 }
                 storeLine = false;
-                break;
-            case WRITE_BUFFER_COMMAND_VALUE:
+                return;
+            case WRITE_BUFFER_COMMAND:
                 doBufferWrite(cmdLine);
-                break;
-            case READ_BUFFER_COMMAND_VALUE:
+                return;
+            case LOAD_BUFFER_COMMAND:
                 doBufferRead(cmdLine);
-                break;
-            case CLEAR_BUFFER_COMMAND_VALUE:
+                return;
+            case CLEAR_BUFFER_COMMAND:
                 if (cmdLine.contains(HELP_SWITCH)) {
                     say(CLEAR_BUFFER_COMMAND + " = clear the entire command history.");
-                    break;
+                    return;
                 }
                 commandHistory = new LinkedList<>();
                 say("Command history cleared.");
-                break;
-            case SHORT_EXIT_COMMAND_VALUE:
-                quit(null);
                 return;
-            case PRINT_HELP_COMMAND_VALUE:
+            case SHORT_EXIT_COMMAND:
+                quit(null);
+                throw new ExitException();
+                //return;
+            case PRINT_HELP_COMMAND:
                 printHelp();
-                break;
-            case LIST_ALL_METHODS_COMMAND_VALUE:
+                return;
+            case LIST_ALL_METHODS_COMMAND:
                 InputLine inputLine = new InputLine(CLT.tokenize(cmdLine));
                 listCLIMethods(inputLine);
-                break;
-            case ONLINE_HELP_COMMAND_VALUE:
+                return;
+            case ONLINE_HELP_COMMAND:
                 inputLine = new InputLine(CLT.tokenize(cmdLine));
                 doHelp(inputLine);
-                break;
-            case TRACE_COMMAND_VALUE:
+                return;
+            case TRACE_COMMAND:
                 doTrace(cmdLine);
-                break;
+                return;
+        }
 
-            case NO_OP_VALUE:
-                break;
-            case USER_DEFINED_COMMAND:
-            default:
-        }
-        if (commandType == NO_OP_VALUE) {
-            // The user entered a blank line or nothing but blanks. Skip it all.
-            return;
-        }
         if (storeLine) {
             // Store it if it was not retrieved from the command history.
             commandHistory.add(0, cmdLine);
         }
-        if (cmdLine.startsWith(COMPONENT_COMMAND)) {
+        if (cmdLine.startsWith(COMPONENT_COMMAND) && !command.equals(COMPONENT_COMMAND)) {
+            say("unknown command: " + cmdLine);
+            return;
+        }
+        if (command.equals(COMPONENT_COMMAND)) {
             // execute a single command in another component.
             if (componentManager == null) {
                 say("Sorry, this does not have components.");
             } else {
-                cmdLine = "use " + cmdLine.substring(COMPONENT_COMMAND.length());
+                cmdLine = "use " + cmdLine.substring(cmdLine.indexOf(COMPONENT_COMMAND) + COMPONENT_COMMAND.length() + 1); // might have leading whitespace
                 InputLine inputLine = new InputLine(CLT.tokenize(cmdLine));
                 componentManager.use(inputLine);
             }
@@ -617,7 +661,7 @@ public class CLIDriver {
                 case SHUTDOWN_RC:
                     isDone = false; // just in case.
                     quit(null);
-                    return;
+                    throw new ExitException();
                 case USER_EXIT_RC:
                     say("User exit encountered");
                     throw new ExitException();
@@ -626,12 +670,13 @@ public class CLIDriver {
                     break;
                 case ABNORMAL_RC:
                 default:
-                    say("Command not found/understood. Try typing help or exit.");
+                    say("Command \"" + cmdLine + "\" not found/understood. Try typing help or exit.");
                     say("To see all commands currently available, type " + LIST_ALL_METHODS_COMMAND);
             }
         }
 
     }
+
     public boolean isTraceOn() {
         return traceOn;
     }
@@ -675,7 +720,7 @@ public class CLIDriver {
     /**
      * Returns a logical true if one of the command lines executes the line successfully. This will
      * also throw a shutdown exception if the user asks it to...
-     * Otherwise it returns false;
+     * Otherwise, it returns false;
      *
      * @param cliAV
      * @return
@@ -684,7 +729,9 @@ public class CLIDriver {
     public int execute(InputLine cliAV) {
         try {
             if (!cliAV.isEmpty()) {
-                String cmdS = cliAV.getCommand();
+                String cmdS;
+                cmdS = cliAV.getCommand();
+
                 if (cmdS.toLowerCase().equals("exit") ||
                         cmdS.toLowerCase().equals("quit")) {
                     // This intercepts quitting so we don't have to jump through hoops to exit.
@@ -693,6 +740,10 @@ public class CLIDriver {
                 if (cmdS.toLowerCase().equals("help") || cmdS.toLowerCase().equals(HELP_SWITCH)) {
                     //    commands[0].help();
                     return HELP_RC;
+                }
+                if (cmdS.toLowerCase().equals("echo") || cmdS.toLowerCase().equals(ECHO_COMMAND)) {
+                    say(cliAV.getOriginalLine().trim().substring(cmdS.length()).trim());
+                    return OK_RC;
                 }
                 for (int i = 0; i < getCLICommands().length; i++) {
                     try {
@@ -815,13 +866,14 @@ public class CLIDriver {
     }
 
     /**
-     * For use with prompts.
+     * Conditional output if in verbose mode only.
      *
      * @param x
      */
-    protected void say2(String x) {
-        getIOInterface().print(x);
-        //System.out.print(x);
+    protected void sayv(String x) {
+        if (isVerbose()) {
+            getIOInterface().print(x);
+        }
     }
 
     public IOInterface getIOInterface() {
@@ -831,9 +883,414 @@ public class CLIDriver {
         return ioInterface;
     }
 
+    /**
+     * This also sets any components you added.
+     *
+     * @param ioInterface
+     */
     public void setIOInterface(IOInterface ioInterface) {
         this.ioInterface = ioInterface;
+        for (Commands command : getCLICommands()) {
+            command.setIOInterface(ioInterface);
+        }
     }
 
     IOInterface ioInterface;
+    protected static String DUMMY_FUNCTION = "dummy0"; // used to create initial command line
+
+    /**
+     * Process a line to run. At invocation you may use something like
+     * <pre>
+     *     cli [{@link #INPUT_FILE_FLAG} | {@link CommonCommands#BATCH_MODE_FLAG} A B C
+     * </pre>
+     * and what happens is that everything after the flag  is fed tot he processor and executed
+     * as a single command, as if you'd type in
+     * <pre>
+     *     A B C
+     * </pre>
+     * This lets you do things like
+     * <pre>
+     *     cli -run use clients
+     * </pre>
+     * to start a component right away.
+     */
+    protected void processRunLine() {
+        // need to tease out the intended line to execute. The arg line looks like
+        // cli -batch | -run A B C
+        // And we added a dummy argument to make it parse right,
+        // so we need to drop the name of the function and the -batch flag.
+        // The net effect is to run the command
+        // A B C
+        execute(new InputLine(getRunLine()));
+    }
+
+    protected void batchFileHelp() {
+        say("Running batch files.");
+        say("You can run scripts from the command line by passing in a file,");
+        say("any line that starts with a # is a comment.");
+        say("All lines MUST end with a ; (which is discarded at processing).");
+        say("You may have commands across multiple lines with all the whitespace you want, but");
+        say("at processing each line will be concatenated with a space, so don't break tokens over ");
+        say("lines. See the readme.txt for more and look at any .cmd file in this distro for examples.");
+    }
+
+    /**
+     * processes the command file supplied in the arguments at invocation.
+     *
+     * @throws Throwable
+     */
+    protected void processBatchFile() throws Throwable {
+        processBatchFile(getInputFile());
+    }
+
+    public int getBatchFileIndex() {
+        return batchFileIndex;
+    }
+
+    public void setBatchFileIndex(int batchFileIndex) {
+        this.batchFileIndex = batchFileIndex;
+    }
+
+    int batchFileIndex = -1;
+
+    public List<String> getBatchFileCommands() {
+        return batchFileCommands;
+    }
+
+    public boolean hasBatchFileCommands() {
+        return batchFileCommands != null && !batchFileCommands.isEmpty();
+    }
+
+    public void setBatchFileCommands(List<String> batchFileCommands) {
+        this.batchFileCommands = batchFileCommands;
+    }
+
+    List<String> batchFileCommands;
+
+    /**
+     * Called to start running a batch file
+     *
+     * @throws Throwable
+     */
+    protected void initInputFile() throws Throwable {
+        String fileName = getInputFile();
+        if (fileName.toLowerCase().equals("--help")) {
+            batchFileHelp();
+            return;
+        }
+        if (fileName == null || fileName.isEmpty()) {
+            throw new FileNotFoundException("Error: The file name is missing.");
+        }
+        File file = new File(fileName);
+        if (!file.exists()) {
+            throw new FileNotFoundException("Error: The file \"" + fileName + "\" does not exist");
+        }
+        if (!file.isFile()) {
+            throw new FileNotFoundException("Error: The object \"" + fileName + "\" is not a file.");
+        }
+        if (!file.canRead()) {
+            throw new GeneralException("Error: Cannot read file \"" + fileName + "\". Please check your permissions.");
+        }
+        FileReader fis = new FileReader(file);
+        DDParser ddp = new DDParser();
+        List<String> commands = ddp.parse(fis);
+        setBatchFileCommands(commands);
+        setBatchFileIndex(0);
+    }
+
+    /**
+     * Allows you to process any other command file.
+     *
+     * @param fileName
+     * @throws Throwable
+     */
+    protected void processBatchFile(String fileName) throws Throwable {
+        if (fileName.toLowerCase().equals("--help")) {
+            batchFileHelp();
+            return;
+        }
+        if (getBatchFileIndex() == -1) {
+            throw new NFWException("batch file system not initialized");
+        }
+        int j = getBatchFileIndex();
+        int size = getBatchFileCommands().size();
+        for (int i = j; i < size; i++) {
+            try {
+                setBatchFileIndex(i);
+                processLine(getBatchFileCommands().get(i));
+                i = getBatchFileIndex();
+            } catch (ExitException ee) {
+                return;
+            } catch (Throwable t) {
+                if (debug) {
+                    t.printStackTrace();
+                }
+                say("Internal error reading line:" + (StringUtils.isTrivial(t.getMessage()) ? "\n" + t.getMessage() : ""));
+            }
+        }
+
+    }
+
+    protected static final String INPUT_FILE_FLAG = "-in";
+    protected static final String OUTPUT_FILE_FLAG = "-out";
+    protected static final String TERMINAL_TYPE_FLAG = "-tty";
+    protected static final String TERMINAL_TYPE_ANSI = "ansi";
+    protected static final String TERMINAL_TYPE_TEXT = "text";
+    protected static final String SHORT_VERBOSE_FLAG = "-v";
+    protected static final String LONG_VERBOSE_FLAG = "-verbose";
+    protected static final String SHORT_NO_OUTPUT_FLAG = "-noOutput";
+    protected static final String LONG_NO_OUTPUT_FLAG = "-noOutput";
+    protected static final String LOG_FLAG = "-log";
+
+    public static void main(String[] args) {
+        CLIDriver cli = getCLIDriver();
+        cli.bootstrap(args);
+        cli.start();
+    }
+
+    public boolean hasOutputFile() {
+        return outputFile != null;
+    }
+
+    public String getOutputFile() {
+        return outputFile;
+    }
+
+    public void setOutputFile(String outputFile) {
+        this.outputFile = outputFile;
+    }
+
+    String outputFile = null;
+    boolean verbose = false;
+    boolean noOutput = false;
+
+    public MyLoggingFacade getLogger() {
+        return logger;
+    }
+
+    public void setLogger(MyLoggingFacade logger) {
+        this.logger = logger;
+    }
+
+    MyLoggingFacade logger;
+
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+        for (Commands commands : commands) {
+            if (commands instanceof ConfigurableCommandsImpl) {
+                ((ConfigurableCommandsImpl) commands).setVerbose(verbose);
+            }
+        }
+    }
+
+    public boolean isNoOutput() {
+        return noOutput;
+    }
+
+    public void setNoOutput(boolean noOutput) {
+        this.noOutput = noOutput;
+    }
+
+    public boolean isRunLineMode() {
+        return runLineMode;
+    }
+
+    public void setRunLineMode(boolean runLineMode) {
+        this.runLineMode = runLineMode;
+    }
+
+    public String getRunLine() {
+        return runLine;
+    }
+
+    public void setRunLine(String runLine) {
+        this.runLine = runLine;
+    }
+
+    String runLine = null;
+
+    public String getInputFile() {
+        return inputFile;
+    }
+
+    public void setInputFile(String inputFile) {
+        this.inputFile = inputFile;
+    }
+
+    boolean runLineMode = false;
+    String inputFile = null;
+
+    public boolean hasBatchFile() {
+        return inputFile != null;
+    }
+
+    /**
+     * This method is charged with interpreting the command line arguments and setting up
+     * the state for this CLI driver. State includes
+     * <ul>
+     *     <li>{@link #getInputFile()} - the batch file, if specified by {@link CommonCommands#BATCH_FILE_MODE_FLAG}</li>
+     *     <li>{@link #getLogger()} - the logger, if specified</li>
+     *     <li>{@link #isRunLineMode()} - if the {@link CommonCommands#BATCH_MODE_FLAG} was used</li>
+     *     <li>{@link #isNoOutput()} - suppress all output if true</li>
+     *     <li>{@link #isVerbose()} - how chatty this should be</li>
+     *     <li>{@link IOInterface}</li>
+     * </ul>
+     * These properties are injected into any component when set. However, this is a one-time
+     * undertaking and the {@link Commands} are not altered after that. So
+     * either create a {@link CLIDriver}, set your components and call this to inject
+     * the state, or create this, call this method and then add your components. You call
+     * <ul>
+     *     <li>{@link #start()} to being interactive processing</li>
+     *     <li>{@link #processBatchFile(String)}  to process the batch file</li>
+     *     <li>{@link #processRunLine()} to run the single command.</li>
+     * </ul>
+     *
+     * @param args
+     * @return The {@link InputLine} after all recognized flags have been processed. This means they are
+     * stripped.
+     */
+    // For testing: batchFile
+    // -batchFile /home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/scripts/jwt-scripts/ex_hello_world.cmd
+    public InputLine bootstrap(String[] args) {
+        return bootstrap(new InputLine(DUMMY_FUNCTION, args));
+    }
+
+    public InputLine bootstrap(InputLine argLine) {
+
+        setNoOutput((argLine.hasArg(SHORT_NO_OUTPUT_FLAG, LONG_NO_OUTPUT_FLAG)));
+        argLine.removeSwitch(SHORT_NO_OUTPUT_FLAG, LONG_NO_OUTPUT_FLAG);
+        setVerbose(argLine.hasArg(SHORT_VERBOSE_FLAG, LONG_VERBOSE_FLAG));
+        argLine.removeSwitch(SHORT_VERBOSE_FLAG, LONG_VERBOSE_FLAG);
+
+        MyLoggingFacade myLoggingFacade = null;
+
+        if (argLine.hasArg(LOG_FLAG)) {
+            String logFileName = argLine.getNextArgFor(LOG_FLAG);
+            File logFile = new File(logFileName);
+            argLine.removeSwitchAndValue(LOG_FLAG);
+            LoggerProvider loggerProvider = new LoggerProvider(logFileName,
+                    logFile.getName() + " logger", 1, 1000000, true, true, Level.INFO);
+            myLoggingFacade = loggerProvider.get(); // if verbose
+        }
+        setLogger(myLoggingFacade);
+        boolean hasInputFile = argLine.hasArg(BATCH_FILE_MODE_FLAG, INPUT_FILE_FLAG);
+
+        // Batch file always has right of way. Do that and return
+/*        if (hasInputFile) {
+            setInputFile(argLine.getNextArgFor(BATCH_FILE_MODE_FLAG, INPUT_FILE_FLAG));
+            argLine.removeSwitchAndValue(BATCH_FILE_MODE_FLAG, INPUT_FILE_FLAG);
+            try {
+                initInputFile();
+            } catch (Throwable e) {
+                if (isVerbose()) {
+                    e.printStackTrace();
+                }
+                say("error initializing input file " + getInputFile());
+            }
+        }*/
+        if (argLine.hasArg(OUTPUT_FILE_FLAG)) {
+            setOutputFile(argLine.getNextArgFor(OUTPUT_FILE_FLAG));
+            argLine.removeSwitchAndValue(OUTPUT_FILE_FLAG);
+        }
+        if (hasInputFile) {
+            String inputFileName = argLine.getNextArgFor(INPUT_FILE_FLAG);
+            //setInputFile(argLine.getNextArgFor(BATCH_FILE_MODE_FLAG, INPUT_FILE_FLAG));
+            argLine.removeSwitchAndValue(BATCH_FILE_MODE_FLAG, INPUT_FILE_FLAG);
+            // initInputFile();
+
+            BasicIO basicIO = new BasicIO();
+            try {
+                FileInputStream fis = new FileInputStream(inputFileName);
+                if (inputFileName.endsWith(".cmd")) {
+                    DDParser ddp = new DDParser();
+                    List<String> commands = ddp.parse(fis);
+                    String inputString = StringUtils.listToString(commands);
+                    ByteArrayInputStream bais = new ByteArrayInputStream(inputString.getBytes());
+                    System.setIn(bais);
+                    basicIO.setInputStream(System.in);
+
+                } else {
+                    basicIO.setInputStream(fis);
+                }
+
+                if (hasOutputFile()) {
+                    FileOutputStream fos = new FileOutputStream(getOutputFile());
+                    PrintStream ps = new PrintStream(fos);
+                    System.setOut(ps);
+                    basicIO.setPrintStream(System.out);
+                }
+                setIOInterface(basicIO);
+                return argLine;
+            } catch (Throwable e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+
+        // Batch mode means that the rest of command line after flag is interpreted as a single command.
+        // This executes one command.
+        setRunLineMode(argLine.hasArg(BATCH_MODE_FLAG));
+        if (isRunLineMode()) {
+            String runLine = argLine.getOriginalLine();
+            if (runLine.indexOf(INPUT_FILE_FLAG) != -1) {
+                runLine = runLine.substring(runLine.indexOf(INPUT_FILE_FLAG) + INPUT_FILE_FLAG.length() + 1);
+            } else {
+                runLine = runLine.substring(runLine.indexOf(BATCH_FILE_MODE_FLAG) + BATCH_FILE_MODE_FLAG.length() + 1);
+            }
+            setRunLine(runLine);
+            argLine.setOriginalLine(runLine);
+            argLine.reparse();
+            return argLine;
+        }
+
+        // Lastt hing to set is the IO if they specify it.
+        if (argLine.hasArg(TERMINAL_TYPE_FLAG)) {
+            String tty = argLine.getNextArgFor(TERMINAL_TYPE_FLAG);
+            argLine.removeSwitchAndValue(TERMINAL_TYPE_FLAG);
+            switch (tty) {
+                case TERMINAL_TYPE_ANSI:
+                    try {
+                        ISO6429Terminal iso6429Terminal = new ISO6429Terminal(getLogger());
+                        ISO6429IO iso6429IO = new ISO6429IO(iso6429Terminal, false);
+                        iso6429IO.addCommandHistory(getCommandHistory());
+                        setIOInterface(iso6429IO);
+                    } catch (IOException e) {
+                        if (isVerbose()) {
+                            e.printStackTrace();
+                        }
+                        say("error loading terminal type " + TERMINAL_TYPE_ANSI);
+                    }
+                    break;
+                case TERMINAL_TYPE_TEXT:
+                    setIOInterface(new BasicIO());
+                    break;
+                default: // They passed in a terminal type, and we don't recognize it
+                    sayv("unknown terminal type: " + tty);
+            }
+
+        }
+
+        return argLine;
+    }
+
+    static CLIDriver driver = null;
+
+    public static boolean hasCLIDriver() {
+        return driver != null;
+    }
+
+    public static void setCLIDriver(CLIDriver driver) {
+        CLIDriver.driver = driver;
+    }
+
+    public static CLIDriver getCLIDriver() {
+        if (driver == null) {
+            driver = new CLIDriver(); // plain vanilla instance
+        }
+        return driver;
+    }
 }

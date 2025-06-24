@@ -81,6 +81,7 @@ public class DDParser {
             if (lineIn.endsWith(";")) {
                 buffer.append(" " + lineIn.substring(0, lineIn.length() - 1)); // whack off final ";"
                 output.add(buffer.toString());
+                buffer = new StringBuilder(); // reset buffer
             } else {
                 buffer.append(" " + lineIn); // whack off final ";"
             }

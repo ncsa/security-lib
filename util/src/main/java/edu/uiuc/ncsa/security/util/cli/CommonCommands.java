@@ -27,7 +27,7 @@ public abstract class CommonCommands implements Commands {
      * If this is invoked from the command line with the batch mode flag, then this should process
      * commands strictly without user intervention, failing if, for instance, some parameters are missing
      * rather than prompting for them. Typically, the {@link CLIDriver} instance sets this at the time of
-     * invocation.
+     * invocation. This flag tells this component not to print most output for instance.
      *
      * @return
      */
@@ -198,11 +198,6 @@ public abstract class CommonCommands implements Commands {
     protected void say2(String x) {
         getIOInterface().print(defaultIndent + x);
     }
-
-
-  /*  protected void sayi2(String x) {
-        say2(INDENT + x);
-    }*/
 
     /**
      * returns "true if the command has the flag --help in it. This is a cue from the user to show

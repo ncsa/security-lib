@@ -31,13 +31,13 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
-            <version>5.5</version>
+            <version>6.x-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
-            <version>5.5</version>
+            <version>6.x-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

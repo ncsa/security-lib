@@ -14,6 +14,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.logging.Level;
 
 /**
@@ -51,7 +52,6 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         return ioInterface;
     }
 
-    @Override
     public void setIOInterface(IOInterface ioInterface) {
         this.ioInterface = ioInterface;
     }
@@ -59,7 +59,6 @@ public abstract class ConfigurableCommandsImpl implements Commands {
     IOInterface ioInterface;
 
     protected void say(String x) {
-        //System.out.println(x);
         getIOInterface().println(x);
     }
 
@@ -120,7 +119,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
             if (f.isDirectory()) {
                 throw new MyConfigurationException("sorry, \" + fileName + \" is a directory");
             }
-            if(!f.canRead()){
+            if (!f.canRead()) {
                 throw new MyConfigurationException("sorry, \" + fileName + \" is not readable");
             }
         } else {
@@ -260,8 +259,6 @@ public abstract class ConfigurableCommandsImpl implements Commands {
     public abstract void setLoader(ConfigurationLoader<? extends AbstractEnvironment> loader);
 
 
-//    ConfigurationLoader<? extends AbstractEnvironment> loadFSSLer;
-
     public static final String VERBOSE_OPTION = "v"; // if present do a backup of the target to a backup schema.
     public static final String VERBOSE_LONG_OPTION = "verbose"; // if present do a backup of the target to a backup schema.
 
@@ -282,19 +279,19 @@ public abstract class ConfigurableCommandsImpl implements Commands {
     public static String COMMENT_START = "#";
 
 
-    public static final String CONFIG_FILE_OPTION = "cfg";
-    public static final String CONFIG_FILE_LONG_OPTION = "configFile";
+    public static final String CONFIG_FILE_OPTION = "-cfg";
+    public static final String CONFIG_FILE_LONG_OPTION = "-configFile";
 
-    public static final String USE_COMPONENT_OPTION = "use";
-    public static final String USE_COMPONENT_LONG_OPTION = "use";
+/*    public static final String USE_COMPONENT_OPTION = "use";
+    public static final String USE_COMPONENT_LONG_OPTION = "use";*/
 
 
     public static final String DEFAULT_LOG_FILE = "log.xml";
-    public static final String ENV_OPTION = "set_env";
-    public static final String ENV_LONG_OPTION = "set_env";
+    public static final String ENV_OPTION = "-set_env";
+    public static final String ENV_LONG_OPTION = "-set_env";
 
-    public static final String CONFIG_NAME_OPTION = "name";
-    public static final String CONFIG_NAME_LONG_OPTION = "name";
+    public static final String CONFIG_NAME_OPTION = "-name";
+    public static final String CONFIG_NAME_LONG_OPTION = "-name";
 
     public Map<Object, Object> getGlobalEnv() {
         return globalEnv;
@@ -365,17 +362,17 @@ public abstract class ConfigurableCommandsImpl implements Commands {
      * Called at initialization to read and process the command line arguments.
      * NOTE that this is not called in this class, but by inheritors.
      */
-    public void initialize() {
+    protected void initialize() {
         if (getConfigFile() == null || getConfigFile().length() == 0) {
             say("Warning: no configuration file specified. type in 'load --help' to see how to load one.");
             return;
         }
         String cfgName = null;
 
-        if (hasOption(CONFIG_NAME_OPTION, CONFIG_NAME_LONG_OPTION)) {
+    /*    if (hasOption(CONFIG_NAME_OPTION, CONFIG_NAME_LONG_OPTION)) {
             cfgName = getCommandLine().getOptionValue(CONFIG_NAME_OPTION);
-        }
-        LoggerProvider loggerProvider = null;
+        }*/
+/*        LoggerProvider loggerProvider = null;
         if (hasOption(LOG_FILE_OPTION, LOG_FILE_LONG_OPTION)) {
             // create the logger for this
             loggerProvider = new LoggerProvider(getLogfileName(), "cli logger", 1
@@ -384,8 +381,8 @@ public abstract class ConfigurableCommandsImpl implements Commands {
             loggerProvider = new LoggerProvider("log.xml", "cli logger", 1,
                     1000000, true, true, Level.FINEST);
         }
-        logger = loggerProvider.get();
-        BasicIO basicIO = new BasicIO();
+        logger = loggerProvider.get();*/
+/*        BasicIO basicIO = new BasicIO();
         try {
             if (hasOption(INPUT_OPTION, INPUT_OPTION)) {
                 basicIO.setInputStream(new FileInputStream(getCommandLine().getOptionValue(INPUT_OPTION)));
@@ -401,27 +398,27 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         if (hasOption(COMMENT_START_OPTION, COMMENT_START_OPTION)) {
             COMMENT_START = getCommandLine().getOptionValue(COMMENT_START_OPTION, COMMENT_START);
         }
-        setIOInterface(basicIO);
+        setIOInterface(basicIO);*/
         info("Config name = " + cfgName);
 
-        if (cfgName == null) {
+        if (getConfigName() == null) {
             info("no named for a configuration given");
         } else {
-            info("getting named configuration \"" + cfgName + "\"");
+            info("getting named configuration \"" + getConfigName() + "\"");
         }
         try {
-            loadConfig(getConfigFile(), cfgName);
+            loadConfig(getConfigFile(), getConfigName());
         } catch (Throwable x) {
             if (x instanceof RuntimeException) {
                 throw (RuntimeException) x;
             }
             throw new GeneralException("Error initializing CLI:" + x.getMessage(), x);
         }
-        if (hasOption(ENV_OPTION, ENV_LONG_OPTION)) {
+/*        if (hasOption(ENV_OPTION, ENV_LONG_OPTION)) {
             String envFile = getCommandLine().getOptionValue(ENV_OPTION);
             readEnv(envFile, false); // on init, silently ignore unless -v option enabled.
             currentEnvFile = envFile;
-        }
+        }*/
     }
 
     protected void loadConfig(String filename, String configName) throws Throwable {
@@ -455,9 +452,29 @@ public abstract class ConfigurableCommandsImpl implements Commands {
 
     String configFile;
 
-    CommandLine cmd = null;
+    //CommandLine cmd = null;
+/*
+        options.addOption(HELP_OPTION, HELP_LONG_OPTION, false, "Display the help message.");
+        options.addOption(DEBUG_OPTION, DEBUG_LONG_OPTION, false, "Enable/disable debug mode.");
+        options.addOption(VERBOSE_OPTION, VERBOSE_LONG_OPTION, false, "Set verbose mode on");
+        options.addOption(CONFIG_FILE_OPTION, CONFIG_FILE_LONG_OPTION, true, "Set the configuration file");
+        options.addOption(CONFIG_NAME_OPTION, CONFIG_NAME_LONG_OPTION, true, "Set the name of the configuration");
+        options.addOption(LOG_FILE_OPTION, LOG_FILE_LONG_OPTION, true, "Set the log file");
+        options.addOption(USE_COMPONENT_OPTION, USE_COMPONENT_LONG_OPTION, true, "Specify the component to use.");
+        options.addOption(ENV_OPTION, ENV_LONG_OPTION, true, "Specify the environment to use.");
+        options.addOption(INPUT_OPTION, INPUT_OPTION, true, "Specify the input file. All input is read from this file.");
+        options.addOption(OUTPUT_OPTION, OUTPUT_OPTION, true, "Specify the output file. All output goes to this file.");
+        options.addOption(COMMENT_START_OPTION, COMMENT_START_OPTION, true, "Specify a comment start. Any line that starts with this is ignored.");
 
-    protected void parseCommandLine(String[] args) throws UnrecognizedOptionException, ParseException {
+ */
+
+    /**
+     *
+     * @param args
+     * @throws UnrecognizedOptionException
+     * @throws ParseException
+     */
+/*    protected void parseCommandLine(String[] args) throws UnrecognizedOptionException, ParseException {
         //CommandLineParser clp = new BasicParser();
         CommandLineParser clp = new DefaultParser();
         try {
@@ -476,12 +493,43 @@ public abstract class ConfigurableCommandsImpl implements Commands {
             }
             throw e;
         }
-    }
+    }*/
 
-    public CommandLine getCommandLine() {
+  /*  public CommandLine getCommandLine() {
         return cmd;
-    }
+    }*/
 
+    /**
+     * Parses command line arguments. This is usually called after {@link CLIDriver#bootstrap(String[])},
+     * which pulls off its startup options
+     * @param args
+     * @throws Exception
+     */
+  protected void startup(InputLine args) throws Exception {
+      if (args.hasArg(VERBOSE_OPTION, VERBOSE_LONG_OPTION)) {
+               setVerbose(true);
+               args.removeSwitch(VERBOSE_OPTION, VERBOSE_LONG_OPTION);
+      }
+      if(args.hasArg(DEBUG_OPTION, DEBUG_LONG_OPTION)){
+          setDebugOn(true);
+          args.removeSwitch(DEBUG_OPTION, DEBUG_LONG_OPTION);
+      }
+      if(args.hasArg(CONFIG_FILE_OPTION, CONFIG_FILE_LONG_OPTION)){
+          setConfigFile(args.getNextArgFor(CONFIG_FILE_OPTION, CONFIG_FILE_LONG_OPTION));
+          args.removeSwitchAndValue(CONFIG_FILE_OPTION, CONFIG_FILE_LONG_OPTION);
+      }
+      if(args.hasArg(CONFIG_NAME_OPTION, CONFIG_NAME_LONG_OPTION)){
+          setConfigName(args.getNextArgFor(CONFIG_NAME_OPTION, CONFIG_NAME_LONG_OPTION));
+          args.removeSwitchAndValue(CONFIG_NAME_OPTION, CONFIG_NAME_LONG_OPTION);
+      }
+      if(args.hasArg(ENV_OPTION, ENV_LONG_OPTION)){
+          String envFile = args.getNextArgFor(ENV_OPTION, ENV_LONG_OPTION);
+          args.removeSwitchAndValue(ENV_OPTION, ENV_LONG_OPTION);
+          readEnv(envFile, false); // on init, silently ignore unless -v option enabled.
+          currentEnvFile = envFile;
+      }
+      initialize(); // now try to get everything.
+  }
     /**
      * Returns true if execution should continue, false if not. Call this first to see if execution should proceed.
      *
@@ -489,7 +537,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
      * @return
      * @throws Exception
      */
-    protected boolean getOptions(String[] args) throws Exception {
+  /*  protected boolean getOptions(String[] args) throws Exception {
         // needed in OA4MP, QDL CLI, CLC etc.
         getOptions();
         if (args.length == 0) {
@@ -526,7 +574,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
             setConfigFile(getCommandLine().getOptionValue(CONFIG_FILE_OPTION));
         }
         return true;
-    }
+    }*/
 
     boolean debugOn = true;
 
@@ -545,9 +593,9 @@ public abstract class ConfigurableCommandsImpl implements Commands {
      * @param longForm
      * @return
      */
-    protected boolean hasOption(String shortForm, String longForm) {
+  /*  protected boolean hasOption(String shortForm, String longForm) {
         return getCommandLine().hasOption(shortForm) || getCommandLine().hasOption(longForm);
-    }
+    }*/
 
     /**
      * Override this to set up your options. You should also use this to check the action and
@@ -561,7 +609,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
      *
      * @return
      */
-    protected Options getOptions() {
+/*    protected Options getOptions() {
         Options options = new Options();
         options.addOption(HELP_OPTION, HELP_LONG_OPTION, false, "Display the help message.");
         options.addOption(DEBUG_OPTION, DEBUG_LONG_OPTION, false, "Enable/disable debug mode.");
@@ -575,7 +623,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         options.addOption(OUTPUT_OPTION, OUTPUT_OPTION, true, "Specify the output file. All output goes to this file.");
         options.addOption(COMMENT_START_OPTION, COMMENT_START_OPTION, true, "Specify a comment start. Any line that starts with this is ignored.");
         return options;
-    }
+    }*/
 
     public void setMyLogger(MyLoggingFacade myLoggingFacade) {
         logger = myLoggingFacade;
@@ -595,7 +643,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
 
     @Override
     public void debug(String x) {
-        if (isDebugOn()) {
+        if (isVerbose()) {
             say(x);
         }
         getMyLogger().debug(x);
@@ -622,16 +670,16 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         getMyLogger().error(x);
     }
 
-    String logfileName;
+  //  String logfileName;
     boolean verbose;
 
-    public String getLogfileName() {
+  /*  public String getLogfileName() {
         return logfileName;
     }
 
     public void setLogfileName(String logfileName) {
         this.logfileName = logfileName;
-    }
+    }*/
 
     public boolean isVerbose() {
         return verbose;
@@ -645,8 +693,6 @@ public abstract class ConfigurableCommandsImpl implements Commands {
      * This will take a String and append the correct number of blanks on the
      * left so it is the right width. This is used for making the banner.
      *
-     * @param x
-     * @param width
      * @return
      */
     protected String padLineWithBlanks(String x, int width) {
@@ -677,5 +723,81 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         return false;
     }
 
+    /**
+     * Either switch to another component or (if there are arguments) simply run the
+     * single command and return. Note that each component has stored state, so
+     * these will be run with whatever is in that state.
+     * Requires {@link #use(InputLine)} be overridden.
+     *
+     * @param inputLine
+     * @param commands
+     * @return
+     */
 
+    protected boolean switchOrRun(InputLine inputLine, CommonCommands commands) {
+        boolean switchComponent = 1 < inputLine.getArgCount();
+
+        CLIDriver currentDriver = commandStack.peek();
+
+
+            if(currentDriver.getCLICommands().length == 1){
+                if(currentDriver.getCLICommands()[0].getName().equals(commands.getName())){
+                    // already currently running.
+                    return true;
+                }
+            }
+        CLIDriver cli = new CLIDriver();
+        cli.setIOInterface(getIOInterface());
+        cli.addCommands(commands);
+        cli.setEnv(getGlobalEnv());
+        if (this instanceof ComponentManager) {
+            cli.setComponentManager((ComponentManager) this);
+        }
+/*        if (getDriver().hasBatchFile()) {
+            cli.setInputFile(currentDriver.getInputFile());
+            cli.setBatchFileCommands(currentDriver.getBatchFileCommands());
+            cli.setBatchFileIndex(currentDriver.getBatchFileIndex()+1); // go on to the next statement. Current one is executing now.
+            commands.setDriver(cli);
+        }*/
+        commandStack.push(cli);
+        if (switchComponent) {
+            inputLine.removeArgAt(0); // removes original arg ("use")
+            cli.execute(inputLine.removeArgAt(0)); // removes components before executing
+        } else {
+            cli.start();
+        }
+/*
+        if(currentDriver.hasBatchFile()) {
+            currentDriver.setBatchFileIndex(cli.getBatchFileIndex());
+        }
+*/
+        commandStack.pop(); // remove previous driver
+        return true;
+    }
+
+    /**
+     * Zeroth element of the command stack is the root instance of this class. The should
+     * never be empty.
+     */
+    Stack<CLIDriver> commandStack = new Stack<>();
+
+    @Override
+    public CLIDriver getDriver() {
+        return driver;
+    }
+
+    /**
+     * Back reference to the driver for this class
+     * @param driver
+     */
+    @Override
+    public void setDriver(CLIDriver driver) {
+        commandStack.push(driver);
+        if(driver.getLogger() != null) {
+            setMyLogger(driver.getLogger());
+        }
+        this.driver = driver;
+    }
+
+    CLIDriver driver;
 }

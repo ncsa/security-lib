@@ -33,4 +33,13 @@ public interface Commands extends Logable, Serializable {
     IOInterface getIOInterface();
     void setIOInterface(IOInterface io);
     String getName();
+    public boolean isBatchMode();
+    public void setBatchMode(boolean batchMode);
+
+    /**
+     * Back reference to the driver that manages this instance.
+     * @return
+     */
+    CLIDriver getDriver();
+    void setDriver(CLIDriver driver);
 }

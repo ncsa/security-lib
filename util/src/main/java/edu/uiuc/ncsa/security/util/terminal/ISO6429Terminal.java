@@ -52,15 +52,17 @@ public class ISO6429Terminal {
     }
 
     public int[] getScreenSize() throws IOException {
-        Size size = terminal.getSize();
-        return new int[]{size.getRows(), size.getColumns()};
-/*      // Trick: Put the cursor in outer space and ask where it ended up. Kludgey but works across the board.
+        Size size = terminal.getSize(); // Um... *Should* work.
+        if(size.getColumns() != 0 && size.getRows() != 0) {
+            return new int[]{size.getRows(), size.getColumns()};
+        }
+      // Trick: Put the cursor in outer space and ask where it ended up. Kludgey but works across the board.
         int[] currentPos = getCursor();
         setCursor(10000, 10000);
         int[] newPos = getCursor();
         setCursor(currentPos[0], currentPos[1]);
         return newPos;
-*/
+
     }
 
     Terminal terminal = null;
