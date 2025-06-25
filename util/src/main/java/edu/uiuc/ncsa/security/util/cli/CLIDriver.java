@@ -1,8 +1,6 @@
 package edu.uiuc.ncsa.security.util.cli;
 
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.LoggerProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -18,8 +16,6 @@ import java.util.*;
 import java.util.logging.Level;
 
 import static edu.uiuc.ncsa.security.util.cli.CLIReflectionUtil.invokeMethod;
-import static edu.uiuc.ncsa.security.util.cli.CommonCommands.BATCH_FILE_MODE_FLAG;
-import static edu.uiuc.ncsa.security.util.cli.CommonCommands.BATCH_MODE_FLAG;
 
 /**
  * A driver program that does introspection on a set of CLICommands
@@ -406,15 +402,6 @@ public class CLIDriver {
     }
 
     protected void NEWstart() {
-        if (hasBatchFileCommands()) {
-            try {
-                processBatchFile();
-                return;
-            } catch (Throwable e) {
-                e.printStackTrace();
-                return;
-            }
-        }
         if (isRunLineMode()) {
             processRunLine(); // contract is that it runs the single line, then continues.
         }
@@ -439,137 +426,6 @@ public class CLIDriver {
         }
     }
 
-    protected void OLDstart() {
-        //commands[0].about(null);
-        String cmdLine;
-        String prompt = commands[0].getPrompt();
-        try {
-            getHelpUtil().load("/meta_command_help.xml");
-        } catch (Throwable e) {
-            if (isTraceOn()) {
-                e.printStackTrace();
-            }
-            say("Could not load help for the metacommands.");
-        }
-
-        while (!isDone) {
-            try {
-                //say2(prompt);
-                if (isTraceOn()) {
-                    // getIoInterface().flush();
-                    // System.err.flush();
-                    // This is because there may be cruft left over from debug statements and
-                    // if we don't do this, the cursor ends up in weird places.
-                    say("");
-                }
-                cmdLine = readline(prompt);
-                // start process line
-                if (hasComments()) {
-                    if (cmdLine.trim().startsWith(getLineCommentStart())) {
-                        continue;
-                    }
-                }
-                if (hasEnv()) {
-                    cmdLine = TemplateUtil.replaceAll(cmdLine, getEnv());
-                }
-                boolean storeLine = true;
-                int commandType = getCommandType(cmdLine);
-                switch (commandType) {
-                    case REPEAT_COMMAND_VALUE:
-                        cmdLine = doRepeatCommand(cmdLine);
-                        storeLine = cmdLine == null; // if there is nothing in the buffer, cmdLine is null, don't store it.
-                        break;
-                    case HISTORY_COMMAND_VALUE:
-                        cmdLine = doHistory(cmdLine);
-                        if (cmdLine == null) {
-                            continue;// if there is nothing in the buffer, cmdLine is null, don't store it.
-                        }
-                        storeLine = false;
-                        break;
-                    case WRITE_BUFFER_COMMAND_VALUE:
-                        doBufferWrite(cmdLine);
-                        continue;
-                    case READ_BUFFER_COMMAND_VALUE:
-                        doBufferRead(cmdLine);
-                        continue;
-                    case CLEAR_BUFFER_COMMAND_VALUE:
-                        if (cmdLine.contains(HELP_SWITCH)) {
-                            say(CLEAR_BUFFER_COMMAND + " = clear the entire command history.");
-                            continue;
-                        }
-                        commandHistory = new LinkedList<>();
-                        say("Command history cleared.");
-                        continue;
-                    case SHORT_EXIT_COMMAND_VALUE:
-                        quit(null);
-                        return;
-                    case PRINT_HELP_COMMAND_VALUE:
-                        printHelp();
-                        continue;
-                    case LIST_ALL_METHODS_COMMAND_VALUE:
-                        InputLine inputLine = new InputLine(CLT.tokenize(cmdLine));
-                        listCLIMethods(inputLine);
-                        continue;
-                    case ONLINE_HELP_COMMAND_VALUE:
-                        inputLine = new InputLine(CLT.tokenize(cmdLine));
-                        doHelp(inputLine);
-                        continue;
-                    case TRACE_COMMAND_VALUE:
-                        doTrace(cmdLine);
-                        continue;
-
-                    case NO_OP_VALUE:
-                        continue;
-                    case USER_DEFINED_COMMAND:
-                    default:
-                }
-                if (commandType == NO_OP_VALUE) {
-                    // The user entered a blank line or nothing but blanks. Skip it all.
-                    continue;
-                }
-                if (storeLine) {
-                    // Store it if it was not retrieved from the command history.
-                    commandHistory.add(0, cmdLine);
-                }
-                if (cmdLine.startsWith(COMPONENT_COMMAND)) {
-                    // execute a single command in another component.
-                    if (componentManager == null) {
-                        say("Sorry, this does not have components.");
-                    } else {
-                        cmdLine = "use " + cmdLine.substring(COMPONENT_COMMAND.length());
-                        InputLine inputLine = new InputLine(CLT.tokenize(cmdLine));
-                        componentManager.use(inputLine);
-                    }
-                } else {
-                    switch (execute(cmdLine)) {
-                        case HELP_RC:
-                            InputLine inputLine = new InputLine(CLT.tokenize(cmdLine));
-                            listCLIMethods(inputLine);
-                            break;
-                        case SHUTDOWN_RC:
-                            isDone = false; // just in case.
-                            quit(null);
-                            return;
-                        case USER_EXIT_RC:
-                            say("User exit encountered");
-                            break;
-                        case OK_RC:
-                            // do nix.
-                            break;
-                        case ABNORMAL_RC:
-                        default:
-                            say("Command not found/understood. Try typing help or exit.");
-                            say("To see all commands currently available, type " + LIST_ALL_METHODS_COMMAND);
-                    }
-                }
-            } catch (Throwable ioe) {
-                if (debug) {
-                    ioe.printStackTrace();
-                }
-                say("Internal error reading line:" + (StringUtils.isTrivial(ioe.getMessage()) ? "\n" + ioe.getMessage() : ""));
-            } // end process line
-        }
-    }
 
     protected void processLine(String cmdLine) throws Throwable {
 
@@ -583,9 +439,13 @@ public class CLIDriver {
         }
         boolean storeLine = true;
         cmdLine = cmdLine.trim();
-
+        String command;
+        // If they send something like //foo split it as // foo
+        if(cmdLine.startsWith(COMPONENT_COMMAND) && !cmdLine.startsWith(COMPONENT_COMMAND + " ")){
+            cmdLine = COMPONENT_COMMAND + " " + cmdLine.substring(COMPONENT_COMMAND.length());
+        }
         StringTokenizer st = new StringTokenizer(cmdLine, " ");
-        String command = st.nextToken().trim();
+        command = st.nextToken().trim();
         if (StringUtils.isTrivial(command)) {
             return;
         }
@@ -901,7 +761,7 @@ public class CLIDriver {
     /**
      * Process a line to run. At invocation you may use something like
      * <pre>
-     *     cli [{@link #INPUT_FILE_FLAG} | {@link CommonCommands#BATCH_MODE_FLAG} A B C
+     *     cli {@link #RUN_COMMAND_FLAG} A B C
      * </pre>
      * and what happens is that everything after the flag  is fed tot he processor and executed
      * as a single command, as if you'd type in
@@ -934,105 +794,10 @@ public class CLIDriver {
         say("lines. See the readme.txt for more and look at any .cmd file in this distro for examples.");
     }
 
-    /**
-     * processes the command file supplied in the arguments at invocation.
-     *
-     * @throws Throwable
-     */
-    protected void processBatchFile() throws Throwable {
-        processBatchFile(getInputFile());
-    }
-
-    public int getBatchFileIndex() {
-        return batchFileIndex;
-    }
-
-    public void setBatchFileIndex(int batchFileIndex) {
-        this.batchFileIndex = batchFileIndex;
-    }
-
-    int batchFileIndex = -1;
-
-    public List<String> getBatchFileCommands() {
-        return batchFileCommands;
-    }
-
-    public boolean hasBatchFileCommands() {
-        return batchFileCommands != null && !batchFileCommands.isEmpty();
-    }
-
-    public void setBatchFileCommands(List<String> batchFileCommands) {
-        this.batchFileCommands = batchFileCommands;
-    }
-
-    List<String> batchFileCommands;
-
-    /**
-     * Called to start running a batch file
-     *
-     * @throws Throwable
-     */
-    protected void initInputFile() throws Throwable {
-        String fileName = getInputFile();
-        if (fileName.toLowerCase().equals("--help")) {
-            batchFileHelp();
-            return;
-        }
-        if (fileName == null || fileName.isEmpty()) {
-            throw new FileNotFoundException("Error: The file name is missing.");
-        }
-        File file = new File(fileName);
-        if (!file.exists()) {
-            throw new FileNotFoundException("Error: The file \"" + fileName + "\" does not exist");
-        }
-        if (!file.isFile()) {
-            throw new FileNotFoundException("Error: The object \"" + fileName + "\" is not a file.");
-        }
-        if (!file.canRead()) {
-            throw new GeneralException("Error: Cannot read file \"" + fileName + "\". Please check your permissions.");
-        }
-        FileReader fis = new FileReader(file);
-        DDParser ddp = new DDParser();
-        List<String> commands = ddp.parse(fis);
-        setBatchFileCommands(commands);
-        setBatchFileIndex(0);
-    }
-
-    /**
-     * Allows you to process any other command file.
-     *
-     * @param fileName
-     * @throws Throwable
-     */
-    protected void processBatchFile(String fileName) throws Throwable {
-        if (fileName.toLowerCase().equals("--help")) {
-            batchFileHelp();
-            return;
-        }
-        if (getBatchFileIndex() == -1) {
-            throw new NFWException("batch file system not initialized");
-        }
-        int j = getBatchFileIndex();
-        int size = getBatchFileCommands().size();
-        for (int i = j; i < size; i++) {
-            try {
-                setBatchFileIndex(i);
-                processLine(getBatchFileCommands().get(i));
-                i = getBatchFileIndex();
-            } catch (ExitException ee) {
-                return;
-            } catch (Throwable t) {
-                if (debug) {
-                    t.printStackTrace();
-                }
-                say("Internal error reading line:" + (StringUtils.isTrivial(t.getMessage()) ? "\n" + t.getMessage() : ""));
-            }
-        }
-
-    }
 
     protected static final String INPUT_FILE_FLAG = "-in";
     protected static final String OUTPUT_FILE_FLAG = "-out";
+    protected static final String RUN_COMMAND_FLAG = "-run";
     protected static final String TERMINAL_TYPE_FLAG = "-tty";
     protected static final String TERMINAL_TYPE_ANSI = "ansi";
     protected static final String TERMINAL_TYPE_TEXT = "text";
@@ -1113,28 +878,16 @@ public class CLIDriver {
 
     String runLine = null;
 
-    public String getInputFile() {
-        return inputFile;
-    }
-
-    public void setInputFile(String inputFile) {
-        this.inputFile = inputFile;
-    }
 
     boolean runLineMode = false;
-    String inputFile = null;
 
-    public boolean hasBatchFile() {
-        return inputFile != null;
-    }
 
     /**
      * This method is charged with interpreting the command line arguments and setting up
      * the state for this CLI driver. State includes
      * <ul>
-     *     <li>{@link #getInputFile()} - the batch file, if specified by {@link CommonCommands#BATCH_FILE_MODE_FLAG}</li>
      *     <li>{@link #getLogger()} - the logger, if specified</li>
-     *     <li>{@link #isRunLineMode()} - if the {@link CommonCommands#BATCH_MODE_FLAG} was used</li>
+     *     <li>{@link #isRunLineMode()} - if the {@link #RUN_COMMAND_FLAG} was used</li>
      *     <li>{@link #isNoOutput()} - suppress all output if true</li>
      *     <li>{@link #isVerbose()} - how chatty this should be</li>
      *     <li>{@link IOInterface}</li>
@@ -1145,7 +898,6 @@ public class CLIDriver {
      * the state, or create this, call this method and then add your components. You call
      * <ul>
      *     <li>{@link #start()} to being interactive processing</li>
-     *     <li>{@link #processBatchFile(String)}  to process the batch file</li>
      *     <li>{@link #processRunLine()} to run the single command.</li>
      * </ul>
      *
@@ -1156,7 +908,7 @@ public class CLIDriver {
     // For testing: batchFile
     // -batchFile /home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/scripts/jwt-scripts/ex_hello_world.cmd
     public InputLine bootstrap(String[] args) {
-        return bootstrap(new InputLine(DUMMY_FUNCTION, args));
+        return bootstrap(new InputLine(getClass().getSimpleName(), args));
     }
 
     public InputLine bootstrap(InputLine argLine) {
@@ -1177,42 +929,26 @@ public class CLIDriver {
             myLoggingFacade = loggerProvider.get(); // if verbose
         }
         setLogger(myLoggingFacade);
-        boolean hasInputFile = argLine.hasArg(BATCH_FILE_MODE_FLAG, INPUT_FILE_FLAG);
+        boolean hasInputFile = argLine.hasArg(INPUT_FILE_FLAG);
 
-        // Batch file always has right of way. Do that and return
-/*        if (hasInputFile) {
-            setInputFile(argLine.getNextArgFor(BATCH_FILE_MODE_FLAG, INPUT_FILE_FLAG));
-            argLine.removeSwitchAndValue(BATCH_FILE_MODE_FLAG, INPUT_FILE_FLAG);
-            try {
-                initInputFile();
-            } catch (Throwable e) {
-                if (isVerbose()) {
-                    e.printStackTrace();
-                }
-                say("error initializing input file " + getInputFile());
-            }
-        }*/
         if (argLine.hasArg(OUTPUT_FILE_FLAG)) {
             setOutputFile(argLine.getNextArgFor(OUTPUT_FILE_FLAG));
             argLine.removeSwitchAndValue(OUTPUT_FILE_FLAG);
         }
         if (hasInputFile) {
             String inputFileName = argLine.getNextArgFor(INPUT_FILE_FLAG);
-            //setInputFile(argLine.getNextArgFor(BATCH_FILE_MODE_FLAG, INPUT_FILE_FLAG));
-            argLine.removeSwitchAndValue(BATCH_FILE_MODE_FLAG, INPUT_FILE_FLAG);
-            // initInputFile();
-
+            argLine.removeSwitchAndValue(INPUT_FILE_FLAG);
             BasicIO basicIO = new BasicIO();
             try {
                 FileInputStream fis = new FileInputStream(inputFileName);
                 if (inputFileName.endsWith(".cmd")) {
+                    // If it's a command file, snarf it up and use it.
                     DDParser ddp = new DDParser();
                     List<String> commands = ddp.parse(fis);
                     String inputString = StringUtils.listToString(commands);
                     ByteArrayInputStream bais = new ByteArrayInputStream(inputString.getBytes());
                     System.setIn(bais);
                     basicIO.setInputStream(System.in);
-
                 } else {
                     basicIO.setInputStream(fis);
                 }
@@ -1233,14 +969,10 @@ public class CLIDriver {
 
         // Batch mode means that the rest of command line after flag is interpreted as a single command.
         // This executes one command.
-        setRunLineMode(argLine.hasArg(BATCH_MODE_FLAG));
+        setRunLineMode(argLine.hasArg(RUN_COMMAND_FLAG));
         if (isRunLineMode()) {
             String runLine = argLine.getOriginalLine();
-            if (runLine.indexOf(INPUT_FILE_FLAG) != -1) {
-                runLine = runLine.substring(runLine.indexOf(INPUT_FILE_FLAG) + INPUT_FILE_FLAG.length() + 1);
-            } else {
-                runLine = runLine.substring(runLine.indexOf(BATCH_FILE_MODE_FLAG) + BATCH_FILE_MODE_FLAG.length() + 1);
-            }
+            runLine = runLine.substring(runLine.indexOf(RUN_COMMAND_FLAG) + RUN_COMMAND_FLAG.length() + 1);
             setRunLine(runLine);
             argLine.setOriginalLine(runLine);
             argLine.reparse();

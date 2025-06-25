@@ -63,6 +63,33 @@ public class StringUtils {
         return blanks.substring(0, width);
     }
 
+    /**
+     * Repeat the given string within the given width. E.g.
+     * <pre>
+     * repeatString("*", 1)
+     * **********
+     * </pre>
+     * @param s
+     * @param width
+     * @return
+     */
+    public static String repeatString(String s, int width){
+        if (width <= 0) {
+            return "";
+        }
+        char[] output = new char[width];
+        char[] input = s.toCharArray();
+        int iterations = width / input.length ;
+        for (int i = 0; i < iterations; i++) {
+            System.arraycopy(input, 0, output, i*input.length, input.length);
+        }
+        int remainder = width % input.length;
+        if(0 < remainder) {
+            System.arraycopy(input, 0, output, iterations * input.length, remainder);
+        }
+
+        return new String(output);
+    }
     static String nbSpaces = "                          ";
 
     public static String getNBSpaces(int width) {
@@ -139,6 +166,8 @@ public class StringUtils {
      * @param args
      */
     public static void main(String[] args) {
+        System.out.println("abcabcabcab".equals(repeatString("abc",11))?"repeatString: pass" : "repeatString: FAIL"); // 8 sec
+
         tests();
         tableTest();
     }

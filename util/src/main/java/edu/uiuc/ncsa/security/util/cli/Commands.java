@@ -27,14 +27,12 @@ public interface Commands extends Logable, Serializable {
     String getPrompt();
     void print_help() throws Exception;  // replaced by CLI Driver /help facility which is much better.
 
-    void bootstrap() throws Throwable;
+    void bootstrap(InputLine inputLine) throws Throwable;
 
     HelpUtil getHelpUtil();
     IOInterface getIOInterface();
     void setIOInterface(IOInterface io);
     String getName();
-    public boolean isBatchMode();
-    public void setBatchMode(boolean batchMode);
 
     /**
      * Back reference to the driver that manages this instance.

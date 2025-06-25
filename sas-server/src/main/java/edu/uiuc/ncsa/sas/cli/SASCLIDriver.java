@@ -104,17 +104,7 @@ public class SASCLIDriver extends CLIDriver implements Executable {
         }
 
         @Override
-        public void bootstrap() throws Throwable {
-
-        }
-
-        @Override
-        public boolean isBatchMode() {
-            return false;
-        }
-
-        @Override
-        public void setBatchMode(boolean batchMode) {
+        public void bootstrap(InputLine inputLine) throws Throwable {
 
         }
 

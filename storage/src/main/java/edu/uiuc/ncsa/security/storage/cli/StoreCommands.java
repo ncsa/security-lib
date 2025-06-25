@@ -3820,8 +3820,14 @@ public abstract class StoreCommands extends CommonCommands {
             showUpdateHelp();
             return;
         }
-        String key = getAndCheckKeyArg(inputLine);
+        // Fixes https://github.com/ncsa/security-lib/issues/54
+        String key = getKeyArg(inputLine, false  );
+        if(key != null && null == getAndCheckKeyArg(inputLine)){
+            say("unknown key \"" + key + "\"");
+            return;
+        }
         List<String> keys;
+
         if (key != null) {
             keys = new ArrayList<>(1);
             keys.add(key);
@@ -4019,8 +4025,12 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
 
-    public void bootstrap() throws Throwable {
-        super.bootstrap();
+    public void bootstrap(InputLine inputLine) throws Throwable {
+    }
+
+    @Override
+    protected void initHelp() throws Throwable {
+        super.initHelp();
         getHelpUtil().load("/store-help.xml");
     }
 

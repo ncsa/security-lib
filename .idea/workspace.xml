@@ -9,23 +9,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="https://github.com/ncsa/security-lib/issues/53 Removed functor code &amp; tests">
-      <change afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/TestCommands.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/util/src/main/resources/cli-test/test0.cmd" afterDir="false" />
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Batch file processign with indices. This should be kept, but probably best replaced by hijacking System.in">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/cli/SASCLIDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/cli/SASCLIDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreUtil.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/Commands.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/Commands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CommonCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CommonCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/InputLine.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/InputLine.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/batch/DDParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/batch/DDParser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/terminal/ISO6429IO.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/terminal/ISO6429IO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/terminal/ISO6429Terminal.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/terminal/ISO6429Terminal.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-installer/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,7 +101,7 @@
     "Application.SASWatcher.executor": "Run",
     "Application.StoreArchiver.executor": "Run",
     "Application.StringUtils.executor": "Run",
-    "Application.TestCommands.executor": "Run",
+    "Application.TestCommands.executor": "Debug",
     "Application.WebClientConfig.executor": "Run",
     "Application.WebInstaller.executor": "Run",
     "DefaultHtmlFileTemplate": "HTML File",
@@ -276,7 +269,6 @@
     <configuration name="TestCommands" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.cli.TestCommands" />
       <module name="util" />
-      <option name="PROGRAM_PARAMETERS" value="  -batchFile $PROJECT_DIR$/util/src/main/resources/cli-test/test0.cmd" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="edu.uiuc.ncsa.security.util.cli.*" />
@@ -427,8 +419,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Application.TestCommands" />
-        <item itemvalue="Application.DDParser" />
         <item itemvalue="Application.StringUtils" />
+        <item itemvalue="Application.DDParser" />
         <item itemvalue="Application.SASCommands" />
         <item itemvalue="Application.CertUtil" />
       </list>
@@ -606,7 +598,7 @@
       <workItem from="1747752972503" duration="417000" />
       <workItem from="1747765002584" duration="599000" />
       <workItem from="1747997704045" duration="599000" />
-      <workItem from="1750287141371" duration="63512000" />
+      <workItem from="1750287141371" duration="83479000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -951,7 +943,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="99" />
+    <option name="localTasksCounter" value="100" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -960,7 +952,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Checkin before system migration" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/40" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/41 Let the comnfigurable commnads (for the CLC) specify -in and -out files for batch processing." />
     <MESSAGE value="Update website" />
@@ -985,7 +976,8 @@
     <MESSAGE value="Migrate to 17" />
     <MESSAGE value="Fix https://github.com/ncsa/security-lib/issues/52" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/53 Removed functor code &amp; tests" />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/53 Removed functor code &amp; tests" />
+    <MESSAGE value="Batch file processign with indices. This should be kept, but probably best replaced by hijacking System.in" />
+    <option name="LAST_COMMIT_MESSAGE" value="Batch file processign with indices. This should be kept, but probably best replaced by hijacking System.in" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -1082,16 +1074,6 @@
           <option name="timeStamp" value="93" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java</url>
-          <line>465</line>
-          <option name="timeStamp" value="95" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java</url>
-          <line>155</line>
-          <option name="timeStamp" value="96" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/cli/CLI_IO.java</url>
           <line>40</line>
           <option name="timeStamp" value="98" />
@@ -1118,17 +1100,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java</url>
-          <line>1076</line>
+          <line>1105</line>
           <option name="timeStamp" value="111" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java</url>
-          <line>1183</line>
-          <option name="timeStamp" value="118" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java</url>
-          <line>419</line>
+          <line>405</line>
           <option name="timeStamp" value="119" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1137,9 +1114,14 @@
           <option name="timeStamp" value="121" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/batch/DDParser.java</url>
-          <line>74</line>
-          <option name="timeStamp" value="122" />
+          <url>file://$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java</url>
+          <line>79</line>
+          <option name="timeStamp" value="127" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java</url>
+          <line>443</line>
+          <option name="timeStamp" value="128" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -20,31 +20,11 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
  */
 public abstract class CommonCommands implements Commands {
 
-    //public static
-    boolean batchMode = false;
 
-    /**
-     * If this is invoked from the command line with the batch mode flag, then this should process
-     * commands strictly without user intervention, failing if, for instance, some parameters are missing
-     * rather than prompting for them. Typically, the {@link CLIDriver} instance sets this at the time of
-     * invocation. This flag tells this component not to print most output for instance.
-     *
-     * @return
-     */
-    public boolean isBatchMode() {
-        return batchMode;
-    }
-
-    public void setBatchMode(boolean batchMode) {
-        this.batchMode = batchMode;
-    }
-
-    public static String BATCH_MODE_FLAG = "-batch";
 
 
     protected CommonCommands(MyLoggingFacade logger) throws Throwable {
         this.logger = logger;
-        bootstrap();
     }
 
     transient protected MyLoggingFacade logger;
@@ -546,56 +526,11 @@ public abstract class CommonCommands implements Commands {
      */
     protected boolean gracefulExit(boolean exitNow, String msg) {
         if (exitNow) {
-            if (isBatch()) {
-                sayv(msg);
-                System.exit(1);
-            }
+
             say(msg);
             return true;
         }
         return false;
-    }
-
-    /* If this is used, then each line of the file is read as an input and processed. It overrides the
-     * {@link #BATCH_MODE_FLAG} if used and that is ignored.
-     */
-    public static String BATCH_FILE_MODE_FLAG = "-batchFile";
-    /**
-     * If a line contains this character, then the line is truncated at that point before processing.
-     */
-    //public static String BATCH_FILE_COMMENT_CHAR = "//";
-    /**
-     * If a line ends with this (after the comment is removed), then glow it on to the
-     * next input line. In effect this lets you split commands across multiple lines, e.g.
-     * <pre>
-     * ls \//My comment
-     * -la \
-     * foobar
-     * </pre>
-     * is the same as entering the single line
-     * <pre>ls -la foobar</pre>
-     * Notice that the lines are concatenated and the comment is stripped out.
-     */
-    public static String BATCH_FILE_LINE_CONTINUES = "\\";
-
-    public boolean isBatchFile() {
-        return batchFile;
-    }
-
-    public void setBatchFile(boolean batchFile) {
-        this.batchFile = batchFile;
-    }
-
-    protected boolean batchFile = false;
-
-    /**
-     * returns true if this is either a batch file or in batch mode. In that case only output is generated
-     * on errors if verbosity is on.
-     *
-     * @return
-     */
-    protected boolean isBatch() {
-        return isBatchFile() || isBatchMode();
     }
 
     /**
@@ -760,8 +695,13 @@ public abstract class CommonCommands implements Commands {
     HelpUtil helpUtil = null;
 
     @Override
-    public void bootstrap() throws Throwable {
+    public void bootstrap(InputLine inputLine) throws Throwable {
+        initHelp();
+
+    }
+    protected void initHelp() throws Throwable{
         getHelpUtil().load("/basic-help.xml");
         getHelpUtil().load("/common_commands_help.xml");
+
     }
 }
