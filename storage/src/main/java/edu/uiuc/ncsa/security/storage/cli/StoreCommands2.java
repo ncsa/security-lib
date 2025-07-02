@@ -48,13 +48,21 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.*;
  * <p>Created by Jeff Gaynor<br>
  * on 5/20/13 at  3:22 PM
  */
-public abstract class StoreCommands extends CommonCommands {
-    public StoreCommands(MyLoggingFacade logger) throws Throwable {
+public abstract class StoreCommands2 extends CommonCommands2 {
+ /*   public StoreCommands(MyLoggingFacade logger) throws Throwable {
         super(logger);
+    }*/
+
+    public StoreCommands2(CLIDriver driver) {
+        super(driver);
     }
 
-    public StoreCommands(AbstractEnvironment environment) throws Throwable {
-        super(environment.getMyLogger());
+    public StoreCommands2(CLIDriver driver, AbstractEnvironment environment) throws Throwable {
+        this(driver);
+        this.environment = environment;
+    }
+    public StoreCommands2(AbstractEnvironment environment) throws Throwable {
+        this((CLIDriver) null);
         this.environment = environment;
     }
 
@@ -89,14 +97,14 @@ public abstract class StoreCommands extends CommonCommands {
      * @param store
      */
 
-    protected StoreCommands(MyLoggingFacade logger, String defaultIndent, Store store) throws Throwable {
-        this(logger, store);
+    protected StoreCommands2(CLIDriver driver, String defaultIndent, Store store) throws Throwable {
+        this(driver, store);
         this.defaultIndent = defaultIndent;
         setSortable(new BasicSorter());
     }
 
-    public StoreCommands(MyLoggingFacade logger, Store store) throws Throwable {
-        this(logger);
+    public StoreCommands2(CLIDriver driver, Store store) throws Throwable {
+        this(driver);
         setStore(store);
         if (store instanceof MonitoredStoreInterface) {
             ((MonitoredStoreInterface) store).setMonitorEnabled(false); // do not fire monitor event in CLI!
@@ -1034,7 +1042,7 @@ public abstract class StoreCommands extends CommonCommands {
 
     /**
      * This is a hook for extensions so they don't have to completely
-     * rewrite complex {@link #update(edu.uiuc.ncsa.security.core.Identifiable)} methods.
+     * rewrite complex {@link #update(Identifiable)} methods.
      * It will be invoked before
      * update displays the completed item and saves it, allowing any properties not in the base class
      * to be queried and saved.
@@ -2053,8 +2061,8 @@ public abstract class StoreCommands extends CommonCommands {
         sayi("Current store has " + getStore().size(false) + " entries (excluding versions).");
     }
 
-/*
 
+    @Override
     public void print_help() throws Exception {
         super.print_help();
         say("--Serialization commands: Reading and writing objects.");
@@ -2073,7 +2081,6 @@ public abstract class StoreCommands extends CommonCommands {
         sayi("size = the number of objects.");
         sayi("update = update (change) a property or all properties for an object.");
     }
-*/
 
     protected int display_width = 120;
 
@@ -4033,6 +4040,7 @@ public abstract class StoreCommands extends CommonCommands {
     @Override
     protected void initHelp() throws Throwable {
         super.initHelp();
+        getHelpUtil().load("/basic-help.xml");
         getHelpUtil().load("/store-help.xml");
     }
 

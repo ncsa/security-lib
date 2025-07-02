@@ -14,13 +14,11 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 
 /**
  * Utilities that are used by any reasonable implementation of the Commands
- * interface.   You will probably want to extend this for your command processor.
+ * interface.   You need to extend this for your command processor.
  * <p>Created by Jeff Gaynor<br>
  * on 10/30/13 at  4:14 PM
  */
 public abstract class CommonCommands implements Commands {
-
-
 
 
     protected CommonCommands(MyLoggingFacade logger) throws Throwable {
@@ -31,32 +29,44 @@ public abstract class CommonCommands implements Commands {
 
     @Override
     public void debug(String x) {
-        logger.debug(x);
+        if (logger != null) {
+            logger.debug(x);
+        }
     }
 
     @Override
     public void error(String x) {
-        logger.error(x);
+        if (logger != null) {
+            logger.error(x);
+        }
     }
+
 
     @Override
     public void info(String x) {
-        logger.info(x);
+        if (logger != null) {
+            logger.info(x);
+        }
     }
 
     @Override
-    public boolean isDebugOn() {
-        return logger.isDebugOn();
+    public boolean isDebugOn() { // from Loggable
+        if (logger != null) {
+            return logger.isDebugOn();
+        }
+        return false;
     }
 
     @Override
-    public void setDebugOn(boolean setOn) {
+    public void setDebugOn(boolean setOn) { // from Loggable
         logger.setDebugOn(setOn);
     }
 
     @Override
     public void warn(String x) {
-        logger.warn(x);
+        if (logger != null) {
+            logger.warn(x);
+        }
     }
 
     protected String defaultIndent = "";
@@ -82,18 +92,8 @@ public abstract class CommonCommands implements Commands {
 
     @Override
     public IOInterface getIOInterface() {
-        if (ioInterface == null) {
-            ioInterface = new BasicIO();
-        }
-        return ioInterface;
+        return getDriver().getIOInterface();
     }
-
-    @Override
-    public void setIOInterface(IOInterface ioInterface) {
-        this.ioInterface = ioInterface;
-    }
-
-    IOInterface ioInterface;
 
     protected String readline(String prompt) throws IOException {
         return getIOInterface().readline(prompt);
@@ -113,7 +113,7 @@ public abstract class CommonCommands implements Commands {
         }
     }
 
-    @Override
+/*    @Override
     public void print_help() throws Exception {
         say("All commands have detailed help by typing:");
         say("command --help");
@@ -132,7 +132,7 @@ public abstract class CommonCommands implements Commands {
         sayi("echo = print the argument. Useful in batch scripts.");
         sayi("version = the version of this component.");
 
-    }
+    }*/
 
     /**
      * Prints with the default indent and a linefeed.
@@ -233,10 +233,10 @@ public abstract class CommonCommands implements Commands {
         boolean loopForever = true;
         String inLine = null;
         boolean hasNullDefault = (defaultValue == null);
-        if(hasNullDefault){
-                      defaultValue = DEFAULT_NULL_VALUE_PLACEHOLDER;
-        }else{
-            if(defaultValue.equals(DEFAULT_NULL_VALUE_PLACEHOLDER)){
+        if (hasNullDefault) {
+            defaultValue = DEFAULT_NULL_VALUE_PLACEHOLDER;
+        } else {
+            if (defaultValue.equals(DEFAULT_NULL_VALUE_PLACEHOLDER)) {
                 defaultValue = "\"" + DEFAULT_NULL_VALUE_PLACEHOLDER + "\""; // try to dismabiguate the case where the actual value is --
             }
         }
@@ -253,16 +253,16 @@ public abstract class CommonCommands implements Commands {
                 if (inputLine.getCommand().equals("--help") || inputLine.getCommand().equals("/help")) {
                     inputLine.appendArg(propertyName);
                     say("-----");
-                   if(! getHelpUtil().printHelp(inputLine)){
-                       say("  no help for topic \"" + propertyName + "\"");
-                   }
+                    if (!getHelpUtil().printHelp(inputLine)) {
+                        say("  no help for topic \"" + propertyName + "\"");
+                    }
                     say("-----");
                 }
             } else {
                 break;
             }
         }
-        if(hasNullDefault && inLine.equals(DEFAULT_NULL_VALUE_PLACEHOLDER)){
+        if (hasNullDefault && inLine.equals(DEFAULT_NULL_VALUE_PLACEHOLDER)) {
             return null;
         }
         return inLine;
@@ -309,7 +309,7 @@ public abstract class CommonCommands implements Commands {
         this.driver = driver;
     }
 
-    CLIDriver driver;
+   transient protected CLIDriver driver;
     protected String CL_OUTPUT_FILE_FLAG = "-out";
     protected String CL_INPUT_FILE_FLAG = "-in";
 
@@ -695,11 +695,13 @@ public abstract class CommonCommands implements Commands {
     HelpUtil helpUtil = null;
 
     @Override
-    public void bootstrap(InputLine inputLine) throws Throwable {
+    public InputLine bootstrap(InputLine inputLine) throws Throwable {
         initHelp();
+        return inputLine;
 
     }
-    protected void initHelp() throws Throwable{
+
+    protected void initHelp() throws Throwable {
         getHelpUtil().load("/basic-help.xml");
         getHelpUtil().load("/common_commands_help.xml");
 

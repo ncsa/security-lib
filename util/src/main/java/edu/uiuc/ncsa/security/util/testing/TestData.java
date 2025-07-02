@@ -12,7 +12,7 @@ import java.util.List;
  * on 9/6/14 at  2:07 PM
  */
 public class TestData extends HashMap<String, Object> {
-    public static final String TEST_ENABLE_KEY = "test:enabled";
+    public static final String TEST_ENABLE_KEY = "enabled";
 
     public String getString(String key) {
         return get(key).toString();

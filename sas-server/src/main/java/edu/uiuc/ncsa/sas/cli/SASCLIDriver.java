@@ -86,10 +86,6 @@ public class SASCLIDriver extends CLIDriver implements Executable {
             return "sas";
         }
 
-        @Override
-        public void print_help() throws Exception {
-
-        }
 
         @Override
         public void setDriver(CLIDriver driver) {
@@ -104,24 +100,22 @@ public class SASCLIDriver extends CLIDriver implements Executable {
         }
 
         @Override
-        public void bootstrap(InputLine inputLine) throws Throwable {
-
+        public InputLine bootstrap(InputLine inputLine) throws Throwable {
+         return inputLine;
         }
+/*
 
         @Override
         public HelpUtil getHelpUtil() {
             return null;
         }
+*/
 
         @Override
         public IOInterface getIOInterface() {
             return null;
         }
 
-        @Override
-        public void setIOInterface(IOInterface io) {
-
-        }
 
         @Override
         public boolean isDebugOn() {

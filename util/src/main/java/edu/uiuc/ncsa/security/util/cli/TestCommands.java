@@ -1,14 +1,17 @@
 package edu.uiuc.ncsa.security.util.cli;
 
 import edu.uiuc.ncsa.security.core.util.Iso8601;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 import java.util.Date;
 
 /**
  * A set of commands for debugging the {@link CLIDriver} only.
  */
-public class TestCommands extends CommonCommands{
+public class TestCommands extends CommonCommands2{
+    public TestCommands(CLIDriver driver) {
+        super(driver);
+    }
+
     @Override
     public String getPrompt() {
         return getName() + ">";
@@ -27,9 +30,21 @@ public class TestCommands extends CommonCommands{
         return "test";
     }
 
-    public TestCommands(MyLoggingFacade logger) throws Throwable {
-        super(logger);
+    @Override
+    public void about(boolean showBanner, boolean showHeader) {
+        say("Test Commands");
     }
+
+    @Override
+    public void initialize() throws Throwable {
+
+    }
+
+    @Override
+    public void load(InputLine inputLine) throws Throwable {
+
+    }
+
     public void size(InputLine inputLine) throws Exception{
         say("42");
     }
@@ -39,10 +54,11 @@ public class TestCommands extends CommonCommands{
 
     public static void main(String[] args) {
         CLIDriver cli = new CLIDriver();
-        cli.bootstrap(args);
+        InputLine inputLine = cli.bootstrap(args);
         try {
-            TestCommands testCommands =new TestCommands(cli.getLogger());
+            TestCommands testCommands =new TestCommands(cli);
             cli.addCommands(testCommands);
+            testCommands.bootstrap(inputLine);
             cli.start();
         }catch(Throwable t) {
             t.printStackTrace();
@@ -51,7 +67,7 @@ public class TestCommands extends CommonCommands{
 }
 /*
   For batch file testing
-  -batchFile /home/ncsa/dev/ncsa-git/security-lib/util/src/main/resources/cli-test/test0.cmd
+  -in /home/ncsa/dev/ncsa-git/security-lib/util/src/main/resources/cli-test/test0.cmd
 
   For testing run mode
   -run size

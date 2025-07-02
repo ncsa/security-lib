@@ -1,0 +1,47 @@
+<!-- Help for the configurable commands. -->
+<html>
+    <entry id="load">
+        <body>
+            <![CDATA[
+load name  = set the named configuration for the current file
+load name file = set the named configuration, set the configuration file
+load -list = list all configurationnames in current configuration file.
+load -list file = list all of the configuration names in the given file.
+]]>
+        </body>
+    </entry>
+    <entry id="-cfg">
+        <body>
+            <![CDATA[Invocation option for the configuration file. This requires the full path to the configuration file.
+You can also use the long version of -configFile.
+
+E.g.
+java -jar cli.jar -cfg /path/to/cfg.xml -name default
+
+would load the configuration file, cfg.xml, find the configuration named "default" and set that
+as the current configuration.
+
+Note that if the named configuration or file cannot be found, a message is printed and the
+system loads with no configuration.
+
+See also: -name, invocation, load]]>
+        </body>
+    </entry>
+    <entry id="-name">
+        <body>
+            <![CDATA[Invocation option for the name of a configuration. A configuration file must be
+loaded as well or you will get an error. There is a long version of this switch, -configName too.
+
+See also: -cfg, invocation, load
+]]>
+        </body>
+    </entry>
+</html>
+
+    <!--
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+</entry>
+    -->

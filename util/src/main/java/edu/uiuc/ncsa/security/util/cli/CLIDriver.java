@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.security.util.cli.batch.DDParser;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import edu.uiuc.ncsa.security.util.terminal.ISO6429IO;
 import edu.uiuc.ncsa.security.util.terminal.ISO6429Terminal;
+import net.sf.json.JSONObject;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -29,6 +30,9 @@ public class CLIDriver {
      */
     public static final String EXIT_COMMAND = "/exit";
     public static final String ECHO_COMMAND = "/echo";
+
+    public CLIDriver() {
+    }
 
     public String getLineCommentStart() {
         return lineCommentStart;
@@ -128,9 +132,9 @@ public class CLIDriver {
             if (xxx instanceof CommonCommands) {
                 CommonCommands commonCommands = ((CommonCommands) xxx);
                 commonCommands.setVerbose(isVerbose());
-                commonCommands.setPrintOuput(!isNoOutput());
+                commonCommands.setPrintOuput(!isOutputOn());
             }
-            xxx.setIOInterface(getIOInterface());
+            //xxx.setIOInterface(getIOInterface());
             xxx.setDriver(this);
 
         }
@@ -167,42 +171,6 @@ public class CLIDriver {
     public static final int ONLINE_HELP_COMMAND_VALUE = 110;
 
 
-    // TODO - Add more CLI-level commands?
-    // Might very well want to fold this into the standard flow rather than intercept it first.
-    //  /i file = interpret all the commands in a file, i.e. run a script. No arg runs command buffer as batch file????
-    protected int getCommandType(String cmdLine) {
-        if (StringUtils.isTrivial(cmdLine.trim())) {
-            return NO_OP_VALUE;
-        }
-        StringTokenizer st = new StringTokenizer(cmdLine.trim(), " ");
-        String nextToken = st.nextToken();
-        switch (nextToken) {
-            case REPEAT_LAST_COMMAND:
-                return REPEAT_COMMAND_VALUE;
-            case HISTORY_LIST_COMMAND:
-                return HISTORY_COMMAND_VALUE;
-            case WRITE_BUFFER_COMMAND:
-                return WRITE_BUFFER_COMMAND_VALUE;
-            case LOAD_BUFFER_COMMAND:
-                return READ_BUFFER_COMMAND_VALUE;
-            case CLEAR_BUFFER_COMMAND:
-                return CLEAR_BUFFER_COMMAND_VALUE;
-            case SHORT_EXIT_COMMAND:
-                return SHORT_EXIT_COMMAND_VALUE;
-            case PRINT_HELP_COMMAND:
-                return PRINT_HELP_COMMAND_VALUE;
-            case LIST_ALL_METHODS_COMMAND:
-                return LIST_ALL_METHODS_COMMAND_VALUE;
-            case TRACE_COMMAND:
-                return TRACE_COMMAND_VALUE;
-            case COMPONENT_COMMAND:
-                return COMPONENT_COMMAND_VALUE;
-            case ONLINE_HELP_COMMAND:
-                return ONLINE_HELP_COMMAND_VALUE;
-
-        }
-        return USER_DEFINED_COMMAND;
-    }
 
     protected void printHelp() {
         String indent = "  ";
@@ -405,7 +373,8 @@ public class CLIDriver {
         if (isRunLineMode()) {
             processRunLine(); // contract is that it runs the single line, then continues.
         }
-        if (commands == null || commands.length == 0) {
+        if (hasInputFile() && (commands == null || commands.length == 0)) {
+            // catches case that there is an input file and we hit the EOF,
             say("(empty command list, exiting...)");
             return;
         }
@@ -414,6 +383,9 @@ public class CLIDriver {
         while (!isDone) {
             try {
                 cmdLine = readline(prompt);
+                if (cmdLine == null) {
+                    return;
+                }
                 processLine(cmdLine);
             } catch (ExitException ee) {
                 return;
@@ -441,7 +413,7 @@ public class CLIDriver {
         cmdLine = cmdLine.trim();
         String command;
         // If they send something like //foo split it as // foo
-        if(cmdLine.startsWith(COMPONENT_COMMAND) && !cmdLine.startsWith(COMPONENT_COMMAND + " ")){
+        if (cmdLine.startsWith(COMPONENT_COMMAND) && !cmdLine.startsWith(COMPONENT_COMMAND + " ")) {
             cmdLine = COMPONENT_COMMAND + " " + cmdLine.substring(COMPONENT_COMMAND.length());
         }
         StringTokenizer st = new StringTokenizer(cmdLine, " ");
@@ -659,12 +631,16 @@ public class CLIDriver {
                 printHelpTopics(inputLine);
                 return;
             }
-            if (getHelpUtil() != null) {
+            //if (getHelpUtil() != null) {
                 helpPrinted = getHelpUtil().printHelp(inputLine) || helpPrinted;
-            }
-            for (Commands command : commands) {
-                if (command.getHelpUtil() != null) {
-                    helpPrinted = command.getHelpUtil().printHelp(inputLine) || helpPrinted;
+           // }
+            if(!helpPrinted) { // don't reprint help repeatedly. Help keys are unique.
+                if(commands != null){
+                for (Commands command : commands) {
+                    //       if (getHelpUtil() != null) {
+                    helpPrinted = getHelpUtil().printHelp(inputLine) || helpPrinted;
+                    //     }
+                }
                 }
             }
             if (!helpPrinted) {
@@ -675,14 +651,15 @@ public class CLIDriver {
 
     protected void printHelpTopics(InputLine inputLine) {
         HelpUtil helpUtil1 = new HelpUtil();
-        if (getHelpUtil() != null) {
+   //     if (getHelpUtil() != null) {
             helpUtil1.getOnlineHelp().putAll(getHelpUtil().getOnlineHelp());
-        }
+    //    }
+        if(commands != null) {
         for (Commands command : commands) {
-            if (command.getHelpUtil() != null) {
-                helpUtil1.getOnlineHelp().putAll(command.getHelpUtil().getOnlineHelp());
-            }
-        }
+            //    if (getHelpUtil() != null) {
+            helpUtil1.getOnlineHelp().putAll(getHelpUtil().getOnlineHelp());
+            //       }
+        }        }
         helpUtil1.printHelp(inputLine);
     }
 
@@ -750,9 +727,6 @@ public class CLIDriver {
      */
     public void setIOInterface(IOInterface ioInterface) {
         this.ioInterface = ioInterface;
-        for (Commands command : getCLICommands()) {
-            command.setIOInterface(ioInterface);
-        }
     }
 
     IOInterface ioInterface;
@@ -801,10 +775,13 @@ public class CLIDriver {
     protected static final String TERMINAL_TYPE_FLAG = "-tty";
     protected static final String TERMINAL_TYPE_ANSI = "ansi";
     protected static final String TERMINAL_TYPE_TEXT = "text";
+    protected static final String TERMINAL_TYPE_ASCII = "ascii";
     protected static final String SHORT_VERBOSE_FLAG = "-v";
     protected static final String LONG_VERBOSE_FLAG = "-verbose";
-    protected static final String SHORT_NO_OUTPUT_FLAG = "-noOutput";
-    protected static final String LONG_NO_OUTPUT_FLAG = "-noOutput";
+    protected static final String SHORT_SET_OUTPUT_FLAG = "-setOutput";
+    protected static final String LONG_SET_OUTPUT_FLAG = "-setOutput";
+    protected static final String SILENT_FLAG = "-silent";
+    protected static final String ENVIRONMENT_FLAG = "-env";
     protected static final String LOG_FLAG = "-log";
 
     public static void main(String[] args) {
@@ -827,7 +804,7 @@ public class CLIDriver {
 
     String outputFile = null;
     boolean verbose = false;
-    boolean noOutput = false;
+    boolean outputOn = true;
 
     public MyLoggingFacade getLogger() {
         return logger;
@@ -845,19 +822,14 @@ public class CLIDriver {
 
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
-        for (Commands commands : commands) {
-            if (commands instanceof ConfigurableCommandsImpl) {
-                ((ConfigurableCommandsImpl) commands).setVerbose(verbose);
-            }
-        }
     }
 
-    public boolean isNoOutput() {
-        return noOutput;
+    public boolean isOutputOn() {
+        return outputOn;
     }
 
-    public void setNoOutput(boolean noOutput) {
-        this.noOutput = noOutput;
+    public void setOutputOn(boolean outputOn) {
+        this.outputOn = outputOn;
     }
 
     public boolean isRunLineMode() {
@@ -888,7 +860,7 @@ public class CLIDriver {
      * <ul>
      *     <li>{@link #getLogger()} - the logger, if specified</li>
      *     <li>{@link #isRunLineMode()} - if the {@link #RUN_COMMAND_FLAG} was used</li>
-     *     <li>{@link #isNoOutput()} - suppress all output if true</li>
+     *     <li>{@link #isOutputOn()} - suppress all output if true</li>
      *     <li>{@link #isVerbose()} - how chatty this should be</li>
      *     <li>{@link IOInterface}</li>
      * </ul>
@@ -905,18 +877,39 @@ public class CLIDriver {
      * @return The {@link InputLine} after all recognized flags have been processed. This means they are
      * stripped.
      */
-    // For testing: batchFile
-    // -batchFile /home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/scripts/jwt-scripts/ex_hello_world.cmd
+    // For testing: in
+    // -in /home/ncsa/dev/ncsa-git/oa4mp/server-admin/src/main/scripts/jwt-scripts/ex_hello_world.cmd
     public InputLine bootstrap(String[] args) {
         return bootstrap(new InputLine(getClass().getSimpleName(), args));
     }
 
+    public boolean hasInputFile() {
+        return hasInputFile;
+    }
+
+    public void setHasInputFile(boolean hasInputFile) {
+        this.hasInputFile = hasInputFile;
+    }
+
+    boolean hasInputFile = false;
     public InputLine bootstrap(InputLine argLine) {
 
-        setNoOutput((argLine.hasArg(SHORT_NO_OUTPUT_FLAG, LONG_NO_OUTPUT_FLAG)));
-        argLine.removeSwitch(SHORT_NO_OUTPUT_FLAG, LONG_NO_OUTPUT_FLAG);
-        setVerbose(argLine.hasArg(SHORT_VERBOSE_FLAG, LONG_VERBOSE_FLAG));
+        if(argLine.hasArg(SILENT_FLAG)) {
+            setOutputOn(false);
+            setVerbose(false);
+        }else{
+            if(argLine.hasArg(SHORT_SET_OUTPUT_FLAG, LONG_SET_OUTPUT_FLAG)){
+                String raw = argLine.getNextArgFor(SHORT_SET_OUTPUT_FLAG, LONG_SET_OUTPUT_FLAG);
+                Boolean bool = isTrue(raw);
+                if(bool != null){
+                    setOutputOn(bool);
+                }
+            }
+            setVerbose(argLine.hasArg(SHORT_VERBOSE_FLAG, LONG_VERBOSE_FLAG));
+        }
+        argLine.removeSwitchAndValue(SHORT_SET_OUTPUT_FLAG, LONG_SET_OUTPUT_FLAG);
         argLine.removeSwitch(SHORT_VERBOSE_FLAG, LONG_VERBOSE_FLAG);
+
 
         MyLoggingFacade myLoggingFacade = null;
 
@@ -930,7 +923,12 @@ public class CLIDriver {
         }
         setLogger(myLoggingFacade);
         boolean hasInputFile = argLine.hasArg(INPUT_FILE_FLAG);
-
+        if (argLine.hasArg(ENVIRONMENT_FLAG)) {
+            String envFile = argLine.getNextArgFor(ENVIRONMENT_FLAG);
+            argLine.removeSwitchAndValue(ENVIRONMENT_FLAG);
+            readEnv(envFile, false); // on init, silently ignore unless -v option enabled.
+            currentEnvFile = envFile;
+        }
         if (argLine.hasArg(OUTPUT_FILE_FLAG)) {
             setOutputFile(argLine.getNextArgFor(OUTPUT_FILE_FLAG));
             argLine.removeSwitchAndValue(OUTPUT_FILE_FLAG);
@@ -939,6 +937,7 @@ public class CLIDriver {
             String inputFileName = argLine.getNextArgFor(INPUT_FILE_FLAG);
             argLine.removeSwitchAndValue(INPUT_FILE_FLAG);
             BasicIO basicIO = new BasicIO();
+            setHasInputFile(true);
             try {
                 FileInputStream fis = new FileInputStream(inputFileName);
                 if (inputFileName.endsWith(".cmd")) {
@@ -997,6 +996,7 @@ public class CLIDriver {
                         say("error loading terminal type " + TERMINAL_TYPE_ANSI);
                     }
                     break;
+                case TERMINAL_TYPE_ASCII:
                 case TERMINAL_TYPE_TEXT:
                     setIOInterface(new BasicIO());
                     break;
@@ -1024,5 +1024,93 @@ public class CLIDriver {
             driver = new CLIDriver(); // plain vanilla instance
         }
         return driver;
+    }
+
+    protected void readEnv(String path, boolean verbose) {
+        // All errors loading the environment are benign.
+        File f = new File(path);
+        if (!f.exists()) {
+            if (verbose) say("Cannot read environment file \"" + path + "\"");
+            return;
+        }
+        if (!f.isFile()) {
+            if (verbose) say("\"" + path + "\" is not  file and cannot be read to set the environment.");
+            return;
+        }
+        String allLines = "";
+        try {
+            FileReader fileReader = new FileReader(f);
+            BufferedReader bf = new BufferedReader(fileReader);
+            String lineIn = bf.readLine();
+            while (lineIn != null) {
+                allLines = allLines + lineIn;
+                lineIn = bf.readLine();
+            }
+            bf.close();
+        } catch (Throwable t) {
+            if (verbose) say("Error loading environment: \"" + t.getMessage() + "\"");
+            if (isVerbose()) {
+                t.printStackTrace();
+            }
+
+        }
+        try {
+            JSONObject jsonObject = JSONObject.fromObject(allLines);
+            if (jsonObject != null && !jsonObject.isEmpty()) {
+                env = jsonObject;
+                return;
+            }
+        } catch (Throwable tt) {
+            // Must be a properties file...
+        }
+        // now figure out what the format is.
+        try {
+            XProperties xp = new XProperties();
+            xp.load(f);
+            if (!xp.isEmpty()) {
+                env = xp;
+            }
+        } catch (Throwable t) {
+            if (isVerbose()) {
+                t.printStackTrace();
+            }
+            if (verbose) say("Could not parse envirnoment file.");
+        }
+        currentEnvFile = path;
+    }
+
+    public String getCurrentEnvFile() {
+        return currentEnvFile;
+    }
+
+    public void setCurrentEnvFile(String currentEnvFile) {
+        this.currentEnvFile = currentEnvFile;
+    }
+
+    String currentEnvFile = null;
+
+    /**
+     * Strings that this will treat as equivalent to logical true.
+     */
+    public static String[] LOGICAL_TRUES = new String[]{"true", "ok", "yes", "1", "on", "yup", "yeah", "enable", "enabled"};
+
+    /**
+     * Strings this will treat as equivalent to logical false.
+     */
+    public static String[] LOGICAL_FALSES = new String[]{"false", "no", "0", "off", "nope", "nay", "disable", "disabled"};
+
+    /**
+     * This checks that the string is one of the allowed trues or false. Anything else returns a null.
+     * @param raw
+     * @return
+     */
+    public  Boolean isTrue(String raw) {
+        for(String s : LOGICAL_TRUES){
+            if(s.equals(raw)) return Boolean.TRUE;
+        }
+        for(String s : LOGICAL_FALSES){
+            if(s.equals(raw)) return Boolean.FALSE;
+        }
+        return null;
     }
 }

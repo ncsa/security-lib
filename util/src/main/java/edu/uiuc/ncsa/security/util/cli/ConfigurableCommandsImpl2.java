@@ -1,25 +1,21 @@
 package edu.uiuc.ncsa.security.util.cli;
 
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
-import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import edu.uiuc.ncsa.security.core.util.*;
-import net.sf.json.JSONObject;
+import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
+import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
-import java.util.logging.Level;
 
 /**
- * Basic implementation of Commands. This supports loading configurations.
+ * Basic implementation of Commands that supports loading configurations.
  * <b>NOTE</b> This does not actually run commands! It is a top-level class that delegates to its
  * command implementations (such as for stores, keys). Therefore, you should not put code here
  * that actually executes things. The contract of this is that it manages logging, loading configurations
@@ -27,39 +23,11 @@ import java.util.logging.Level;
  * <p>Created by Jeff Gaynor<br>
  * on 5/20/13 at  11:35 AM
  */
-public abstract class ConfigurableCommandsImpl implements Commands {
-    protected ConfigurableCommandsImpl(MyLoggingFacade logger) {
-        this.logger = logger;
+public abstract class ConfigurableCommandsImpl2 extends AbstractCommandsImpl {
+    public ConfigurableCommandsImpl2(CLIDriver driver) {
+        super(driver);
     }
 
-    /**
-     * returns "true if the command has the flag --help in it. This is a cue from the user to show
-     * the help for a given function. So it the function is called "X" and its help is in the function
-     * "showXHelp" then a value of true from this should simply invoke "showXHelp" and return.
-     *
-     * @param inputLine
-     * @return
-     */
-    protected boolean showHelp(InputLine inputLine) {
-        if ((1 < inputLine.size()) && inputLine.getArg(1).equals("--help")) return true;
-        return false;
-    }
-
-    @Override
-    public IOInterface getIOInterface() {
-        return getDriver().getIOInterface();
-    }
-
-
-    protected void say(String x) {
-        getIOInterface().println(x);
-    }
-
-    protected void sayv(String x) {
-        if (isVerbose()) {
-            say(x);
-        }
-    }
 
     public String getConfigName() {
         return configName;
@@ -80,44 +48,80 @@ public abstract class ConfigurableCommandsImpl implements Commands {
             showLoadHelp();
             return;
         }
-        if (inputLine.getArgCount() == 0) {
-            if (StringUtils.isTrivial(configName) && StringUtils.isTrivial(getConfigFile())) {
-                info("no configuration set");
-                sayv("no configuration set");
+        // These override the like-named class variables so if there is a loading error,
+        // current configuration is not munged. If the load works, then loadConfig resets
+        // the class variables.
+        String fileName = null;
+        String configName = null;
+
+        switch (inputLine.getArgCount()) {
+            case 0: // query current config
+                if (StringUtils.isTrivial(configName) && StringUtils.isTrivial(getConfigFile())) {
+                    info("no configuration set");
+                    sayv("no configuration set");
+                    return;
+                }
+                String m = StringUtils.isTrivial(configName) ? "no config name" : "current config name= \"" + configName;
+                m = m + " " + (StringUtils.isTrivial(getConfigFile()) ? "no file set" : ("from file " + getConfigFile()));
+                info(m);
+                sayv(m);
                 return;
-            }
-            String m = StringUtils.isTrivial(configName) ? "no config name" : "current config name= \"" + configName;
-            m = m + " " + (StringUtils.isTrivial(getConfigFile()) ? "no file set" : ("from file " + getConfigFile()));
-            info(m);
-            sayv(m);
+            case 1: // either -list or set the name
+                if (inputLine.hasArg(LIST_CFGS)) {
+                    listConfigs(inputLine);
+                    // no way to return a value and have it findable with introspection (since signature would change).
+                    // Only way to send notification.
+                    return;
+                    //  throw new ListOnlyNotification();
+                }
+                if (StringUtils.isTrivial(getConfigFile())) {
+                    say("no config file set");
+                    return;
+                }
+                configName = inputLine.getArg(1);
+                loadConfig(getConfigFile(), configName);
+                say("loaded " + configName);
+                return;
+            case 2:
+                if (inputLine.hasArg(LIST_CFGS)) {
+                    listConfigs(inputLine);
+                    // no way to return a value and have it findable with introspection (since signature would change).
+                    // Only way to send notification.
+                    throw new ListOnlyNotification();
+                }
+                configName = inputLine.getArg(1);
+                fileName = inputLine.getArg(2);
+                break;
+            default:
+                if (inputLine.hasArg(CONFIG_FILE_OPTION, CONFIG_FILE_LONG_OPTION)) {
+                    fileName = inputLine.getNextArgFor(CONFIG_FILE_OPTION, CONFIG_FILE_LONG_OPTION);
+                    inputLine.removeSwitchAndValue(CONFIG_FILE_OPTION, CONFIG_FILE_LONG_OPTION);
+                }
+                if (inputLine.hasArg(CONFIG_NAME_OPTION, CONFIG_NAME_LONG_OPTION)) {
+                    configName = inputLine.getNextArgFor(CONFIG_NAME_OPTION, CONFIG_NAME_LONG_OPTION);
+                    inputLine.removeSwitchAndValue(CONFIG_NAME_OPTION, CONFIG_NAME_LONG_OPTION);
+                }
+        }
+        if (fileName == null) {
+            say("no configuration file specified");
+            return;
+        }
+        if (configName == null) {
+            say("no configuration name specified");
             return;
         }
 
-        if (inputLine.hasArg(LIST_CFGS)) {
-            listConfigs(inputLine);
-            // no way to return a value and have it findable with introspection (since signature would change).
-            // Only way to send notification. 
-            throw new ListOnlyNotification();
+        File f = new File(fileName);
+        if (!f.exists()) {
+            throw new MyConfigurationException("sorry, file does not exist: " + fileName);
+        }
+        if (f.isDirectory()) {
+            throw new MyConfigurationException("sorry, \" + fileName + \" is a directory");
+        }
+        if (!f.canRead()) {
+            throw new MyConfigurationException("sorry, \" + fileName + \" is not readable");
         }
 
-        String fileName = null;
-        configName = inputLine.getArg(1);
-
-        if (2 < inputLine.size()) {
-            fileName = inputLine.getArg(2);
-            File f = new File(fileName);
-            if (!f.exists()) {
-                throw new MyConfigurationException("sorry, file does not exist: " + fileName);
-            }
-            if (f.isDirectory()) {
-                throw new MyConfigurationException("sorry, \" + fileName + \" is a directory");
-            }
-            if (!f.canRead()) {
-                throw new MyConfigurationException("sorry, \" + fileName + \" is not readable");
-            }
-        } else {
-            fileName = getConfigFile();
-        }
         sayv("loading configuration from " + fileName + ", named " + configName);
         loadConfig(fileName, configName);
         sayv("done!");
@@ -125,6 +129,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
 
     boolean traceOn = false;
 
+/*
     public void trace(InputLine inputLine) throws Exception {
         if (inputLine.getArgCount() == 0 || showHelp(inputLine)) {
             say("trace [on  off] ");
@@ -144,15 +149,16 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         }
         say("trace " + (traceOn ? "on" : "off"));
     }
+*/
 
-    protected String FILE_SWITCH = "-file";
+    protected String CFG_FILE_SWITCH = "-cfg";
 
     protected void listConfigs(InputLine inputLine) throws Exception {
 
         String targetFilename = getConfigFile();
-        if (inputLine.hasArg(FILE_SWITCH)) {
-            targetFilename = inputLine.getNextArgFor(FILE_SWITCH);
-            inputLine.removeSwitchAndValue(FILE_SWITCH);
+        if (inputLine.hasArg(CFG_FILE_SWITCH)) {
+            targetFilename = inputLine.getNextArgFor(CFG_FILE_SWITCH);
+            inputLine.removeSwitchAndValue(CFG_FILE_SWITCH);
         }
         if (StringUtils.isTrivial(targetFilename)) {
             say("Sorry no configuration file specified.");
@@ -212,15 +218,22 @@ public abstract class ConfigurableCommandsImpl implements Commands {
     String LIST_CFGS = "-list";
 
     protected void showLoadHelp() {
-        say("load [" + FILE_SWITCH + " config_file] " + LIST_CFGS + " = list the configurations by name in the file or current file");
-        say("load [config_name config_file]  a configuration from the file. The options are");
-        say("   load - displays current configuration file and name of the current configuration.");
-        say("   load configName - loads the named configuration from the currently active configuration file.");
-        say("   load configName fileName - loads the configuration named \"configName\" from the fully qualified name of the file and sets it active");
+        say("load  = list the currently set configurations");
+        say("load config_name = Load the named configuration from the current file");
+        say("load config_name config_file= Set the configuration file, then load the named configuration");
+        say("load " + LIST_CFGS + "= list all configurations in the current file");
+        say("load " + LIST_CFGS + " config_file= list all configurations in the given file. Does not change configuration file.");
+        say("You can set these using the positions of the arguments. Optionally you can also designate them with switches:");
+        say("load [" + CONFIG_FILE_OPTION + "|" + CONFIG_FILE_LONG_OPTION  + "] config_file + [" +
+                CONFIG_NAME_OPTION + " | " + CONFIG_NAME_LONG_OPTION + " ] config_name");
+        say("The advantage of flags is that order does not matter. Note that if you use switches, you must use both.");
         say("\nExample\n");
         say("   load default /var/www/config/config.xml \n");
         say("loads the configuration named \"default\" from the file named \"config.xml\" in the directory \"/var/www/config\"\n");
         say("Note that after a load, any new configuration file becomes the default for future load operations.");
+        say("Or the equivalent");
+        say("   load "+ CONFIG_NAME_OPTION+" default " + CONFIG_FILE_OPTION + " /var/www/config/config.xml \n");
+
     }
 
 
@@ -238,10 +251,10 @@ public abstract class ConfigurableCommandsImpl implements Commands {
 
     AbstractEnvironment environment;
 
-    ConfigurationNode configurationNode;
 
     /**
      * For the configuration. This is the tag name (e.g. "client" or "server") in the XML file.
+     * Note this is used by subclasses in other projects.
      *
      * @return
      */
@@ -251,43 +264,19 @@ public abstract class ConfigurableCommandsImpl implements Commands {
 
     public abstract void setLoader(ConfigurationLoader<? extends AbstractEnvironment> loader);
 
-
-    public static final String VERBOSE_OPTION = "v"; // if present do a backup of the target to a backup schema.
-    public static final String VERBOSE_LONG_OPTION = "verbose"; // if present do a backup of the target to a backup schema.
-
-    public static final String DEBUG_OPTION = "d"; // if present do a backup of the target to a backup schema.
-    public static final String DEBUG_LONG_OPTION = "debug"; // if present do a backup of the target to a backup schema.
-
-
-    public static final String LOG_FILE_OPTION = "log"; // if present do a backup of the target to a backup schema.
-    public static final String LOG_FILE_LONG_OPTION = "logFile"; // if present do a backup of the target to a backup schema.
-
-    // other options
-    public static final String HELP_OPTION = "h";
-    public static final String HELP_LONG_OPTION = "help";
-
-    public static final String INPUT_OPTION = "in";
-    public static final String OUTPUT_OPTION = "out";
-    public static final String COMMENT_START_OPTION = "comment";
-    public static String COMMENT_START = "#";
-
-
     public static final String CONFIG_FILE_OPTION = "-cfg";
     public static final String CONFIG_FILE_LONG_OPTION = "-configFile";
 
-    public static final String ENV_OPTION = "-set_env";
-    public static final String ENV_LONG_OPTION = "-set_env";
-
     public static final String CONFIG_NAME_OPTION = "-name";
-    public static final String CONFIG_NAME_LONG_OPTION = "-name";
+    public static final String CONFIG_NAME_LONG_OPTION = "-configName";
 
-    public Map<Object, Object> getGlobalEnv() {
-        return globalEnv;
+    @Override
+    protected void initHelp() throws Throwable {
+        super.initHelp();
+        getHelpUtil().load("/cci_help.xml");
+
     }
-
-    Map<Object, Object> globalEnv;
-    String currentEnvFile = null;
-
+/*
     protected void readEnv(String path, boolean verbose) {
         // All errors loading the environment are benign.
         File f = new File(path);
@@ -341,16 +330,14 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         currentEnvFile = path;
     }
 
-/*    @Override
-    public void print_help() throws Exception {
-        say("Need to write help.");
-    }*/
+*/
+
 
     /**
      * Called at initialization to read and process the command line arguments.
      * NOTE that this is not called in this class, but by inheritors.
      */
-    protected void initialize() {
+    public void initialize() {
         if (getConfigFile() == null || getConfigFile().length() == 0) {
             say("Warning: no configuration file specified. type in 'load --help' to see how to load one.");
             return;
@@ -374,6 +361,13 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         }
     }
 
+    /**
+     * Loads the configuration and sets the filename and configuration given as the current ones.
+     *
+     * @param filename
+     * @param configName
+     * @throws Throwable
+     */
     protected void loadConfig(String filename, String configName) throws Throwable {
         if (filename == null) {
             throw new MyConfigurationException("Error: no configuration file specified");
@@ -414,14 +408,6 @@ public abstract class ConfigurableCommandsImpl implements Commands {
      */
     @Override
     public InputLine bootstrap(InputLine args) throws Throwable {
-        if (args.hasArg(VERBOSE_OPTION, VERBOSE_LONG_OPTION)) {
-            setVerbose(true);
-            args.removeSwitch(VERBOSE_OPTION, VERBOSE_LONG_OPTION);
-        }
-        if (args.hasArg(DEBUG_OPTION, DEBUG_LONG_OPTION)) {
-            setDebugOn(true);
-            args.removeSwitch(DEBUG_OPTION, DEBUG_LONG_OPTION);
-        }
         if (args.hasArg(CONFIG_FILE_OPTION, CONFIG_FILE_LONG_OPTION)) {
             setConfigFile(args.getNextArgFor(CONFIG_FILE_OPTION, CONFIG_FILE_LONG_OPTION));
             args.removeSwitchAndValue(CONFIG_FILE_OPTION, CONFIG_FILE_LONG_OPTION);
@@ -430,105 +416,9 @@ public abstract class ConfigurableCommandsImpl implements Commands {
             setConfigName(args.getNextArgFor(CONFIG_NAME_OPTION, CONFIG_NAME_LONG_OPTION));
             args.removeSwitchAndValue(CONFIG_NAME_OPTION, CONFIG_NAME_LONG_OPTION);
         }
-        if (args.hasArg(ENV_OPTION, ENV_LONG_OPTION)) {
-            String envFile = args.getNextArgFor(ENV_OPTION, ENV_LONG_OPTION);
-            args.removeSwitchAndValue(ENV_OPTION, ENV_LONG_OPTION);
-            readEnv(envFile, false); // on init, silently ignore unless -v option enabled.
-            currentEnvFile = envFile;
-        }
-        initialize();
-        return args;// now try to get everything.
+        return super.bootstrap(args);
     }
 
-
-    boolean debugOn = true;
-
-    public boolean isDebugOn() {
-        return debugOn;
-    }
-
-    public void setDebugOn(boolean setOn) {
-        this.debugOn = setOn;
-    }
-
-    public void setMyLogger(MyLoggingFacade myLoggingFacade) {
-        logger = myLoggingFacade;
-
-    }
-
-    public MyLoggingFacade getMyLogger() {
-        if (logger == null) {
-            //  LoggerProvider loggerProvider = new LoggerProvider(getLogfileName(), "cli logger", 1, 1000000, isDebugOn(), true);
-            LoggerProvider loggerProvider = new LoggerProvider("log.xml", "cli logger", 1, 1000000, true, true, Level.INFO);
-            logger = loggerProvider.get();
-        }
-        return logger;
-    }
-
-    transient MyLoggingFacade logger;
-
-    protected boolean hasLogger() {
-        return logger != null;
-    }
-    @Override
-    public void debug(String x) {
-        if (isVerbose()) {
-            say(x);
-        }
-        if(hasLogger()) {
-            getMyLogger().debug(x);
-        }
-    }
-
-    public void info(String x) {
-        if (isVerbose()) {
-            say(x);
-        }
-        if(hasLogger()) {
-            getMyLogger().info(x);
-        }
-    }
-
-    public void warn(String x) {
-        if (isVerbose()) {
-            say(x);
-        }
-        if(hasLogger()) {
-            getMyLogger().warn(x);
-        }
-    }
-
-    public void error(String x) {
-        if (isVerbose()) {
-            say(x);
-        }
-        if(hasLogger()) {
-            getMyLogger().error(x);
-        }
-    }
-
-    boolean verbose;
-    
-    public boolean isVerbose() {
-        return verbose;
-    }
-
-    public void setVerbose(boolean verbose) {
-        this.verbose = verbose;
-    }
-
-    /**
-     * This will take a String and append the correct number of blanks on the
-     * left so it is the right width. This is used for making the banner.
-     * <h2>Used extensively in subclasses for formatting help</h2>
-     *
-     * @return
-     * @deprecated use {@link StringUtils#pad2(String, int)}
-     */
-    protected String padLineWithBlanks(String x, int width) {
-        // argh!
-        return StringUtils.pad2(x, width);
-    }
 
     public abstract void useHelp();
 
@@ -563,7 +453,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
      * @return
      */
 
-    protected boolean switchOrRun(InputLine inputLine, CommonCommands commands) {
+    protected boolean switchOrRun(InputLine inputLine, CommonCommands2 commands) {
         boolean switchComponent = 1 < inputLine.getArgCount();
 
         CLIDriver currentDriver = commandStack.peek();
@@ -578,7 +468,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         CLIDriver cli = new CLIDriver();
         cli.setIOInterface(getIOInterface());
         cli.addCommands(commands);
-        cli.setEnv(getGlobalEnv());
+        //cli.setEnv(getGlobalEnv());
         if (this instanceof ComponentManager) {
             cli.setComponentManager((ComponentManager) this);
         }
@@ -599,11 +489,6 @@ public abstract class ConfigurableCommandsImpl implements Commands {
      */
     Stack<CLIDriver> commandStack = new Stack<>();
 
-    @Override
-    public CLIDriver getDriver() {
-        return driver;
-    }
-
     /**
      * Back reference to the driver for this class
      *
@@ -612,11 +497,10 @@ public abstract class ConfigurableCommandsImpl implements Commands {
     @Override
     public void setDriver(CLIDriver driver) {
         commandStack.push(driver);
-        if (driver.getLogger() != null) {
+        super.setDriver(driver);
+/*        if (driver.getLogger() != null) {
             setMyLogger(driver.getLogger());
-        }
-        this.driver = driver;
+        }*/
     }
 
-    CLIDriver driver;
 }

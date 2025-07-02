@@ -9,15 +9,28 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Batch file processign with indices. This should be kept, but probably best replaced by hijacking System.in">
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="https://github.com/ncsa/security-lib/issues/54">
+      <change afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/AbstractCommandsImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CommonCommands2.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl2.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/TestCCI.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/util/src/main/resources/cci_help.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/core/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/log.xml" beforeDir="false" afterPath="$PROJECT_DIR$/log.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/cli/SASCLIDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/cli/SASCLIDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreTester.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/resources/common_commands_help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/resources/common_commands_help.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/Commands.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/Commands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CommonCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CommonCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/TestCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/TestCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/testing/TestConfigLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/testing/TestConfigLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/testing/TestData.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/testing/TestData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/testing/TestEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/testing/TestEnvironment.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -101,7 +114,9 @@
     "Application.SASWatcher.executor": "Run",
     "Application.StoreArchiver.executor": "Run",
     "Application.StringUtils.executor": "Run",
-    "Application.TestCommands.executor": "Debug",
+    "Application.TestCCI.executor": "Run",
+    "Application.TestCommands.executor": "Run",
+    "Application.TestConfigLoader.executor": "Run",
     "Application.WebClientConfig.executor": "Run",
     "Application.WebInstaller.executor": "Run",
     "DefaultHtmlFileTemplate": "HTML File",
@@ -125,6 +140,11 @@
     "project.structure.side.proportion": "0.5883041",
     "settings.editor.selected.configurable": "preferences.lookFeel",
     "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "XML"
+    ]
   }
 }]]></component>
   <component name="RecentsManager">
@@ -136,8 +156,8 @@
       <recent name="$PROJECT_DIR$/core/src/test/resources/cfg_loader" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/web-installer/src/main/resources/base" />
       <recent name="$PROJECT_DIR$/util/src/main/resources" />
+      <recent name="$PROJECT_DIR$/web-installer/src/main/resources/base" />
       <recent name="$PROJECT_DIR$/sas-server/src/main/webapp" />
       <recent name="$PROJECT_DIR$/skin/src/main/resources/css" />
       <recent name="$PROJECT_DIR$/sas-server/src/main" />
@@ -156,12 +176,14 @@
       <recent name="edu.uiuc.ncsa.security.util" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="edu.uiuc.ncsa.security.util.cli" />
+      <recent name="edu.uiuc.ncsa.security.storage.cli" />
       <recent name="edu.uiuc.ncsa.sas.io" />
       <recent name="edu.uiuc.ncsa.security.storage.monitored.upkeep" />
       <recent name="edu.uiuc.ncsa.security.util.mail" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.TestCommands">
+  <component name="RunManager" selected="Application.TestCCI">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -180,19 +202,6 @@
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="edu.uiuc.ncsa.security.util.cli.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="CertUtil" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.crypto.CertUtil" />
-      <module name="core" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.util.crypto.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -238,20 +247,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="SASCommands" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.sas.admin.SASCommands" />
-      <module name="sas-server" />
-      <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/sas/sat.xml -name oa4mp" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.sas.admin.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="StringUtils" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.util.StringUtils" />
       <module name="core" />
@@ -266,12 +261,40 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="TestCCI" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.cli.TestCCI" />
+      <module name="util" />
+      <option name="PROGRAM_PARAMETERS" value="test0 $APPLICATION_CONFIG_DIR$/scratches/test_cfg.xml  " />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.util.cli.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="TestCommands" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.cli.TestCommands" />
       <module name="util" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="edu.uiuc.ncsa.security.util.cli.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TestConfigLoader" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.testing.TestConfigLoader" />
+      <module name="util" />
+      <option name="PROGRAM_PARAMETERS" value="$APPLICATION_CONFIG_DIR$/scratches/test_cfg.xml test0" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.util.testing.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -409,20 +432,20 @@
       <item itemvalue="Application.SASCLIDriver" />
       <item itemvalue="Application.SAS Client" />
       <item itemvalue="Application.WebInstaller" />
+      <item itemvalue="Application.TestCCI" />
+      <item itemvalue="Application.TestConfigLoader" />
       <item itemvalue="Application.TestCommands" />
       <item itemvalue="Application.DDParser" />
       <item itemvalue="Application.StringUtils" />
-      <item itemvalue="Application.CertUtil" />
-      <item itemvalue="Application.SASCommands" />
       <item itemvalue="Tomcat Server.SAS Servlet" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.TestCCI" />
+        <item itemvalue="Application.TestConfigLoader" />
         <item itemvalue="Application.TestCommands" />
         <item itemvalue="Application.StringUtils" />
         <item itemvalue="Application.DDParser" />
-        <item itemvalue="Application.SASCommands" />
-        <item itemvalue="Application.CertUtil" />
       </list>
     </recent_temporary>
   </component>
@@ -598,7 +621,7 @@
       <workItem from="1747752972503" duration="417000" />
       <workItem from="1747765002584" duration="599000" />
       <workItem from="1747997704045" duration="599000" />
-      <workItem from="1750287141371" duration="83479000" />
+      <workItem from="1750287141371" duration="162195000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -943,7 +966,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="100" />
+    <option name="localTasksCounter" value="101" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -952,7 +975,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="https://github.com/ncsa/security-lib/issues/40" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/41 Let the comnfigurable commnads (for the CLC) specify -in and -out files for batch processing." />
     <MESSAGE value="Update website" />
     <MESSAGE value="Improved the echo http request facility to print the body of the POST nicely, since otherwise large POSTs were just a mess to read." />
@@ -977,7 +999,8 @@
     <MESSAGE value="Fix https://github.com/ncsa/security-lib/issues/52" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/53 Removed functor code &amp; tests" />
     <MESSAGE value="Batch file processign with indices. This should be kept, but probably best replaced by hijacking System.in" />
-    <option name="LAST_COMMIT_MESSAGE" value="Batch file processign with indices. This should be kept, but probably best replaced by hijacking System.in" />
+    <MESSAGE value="https://github.com/ncsa/security-lib/issues/54" />
+    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/54" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -1090,7 +1113,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>3053</line>
+          <line>3054</line>
           <option name="timeStamp" value="105" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1104,11 +1127,6 @@
           <option name="timeStamp" value="111" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java</url>
-          <line>405</line>
-          <option name="timeStamp" value="119" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/batch/DDParser.java</url>
           <line>62</line>
           <option name="timeStamp" value="121" />
@@ -1119,9 +1137,44 @@
           <option name="timeStamp" value="127" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/AbstractCommandsImpl.java</url>
+          <line>418</line>
+          <option name="timeStamp" value="131" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/TestCCI.java</url>
+          <line>203</line>
+          <option name="timeStamp" value="142" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl2.java</url>
+          <line>56</line>
+          <option name="timeStamp" value="144" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/TestCCI.java</url>
+          <line>100</line>
+          <option name="timeStamp" value="146" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java</url>
-          <line>443</line>
-          <option name="timeStamp" value="128" />
+          <line>375</line>
+          <option name="timeStamp" value="147" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl2.java</url>
+          <line>181</line>
+          <option name="timeStamp" value="148" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/testing/TestConfigLoader.java</url>
+          <line>152</line>
+          <option name="timeStamp" value="149" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java</url>
+          <line>611</line>
+          <option name="timeStamp" value="151" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -1,0 +1,283 @@
+
+<html>
+    <entry id="clear_env">
+    <body>
+    <![CDATA[Command.
+Clear the environment]]>
+    </body>
+    </entry>
+    <entry id="environment">
+    <body>
+    <![CDATA[A properties file that contains values that are useful. These are accessed
+using the construct ${key} and replaced before any processing takes place. This allows
+for shorthand to be used for commands.
+
+See also: set_env, get_env, print_env, read_env, save_env]]>
+    </body>
+    </entry>
+    <entry id="set_env">
+    <body>
+    <![CDATA[Command.
+Set a value in the environment.
+
+See also: get_env, clear_env, print_env, read_env, save_env]]>
+    </body>
+    </entry>
+    <entry id="get_env">
+    <body>
+    <![CDATA[Command.
+Retrieve a specific value from the environment.
+
+See also: get_env, clear_env, print_env, read_env, save_env]]>
+    </body>
+    </entry>
+    <entry id="print_env">
+    <body>
+    <![CDATA[Command.
+Print out the entire environment.
+
+See also: get_env, clear_env, get_env, read_env, save_env]]>
+    </body>
+    </entry>
+    <entry id="read_env">
+    <body>
+    <![CDATA[Command.
+Read the stored environment from a file.
+
+See also: get_env, clear_env, print_env, save_env, set_env]]>
+    </body>
+    </entry>
+    <entry id="save_env">
+    <body>
+    <![CDATA[Command.
+Save the current environment to a file. This may be read later and re-used.
+
+See also: get_env, clear_env, print_env, read_env, set_env]]>
+    </body>
+    </entry>
+    <entry id="echo">
+    <body>
+    <![CDATA[Command.
+Simply print the argument to the console. This is very useful in types of scripting
+for output.
+
+See also: set_output_on]]>
+    </body>
+    </entry>
+    <entry id="commands">
+    <body>
+    <![CDATA[Commands are directives for the CLI to perform tasks on store object
+such as serialization. Help here is rather short for any given command and the reason
+is that every command has its own help facility. Simply type
+
+command --help
+
+E.g.
+
+get_env --help
+
+to get a great deal of help. ]]>
+    </body>
+    </entry>
+    <entry id="set_output_on">
+    <body>
+    <![CDATA[Command.
+Toggle output on or off. This is used in scripts where you do not want the usually
+chatty CLI to print what it is doing.]]>
+    </body>
+    </entry>
+    <entry id="set_verbose_on">
+    <body>
+    <![CDATA[Command.
+If this is on, then additional output may be printed as the CLI operates.]]>
+    </body>
+    </entry>
+    <entry id="version">
+    <body>
+    <![CDATA[Command.
+Print the current version number to the console.]]>
+    </body>
+    </entry>
+    <entry id="invocation">
+        <body>
+            <![CDATA[The basic command line options for starting the CLI.
+When starting the CLI, you may specify the following flags and values. These will
+be processed.
+
+-----------+-----+------------------------------------------------
+Argument   |Type |   Description
+-----------+-----+------------------------------------------------
+-setOutput |  B  | Set all output on or off
+-----------+-----+------------------------------------------------
+-v         |  F  | Turn verbose mode on. This makes the output very chatty
+           |     |  You can also use the argument -verbose
+-----------+-----+------------------------------------------------
+-log       |  P  | Full path to the log file.
+-----------+-----+------------------------------------------------
+-env       |  P  | Full path to the environment file.
+-----------+-----+------------------------------------------------
+-tty       |  S  | ansi | ascii | text. Terminal type. ascii and text are
+           |     | the same.
+-----------+-----+------------------------------------------------
+-in        |  P  | full path to an input file. The commands from this file will
+           |     | be read as if typed from the terminal, and the CLI will exit
+           |     | when it is done.  You may also use the command file format.
+           |     | See help for input_file
+-----------+-----+------------------------------------------------
+-out       | P   | full path to an output file. All console output will be directed
+           |     | to this file, so nothing will be printed.
+           |     | Note that if you set output off, then nothing is piped to this file.
+-----------+-----+------------------------------------------------
+-run       | S   | Take the rest of the line from this argument and execute it on
+           |     | startup. The CLI will then resume normal operation.
+-----------+-----+------------------------------------------------
+-silent    | F   | Disable all output. Same as setting verbose to false and
+           |     | setOutput to false.
+-----------+-----+------------------------------------------------
+Note you can get more detailed help by invoking help with the argument, e.g.
+
+cli>/help -tty
+
+key:
+type:
+  B = boolean
+  S = string
+  F =  flag. Present or not, no argument
+  P = full path to a file
+Boolean options accept:
+    true  | on  | enable  | enabled  | 1 | yes | ok   (for logical true)
+    false | off | disable | disabled | 0 | no         ( for logical false)
+
+]]>
+        </body>
+        <example>
+            <![CDATA[Assuming your jar is cli.jar,
+E.g. 1, Get help only
+$>java -jar cli.jar help
+
+E.g. 2, Run an input file in_file.cmd and pipe the output to out_file.txt
+$>java -jar cli.jar -in /path/to/in_file.cml -out /path/to/out_file.txt
+
+E.g. 3 start the CLI and execute a single startup command
+$>java -jar cli.jar -tty ansi -run use clients
+  clients>
+
+This starts the CLI and executes the command "use clients" which (in the case of
+OA4MP, e.g.) starts up the client component. The terminal mode is set to ansi.
+   ]]>
+        </example>
+    </entry>
+
+    <entry id="-tty">
+        <body>
+            <![CDATA[The CLI can run in one of two modes:
+ascii/text = standard Java mode. This works across all platforms but is very,
+             very limited in that it can do. This is the default.
+      ansi = (ISO 6429) This allows for editing the current line with cursor keys,
+             and command completion (with tab). This makes the CLI behave much
+             more like a standard command line program. The downside is that
+             it *may* not behave well in certain environments.
+
+You set the mode at invocation (see help for that) with the -tty switch. Once set
+it cannot be changed during that session.
+
+See also: invocation]]>
+        </body>
+    </entry>
+    <entry id="-v">
+        <body>
+            <![CDATA[Sets the output mode to verbose at invocation. This may
+be changed using the set_verbose_on command.
+
+See also: /trace, set_output_on]]>
+        </body>
+    </entry>
+    <entry id="-in">
+        <body>
+            <![CDATA[Set the input file. The argument is the fully qualified path.
+There is a reserved format for files with extension ".cmd" (aka command files) which
+consists of
+1. Comments are single line and the first non-blank character is #
+2. Commands may span multiple lines, but end with a semi-colon ";"
+
+Command files are mostly syntactic sugar but if they are complex, allow for
+must better visualization, especially if there is complex input, such as long
+arguments.
+
+Otherwise, any file can be used and each line is treated as a command, just as
+if you typed it in.
+
+All commands are pre-processed for environment variables before execution.
+
+Output will be to the console unless you specify an output file with -out.
+
+See also: invocation, -out, -run]]>
+        </body>
+    </entry>
+    <entry id="-out">
+        <body>
+            <![CDATA[Set the output file. The argument is the fully qualified path.
+All output from the console is sent to this file. If you set output to off, then
+no output is generated.
+
+
+See also: -in, invocation, -run]]>
+        </body>
+    </entry>
+    <entry id="-slient">
+        <body>
+            <![CDATA[Alias for no output, verbose off.
+mostly this is a convenience so you can do something like
+
+$> java -jar cli.jar -verbose -outputOn true {bunch of arguments} -silent
+
+I.e. set up your command line, then turn off output as part of running it. ]]>
+        </body>
+    </entry>
+    <entry id="-log">
+        <body>
+            <![CDATA[Set a log file. The argument is the fully qualified path.
+If omitted, no logging is done. Logging is normally set to give feedback
+on how the CLI itself is running and may or may not be of interest.]]>
+        </body>
+    </entry>
+    <entry id="-env">
+        <body>
+            <![CDATA[Set the environment at startup. The argument is the fully qualified path.
+You can set the environment at startup as well as loading it during execution.
+
+See also: environment, set_env, invocation]]>
+        </body>
+    </entry>
+    <entry id="-run">
+        <body>
+            <![CDATA[Take the rest of the invocation line and execute it.
+This allows you to run a single command as part of startup. The CLI
+will operate as if you typed that in initially. This lets you, for instance,
+select a component on startup. If there is an input file, this is ignored.
+
+See also: invocation, -in, -out.]]>
+        </body>
+    </entry>
+</html>
+
+ <!--
+ entry templates, without and with examples. These are not indented since
+ we need to control whitespace and our ever so helpful editor adds it when
+ any is detected, leading to bad output.
+
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+</entry>
+
+<entry id="">
+<body>
+<![CDATA[]]>
+</body>
+<example>
+<![CDATA[]]>
+</example>
+</entry>
+          -->

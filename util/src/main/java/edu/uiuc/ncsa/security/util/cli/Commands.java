@@ -25,13 +25,11 @@ public interface Commands extends Logable, Serializable {
      * @return java.lang.String
      */
     String getPrompt();
-    void print_help() throws Exception;  // replaced by CLI Driver /help facility which is much better.
+    //void print_help() throws Exception;  // replaced by CLI Driver /help facility which is much better.
 
-    void bootstrap(InputLine inputLine) throws Throwable;
+    InputLine bootstrap(InputLine inputLine) throws Throwable;
 
-    HelpUtil getHelpUtil();
     IOInterface getIOInterface();
-    void setIOInterface(IOInterface io);
     String getName();
 
     /**
