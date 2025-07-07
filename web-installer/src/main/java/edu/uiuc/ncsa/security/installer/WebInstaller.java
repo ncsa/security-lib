@@ -42,6 +42,7 @@ public class WebInstaller {
     static protected final String OA4MP_FLAG = "-oa4mp";
     static protected final String ALL_FLAG = "-all";
     static protected final String VERSION_FLAG = "-version";
+    static protected final String PREPROCESS_FLAG = "-preprocess";
     static protected final String VERSION_LATEST = "latest";
     static public final Boolean USE_TEMPLATES_DEFAULT = false;
     static public final Boolean EXECUTABLE_DEFAULT = false;
@@ -91,6 +92,9 @@ public class WebInstaller {
             say(DIR_ARG + " root = install to the given directory. If omitted, you will be prompted.");
             say(LOG_ARG + " file = file for logging. It will be overwritten as needed.");
             say(VERSION_FLAG + " = Specify a version for " + getAppName());
+            say(PREPROCESS_FLAG + " = Specify a file or directory for pre-processing. This lets the installer");
+            say("          operate on extensions and scripts. At the end, all templates will be replaced with");
+            say("          the current values. Note, only operates during " + INSTALL_OPTION + " or " + UPDATE_OPTION + ".");
             printMoreArgHelp();
             say("--------------");
             say("Flags are:");
@@ -409,6 +413,7 @@ public class WebInstaller {
         if (getArgMap().isShowReleaseNotes()) {
             return true;
         }
+
         if (dirList == null) {
             // so this is not registered as a version
             throw new FileNotFoundException("no such version \"" + getArgMap().getVersion() + "\"");
@@ -483,20 +488,23 @@ public class WebInstaller {
 
     ArgMap argMap = null;
 
+    /**
+     * This can't run since its just the superclass, so the main method is to
+     * let us test if it bootstraps right, reads arguments, etc.
+     * @param args
+     */
     public static void main(String[] args) {
         WebInstaller webInstaller = new WebInstaller();
         try {
-            System.out.println(webInstaller.getID(1));
-            System.out.println(webInstaller.getID(2));
-            System.out.println(webInstaller.getID(3));
-/*
+
+
             if (webInstaller.init(args)) {
                 webInstaller.process();
                 webInstaller.shutdown();
             } else {
                 webInstaller.showHelp();
             }
-*/
+
         } catch (Throwable t) {
             System.out.println(t.getMessage());
             if (webInstaller.isDebugOn()) {
@@ -516,6 +524,11 @@ public class WebInstaller {
     File root;
 
 
+    /**
+     * Apply the templates to the argument (the current line usually).
+     * @param currentLine
+     * @return
+     */
     protected String doReplace(String currentLine) {
         for (String key : templates.keySet()) {
             if (currentLine.contains(key)) {
@@ -574,6 +587,9 @@ public class WebInstaller {
      */
     protected Map<String, String> setupTemplates() throws IOException {
         templates = new HashMap<>();
+        if(!getArgMap().hasRootDir()) {
+            throw new IllegalArgumentException("root directory not set");
+        }
         templates.put("${ROOT}", getArgMap().getRootDir().getAbsolutePath() + File.separator);
         return templates;
     }
@@ -664,6 +680,28 @@ public class WebInstaller {
         if (getArgMap().isPacerOn()) {
             pacer.pace(doneCount, " files processed  of " + totalFileCount + " (" + ((100 * doneCount) / totalFileCount) + "%)");
             say("\n"); // spacer after last pacer call
+        }
+        if(getArgMap().isPreprocess()){
+            File f = getArgMap().getPreprocessDir();
+            File[] files = null;
+            if(!f.exists()){
+                say("no preprocess file or directory found for \"" + f.getAbsolutePath() + "\"");
+            }else {
+                if(f.isDirectory()){
+                    files = f.listFiles();
+                }else{
+                    files = new File[]{f};
+                }
+            }
+            if(files == null) {
+                say("no preprocess file or directory found for \"" + f.getAbsolutePath() + "\"");
+            }else{
+                say("pre-processing " + f.getAbsolutePath() );
+                for(File ff : files){
+                    processTemplates(ff);
+                }
+                say("pre-processed " + files.length + " file(s)");
+            }
         }
         if (doneCount != totalFileCount) {
             if (getArgMap().isLoggingEnabled()) {

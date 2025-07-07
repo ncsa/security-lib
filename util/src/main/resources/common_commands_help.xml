@@ -122,7 +122,7 @@ Argument   |Type |   Description
 -in        |  P  | full path to an input file. The commands from this file will
            |     | be read as if typed from the terminal, and the CLI will exit
            |     | when it is done.  You may also use the command file format.
-           |     | See help for input_file
+           |     | See help for -in
 -----------+-----+------------------------------------------------
 -out       | P   | full path to an output file. All console output will be directed
            |     | to this file, so nothing will be printed.
@@ -197,6 +197,7 @@ See also: /trace, set_output_on]]>
             <![CDATA[Set the input file. The argument is the fully qualified path.
 There is a reserved format for files with extension ".cmd" (aka command files) which
 consists of
+
 1. Comments are single line and the first non-blank character is #
 2. Commands may span multiple lines, but end with a semi-colon ";"
 
@@ -210,6 +211,11 @@ if you typed it in.
 All commands are pre-processed for environment variables before execution.
 
 Output will be to the console unless you specify an output file with -out.
+
+This will suppress output unless you specifically turn it on and suppresses
+printing the prompt. However, the echo command will still put output to the
+console (or output file) allowing you to give status as, e.g. a script is
+running.
 
 See also: invocation, -out, -run]]>
         </body>

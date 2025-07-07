@@ -86,10 +86,15 @@ public class JSONWebKeyUtil {
             array = (JSONArray) json;
         } else {
             JSONObject jsonObject = (JSONObject) json;
-            if (!jsonObject.containsKey(KEYS)) {
-                throw new IllegalArgumentException("No keys found");
+            if (jsonObject.containsKey(KEYS)) {
+                array = jsonObject.getJSONArray(KEYS);
+            } else {
+                // throw new IllegalArgumentException("No keys found");
+                // assumes that if there is no keys entry, the argument is a single key.
+                // This may bomb later.
+                array = new JSONArray();
+                array.add(jsonObject);
             }
-            array = jsonObject.getJSONArray(KEYS);
         }
         JSONWebKeys keys = new JSONWebKeys(null);
         for (int i = 0; i < array.size(); i++) {
@@ -127,7 +132,6 @@ public class JSONWebKeyUtil {
      */
 
     // Fix https://github.com/ncsa/oa4mp/issues/131
-
 
 
     /**
@@ -188,7 +192,6 @@ public class JSONWebKeyUtil {
      * @param webKey
      * @return
      */
-
 
 
     /**

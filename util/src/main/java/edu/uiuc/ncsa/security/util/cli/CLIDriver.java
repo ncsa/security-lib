@@ -134,9 +134,7 @@ public class CLIDriver {
                 commonCommands.setVerbose(isVerbose());
                 commonCommands.setPrintOuput(!isOutputOn());
             }
-            //xxx.setIOInterface(getIOInterface());
             xxx.setDriver(this);
-
         }
         setCLICommands(cci);
 
@@ -150,27 +148,16 @@ public class CLIDriver {
         this.commands = commands;
     }
 
-
-    protected String readline(String prompt) throws IOException {
-        return getIOInterface().readline(prompt);
+    protected boolean noPrompt() {
+        return !isOutputOn() || hasInputFile();
     }
 
-    protected static final int USER_DEFINED_COMMAND = -1;
-    protected static final int NO_OP_VALUE = 0;
-    protected static final int REPEAT_COMMAND_VALUE = 10;
-    protected static final int HISTORY_COMMAND_VALUE = 20;
-    protected static final int WRITE_BUFFER_COMMAND_VALUE = 30;
-    protected static final int READ_BUFFER_COMMAND_VALUE = 40;
-    protected static final int CLEAR_BUFFER_COMMAND_VALUE = 50;
-    protected static final int SHORT_EXIT_COMMAND_VALUE = 60;
-    protected static final int PRINT_HELP_COMMAND_VALUE = 70;
-    protected static final int LIST_ALL_METHODS_COMMAND_VALUE = 80;
-    protected static final int TRACE_COMMAND_VALUE = 90;
-    protected static final int COMPONENT_COMMAND_VALUE = 100;
-
-    public static final int ONLINE_HELP_COMMAND_VALUE = 110;
-
-
+    protected String readline(String prompt) throws IOException {
+        if (noPrompt()) { // don't print the prompt if output is suppressed
+            return getIOInterface().readline();
+        }
+        return getIOInterface().readline(prompt);
+    }
 
     protected void printHelp() {
         String indent = "  ";
@@ -632,15 +619,15 @@ public class CLIDriver {
                 return;
             }
             //if (getHelpUtil() != null) {
-                helpPrinted = getHelpUtil().printHelp(inputLine) || helpPrinted;
-           // }
-            if(!helpPrinted) { // don't reprint help repeatedly. Help keys are unique.
-                if(commands != null){
-                for (Commands command : commands) {
-                    //       if (getHelpUtil() != null) {
-                    helpPrinted = getHelpUtil().printHelp(inputLine) || helpPrinted;
-                    //     }
-                }
+            helpPrinted = getHelpUtil().printHelp(inputLine) || helpPrinted;
+            // }
+            if (!helpPrinted) { // don't reprint help repeatedly. Help keys are unique.
+                if (commands != null) {
+                    for (Commands command : commands) {
+                        //       if (getHelpUtil() != null) {
+                        helpPrinted = getHelpUtil().printHelp(inputLine) || helpPrinted;
+                        //     }
+                    }
                 }
             }
             if (!helpPrinted) {
@@ -651,15 +638,16 @@ public class CLIDriver {
 
     protected void printHelpTopics(InputLine inputLine) {
         HelpUtil helpUtil1 = new HelpUtil();
-   //     if (getHelpUtil() != null) {
-            helpUtil1.getOnlineHelp().putAll(getHelpUtil().getOnlineHelp());
-    //    }
-        if(commands != null) {
-        for (Commands command : commands) {
-            //    if (getHelpUtil() != null) {
-            helpUtil1.getOnlineHelp().putAll(getHelpUtil().getOnlineHelp());
-            //       }
-        }        }
+        //     if (getHelpUtil() != null) {
+        helpUtil1.getOnlineHelp().putAll(getHelpUtil().getOnlineHelp());
+        //    }
+        if (commands != null) {
+            for (Commands command : commands) {
+                //    if (getHelpUtil() != null) {
+                helpUtil1.getOnlineHelp().putAll(getHelpUtil().getOnlineHelp());
+                //       }
+            }
+        }
         helpUtil1.printHelp(inputLine);
     }
 
@@ -669,7 +657,9 @@ public class CLIDriver {
         String[] tempCCIN = CLIReflectionUtil.getCommandsNameList(getCLICommands());
         List<String> list = new ArrayList<>();
         for (String x : tempCCIN) {
-            list.add(x);
+            if (!x.equals("bootstrap")) {  // explicitly omit this since it looks like a command but is not.
+                list.add(x);
+            }
         }
         FormatUtil.formatList(inputLine, list);
 
@@ -892,23 +882,8 @@ public class CLIDriver {
     }
 
     boolean hasInputFile = false;
-    public InputLine bootstrap(InputLine argLine) {
 
-        if(argLine.hasArg(SILENT_FLAG)) {
-            setOutputOn(false);
-            setVerbose(false);
-        }else{
-            if(argLine.hasArg(SHORT_SET_OUTPUT_FLAG, LONG_SET_OUTPUT_FLAG)){
-                String raw = argLine.getNextArgFor(SHORT_SET_OUTPUT_FLAG, LONG_SET_OUTPUT_FLAG);
-                Boolean bool = isTrue(raw);
-                if(bool != null){
-                    setOutputOn(bool);
-                }
-            }
-            setVerbose(argLine.hasArg(SHORT_VERBOSE_FLAG, LONG_VERBOSE_FLAG));
-        }
-        argLine.removeSwitchAndValue(SHORT_SET_OUTPUT_FLAG, LONG_SET_OUTPUT_FLAG);
-        argLine.removeSwitch(SHORT_VERBOSE_FLAG, LONG_VERBOSE_FLAG);
+    public InputLine bootstrap(InputLine argLine) {
 
 
         MyLoggingFacade myLoggingFacade = null;
@@ -938,6 +913,9 @@ public class CLIDriver {
             argLine.removeSwitchAndValue(INPUT_FILE_FLAG);
             BasicIO basicIO = new BasicIO();
             setHasInputFile(true);
+            // suppress the prompt as the default, but let them override it later
+            setOutputOn(false);
+            setVerbose(false);
             try {
                 FileInputStream fis = new FileInputStream(inputFileName);
                 if (inputFileName.endsWith(".cmd")) {
@@ -966,7 +944,24 @@ public class CLIDriver {
             }
         }
 
-        // Batch mode means that the rest of command line after flag is interpreted as a single command.
+
+        if (argLine.hasArg(SILENT_FLAG)) {
+            setOutputOn(false);
+            setVerbose(false);
+        } else {
+            if (argLine.hasArg(SHORT_SET_OUTPUT_FLAG, LONG_SET_OUTPUT_FLAG)) {
+                String raw = argLine.getNextArgFor(SHORT_SET_OUTPUT_FLAG, LONG_SET_OUTPUT_FLAG);
+                Boolean bool = isTrue(raw);
+                if (bool != null) {
+                    setOutputOn(bool);
+                }
+            }
+            setVerbose(argLine.hasArg(SHORT_VERBOSE_FLAG, LONG_VERBOSE_FLAG));
+        }
+        argLine.removeSwitchAndValue(SHORT_SET_OUTPUT_FLAG, LONG_SET_OUTPUT_FLAG);
+        argLine.removeSwitch(SHORT_VERBOSE_FLAG, LONG_VERBOSE_FLAG);
+
+        // run line means that the rest of command line after flag is interpreted as a single command.
         // This executes one command.
         setRunLineMode(argLine.hasArg(RUN_COMMAND_FLAG));
         if (isRunLineMode()) {
@@ -978,7 +973,7 @@ public class CLIDriver {
             return argLine;
         }
 
-        // Lastt hing to set is the IO if they specify it.
+        // Last thing to set is the IO if they specify it.
         if (argLine.hasArg(TERMINAL_TYPE_FLAG)) {
             String tty = argLine.getNextArgFor(TERMINAL_TYPE_FLAG);
             argLine.removeSwitchAndValue(TERMINAL_TYPE_FLAG);
@@ -1101,15 +1096,16 @@ public class CLIDriver {
 
     /**
      * This checks that the string is one of the allowed trues or false. Anything else returns a null.
+     *
      * @param raw
      * @return
      */
-    public  Boolean isTrue(String raw) {
-        for(String s : LOGICAL_TRUES){
-            if(s.equals(raw)) return Boolean.TRUE;
+    public Boolean isTrue(String raw) {
+        for (String s : LOGICAL_TRUES) {
+            if (s.equals(raw)) return Boolean.TRUE;
         }
-        for(String s : LOGICAL_FALSES){
-            if(s.equals(raw)) return Boolean.FALSE;
+        for (String s : LOGICAL_FALSES) {
+            if (s.equals(raw)) return Boolean.FALSE;
         }
         return null;
     }

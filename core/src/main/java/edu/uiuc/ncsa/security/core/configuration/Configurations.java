@@ -94,7 +94,7 @@ public class Configurations {
      * All the actual work for loading files is done here.
      *
      * @param cfg
-     * @param visitedFiles
+     * @param visitedFiles Files already processed. Prevents cycles.
      * @return
      * @throws ConfigurationException
      */
@@ -113,11 +113,15 @@ public class Configurations {
                     try {
                         File x = new File(currentFile);
                         if (x.isDirectory()) {
-                            System.out.println("Configuration error: The file named \"" + currentFile + "\" is a directory. Skipping...");
+                            if(DebugUtil.isTraceEnabled()) {
+                                System.out.println("Configuration error: The file named \"" + currentFile + "\" is a directory. Skipping...");
+                            }
                             continue;
                         }
                         if (!x.exists()) {
-                            System.out.println("Configuration error: The file named \"" + currentFile + "\" does not exist. Skipping...");
+                            if(DebugUtil.isTraceEnabled()) {
+                                System.out.println("Configuration error: The file named \"" + currentFile + "\" does not exist. Skipping...");
+                            }
                             continue;
                         }
                         if (x.canRead()) {
@@ -126,19 +130,27 @@ public class Configurations {
                             fis.close();
                             resolveFileReferences(cfg, visitedFiles);
                         } else {
-                            System.out.println("Configuration error: The file named \"" + currentFile + "\" cannot be read (permission issue?). Skipping...");
+                            if(DebugUtil.isTraceEnabled()) {
+                                System.out.println("Configuration error: The file named \"" + currentFile + "\" cannot be read (permission issue?). Skipping...");
+                            }
                         }
                     } catch (FileNotFoundException e) {
-                        System.out.println("Configuration error: Could not find the file named \"" + currentFile + "\". Skipping...");
+                        if(DebugUtil.isTraceEnabled()) {
+                            System.out.println("Configuration error: Could not find the file named \"" + currentFile + "\". Skipping...");
+                        }
                     } catch (IOException e) {
-                        System.out.println("Configuration error: Some error processing \"" + currentFile +
-                                "\" happened. Message read \"" + e.getMessage() + "\". Skipping...");
+                        if(DebugUtil.isTraceEnabled()) {
+                            System.out.println("Configuration error: Some error processing \"" + currentFile +
+                                    "\" happened. Message read \"" + e.getMessage() + "\". Skipping...");
+                        }
                     } finally {
                         if (fis != null) {
                             try {
                                 fis.close();
                             } catch (IOException e) {
-                                System.out.println("IOException. Could not close the file \"" + currentFile + "\". Skipping...");
+                                if(DebugUtil.isTraceEnabled()) {
+                                    System.out.println("IOException. Could not close the file \"" + currentFile + "\". Skipping...");
+                                }
 
                             }
                         }

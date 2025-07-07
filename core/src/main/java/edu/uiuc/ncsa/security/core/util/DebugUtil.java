@@ -102,6 +102,10 @@ public class DebugUtil implements DebugConstants {
         return getInstance().isEnabled();
     }
 
+    public static boolean isTraceEnabled() {
+        return getInstance().getDebugLevel() == DEBUG_LEVEL_TRACE;
+    }
+
     public static void printStackTrace(Throwable t) {
         if (isEnabled()) {
             t.printStackTrace();
@@ -324,6 +328,7 @@ public class DebugUtil implements DebugConstants {
     /**
      * This is used to supply all the paths in tests. Set the environment variable NCSA_DEV_PATH
      * and it will be used to resolve resources etc.
+     *
      * @return
      */
     static public String getDevPath() {
@@ -340,6 +345,7 @@ public class DebugUtil implements DebugConstants {
     static public String NCSA_CONFIG_ROOT = "NCSA_CONFIG_ROOT";
 
     static public String DEFAULT_CONFIG_ROOT = "/home/ncsa/dev/csd/config"; // Jeff's system...
+
     static public String getConfigPath() {
         if (configPath == null) {
             configPath = System.getenv(NCSA_CONFIG_ROOT);
@@ -351,9 +357,9 @@ public class DebugUtil implements DebugConstants {
     }
 
     public static String getDevOutput() {
-        if(devOutput == null){
+        if (devOutput == null) {
             devOutput = System.getenv(NCSA_DEV_OUTPUT);
-            if(StringUtils.isTrivial(devOutput)){
+            if (StringUtils.isTrivial(devOutput)) {
                 devOutput = DEFAULT_DEV_OUTPUT;
             }
         }
@@ -361,7 +367,7 @@ public class DebugUtil implements DebugConstants {
     }
 
     static String devOutput = null;
-     static public String NCSA_DEV_OUTPUT = "NCSA_DEV_OUTPUT";
-     static public String DEFAULT_DEV_OUTPUT = "/home/ncsa/dev/temp-deploy"; // Jeff's system...
+    static public String NCSA_DEV_OUTPUT = "NCSA_DEV_OUTPUT";
+    static public String DEFAULT_DEV_OUTPUT = "/home/ncsa/dev/temp-deploy"; // Jeff's system...
 
 }

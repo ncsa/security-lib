@@ -19,7 +19,7 @@ public class ArgMap extends HashMap {
 
     /**
      * Constructor if you want to add your own operations. Remember that the list of
-     * all operations is checked so if the user passes an unkown one, an exception is raised.
+     * all operations is checked so if the user passes an unknown one, an exception is raised.
      * @param args
      * @param allOperations
      */
@@ -47,10 +47,10 @@ public class ArgMap extends HashMap {
                     put(DEBUG_FLAG, true);
                     break;
                 case DIR_ARG:
-                    i = getI(i, args, DIR_ARG);
+                    i = getFileArg(i, args, DIR_ARG);
                     break;
                 case LOG_ARG:
-                    i = getI(i, args, LOG_ARG);
+                    i = getFileArg(i, args, LOG_ARG);
                     break;
                 case ALL_FLAG:
                     put(ALL_FLAG, true);
@@ -63,6 +63,10 @@ public class ArgMap extends HashMap {
                     break;
                 case VERSION_FLAG:
                     put(VERSION_FLAG, args[++i]);
+                    break;
+                case PREPROCESS_FLAG:
+                    i = getFileArg(i, args, PREPROCESS_FLAG);
+                    break;
             }
         }
         if (!isShowHelp()) {
@@ -79,13 +83,21 @@ public class ArgMap extends HashMap {
         }
     }
 
-    private int getI(int i, String[] args, String logArg) {
+    /**
+     * Gets the next argument at index i and if in fit shape, sets the argument to a file.
+     * No testing on the file is done here, since it may need to be created
+     * @param i
+     * @param args
+     * @param key
+     * @return
+     */
+    private int getFileArg(int i, String[] args, String key) {
         if ((i + 1) < args.length) {
 // if this is the very last argument on the line, skip it
             if (args[i + 1].startsWith("-")) {
                 throw new IllegalArgumentException("missing directory");
             }
-            put(logArg, new File(args[++i]));
+            put(key, new File(args[++i]));
         }
         return i;
     }
@@ -112,6 +124,10 @@ public class ArgMap extends HashMap {
     public File getRootDir() {
         if (!containsKey(DIR_ARG)) return null;
         return (File) get(DIR_ARG);
+    }
+    public File getPreprocessDir() {
+        if (!containsKey(PREPROCESS_FLAG)) return null;
+        return (File) get(PREPROCESS_FLAG);
     }
     public String getString(String key){
         if(containsKey(key)){
@@ -167,4 +183,6 @@ public class ArgMap extends HashMap {
     public boolean isShowReleaseNotes(){
         return getOperation().equals(NOTES_OPTION);
     }
+
+    public boolean isPreprocess() {return containsKey(PREPROCESS_FLAG);}
 }
