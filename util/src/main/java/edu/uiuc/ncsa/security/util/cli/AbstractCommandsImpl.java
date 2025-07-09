@@ -13,7 +13,7 @@ import java.util.Map;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 
 /**
- * Class that collectes the startup logic for {@link Commands} implementations
+ * Class that collects the startup logic for {@link Commands} implementations
  */
 public abstract class AbstractCommandsImpl implements Commands {
     public AbstractCommandsImpl(CLIDriver driver) {

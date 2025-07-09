@@ -89,7 +89,6 @@ public class JSONWebKeyUtil {
             if (jsonObject.containsKey(KEYS)) {
                 array = jsonObject.getJSONArray(KEYS);
             } else {
-                // throw new IllegalArgumentException("No keys found");
                 // assumes that if there is no keys entry, the argument is a single key.
                 // This may bomb later.
                 array = new JSONArray();
@@ -184,15 +183,6 @@ public class JSONWebKeyUtil {
         jsonWebKey.use = "sig";
         return jsonWebKey;
     }
-
-
-    /**
-     * Sets common elements for all keys.
-     *
-     * @param webKey
-     * @return
-     */
-
 
     /**
      * Very useful utility to take a set of keys and return another set of keys that are only the public parts.

@@ -2,13 +2,8 @@ package edu.uiuc.ncsa.security.util.cli;
 
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
-import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
-import edu.uiuc.ncsa.security.core.util.LoggerProvider;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
-import org.apache.commons.cli.*;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.BufferedReader;
@@ -23,7 +18,7 @@ import java.util.logging.Level;
  * <p>Created by Jeff Gaynor<br>
  * on 9/7/11 at  12:31 PM
  */
-public abstract class CLITool implements Logable {
+public abstract class CLITool2 implements Logable {
     public static final String VERBOSE_OPTION = "v"; // if present do a backup of the target to a backup schema.
     public static final String VERBOSE_LONG_OPTION = "verbose"; // if present do a backup of the target to a backup schema.
 
@@ -35,8 +30,8 @@ public abstract class CLITool implements Logable {
     public static final String LOG_FILE_LONG_OPTION = "logFile"; // if present do a backup of the target to a backup schema.
 
     // other options
-    public static final String HELP_OPTION = "h";
-    public static final String HELP_LONG_OPTION = "help";
+    public static final String HELP_OPTION = "--h";
+    public static final String HELP_LONG_OPTION = "--help";
 
 
     public static final String CONFIG_FILE_OPTION = "cfg";
@@ -138,22 +133,10 @@ public abstract class CLITool implements Logable {
         // logger can't be loaded until the configuration file is found. All logging
         // messages before it is loaded will end up in the default log file, not
         // where the user wants them.
-        if (getConfigFile() == null) {
-            throw new MyConfigurationException("Error: no configuration file");
+        if (!hasConfigFile() || !hasConfigName()) {
+            throw new MyConfigurationException("Error: no configuration set");
         }
-        if (getConfigFile().length() == 0) {
-            throw new MyConfigurationException("Error:No configuration found.");
-        }
-        String cfgName = null;
-
-        if (hasOption(CONFIG_NAME_OPTION, CONFIG_NAME_LONG_OPTION)) {
-            cfgName = getCommandLine().getOptionValue(CONFIG_NAME_OPTION);
-        }
-
-
-        setConfigurationNode(XMLConfigUtil.findConfiguration(getConfigFile(), cfgName, getComponentName()));
-
-
+        setConfigurationNode(XMLConfigUtil.findConfiguration(getConfigFile(), getConfigName(), getComponentName()));
     }
 
 
@@ -180,6 +163,9 @@ public abstract class CLITool implements Logable {
         say("  -" + HELP_OPTION + " (-" + HELP_LONG_OPTION + ") -- this message");
     }
 
+    public boolean hasConfigFile() {
+        return configFile != null && configFile.length() > 0;
+    }
     public String getConfigFile() {
         return configFile;
     }
@@ -215,160 +201,73 @@ public abstract class CLITool implements Logable {
      * @return
      * @throws Exception
      */
-    protected boolean getOptions(String[] args) throws Exception {
-        getOptions();
-        if (args.length == 0) {
-            help();
-            return false;
-        }
-        for (String z : args) {
-            if (z.toLowerCase().endsWith("help")) {
-                help();
-                return false;
-            }
-        }
-        parseCommandLine(args);
-        if (hasOption(HELP_OPTION, HELP_LONG_OPTION)) {
+    protected boolean getOptions(String[] args) {
+        InputLine inputLine = new InputLine(getClass().getSimpleName(), args);
+        setInputLine(inputLine);
+        if (args.length == 0 || inputLine.hasArg(HELP_LONG_OPTION, HELP_LONG_OPTION)) {
             help();
             return false;
         }
         setVerbose(false);
 
-        if (hasOption(VERBOSE_OPTION, VERBOSE_LONG_OPTION)) {
+        if (inputLine.hasArg(VERBOSE_OPTION, VERBOSE_LONG_OPTION)) {
             setVerbose(true);
         }
 
         setDebugOn(false);
-        if (hasOption(DEBUG_OPTION, DEBUG_LONG_OPTION)) {
+        if (inputLine.hasArg(DEBUG_OPTION, DEBUG_LONG_OPTION)) {
             setDebugOn(true);
         }
 
-        if (hasOption(LOG_FILE_OPTION, LOG_FILE_LONG_OPTION)) {
-            setLogfileName(getCommandLine().getOptionValue(LOG_FILE_LONG_OPTION));
+        if (inputLine.hasArg(LOG_FILE_OPTION, LOG_FILE_LONG_OPTION)) {
+            setLogfileName(inputLine.getNextArgFor(LOG_FILE_OPTION, LOG_FILE_LONG_OPTION));
         }
 
-        if (hasOption(CONFIG_FILE_OPTION, CONFIG_FILE_LONG_OPTION)) {
-            setConfigFile(getCommandLine().getOptionValue(CONFIG_FILE_OPTION));
+        if (inputLine.hasArg(CONFIG_FILE_OPTION, CONFIG_FILE_LONG_OPTION)) {
+            setConfigFile(inputLine.getNextArgFor(CONFIG_FILE_OPTION, CONFIG_FILE_LONG_OPTION));
         }
+
+
+        if (inputLine.hasArg(CONFIG_NAME_OPTION, CONFIG_NAME_LONG_OPTION)) {
+            setConfigName(inputLine.getNextArgFor(CONFIG_NAME_OPTION, CONFIG_NAME_LONG_OPTION));
+        }
+
         return true;
     }
 
     /**
-     * Checks if the long or short form is part of the command line options.
-     *
-     * @param shortForm
-     * @param longForm
+     * Get the original input line.
      * @return
      */
-    protected boolean hasOption(String shortForm, String longForm) {
-        return getCommandLine().hasOption(shortForm) || getCommandLine().hasOption(longForm);
+    public InputLine getInputLine() {
+        return inputLine;
     }
 
-    CommandLine cmd = null;
-
-    protected void parseCommandLine(String[] args) {
-        //CommandLineParser clp = new BasicParser();
-        CommandLineParser clp = new DefaultParser();
-        try {
-            cmd = clp.parse(getOptions(), args);
-        } catch (UnrecognizedOptionException ux) {
-            String err = "Error: unrecognized option  + " + ux.getMessage()  ;
-            say(err);
-            say("Invoke with -help for more");
-            if (isVerbose()) {
-                ux.printStackTrace();
-            }
-            throw new GeneralException(err, ux);
-        } catch (ParseException e) {
-            String err= "Error: could not parse a command line argument:" + e.getMessage();
-            say(err);
-            if (isVerbose()) {
-                e.printStackTrace();
-            }
-            throw new GeneralException(err,e);
-        }
+    public void setInputLine(InputLine inputLine) {
+        this.inputLine = inputLine;
     }
 
-    /**
-     * So you can construct the argument list and have this tool use its built in configuration.
-     * @param args
-     */
-    public void setCommandLine(String[] args){
-        parseCommandLine(args);
+    InputLine inputLine;
+    public String getConfigName() {
+        return configName;
     }
-    public CommandLine getCommandLine() {
-        return cmd;
+
+    public void setConfigName(String configName) {
+        this.configName = configName;
     }
+
+    String configName;
+
+public boolean hasConfigName() {
+    return configName != null && configName.length() > 0;
+}
+
 
     /**
      * What this tool should do.
      */
-    int action;
 
-    /**
-     * This application allows you to specify numeric values that determine the behavior of this application.
-     * You may access the result in a switch statement. You set them in the {@link #getOptions(String[])}
-     * method and access them in the {@link #doIt()} method. Use of this facility, is optional.
-     *
-     * @return
-     */
-    public int getAction() {
-        return action;
-    }
-
-    public void setAction(int action) {
-        this.action = action;
-    }
-
-
-    /**
-     * Converts command line arguments into integer action values. This makes writing switch
-     * statements for choosing actions very easy. Pass in the short and long options, the
-     * action that should be assigned and the command line. If the command option is present,
-     * the action will be set.
-     * <p/>
-     * <p>The only supplied default is {@link #NO_ACTION} </p>
-     *
-     * @param flag
-     * @param longFlag
-     * @param action
-     */
-    protected void checkAction(String flag, String longFlag, int action) {
-        if (getCommandLine().hasOption(flag) || getCommandLine().hasOption(longFlag)) {
-            if (getAction() != NO_ACTION) {
-                throw new RuntimeException("Error: attempted to reset the action");
-            }
-            setAction(action);
-        }
-
-    }
-
-    /**
-     * Override this to set up your options. You should also use this to check the action and
-     * set it, .e.g.,<br><br>
-     * <code>
-     * &nbsp;&nbsp;&nbsp;&nbsp;Options options = super.getOptions();<br>
-     * &nbsp;&nbsp;&nbsp;&nbsp;options.addOptions(SHORT_FORM, LONG_FORM, ... // This is in the commons documentation <BR>
-     * &nbsp;&nbsp;&nbsp;&nbsp;checkAction(SHORT_FORM, LONG_FORM, ACTION_CODE);<BR>
-     * </code>
-     * <br><br>
-     * which would set an integer value suitable for using with the {@link #getAction()} call in
-     * a switch statement.
-     *
-     * @return
-     */
-    protected Options getOptions() {
-        Options options = new Options();
-        options.addOption(HELP_OPTION, HELP_LONG_OPTION, false, "Display the help message.");
-        options.addOption(DEBUG_OPTION, DEBUG_LONG_OPTION, false, "Enable/disable debug mode.");
-        options.addOption(VERBOSE_OPTION, VERBOSE_LONG_OPTION, false, "Set verbose mode on");
-        options.addOption(CONFIG_FILE_OPTION, CONFIG_FILE_LONG_OPTION, true, "Set the configuration file");
-        options.addOption(CONFIG_NAME_OPTION, CONFIG_NAME_LONG_OPTION, true, "Set the name of the configuration");
-        options.addOption(LOG_FILE_OPTION, LOG_FILE_LONG_OPTION, true, "Set the log file");
-        return options;
-    }
-
-    /**
+     /**
      * Prints to the console only if verbose is enabled.
      *
      * @param x
@@ -383,7 +282,6 @@ public abstract class CLITool implements Logable {
      * @param x
      */
     public static void say(String x) {
-    //    System.out.println(x);
         getIoInterface().println(x);
     }
 
@@ -434,6 +332,7 @@ public abstract class CLITool implements Logable {
         if (isVerbose()) {
             say(x);
         }
+        if(getMyLogger() == null) return;
         getMyLogger().info(x);
     }
 
@@ -441,6 +340,7 @@ public abstract class CLITool implements Logable {
         if (isVerbose()) {
             say(x);
         }
+        if(getMyLogger() == null) return;
         getMyLogger().warn(x);
     }
 
@@ -448,6 +348,7 @@ public abstract class CLITool implements Logable {
         if (isVerbose()) {
             say(x);
         }
+        if(getMyLogger() == null) return;
         getMyLogger().error(x);
     }
 
@@ -455,6 +356,7 @@ public abstract class CLITool implements Logable {
         if (isVerbose()) {
             say(x);
         }
+        if(getMyLogger() == null) return;
         getMyLogger().error(x,t);
     }
 
