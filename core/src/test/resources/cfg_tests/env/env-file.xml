@@ -1,0 +1,23 @@
+<!--
+      Tests  environment variable resolution. This is a stand-alone environment file.
+      It is imported as part of testing. It has empty elements and white space too.
+-->
+<config>
+    <env key="A">foo</env>
+    <env key="B">bar</env>
+    <env key="C">serv</env>
+    <env key="empty1"/>
+    <env key="empty2">
+
+    </env>
+
+
+    <env
+        key="multiline1">
+<![CDATA[
+<ssh a="b"
+     c="d"
+/>]]>
+    </env>
+
+</config>

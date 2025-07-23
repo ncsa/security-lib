@@ -1,0 +1,13 @@
+<!--
+     Driver file pattern. Thop level (this file) only has aliases and includes.
+     Also has random whitespace to emulate a heavily commented file, to check
+     whitespace processing is sane.
+-->
+<bundle>
+  <file include="/home/ncsa/dev/ncsa-git/security-lib/core/src/test/resources/cfg_tests/file/driver-test-A.xml"/>
+  <file include="/home/ncsa/dev/ncsa-git/security-lib/core/src/test/resources/cfg_tests/file/driver-test-B.xml"/>
+  <file include="/home/ncsa/dev/ncsa-git/security-lib/core/src/test/resources/cfg_tests/file/driver-test-C.xml"/>
+    <include_test name="default" alias="includeA"/>
+    <include_test name="default2" alias="includeB"/>
+    <include_test name="default3" alias="includeC"/>
+</bundle>

@@ -1,5 +1,10 @@
 <!--
      The diamond problem is a famous one in multiple inheritance. If A and B inherit from C
+         A
+       /   \
+     C      D
+      \   /
+        B
      (so each has its own overrides) , and D inherits from them, which to use?
      Our solution is positional. Specifying "B C" then B has preference to C.
 -->

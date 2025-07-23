@@ -1,0 +1,6 @@
+
+<config>
+    <env key="override">C</env>
+    <env key="A">${override}_C</env>
+    <mytag name="${override}" >${A}</mytag>
+</config>

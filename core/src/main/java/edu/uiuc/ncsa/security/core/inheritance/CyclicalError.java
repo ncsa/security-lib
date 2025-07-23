@@ -1,12 +1,12 @@
 package edu.uiuc.ncsa.security.core.inheritance;
 
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/2/21 at  8:19 AM
  */
-public class CyclicalError extends GeneralException {
+public class CyclicalError extends MyConfigurationException {
     public CyclicalError() {
     }
 

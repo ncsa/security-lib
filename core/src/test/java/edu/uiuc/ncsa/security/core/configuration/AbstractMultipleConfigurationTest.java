@@ -1,7 +1,8 @@
 package edu.uiuc.ncsa.security.core.configuration;
 
+import edu.uiuc.ncsa.security.core.MultiConfigurationsInterface;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.inheritance.InheritanceList;
-import edu.uiuc.ncsa.security.core.inheritance.MultipleInheritanceEngine;
 import edu.uiuc.ncsa.security.core.inheritance.UnresolvedReferenceException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import org.junit.Test;
@@ -22,15 +23,9 @@ import java.util.Map;
 /*
   Running this -- it is run in OA4MP and QDL in their builds as a regression test too.
  */
-public class MultipleInheritanceTest extends AbstractInheritanceTest {
+public abstract class AbstractMultipleConfigurationTest extends AbstractConfigurationTest {
     protected String path = DebugUtil.getDevPath() + "/security-lib/core/src/test/resources/cfg_loader/";
 
-
-    void verbose(String x) {
-        if (MultipleInheritanceEngine.DEBUG_ON) {
-            System.out.println(x);
-        }
-    }
 
     /**
      * The huge and messy test for this that shows how everything works. This is probably the
@@ -44,8 +39,8 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
     public void testBig() throws Exception {
         String fileName = path + "test-big-cfg.xml";
         verbose("testBig");
-        MultiConfigurations configurations2 = getConfigurations2(fileName);
-        Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
+        MultiConfigurationsInterface configuration = getConfiguration(fileName);
+        Map<String, InheritanceList> ro = configuration.getInheritanceEngine().getResolvedOverrides();
         //   resolvedOverrides:{A=[T, U, R, W, Q, P],   D=[T, U, R, W, Q, P], E=[T, U, R, W, Q, P],
         //   ,
         //     X=[T, U, R, W, Q, P], }
@@ -70,7 +65,16 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
         for (String v : listOfNames) {
             testInheritanceList(ro, v, iList);
         }
-        assert configurations2.getNamedConfig("A").size() == 6;
+        Object cfg = getNamedConfiguration(configuration,"A");
+        if(cfg instanceof List){
+            assert ((List)cfg).size() == 6;
+        }else {
+            if (cfg instanceof CFNode) {
+                assert ((CFNode) cfg).size() == 6;
+            }else{
+                assert false: "unknown cfg type";
+            }
+        }
     }
 
     @Test
@@ -79,8 +83,8 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
 
         String fileName = path + "cyclic-test.xml";
         try {
-            MultiConfigurations configurations2 = getConfigurations2(fileName);
-            Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
+            MultiConfigurationsInterface configuration = getConfiguration(fileName);
+            Map<String, InheritanceList> ro = configuration.getInheritanceEngine().getResolvedOverrides();
             assert false;
         } catch (UnresolvedReferenceException t) {
             assert true;
@@ -94,7 +98,7 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
         verbose("test basic includes:");
 
         String fileName = path + "basic-include-test.xml";
-        MultiConfigurations configurations2 = getConfigurations2(fileName);
+        MultiConfigurationsInterface configurations2 = getConfiguration(fileName);
         Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
         assert ro.size() == 4 : "Expected 4 resolved elements, got " + ro.size();
         assert ro.containsKey("A") : "Missing A element";
@@ -111,8 +115,8 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
         assert elements.get(1).equals("Y");
 
     }
-    protected void checkOverridesInAlias(MultiConfigurations configurations2, int size) throws Exception{
-        Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
+    protected void checkOverridesInAlias(MultiConfigurationsInterface multiConfigurations, int size) throws Exception{
+        Map<String, InheritanceList> ro = multiConfigurations.getInheritanceEngine().getResolvedOverrides();
 
         //   resolvedOverrides:{A=[A, C, X], B=[C, X], C=[C, X], X=[X]}
         assert ro.size() == size : "Expected 4 resolved elements, got " + ro.size();
@@ -149,7 +153,7 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
     public void testOverrideInAlias() throws Exception {
         verbose("testOverrideInAlias:");
         String fileName = path + "override-in-alias-test.xml";
-        MultiConfigurations configurations2 = getConfigurations2(fileName);
+        MultiConfigurationsInterface configurations2 = getConfiguration(fileName);
         checkOverridesInAlias(configurations2, 4); // should have 4 elements at the top.
     }
 
@@ -166,7 +170,7 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
          }
         verbose("testSingleInclude:");
         String fileName = path + "single-include-test.xml";
-        MultiConfigurations configurations2 = getConfigurations2(fileName);
+        MultiConfigurationsInterface configurations2 = getConfiguration(fileName);
         checkOverridesInAlias(configurations2, 5);  // regression, make sure that all imported, 5 elements at top
         // check that the extension worked
         Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
@@ -189,8 +193,8 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
         verbose("testMinimum:");
         String fileName = path + "min-test.xml";
         String cfgName = "A";
-        MultiConfigurations configurations2 = getConfigurations2(fileName);
-        Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
+        MultiConfigurationsInterface multiConfigurationsInterface = getConfiguration(fileName);
+        Map<String, InheritanceList> ro = multiConfigurationsInterface.getInheritanceEngine().getResolvedOverrides();
         assert ro.containsKey("A");
         List<String> elements = ro.get("A").getElements();
 
@@ -204,8 +208,8 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
         verbose("testAliasNoInherit:");
 
         String fileName = path + "alias-test-no-inherit.xml";
-        MultiConfigurations configurations2 = getConfigurations2(fileName);
-        Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
+        MultiConfigurationsInterface multiConfigurationsInterface = getConfiguration(fileName);
+        Map<String, InheritanceList> ro = multiConfigurationsInterface.getInheritanceEngine().getResolvedOverrides();
         assert ro.size() == 5 : "expected 5 elements and got " + ro.size();
         String[] values = new String[]{"A", "B", "C", "X", "Y"};
         for (String v : values) {
@@ -214,7 +218,6 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
             assert elements.size() == 1 : "Wrong number of elements in resolution. Expected 1 and got " + elements.size();
             assert elements.get(0).equals("Y") : "Wrong resolved value. Expected Y and got " + elements.get(0);
         }
-
     }
 
     /**
@@ -234,8 +237,8 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
     @Test
     public void testMinAlias() throws Exception {
         String fileName = path + "min-alias-test.xml";
-        MultiConfigurations configurations2 = getConfigurations2(fileName);
-        Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
+        MultiConfigurationsInterface multiConfigurationsInterface = getConfiguration(fileName);
+        Map<String, InheritanceList> ro = multiConfigurationsInterface.getInheritanceEngine().getResolvedOverrides();
         assert ro.size() == 3;
 
         assert ro.containsKey("A");
@@ -258,8 +261,8 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
     @Test
     public void testMultipleOverrides() throws Exception {
         String fileName = path + "multiple-overrides-test.xml";
-        MultiConfigurations configurations2 = getConfigurations2(fileName);
-        Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
+        MultiConfigurationsInterface multiConfigurationsInterface = getConfiguration(fileName);
+        Map<String, InheritanceList> ro = multiConfigurationsInterface.getInheritanceEngine().getResolvedOverrides();
         assert ro.size() == 8;
         String[] values = new String[]{"P", "Q", "X", "Y", "Z"};
         List<String> elements;
@@ -303,8 +306,8 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
     @Test
     public void testDiamond() throws Exception {
         String fileName = path + "diamond-test.xml";
-        MultiConfigurations configurations2 = getConfigurations2(fileName);
-        Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
+        MultiConfigurationsInterface multiConfigurationsInterface = getConfiguration(fileName);
+        Map<String, InheritanceList> ro = multiConfigurationsInterface.getInheritanceEngine().getResolvedOverrides();
 // resolvedOverrides:{A=[A, C], B=[B, C], C=[C], D=[D, A, B, C], E=[E, B, A, C]}
         assert ro.size() == 5;
         testInheritanceList(ro, "A", new String[]{"A", "C"});

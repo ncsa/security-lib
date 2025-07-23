@@ -1,0 +1,13 @@
+<!--
+      Tests  environment variable resolution and environment scope.
+      This loads a B file with similar names and an override,
+      which loads a C file. it should resolve the environment,
+      then try to process file includes.
+-->
+<config>
+    <env key="path">/home/ncsa/dev/ncsa-git/security-lib/core/src/main/resources/cfg_tests</env>
+    <env key="override">A</env>
+    <file include="${path}/env/env-B.xml"/>
+    <env key="A">${override}_A</env>
+    <mytag name="${override}">${A}</mytag>
+</config>

@@ -1,0 +1,6 @@
+<config>
+    <service name="A" alias="B"/>
+    <service name="B" alias="C"/>
+    <service name="C" alias="D"/>
+    <service name="D" >foo</service>
+</config>

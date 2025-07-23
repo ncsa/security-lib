@@ -1,0 +1,4 @@
+<config>
+    <include_test name="includeB">include_B</include_test>
+    <include_test name="default4" alias="includeC"/>
+</config>

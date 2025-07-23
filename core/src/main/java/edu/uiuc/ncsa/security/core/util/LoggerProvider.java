@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.security.core.util;
 
-import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;
@@ -150,9 +149,9 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
     public MyLoggingFacade get() {
 
         if (logger == null) {
-            if (disableLog4j) {
+      /*      if (disableLog4j) {
                 Configurations.killLog4J();
-            }
+            }*/
             if (loggerName == null) {
                 loggerName = "NCSA-sec-lib";
             }

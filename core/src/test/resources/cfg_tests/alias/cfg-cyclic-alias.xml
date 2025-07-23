@@ -1,0 +1,9 @@
+<!--
+      This file has a cycle in it for the alias A -> B -> C -> A. Configuration engine should catch this.
+-->
+<config>
+    <service name="A" alias="B"/>
+    <service name="B" alias="C"/>
+    <service name="C" alias="A"/>
+    <service name="D" />
+</config>

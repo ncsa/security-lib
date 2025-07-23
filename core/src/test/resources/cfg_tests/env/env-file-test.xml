@@ -1,0 +1,16 @@
+<!--
+      Tests  environment variable resolution. The initial block is valid XML for key/value pairs.
+      The *rest* of the document will be prepreoccesed using these and need not be valid XML.
+      This allows for, e.g., templates in tag names.
+-->
+<config>
+    <env include="/home/ncsa/dev/ncsa-git/security-lib/core/src/test/resources/cfg_tests/env/env-file.xml"/>
+    <${C}ice name="${A}">service ${A}</${C}ice>
+    <service name="${B}">
+        <JSONWebkey file="/path">
+            <entry>JSON ${B}</entry>
+        </JSONWebkey>
+        ${empty1}
+        ${multiline1}
+    </service>
+</config>

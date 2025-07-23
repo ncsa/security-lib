@@ -19,7 +19,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * <p>Created by Jeff Gaynor<br>
  * on 1/31/21 at  4:59 PM
  */
-public class MultiConfigurations {
+public class MultiConfigurations implements edu.uiuc.ncsa.security.core.MultiConfigurationsInterface{
     public static final String EXTENDS_TAG = "extends";
     public static final String NAME_TAG = "name";
     public static final String ALIAS_TAG = "alias";

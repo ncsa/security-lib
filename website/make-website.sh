@@ -10,6 +10,7 @@ echo "converting docs to PDF"
 
 lowriter --headless --convert-to pdf $NCSA_ROOT/sas-server/src/main/docs/SAS-protocol.odt
 lowriter --headless --convert-to pdf $NCSA_ROOT/storage/src/main/docs/upkeep.odt
+lowriter --headless --convert-to pdf $NCSA_ROOT/core/src/main/docs/configurations.odt
 lowriter --headless --convert-to pdf $NCSA_ROOT/web-installer/src/main/docs/installer.odt
 echo "done converting PDFs"
 

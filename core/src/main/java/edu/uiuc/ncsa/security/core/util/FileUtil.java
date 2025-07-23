@@ -40,6 +40,7 @@ public class FileUtil {
 
     /**
      * Read a (possibly binary) file and convert the contents to a base64 escaped string.
+     *
      * @param fileName
      * @return
      * @throws Throwable
@@ -51,9 +52,17 @@ public class FileUtil {
         return Base64.encodeBase64URLSafeString(contents);
     }
 
+    public static String readFileAsBinary(InputStream inputStream) throws Throwable {
+        if (inputStream == null) {
+            return null;
+        }
+        return Base64.encodeBase64URLSafeString(inputStream.readAllBytes());
+    }
+
     /**
      * Compliment to {@link #readFileAsBinary(String)}. This will take a base64 encoded string, decode it to a
      * byte array and write the result to a file.
+     *
      * @param filename
      * @param contents
      * @throws Throwable
@@ -65,6 +74,7 @@ public class FileUtil {
 
     /**
      * Read a (text) file in as a long string.
+     *
      * @param fileName
      * @return
      * @throws Throwable
@@ -84,15 +94,17 @@ public class FileUtil {
         return stringBuffer.toString();
 
     }
+
     /**
      * Reads an {@link InputStream} as a single string. This is useful when reading
      * a resource as an input stream.
+     *
      * @param inputStream
      * @return
      * @throws Throwable
      */
     public static String readFileAsString(InputStream inputStream) throws Throwable {
-        if(inputStream == null){
+        if (inputStream == null) {
             return null;
         }
         InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -100,9 +112,9 @@ public class FileUtil {
         BufferedReader br = new BufferedReader(inputStreamReader);
         String in = br.readLine();
         StringBuilder stringBuilder = new StringBuilder();
-        while(in != null){
-             stringBuilder.append(in + "\n");
-             in = br.readLine();
+        while (in != null) {
+            stringBuilder.append(in + "\n");
+            in = br.readLine();
         }
         return stringBuilder.toString();
     }
@@ -110,12 +122,13 @@ public class FileUtil {
     /**
      * Reads an {@link InputStream} as a set of lines. This is useful when reading
      * a resource as an input stream.
+     *
      * @param inputStream
      * @return
      * @throws Throwable
      */
     public static List<String> readFileAsLines(InputStream inputStream) throws Throwable {
-        if(inputStream == null){
+        if (inputStream == null) {
             return null;
         }
         InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -123,15 +136,16 @@ public class FileUtil {
         BufferedReader br = new BufferedReader(inputStreamReader);
         String in = br.readLine();
         List<String> out = new ArrayList<>();
-        while(in != null){
+        while (in != null) {
             out.add(in);
-             in = br.readLine();
+            in = br.readLine();
         }
         return out;
     }
 
     /**
      * Read a (text) file in as a list of strings, one per line.
+     *
      * @param fileName
      * @return
      * @throws Throwable
@@ -144,6 +158,7 @@ public class FileUtil {
 
     /**
      * Compliment to {@link #readFileAsString(String)}, which writes the string to a file.
+     *
      * @param filename
      * @param contents
      * @throws Throwable
@@ -154,4 +169,5 @@ public class FileUtil {
         fileWriter.flush();
         fileWriter.close();
     }
+
 }

@@ -3,19 +3,17 @@ package edu.uiuc.ncsa.security.util.configuration;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.MultiConfigurations;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import edu.uiuc.ncsa.security.core.inheritance.InheritanceList;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
- * Static utilities for working with configurations.
+ * Static utilities for working with XML configurations.
  * <p>Created by Jeff Gaynor<br>
  * on 3/23/12 at  8:23 AM
  */
@@ -58,7 +56,7 @@ public class XMLConfigUtil implements TimeConstants {
      */
     public static ConfigurationNode findMultiNode(String fileName, String cfgName, String cfgTagName) throws ConfigurationException {
         MultiConfigurations configurations2 = getConfigurations2(fileName, cfgTagName);
-        Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
+        //configurations2.getInheritanceEngine().getResolvedOverrides();
         List<ConfigurationNode> nodes = configurations2.getNamedConfig(cfgName);
         if (nodes.isEmpty()) {
             return null;
@@ -230,52 +228,6 @@ public class XMLConfigUtil implements TimeConstants {
 
         }
      }
-
-
-    // Old way. Clunky direct parsing that just continued to grow. New way just uses regexs and is much better.
-    // Does not support weeks months or years
- /*   protected static TimeThingy OLDcreateTimeThingy(String x, boolean isSeconds) {
-        x = x.trim();
-        if (x.endsWith(".")) {
-            // allows for "100 sec." or "100000 ms."
-            x = x.substring(0, x.length() - 1);
-        }
-        // do in order of length of units or collisions happen.
-        if (x.endsWith(UNITS_MILLISECONDS)) {
-            return new TimeThingy(1L, x.substring(0, x.length() - UNITS_MILLISECONDS.length()));
-        }
-        if (x.endsWith(UNITS_SECONDS_LONG)) {
-            return new TimeThingy(1000L, x.substring(0, x.length() - UNITS_SECONDS_LONG.length()));
-        }
-        if (x.endsWith(UNITS_MINUTES)) {
-            return new TimeThingy(1000L * 60L, x.substring(0, x.length() - UNITS_MINUTES.length()));
-        }
-        if (x.endsWith(UNITS_MINUTES_LONG)) {
-            return new TimeThingy(1000L * 60L, x.substring(0, x.length() - UNITS_MINUTES_LONG.length()));
-        }
-        if (x.endsWith(UNITS_HOURS)) {
-            return new TimeThingy(1000L * 3600L, x.substring(0, x.length() - UNITS_HOURS.length()));
-        }
-        if (x.endsWith(UNITS_HOURS_LONG)) {
-            return new TimeThingy(1000L * 3600L, x.substring(0, x.length() - UNITS_HOURS_LONG.length()));
-        }
-        if (x.endsWith(UNITS_DAYS)) {
-            return new TimeThingy(1000L * 3600L * 24, x.substring(0, x.length() - UNITS_DAYS.length()));
-        }
-        if (x.endsWith(UNITS_DAYS_LONG)) {
-            return new TimeThingy(1000L * 3600L * 24, x.substring(0, x.length() - UNITS_DAYS_LONG.length()));
-        }
-
-
-
-        // do seconds last since plural times (e.g. hrs) get flagged with this test and everything
-        // is interpeted as seconds otherwise.
-        if (x.endsWith(UNITS_SECONDS)) {
-            return new TimeThingy(1000L, x.substring(0, x.length() - UNITS_SECONDS.length()));
-        }
-        return new TimeThingy(isSeconds ? 1000L : 1L, x); // nothing to do, it's already to go, just need to know if default is seconds.
-
-    }*/
 
     /**
      * Quick double check of this class. Run it and peruse the output.

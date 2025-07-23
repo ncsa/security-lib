@@ -33,24 +33,6 @@ public class Configurations {
     public static final String INCLUDE_TAG = "include";
 
     /**
-     * Useful utility call. This explicitly kills off logging from log 4 java. This is needed since some
-     * dependency (don't know which) has a misconfigured log4j properties file in its library which
-     * spews forth random messages. Invoke this at server start to definitely kill off any log4j activity.
-     * It is annoying to have to add a dependency to clean up after someone else!
-     */
-    public static void killLog4J() {
-        //   DebugUtil.trace(Configurations.class, "Killing off log 4 java!");
-        // CIL-1145 fix. More recent log4j versions now have a way to reset all levels.
-        // Configurator.setAllLevels(LogManager.getRootLogger().getName(), Level.OFF);
-       /* List<Logger> loggers = Collections.<Logger>list(LogManager.getCurrentLoggers());
-        loggers.add(LogManager.getRootLogger());
-        for (Logger logger : loggers) {
-            logger.setLevel(Level.OFF);
-        }*/
-        //     DebugUtil.trace(Configurations.class, "log 4 java has been dispatched!");
-    }
-
-    /**
      * Loads the configuration from the given file. Various checks are done to give information about
      * failures.
      *

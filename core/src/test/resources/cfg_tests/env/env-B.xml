@@ -1,0 +1,7 @@
+
+<config>
+    <env key="override">B</env>
+    <file include="${path}/env/env-C.xml"/>
+    <env key="A">${override}_B</env>
+    <mytag name="${override}">${A}</mytag>
+</config>

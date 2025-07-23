@@ -1,0 +1,3 @@
+<config>
+    <include_test name="includeA">include_A</include_test>
+</config>

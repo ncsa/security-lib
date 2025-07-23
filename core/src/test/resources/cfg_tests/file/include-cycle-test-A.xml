@@ -1,0 +1,8 @@
+<!--
+     Cyclical test. This attempts to include a file that points to this and should be flagged as
+     a cyclical error at load time.
+-->
+<config>
+    <file include="/home/ncsa/dev/ncsa-git/security-lib/core/src/test/resources/cfg_tests/file/include-cycle-test-B.xml"/>
+    <include_test name="A">included A</include_test>
+</config>
