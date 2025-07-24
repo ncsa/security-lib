@@ -5,7 +5,7 @@
     <parent>
         <artifactId>security-lib</artifactId>
         <groupId>edu.uiuc.ncsa.security</groupId>
-        <version>6.2</version>
+        <version>6.2.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -87,7 +87,7 @@
                 <dependency>
                     <groupId>com.sun.mail</groupId>
                     <artifactId>javax.mail</artifactId>
-                    <version>1.6.2</version>
+                    <version>1.6.2.0</version>
                     <scope>provided</scope>
                 </dependency>
         -->
@@ -148,7 +148,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
-            <version>6.2</version>
+            <version>6.2.0</version>
         </dependency>
         <dependency>
             <groupId>net.sf.json-lib</groupId>
@@ -187,7 +187,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>core</artifactId>
-            <version>6.2</version>
+            <version>6.2.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
