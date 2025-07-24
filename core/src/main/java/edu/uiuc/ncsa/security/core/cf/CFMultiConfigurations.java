@@ -254,7 +254,7 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
      * @return
      */
     public static CFNode getAllNodes(CFNode node, String name) {
-        return node.getAllNodes(name);
+        return node.getNodes(name);
 /*
         List<Node> returnedNodes = new ArrayList<>();
         if (!node.hasNodes()) return new CFNode(returnedNodes);
@@ -342,7 +342,7 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
      * @return
      */
     public static boolean getFirstBooleanValue(CFNode node, String attrib, boolean defaultValue) {
-        return node.getFirstBooleanValue(attrib, defaultValue);
+        return node.getFirstBooleanAttribute(attrib, defaultValue);
 /*
         if (!node.hasNodes()) return defaultValue;
         try {
@@ -362,7 +362,7 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
      * @return
      */
     public static boolean getFirstBooleanValue(CFNode node, String attrib) {
-        return node.getFirstBooleanValue(attrib);
+        return node.getFirstBooleanAttribute(attrib);
 /*
         if (!node.hasNodes()) throw new IllegalArgumentException("no such node " + attrib);
         for (Node n : node.getNodes()) {
@@ -384,7 +384,7 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
     }
 
     public static long getFirstLongValue(CFNode node, String attrib) {
-        return node.getFirstLongValue(attrib);
+        return node.getFirstLongAttribute(attrib);
 /*
         if (!node.hasNodes()) throw new IllegalArgumentException("no such node " + attrib);
         String x = getFirstAttribute(node, attrib);
@@ -400,7 +400,7 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
     }
 
     public static long getFirstLongValue(CFNode node, String attrib, long defaultValue) {
-        return node.getFirstLongValue(attrib, defaultValue);
+        return node.getFirstLongAttribute(attrib, defaultValue);
 /*
         if (!node.hasNodes()) return defaultValue;
         try {

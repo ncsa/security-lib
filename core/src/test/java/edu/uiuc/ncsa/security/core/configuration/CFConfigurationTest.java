@@ -87,9 +87,11 @@ public class CFConfigurationTest extends TestCase {
      * @throws Exception
      */
     public void testFileIncludes() throws Exception {
-        FileInputStream fis = getFileInputStream("file/include-test-A.xml");
-        CFLoader config = new CFLoader();
-        CFBundle cfg = config.loadBundle(fis, "include_test");
+        CFBundle cfg  = new CFLoader.Builder()
+                .tagname("include_test")
+                .inputStream(getFileInputStream("file/include-test-A.xml"))
+                .build()
+                .loadBundle();
 
         CFNode testA = cfg.getNamedConfig( "A");
         assert testA.getNodeContents().equals("included A");

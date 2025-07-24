@@ -9,66 +9,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="web installer improvements">
-      <change afterPath="$PROJECT_DIR$/core/src/main/docs/configurations.odt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/MultiConfigurationsInterface.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cf/CFBundle.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cf/CFLoader.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cf/CFMultiConfigurations.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cf/CFNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cf/CFXMLConfigurations.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cf/package-info.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/EnvEntry.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/EnvStack.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/EnvTable.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/EnvironmentProcessor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/state/SKey.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/state/SStack.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/state/STable.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/state/SThing.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/TemplateUtility.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/AbstractConfigInheritenceTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/AbstractConfigurationTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/ApacheConfigInheritenceTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/ApacheMultipleInheritenceTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/CFBundleInheritenceTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/CFConfigurationTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/CFMultipleConfigurationTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/alias/cfg-alias.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/alias/cfg-cyclic-alias.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/env/env-A.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/env/env-B.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/env/env-C.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/env/env-file-test.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/env/env-file.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/env/env.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/file/driver-test-A.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/file/driver-test-B.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/file/driver-test-C.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/file/driver.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/file/include-cycle-test-A.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/file/include-cycle-test-B.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/file/include-test-A.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/file/include-test-B.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/file/include-test-C.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_tests/readme.txt" afterDir="false" />
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="https://github.com/ncsa/security-lib/issues/56">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/core/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/Configurations.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/Configurations.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/MultiConfigurations.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/MultiConfigurations.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/inheritance/CyclicalError.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/inheritance/CyclicalError.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/FileUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/FileUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/LoggerProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/LoggerProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/AbstractInheritanceTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/ConfigInheritanceTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/ConfigTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/ConfigTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/MultipleInheritanceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/AbstractMultipleConfigurationTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/test/resources/cfg_loader/diamond-test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/test/resources/cfg_loader/diamond-test.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/configuration/TemplateUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/configuration/TemplateUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/configuration/XMLConfigUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/configuration/XMLConfigUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/docs/configurations.odt" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/docs/configurations.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cf/CFLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cf/CFLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cf/CFMultiConfigurations.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cf/CFMultiConfigurations.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cf/CFNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cf/CFNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/CFConfigurationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration/CFConfigurationTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/make-website.sh" beforeDir="false" afterPath="$PROJECT_DIR$/website/make-website.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -681,7 +629,7 @@
       <workItem from="1747765002584" duration="599000" />
       <workItem from="1747997704045" duration="599000" />
       <workItem from="1750287141371" duration="210583000" />
-      <workItem from="1752785622354" duration="70053000" />
+      <workItem from="1752785622354" duration="79287000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -1026,7 +974,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="103" />
+    <option name="localTasksCounter" value="104" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1035,7 +983,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Improved the echo http request facility to print the body of the POST nicely, since otherwise large POSTs were just a mess to read." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/42" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues /42  update website" />
     <MESSAGE value="Added java serializationfor a few classes. QDL still officially at least allows it, so need it for that." />
@@ -1060,7 +1007,8 @@
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/54" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/54 part 2. Misc. cleanup" />
     <MESSAGE value="web installer improvements" />
-    <option name="LAST_COMMIT_MESSAGE" value="web installer improvements" />
+    <MESSAGE value="https://github.com/ncsa/security-lib/issues/56" />
+    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/56" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
