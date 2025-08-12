@@ -14,6 +14,23 @@ public abstract class CommonCommands2 extends AbstractCommandsImpl {
         super(driver);
     }
 
+    boolean throwExceptions = false;
+
+    /**
+     * In methods that take an {@link InputLine}, throw and exception rather than report one
+     * to the command line. This is set to true only if this is being used an a utility in another
+     * setting, rather than interactively.  There is consequently no way for a user to touch this from
+     * the command line.
+     * @return
+     */
+    public boolean isThrowExceptions() {
+        return throwExceptions;
+    }
+
+    public void setThrowExceptions(boolean throwExceptions) {
+        this.throwExceptions = throwExceptions;
+    }
+
 
 
     @Override
@@ -164,22 +181,5 @@ public abstract class CommonCommands2 extends AbstractCommandsImpl {
         }
         say("* CLI (Command Line Interpreter) Version " + LoggingConfigLoader.VERSION_NUMBER);
     }
-
-/*
-    protected void echoHelp() {
-        say("echo arg0 arg1...");
-        sayi("Simply echos the arg(s) to the console . This is extremely useful in scripts.");
-        say("See also set_output_on");
-    }
-
-    public void echo(InputLine inputLine) {
-        if (showHelp(inputLine)) {
-            echoHelp();
-            return;
-        }
-        say(inputLine.format());
-    }
-*/
-
 
 }
