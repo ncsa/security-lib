@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.core.configuration.provider;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.apache.commons.configuration.tree.DefaultConfigurationNode;
 
@@ -45,7 +46,29 @@ public abstract class HierarchicalConfigProvider<T> implements Provider<T>, CfgE
         return null;
     }
 
+    /*
+        Part of porting this to use CFNodes. There are 67 classes in OA4MP that extend this
+        base class, so having a parallel system would be close to impossible.
+        Best way to port is to allow for CFNode in constructor and have machinery
+        in place to use either or.
+        Later can rip out Apache Commons plumbing when not used.
 
+     */
+    CFNode cfNode;
+
+    public CFNode getCFNode() {
+        return cfNode;
+    }
+
+    public void setCFNode(CFNode cfNode) {
+        this.cfNode = cfNode;
+    }
+
+    ;
+
+    public boolean hasCFNode() {
+        return cfNode != null;
+    }
 
     public ConfigurationNode getConfig() {
         return config;
@@ -61,6 +84,10 @@ public abstract class HierarchicalConfigProvider<T> implements Provider<T>, CfgE
         this.config = config;
     }
 
+    public HierarchicalConfigProvider(CFNode cfNode) {
+        this.cfNode = cfNode;
+    }
+
     /**
      * Gets the attribute with the given key. This slaps "[@" and "]" around the key to conform with
      * how Apache resolves these.
@@ -69,10 +96,17 @@ public abstract class HierarchicalConfigProvider<T> implements Provider<T>, CfgE
      * @return
      */
     public String getAttribute(String key) {
-        // return getConfig().getString(toAttrKey(key));
-        List list = getConfig().getAttributes(key);
+        List list;
+        if (hasCFNode()) {
+            list = getCFNode().getAttributes(key);
+        } else {
+            list = getConfig().getAttributes(key);
+        }
         if (list.isEmpty()) {
             return null;
+        }
+        if (hasCFNode()) {
+            return ((CFNode) list.get(0)).getNodeContents();
         }
         DefaultConfigurationNode node = (DefaultConfigurationNode) list.get(0);
         return node.getValue().toString();
@@ -80,13 +114,14 @@ public abstract class HierarchicalConfigProvider<T> implements Provider<T>, CfgE
 
     /**
      * utility method to supply a default value if the given value is missing.
+     *
      * @param key
      * @param defaultValue
      * @return
      */
     protected String getAttribute(String key, String defaultValue) {
         String x = getAttribute(key);
-        if(x == null){
+        if (x == null) {
             x = defaultValue;
         }
         return x;
@@ -94,9 +129,9 @@ public abstract class HierarchicalConfigProvider<T> implements Provider<T>, CfgE
 
 
     public int getIntAttribute(String key, int defaultValue) {
-            String x = getAttribute(key);
+        String x = getAttribute(key);
 
-        if(x == null){
+        if (x == null) {
             return defaultValue;
         }
         // this might fail if the integer is of the wrong format. That is ok and no default should be supplied.
@@ -119,7 +154,13 @@ public abstract class HierarchicalConfigProvider<T> implements Provider<T>, CfgE
      * @return
      */
     public boolean isA(String name) {
-        String x = getConfig().getName();
+        String x;
+        if (hasCFNode()) {
+            x = getCFNode().getName();
+        } else {
+
+            x = getConfig().getName();
+        }
         if (x == null || x.length() == 0) return false;
         return x.equals(name);
     }
@@ -132,18 +173,25 @@ public abstract class HierarchicalConfigProvider<T> implements Provider<T>, CfgE
      * @return
      */
     public boolean hasA(String name) {
+        if (hasCFNode()) {
+            return 0 < getCFNode().getChildren(name).size();
+        }
         return 0 < getConfig().getChildren(name).size();
     }
 
     /**
-     * Return the given configuration
+     * Return the given {@link ConfigurationNode}. This
      *
      * @param name
      * @return
      */
     public ConfigurationNode getConfigurationAt(String name) {
-        List list = getConfig().getChildren(name);
-        if(list.isEmpty()){
+        if (hasCFNode()) {
+            throw new IllegalArgumentException("this configuration does not have an Apache ConfigurationNode!");
+        }
+        List
+                list = getConfig().getChildren(name);
+        if (list.isEmpty()) {
             return null;
         }
         return (ConfigurationNode) list.get(0);
@@ -153,10 +201,10 @@ public abstract class HierarchicalConfigProvider<T> implements Provider<T>, CfgE
      * Checks that the event applies to this component. The type is the component and the target is Normally you set the component key as a static field in the
      * class (e.g. "mysql") and pass it along in the the {@link #componentFound(CfgEvent)}
      * method. If checkEvent fails, do no more processing with the event.
+     *
      * @param cfgEvent
      * @return
      */
-   abstract  protected boolean checkEvent(CfgEvent cfgEvent);
-
+    abstract protected boolean checkEvent(CfgEvent cfgEvent);
 
 }

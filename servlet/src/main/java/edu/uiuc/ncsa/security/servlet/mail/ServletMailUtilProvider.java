@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.servlet.mail;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
 import edu.uiuc.ncsa.security.util.mail.MailUtilProvider;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -13,6 +14,10 @@ public class ServletMailUtilProvider extends MailUtilProvider {
     }
 
     public ServletMailUtilProvider(ConfigurationNode config) {
+        super(config);
+    }
+
+    public ServletMailUtilProvider(CFNode config) {
         super(config);
     }
 

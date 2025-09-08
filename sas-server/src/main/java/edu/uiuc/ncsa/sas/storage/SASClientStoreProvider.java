@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.sas.storage;
 
 import edu.uiuc.ncsa.sas.client.SASClient;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.configuration.provider.MultiTypeProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -20,11 +21,12 @@ public class SASClientStoreProvider<T extends SASClientStore> extends MultiTypeP
         this.clientProvider = clientProvider;
     }
 
-/*
-    public SATClientStoreProvider(MyLoggingFacade logger, String type, String target) {
-        super(logger, type, target);
+    public SASClientStoreProvider(CFNode config, boolean disableDefaultStore, MyLoggingFacade logger, String type, String target,
+                                  IdentifiableProvider<? extends SASClient> clientProvider) {
+        super(config, disableDefaultStore, logger, type, target);
+        this.clientProvider = clientProvider;
     }
-*/
+
 
     protected IdentifiableProvider<? extends SASClient> clientProvider;
 

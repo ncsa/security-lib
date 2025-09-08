@@ -1,13 +1,11 @@
 package edu.uiuc.ncsa.security.storage.sql;
 
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.core.configuration.Configurations;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
-import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
+import edu.uiuc.ncsa.security.storage.AbstractUpkeepStoreProvider;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfigUtils;
-import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
 import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionParameters;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -17,7 +15,7 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
  * <p>Created by Jeff Gaynor<br>
  * on 1/10/12 at  2:47 PM
  */
-public abstract class SQLStoreProvider<T extends Store> extends TypedProvider<T> {
+public abstract class SQLStoreProvider<T extends Store> extends AbstractUpkeepStoreProvider<T> {
 
     public String getSchema() {
         if(getConnectionPool().getConnectionParameters() instanceof DerbyConnectionParameters){
@@ -66,8 +64,29 @@ public abstract class SQLStoreProvider<T extends Store> extends TypedProvider<T>
         connectionPoolProvider = cpp;
         this.converter = converter;
     }
+    protected SQLStoreProvider(CFNode config,
+                               ConnectionPoolProvider<? extends ConnectionPool> cpp,
+                               String type,
+                               String target,
+                               MapConverter converter) {
+        super(config, type, target);
+        connectionPoolProvider = cpp;
+        this.converter = converter;
+    }
 
     protected SQLStoreProvider(ConfigurationNode config,
+                               ConnectionPoolProvider<? extends ConnectionPool> cpp,
+                               String type,
+                               String target,
+                               String tablename,
+                               MapConverter converter
+    ) {
+        super(config, type, target);
+        connectionPoolProvider = cpp;
+        this.tablename = tablename;
+        this.converter = converter;
+    }
+    protected SQLStoreProvider(CFNode config,
                                ConnectionPoolProvider<? extends ConnectionPool> cpp,
                                String type,
                                String target,
@@ -85,14 +104,14 @@ public abstract class SQLStoreProvider<T extends Store> extends TypedProvider<T>
                                String type,
                                String target,
                                MapConverter converter) {
-        this(null, cpp, type, target, converter);
+        this((CFNode)null, cpp, type, target, converter);
     }
 
     protected SQLStoreProvider(ConnectionPoolProvider<? extends ConnectionPool> cpp,
                                String type, String target,
                                String tablename,
                                MapConverter converter) {
-        this(null, cpp, type, target, tablename, converter);
+        this((CFNode)null, cpp, type, target, tablename, converter);
     }
 
     public SQLStoreProvider() {
@@ -122,28 +141,4 @@ public abstract class SQLStoreProvider<T extends Store> extends TypedProvider<T>
 
     public abstract T newInstance(Table table);
 
-    public UpkeepConfiguration getUpkeepConfiguration() {
-
-        return upkeepConfiguration;
-    }
-
-    public void setUpkeepConfiguration(UpkeepConfiguration upkeepConfiguration) {
-        this.upkeepConfiguration = upkeepConfiguration;
-    }
-
-    UpkeepConfiguration upkeepConfiguration;
-
-    @Override
-    public void setConfig(ConfigurationNode config) {
-        super.setConfig(config);
-        ConfigurationNode upkeepNode = Configurations.getFirstNode(getConfig(), UpkeepConfigUtils.UPKEEP_TAG);
-        if (upkeepNode != null) {
-            try {
-                upkeepConfiguration = UpkeepConfigUtils.processUpkeep(Configurations.getFirstNode(getConfig(), UpkeepConfigUtils.UPKEEP_TAG));
-            } catch (Throwable t) {
-                System.err.println("could not load configuration for " + getClass().getSimpleName() + ":" + t.getMessage());
-                throw t;
-            }
-        }
-    }
 }

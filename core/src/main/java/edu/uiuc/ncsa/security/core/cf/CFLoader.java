@@ -25,6 +25,21 @@ import java.util.*;
 
 import static edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations.*;
 
+/**
+ * Loads teh configuration from the file or other source. Typical idiom for use:
+ * <pre>
+ *         FileInputStream fis = getFileInputStream("alias/cfg-alias.xml");
+ *         {@link CFLoader} config = new CFLoader();
+ *         {@link CFBundle} bundle = config.loadBundle(fis, "service");
+ *         {@link CFNode} node = bundle.getNamedConfig("A");
+ * </pre>
+ * In this case, a file with a relative path is loaded, the bundle created
+ * for the given tag (so all of the tags named "service" are in the resulting bundle)
+ * and then a specific configuration of type "service" with
+ * name "A" is retrieved. This is the top node
+ * for that configuration. All environment variables and inheritence has been resolved,
+ * so you can just use the CFNode's methods.
+ */
 public class CFLoader {
     public static final String FILE_TAG = "file";
     public static final String INCLUDE_TAG = "include";

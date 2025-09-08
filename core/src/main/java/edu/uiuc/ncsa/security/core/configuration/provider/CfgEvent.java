@@ -1,8 +1,10 @@
 package edu.uiuc.ncsa.security.core.configuration.provider;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.util.EventObject;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -20,6 +22,11 @@ public class CfgEvent extends EventObject {
         configuration = config;
     }
 
+    public CfgEvent(Object source, CFNode config) {
+        super(source);
+        cfNode = config;
+    }
+
     public ConfigurationNode getConfiguration() {
         return configuration;
     }
@@ -29,4 +36,36 @@ public class CfgEvent extends EventObject {
     }
 
     ConfigurationNode configuration;
+
+    public CFNode getCFNode() {
+        return cfNode;
+    }
+
+    public void setCFNode(CFNode cfNode) {
+        this.cfNode = cfNode;
+    }
+
+    CFNode cfNode;
+    protected boolean hasCFNode() {return cfNode != null;}
+    public String getName(){
+        if(hasCFNode()){
+
+        }
+        return configuration.getName();
+    }
+    List children = null;
+
+    public List getChildren(String name) {
+        if(children == null){
+            if(hasCFNode()){
+                children = cfNode.getChildren(name);
+            }else{
+                children = configuration.getChildren(name);
+            }
+        }
+        return children;
+    }
+    public boolean hasChildren(String name) {
+        return !getChildren(name).isEmpty();
+    }
 }

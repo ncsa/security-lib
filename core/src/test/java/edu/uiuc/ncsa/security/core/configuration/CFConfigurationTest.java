@@ -185,4 +185,32 @@ public class CFConfigurationTest extends TestCase {
         }
         assert !bad : "alias cycle not detected";
     }
+
+    /**
+     * Tests that gettig a configuration then iterating over its children works
+     * @throws Exception
+     */
+    public void testChildren() throws Exception {
+        FileInputStream fis = getFileInputStream("cfg-children.xml");
+        CFLoader config = new CFLoader();
+        String[] contents = new String[]{"p_content", "q_content", "r_content", "s_content"};
+        CFBundle bundle = config.loadBundle(fis, "service");
+        CFNode node = bundle.getNamedConfig("A");
+        List<CFNode> kidList = node.getChildren("kids");
+        List<CFNode> kids = kidList.get(0).getChildren("kid");
+        int i = 0;
+        for (CFNode kid : kids) {
+            assert kid.getNodeContents().equals(contents[i++]); // checks nodes in order
+        }
+        // Check that we can read stuff nested in a complex structure
+        CFNode test = node.getFirstChild("nested")
+                .getFirstChild("elements")
+                .getFirstChild("element")
+                .getFirstChild("test");
+        // Show reading attribute wotks
+        assert test.getFirstAttribute("name").equals("nested");
+        assert test.getFirstBooleanValue("boolean");
+        // Show reading CData section works with weird/illegal characters.
+        assert test.getFirstNode("path").getNodeContents().equals("/φΧχΨψΩω/⁺→⇒∅/<  >/∧∨≈≔≕≠");
+    }
 }

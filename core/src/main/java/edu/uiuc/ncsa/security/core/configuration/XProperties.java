@@ -218,12 +218,12 @@ public class XProperties extends Properties {
     /**
      * Strings that this will treat as equivalent to logical true.
      */
-    public static String[] LOGICAL_TRUES = new String[]{"true", "ok", "yes", "1", "on", "yup", "yeah", "enable", "enabled"};
+    public static String[] LOGICAL_TRUES = StringUtils.LOGICAL_TRUES;
 
     /**
      * Strings this will treat as equivalent to logical false.
      */
-    public static String[] LOGICAL_FALSES = new String[]{"false", "no", "0", "off", "nope", "nay", "disable", "disabled"};
+    public static String[] LOGICAL_FALSES = StringUtils.LOGICAL_FALSES;
 
     /**
      * Retrieves the boolean value. Any of <code>LOGICAL_TRUES</code> are equivalent to
@@ -235,21 +235,12 @@ public class XProperties extends Properties {
      */
     public boolean getBoolean(String key) {
         String rawOut = getProperty(key);
-        String out = rawOut.toLowerCase();
-        if (out == null) {
+        if (rawOut == null) {
             throw new GeneralException("null value for key >>" + key + "<< encountered.");
         }
-        for (int i = 0; i < LOGICAL_TRUES.length; i++) {
-            if (LOGICAL_TRUES[i].equals(out)) {
-                return true;
-            }
-        }
-        for (int i = 0; i < LOGICAL_FALSES.length; i++) {
-            if (LOGICAL_FALSES[i].equals(out)) {
-                return false;
-            }
-        }
-        throw new GeneralException("unknown value >" + rawOut + "< for boolean key >" + key + "<");
+        Boolean out = StringUtils.toBoolean(rawOut, true);
+        if(out!=null){return out;}
+        throw new GeneralException("unknown value >" + rawOut + "< for boolean, key >" + key + "<");
     }//end getBoolean(String)
 
 

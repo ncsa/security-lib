@@ -1087,12 +1087,12 @@ public class CLIDriver {
     /**
      * Strings that this will treat as equivalent to logical true.
      */
-    public static String[] LOGICAL_TRUES = new String[]{"true", "ok", "yes", "1", "on", "yup", "yeah", "enable", "enabled"};
+    public static String[] LOGICAL_TRUES = StringUtils.LOGICAL_TRUES;
 
     /**
      * Strings this will treat as equivalent to logical false.
      */
-    public static String[] LOGICAL_FALSES = new String[]{"false", "no", "0", "off", "nope", "nay", "disable", "disabled"};
+    public static String[] LOGICAL_FALSES = StringUtils.LOGICAL_FALSES;
 
     /**
      * This checks that the string is one of the allowed trues or false. Anything else returns a null.
@@ -1101,12 +1101,6 @@ public class CLIDriver {
      * @return
      */
     public Boolean isTrue(String raw) {
-        for (String s : LOGICAL_TRUES) {
-            if (s.equals(raw)) return Boolean.TRUE;
-        }
-        for (String s : LOGICAL_FALSES) {
-            if (s.equals(raw)) return Boolean.FALSE;
-        }
-        return null;
+        return StringUtils.toBoolean(raw);
     }
 }

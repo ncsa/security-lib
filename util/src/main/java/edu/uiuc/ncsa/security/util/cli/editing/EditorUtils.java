@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.cli.editing;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -77,6 +78,40 @@ public class EditorUtils {
         }
         return editors;
     }
+    public static Editors getEditors(CFNode cfNode) {
+        Editors editors = new Editors(); // never null
+        if (cfNode == null) {
+            return editors;
+        }
+        CFNode node = cfNode.getFirstNode( EDITORS_TAG);
+        if (node != null) {
+            // Loop through all the editor elements
+            for (CFNode kid : node.getChildren(EDITOR_TAG)) {
+                String name = kid.getFirstAttribute(EDITOR_NAME_ATTR);
+                if (StringUtils.isTrivial(name)) {
+                    continue; // not a valid node.
+                }
+                EditorEntry qdlEditor = new EditorEntry();
+                qdlEditor.name = name;
+                qdlEditor.exec = kid.getFirstAttribute( EDITOR_EXEC_ATTR);
+                qdlEditor.clearScreen = kid.getFirstBooleanValue( EDITOR_CLEAR_SCREEN_ATTR, false);
+                for (CFNode arg : kid.getChildren(EDITOR_ARG_TAG)) {
+                    EditorArg qdlEditorArg = new EditorArg();
+                    String flag = arg.getFirstAttribute(EDITOR_ARG_FLAG_ATTR);
+                    if (isTrivial(flag)) {
+                        continue;
+                    }
+                    qdlEditorArg.flag = flag;
+                    qdlEditorArg.connector = arg.getFirstAttribute( EDITOR_ARG_CONNECTOR_ATTR);
+                    qdlEditorArg.value = arg.getFirstAttribute( EDITOR_ARG_VALUE_ATTR);
+                    qdlEditor.args.add(qdlEditorArg);
+                }
+                editors.put(qdlEditor);
+            }
+        }
+        return editors;
+    }
+
 
     protected static void say(String x) {
         System.out.println(x);

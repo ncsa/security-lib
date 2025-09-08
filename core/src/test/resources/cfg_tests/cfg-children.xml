@@ -1,0 +1,23 @@
+<!--
+      Test for reading a list from a configuration element and navigating it.
+-->
+<config>
+    <service name="A" >
+        <kids>
+            <kid name="p">p_content</kid>
+            <kid name="q">q_content</kid>
+            <kid name="r">r_content</kid>
+            <kid name="s">s_content</kid>
+        </kids>
+        <nested>
+            <elements>
+                <element>
+                    <test name="nested"
+                          boolean="true">
+                        <path><![CDATA[/φΧχΨψΩω/⁺→⇒∅/<  >/∧∨≈≔≕≠]]></path>
+                    </test>
+                </element>
+            </elements>
+        </nested>
+    </service>
+</config>
