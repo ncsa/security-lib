@@ -89,7 +89,7 @@ public abstract class TypedProvider<T> extends HierarchicalConfigProvider<T> {
             setConfig(cfgEvent.getConfiguration().getChildren(getTarget()).get(0));
             return true;
         }*/
-        if (cfgEvent.getName().equals(getType()) && !cfgEvent.hasChildren(getTarget())) {
+        if (cfgEvent.getName().equals(getType()) && cfgEvent.hasChildren(getTarget())) {
             if(hasCFNode()){
                 setParentCFNode(cfgEvent.getCFNode());
                 setCFNode((CFNode) cfgEvent.getChildren(getTarget()).get(0));
