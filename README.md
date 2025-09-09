@@ -8,7 +8,7 @@ several libraries, e.g. This is how the storage library would be referenced
 <dependency>
     <groupId>edu.uiuc.ncsa.security</groupId>
     <artifactId>storage</artifactId>
-    <version>6.x-SNAPSHOT</version>
+    <version>6.2.1</version>
     <scope>compile</scope>
 </dependency>
 ```

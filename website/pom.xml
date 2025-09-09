@@ -6,7 +6,7 @@
 
     <groupId>edu.uiuc.ncsa.security</groupId>
     <artifactId>website</artifactId>
-    <version>6.x-SNAPSHOT</version>
+    <version>6.2.1</version>
 
     <name>NCSA security utilities website</name>
     <!-- FIXME change it to the project's website -->
@@ -21,12 +21,12 @@
          <dependency>
              <groupId>edu.uiuc.ncsa.security</groupId>
              <artifactId>servlet</artifactId>
-             <version>6.x-SNAPSHOT</version>
+             <version>6.2.1</version>
          </dependency>
          <dependency>
              <groupId>edu.uiuc.ncsa.security</groupId>
              <artifactId>core</artifactId>
-             <version>6.x-SNAPSHOT</version>
+             <version>6.2.1</version>
          </dependency>
 
          <dependency>
@@ -38,12 +38,12 @@
          <dependency>
              <groupId>edu.uiuc.ncsa.security</groupId>
              <artifactId>storage</artifactId>
-             <version>6.x-SNAPSHOT</version>
+             <version>6.2.1</version>
          </dependency>
          <dependency>
              <groupId>edu.uiuc.ncsa.security</groupId>
              <artifactId>util</artifactId>
-             <version>6.x-SNAPSHOT</version>
+             <version>6.2.1</version>
          </dependency>
 
      </dependencies>
