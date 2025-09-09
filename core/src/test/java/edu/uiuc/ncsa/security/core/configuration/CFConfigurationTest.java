@@ -31,6 +31,16 @@ public class CFConfigurationTest extends TestCase {
         assert node.getNodeContents().equals("foo");
     }
 
+    public void testOA4MPCfg() throws Exception {
+        FileInputStream fis = new FileInputStream("/home/ncsa/dev/csd/config/servers.xml");
+        CFLoader config = new CFLoader();
+        CFBundle bundle = config.loadBundle(fis, "service");
+        CFNode node = bundle.getNamedConfig("localhost:oa4mp.oa2.mariadb");
+        //Node testedNode = CFXMLConfigurations.getConfig(doc, "service", "A");
+        //assert testedNode.getTextContent().equals("foo");
+        assert node.getNodeContents().equals("foo");
+        assert node.getFirstAttribute("version").equals("1.0");
+    }
     /**
      * Tests that a cycle in an alias is detected and an exception is thrown.
      *
@@ -102,6 +112,21 @@ public class CFConfigurationTest extends TestCase {
         CFNode testC = cfg.getNamedConfig( "C");
         assert testC.getNodeContents().equals("included C");
     }
+
+    public void testBadFileInclude() throws Exception {
+        boolean goodTest = false;
+        try {
+            CFBundle cfg = new CFLoader.Builder()
+                    .tagname("bad-include")
+                    .inputStream(getFileInputStream("file/bad-include.xml"))
+                    .build()
+                    .loadBundle();
+        }catch(MyConfigurationException e) {
+            goodTest = true;
+        }
+assert goodTest : "bad include not detected";
+    }
+
 
     /**
      * tests that loading a file that tries to include it (i.e., circular reference) failes

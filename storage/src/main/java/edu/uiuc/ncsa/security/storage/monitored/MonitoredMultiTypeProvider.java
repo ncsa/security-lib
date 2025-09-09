@@ -26,6 +26,10 @@ public abstract class MonitoredMultiTypeProvider<T> extends MultiTypeProvider<T>
         super(config, disableDefaultStore, logger, type, target);
     }
 
+    public MonitoredMultiTypeProvider(CFNode config, boolean disableDefaultStore, MyLoggingFacade logger, String type, String target) {
+        super(config, disableDefaultStore, logger, type, target);
+    }
+
     public MonitoredMultiTypeProvider(MyLoggingFacade logger, String type, String target) {
         super(logger, type, target);
     }

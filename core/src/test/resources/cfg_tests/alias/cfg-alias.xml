@@ -3,4 +3,6 @@
     <service name="B" alias="C"/>
     <service name="C" alias="D"/>
     <service name="D" >foo</service>
+    <service name="E" >Efoo</service> <!-- couple that aren't aliases to make sure they work too. -->
+    <service name="F" >Ffoo</service>
 </config>

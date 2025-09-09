@@ -390,21 +390,15 @@ public class CFLoader {
                     visitedFiles.add(currentFile);
                     File x = new File(currentFile);
                     if (x.isDirectory()) {
-                        if (DebugUtil.isTraceEnabled()) {
-                            System.out.println("Configuration error: The file named \"" + currentFile + "\" is a directory. Skipping...");
-                        }
-                        continue;
+                            throw new MyConfigurationException("Included file \"" + currentFile + "\" is a directory.");
                     }
                     if (!x.exists()) {
-                        if (DebugUtil.isTraceEnabled()) {
-                            System.out.println("Configuration error: The file named \"" + currentFile + "\" does not exist. Skipping...");
-                        }
-                        continue;
+                            throw new MyConfigurationException("included file \"" + currentFile + "\" does not exist.");
                     }
                     if (x.canRead()) {
                         Document doc = loadDocument(x);
-                        System.out.println("resolveFiles: loaded doc");
-                        printDocument(doc, System.out);
+                        //System.out.println("resolveFiles: loaded doc");
+                        //printDocument(doc, System.out);
                         resolveFileReferences(rootDoc, doc.getDocumentElement(), stack, visitedFiles);
                         Node root = doc.getDocumentElement();
                         NodeList kids = root.getChildNodes();
@@ -420,8 +414,8 @@ public class CFLoader {
                                 rootDoc.getDocumentElement().appendChild(importedNode);
                             }
                         }
-                        System.out.println("resolveFiles: root  doc post");
-                        printDocument(rootDoc, System.out);
+                     //   System.out.println("resolveFiles: root  doc post");
+                     //   printDocument(rootDoc, System.out);
                     } else {
                         if (DebugUtil.isTraceEnabled()) {
                             System.out.println("Configuration error: The file named \"" + currentFile + "\" cannot be read (permission issue?). Skipping...");

@@ -35,9 +35,7 @@ public class CFXMLConfigurations {
      * Top-level tag for all configurations this system understands
       */
     public static final String CONFIGURATION_TAG = "config";
-    public static final String CONFIGURATION2_TAG = "bundle";
-    public static final String FILE_TAG = "file";
-    public static final String INCLUDE_TAG = "include";
+
 
     /**
      * This just returns the {@link Document}.

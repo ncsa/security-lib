@@ -37,7 +37,7 @@ public abstract class CFDBConfigLoader<T extends AbstractEnvironment> extends CF
     }
 
 
-    MySQLConnectionPoolProvider mySQLConnectionPoolProvider;
+    protected  MySQLConnectionPoolProvider mySQLConnectionPoolProvider;
 
 
     public MySQLConnectionPoolProvider getMySQLConnectionPoolProvider() {
@@ -47,7 +47,7 @@ public abstract class CFDBConfigLoader<T extends AbstractEnvironment> extends CF
         return mySQLConnectionPoolProvider;
     }
 
-    MariaDBConnectionPoolProvider mariaDBConnectionPoolProvider;
+    protected  MariaDBConnectionPoolProvider mariaDBConnectionPoolProvider;
 
     public MariaDBConnectionPoolProvider getMariaDBConnectionPoolProvider() {
         if (mariaDBConnectionPoolProvider == null) {
@@ -75,7 +75,7 @@ public abstract class CFDBConfigLoader<T extends AbstractEnvironment> extends CF
         return mariaDBConnectionPoolProvider;
     }
 
-    DerbyConnectionPoolProvider derbyConnectionPoolProvider;
+    protected DerbyConnectionPoolProvider derbyConnectionPoolProvider;
     // need no-arg constructor whose values will be overriden later from configuration.
 
     public DerbyConnectionPoolProvider getDerbyConnectionPoolProvider() {
@@ -89,7 +89,7 @@ public abstract class CFDBConfigLoader<T extends AbstractEnvironment> extends CF
         return derbyConnectionPoolProvider;
     }
 
-    PGConnectionPoolProvider pgConnectionPoolProvider = null;
+    protected  PGConnectionPoolProvider pgConnectionPoolProvider = null;
 
     public PGConnectionPoolProvider getPgConnectionPoolProvider(String databaseName, String schema) {
         if (pgConnectionPoolProvider == null) {

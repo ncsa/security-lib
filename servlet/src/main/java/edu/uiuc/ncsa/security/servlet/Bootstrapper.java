@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.servlet;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -33,6 +34,14 @@ public abstract class Bootstrapper implements ServletContextListener {
       // no op. Override if needed.
     }
 
+    /**
+     * Toggles using new (CF) configurations or sticks with the old Apache.
+     */
+    protected boolean useCF = false;
+    /**
+     * Entry point for this class. The web server calls (once) this when the system starts.
+     * @param event
+     */
     @Override
     public void contextInitialized(ServletContextEvent event) {
         try {
@@ -51,6 +60,8 @@ public abstract class Bootstrapper implements ServletContextListener {
     public abstract ConfigurationLoader getConfigurationLoader(ServletContext servletContext) throws Exception;
 
     public abstract ConfigurationLoader getConfigurationLoader(ConfigurationNode node) throws MyConfigurationException;
+
+    public abstract ConfigurationLoader getConfigurationLoader(CFNode node) throws MyConfigurationException;
 
      public abstract Initialization getInitialization();
 }
