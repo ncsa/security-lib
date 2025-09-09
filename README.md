@@ -53,7 +53,7 @@ project does not currently use `$NCSA_DEV_OUTPUT`.
                          
 # Rolling a release
 
-The critical part is to replace the SNAPSHOT tag (e.g. 6.x-SNAPSHOT)
+The critical part is to replace the SNAPSHOT tag (e.g. 6.2.1)
 globally with your preferred version. Note that this tag will also be found in
 java files (so the system is aware of the current release version), so this
 change does not merely affect the pom.xml files. You should also be sure before

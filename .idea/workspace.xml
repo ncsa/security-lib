@@ -9,8 +9,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="6.2.1 checkin">
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="6.2.1 website rebuild">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -973,7 +974,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="106" />
+    <option name="localTasksCounter" value="107" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -982,7 +983,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Added java serializationfor a few classes. QDL still officially at least allows it, so need it for that." />
     <MESSAGE value="Updating website" />
     <MESSAGE value="Added utility to get all HTTP header parameters properly parsed." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/43 and website" />
@@ -1007,7 +1007,8 @@
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/56" />
     <MESSAGE value="Routine checkin" />
     <MESSAGE value="6.2.1 checkin" />
-    <option name="LAST_COMMIT_MESSAGE" value="6.2.1 checkin" />
+    <MESSAGE value="6.2.1 website rebuild" />
+    <option name="LAST_COMMIT_MESSAGE" value="6.2.1 website rebuild" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
