@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>web-installer</artifactId>
+    <name>Web Installer</name>
     <properties>
      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
      <additionalparam>-Xdoclint:none</additionalparam>
