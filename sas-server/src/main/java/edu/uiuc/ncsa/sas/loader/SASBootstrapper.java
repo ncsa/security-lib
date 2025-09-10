@@ -1,6 +1,9 @@
 package edu.uiuc.ncsa.sas.loader;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.servlet.Bootstrapper;
 import edu.uiuc.ncsa.security.servlet.Initialization;
 import edu.uiuc.ncsa.security.servlet.ServletXMLConfigUtil;
@@ -35,5 +38,10 @@ public class SASBootstrapper extends Bootstrapper {
     @Override
     public Initialization getInitialization() {
         return new SASServletInitializer();
+    }
+
+    @Override
+    public ConfigurationLoader getConfigurationLoader(CFNode node) throws MyConfigurationException {
+        throw new NotImplementedException("Need to add support to SAS for CF System");
     }
 }

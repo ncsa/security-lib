@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.core.configuration.provider;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
@@ -27,6 +28,13 @@ public abstract class MultiTypeProvider<T> extends TypedProvider<T> {
         this.logger =logger;
         this.disableDefaultStore = disableDefaultStore;
     }
+    protected MultiTypeProvider(CFNode config,
+                                boolean disableDefaultStore,
+                                MyLoggingFacade logger, String type, String target) {
+        super(config, type, target);
+        this.logger =logger;
+        this.disableDefaultStore = disableDefaultStore;
+    }
 
     protected MultiTypeProvider(MyLoggingFacade logger, String type, String target) {
         super(type, target);
@@ -45,20 +53,42 @@ public abstract class MultiTypeProvider<T> extends TypedProvider<T> {
      */
     @Override
       public T get() {
-          List kidList = getConfig().getChildren();
-          for (int i = 0; i < kidList.size(); i++) {
-              ConfigurationNode foo = (ConfigurationNode) kidList.get(i);
-              T gotOne = fireComponentFound(new CfgEvent(this, foo));
-              if (gotOne != null) {
-                  return gotOne;
-              }
-          }
-          // if we get to here, return the default store.
-          if(disableDefaultStore){
-              throw new DefaultStoreDisabledException("Error: Default store is not enabled for this configuration.(" + getClass().getSimpleName() + ")");
-          }
-          return getDefaultStore();
+        if(hasCFNode()){
+            return getCF();
+        }
+        return getCN();
       }
+
+    protected T getCF() {
+        List<CFNode> kidList = getCFNode().getChildren();
+        for (int i = 0; i < kidList.size(); i++) {
+            CFNode node =  kidList.get(i);
+            T gotOne = fireComponentFound(new CfgEvent(this, node));
+            if (gotOne != null) {
+                return gotOne;
+            }
+        }
+        // if we get to here, return the default store.
+        if(disableDefaultStore){
+            throw new DefaultStoreDisabledException("Error: Default store is not enabled for this configuration.(" + getClass().getSimpleName() + ")");
+        }
+        return getDefaultStore();
+    }
+    protected T getCN() {
+        List kidList = getConfig().getChildren();
+        for (int i = 0; i < kidList.size(); i++) {
+            ConfigurationNode foo = (ConfigurationNode) kidList.get(i);
+            T gotOne = fireComponentFound(new CfgEvent(this, foo));
+            if (gotOne != null) {
+                return gotOne;
+            }
+        }
+        // if we get to here, return the default store.
+        if(disableDefaultStore){
+            throw new DefaultStoreDisabledException("Error: Default store is not enabled for this configuration.(" + getClass().getSimpleName() + ")");
+        }
+        return getDefaultStore();
+    }
     /**
      * Supply a default store if none is specified. It is also acceptable to throw an exception
      * for this method if no default store should be given.

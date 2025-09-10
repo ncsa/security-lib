@@ -6,7 +6,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
@@ -18,14 +20,17 @@ public class CFNode {
     public CFNode() {
     }
 
-    public int size(){
-        if(!hasNodes()) return 0;
+
+    public int size() {
+        if (!hasNodes()) return 0;
         return nodes.size();
     }
+
     public CFNode(Node node) {
         this.nodes = new ArrayList<Node>(1);
         this.nodes.add(node);
     }
+
     public CFNode(List<Node> nodes) {
         this.nodes = nodes;
     }
@@ -38,13 +43,14 @@ public class CFNode {
         this.nodes = nodes;
     }
 
-    public boolean hasNodes(){
+    public boolean hasNodes() {
         return nodes != null && !nodes.isEmpty();
     }
+
     List<Node> nodes;
 
-    public String getName(){
-        if(!hasNodes()) return null;
+    public String getName() {
+        if (!hasNodes()) return null;
         return nodes.get(0).getNodeName();
     }
 
@@ -67,6 +73,7 @@ public class CFNode {
 
     /**
      * Returns all attributes as strings.
+     *
      * @param name
      * @return
      */
@@ -82,8 +89,31 @@ public class CFNode {
     }
 
     /**
+     * Return <i>all</i> the attributes as a map. You must convert these to whatever they
+     * are supposed to be. Note that this does resolve overrides.
+     *
+     * @return
+     */
+    public Map<String, String> getAttributes() {
+        Map<String, String> map = new HashMap<>();
+        for (Node n : getNodes()) {
+            NamedNodeMap namedNodeMap = n.getAttributes();
+            for (int i = 0; i < namedNodeMap.getLength(); i++) {
+                Node attribute = namedNodeMap.item(i);
+                if (attribute != null) {
+                    map.put(attribute.getNodeName(), attribute.getNodeValue());
+                /*    System.out.println(getClass().getSimpleName() + " attribute Name: " + attribute.getNodeName() +
+                            ", Value: " + attribute.getNodeValue());*/
+                }
+            }
+        }
+        return map;
+    }
+
+    /**
      * Returns all the long values for the attribute. This does not flag errors,
      * it just skips them.
+     *
      * @param name
      * @return
      */
@@ -92,9 +122,9 @@ public class CFNode {
         for (Node n : getNodes()) {
             String x = CFXMLConfigurations.getFirstAttribute(n, name);
             if (!StringUtils.isTrivial(x)) {
-                try{
+                try {
                     attrs.add(Long.parseLong(x));
-                }catch (NumberFormatException e){
+                } catch (NumberFormatException e) {
 
                 }
             }
@@ -106,6 +136,7 @@ public class CFNode {
     /**
      * returns the boolean values for the attribute. It does not flag
      * bad ones, it just skips them.
+     *
      * @param name
      * @return
      */
@@ -114,8 +145,8 @@ public class CFNode {
         for (Node n : getNodes()) {
             String x = CFXMLConfigurations.getFirstAttribute(n, name);
             if (!StringUtils.isTrivial(x)) {
-                Boolean b = toBoolean(x);
-                if(b != null) attrs.add(b);
+                Boolean b = StringUtils.toBoolean(x);
+                if (b != null) attrs.add(b);
             }
         }
         return attrs;
@@ -154,18 +185,55 @@ public class CFNode {
      *
      * @return
      */
-    public CFNode getChildren(String name) {
-        List<Node> kids = new ArrayList<>();
+    public List<CFNode> getChildren(String name) {
+        List<CFNode> kids = new ArrayList<>();
         for (Node n : getNodes()) {
             NodeList nodeList = n.getChildNodes();
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node nn = nodeList.item(i);
                 if (nn.getNodeName().equals(name)) {
-                    kids.add(nn);
+                    kids.add(new CFNode(nn));
                 }
             }
         }
-        return new CFNode(kids);
+        return kids;
+    }
+
+    /**
+     * Get <b>all</b> child nodes.
+     *
+     * @return
+     */
+    public List<CFNode> getChildren() {
+        List<CFNode> kids = new ArrayList<>();
+        for (Node n : getNodes()) {
+            NodeList nodeList = n.getChildNodes();
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node nn = nodeList.item(i);
+                kids.add(new CFNode(nn));
+            }
+        }
+        return kids;
+    }
+
+    /**
+     * Synonym for {@link #getNodeContents()}
+     * @return
+     */
+    public String getValue(){
+        return getNodeContents();
+    }
+    /**
+     * Convenience method to get the zero-th node or null if there is none. In many cases you know
+     * there is exactly a single node and you just want that.
+     *
+     * @param name
+     * @return
+     */
+    public CFNode getFirstChild(String name) {
+        List<CFNode> nodes = getChildren(name);
+        if (nodes.size() == 0) return null;
+        return nodes.get(0);
     }
 
     /**
@@ -209,18 +277,18 @@ public class CFNode {
             return defaultValue;
         }
         for (Node n : getNodes()) {
-            System.out.println(n.getNodeName() + " " + n.getNodeValue());
+            //   System.out.println(n.getNodeName() + " " + n.getNodeValue());
             NodeList kids = n.getChildNodes();
             for (int i = 0; i < kids.getLength(); i++) {
                 Node nn = kids.item(i);
-                System.out.println(nn.getNodeName() + " " + nn.getNodeValue() + " text=" + nn.getTextContent());
+                //     System.out.println(nn.getNodeName() + " " + nn.getNodeValue() + " text=" + nn.getTextContent());
                 if (nn.getNodeName().equals(name)) {
                     String out = nn.getTextContent();
-                    if(out != null) {
+                    if (out != null) {
                         return out;
-                    }else{
+                    } else {
                         out = nn.getNodeValue();
-                        if(out != null) {
+                        if (out != null) {
                             return out;
                         }
                         return defaultValue;
@@ -229,30 +297,31 @@ public class CFNode {
             }
 
         }
-       return defaultValue;
+        return defaultValue;
     }
 
     /**
      * Get the contents of the current node.
+     *
      * @return
      */
     public String getNodeContents() {
-       for (Node n : getNodes()) {
-            System.out.println(n.getNodeName() + " " + n.getNodeValue());
+        for (Node n : getNodes()) {
+            // System.out.println(n.getNodeName() + " " + n.getNodeValue());
             NodeList kids = n.getChildNodes();
             for (int i = 0; i < kids.getLength(); i++) {
                 Node nn = kids.item(i);
-                System.out.println(nn.getNodeName() + " " + nn.getNodeValue() + " text=" + nn.getTextContent());
-                    String out = nn.getTextContent();
-                    if(out != null) {
+                String out = nn.getTextContent();
+                if (!StringUtils.isTrivial(out)) {
+                    return out;
+                } else {
+                    out = nn.getNodeValue();
+                    if (!StringUtils.isTrivial(out)) {
                         return out;
-                    }else{
-                        out = nn.getNodeValue();
-                        if(out != null) {
-                            return out;
-                        }
+                    } else {
                         return null;
                     }
+                }
             }
 
         }
@@ -284,68 +353,67 @@ public class CFNode {
      * @param defaultValue
      * @return
      */
-    public boolean getFirstBooleanAttribute(String attrib, boolean defaultValue) {
+    public boolean getFirstBooleanValue(String attrib, boolean defaultValue) {
         if (!hasNodes()) return defaultValue;
         try {
-            return getFirstBooleanAttribute( attrib);
+            return getFirstBooleanValue(attrib);
         } catch (IllegalArgumentException illegalArgumentException) {
             return defaultValue;
         }
     }
 
-    /**
-     * Checks if the value is explicitly set to true | on or false | off
-     * @param x
-     * @return
-     */
-    Boolean toBoolean(String x) {
-        if (x.equalsIgnoreCase("true") || x.equalsIgnoreCase("on")) return Boolean.TRUE;
-        if (x.equalsIgnoreCase("false") || x.equalsIgnoreCase("off")) return Boolean.FALSE;
-        return null;
-    }
+
     /**
      * Get the first attribute and return a boolean. Note that this supports values of
-     * true, false, on and off. If no such value is found, an exception is raised.
+     * {@link StringUtils#LOGICAL_TRUES} and {@link StringUtils#LOGICAL_FALSES}.
+     * If no such value is found, an error is raised, since use of this method
+     * asserts the value is a boolean.
      *
      * @param attrib
      * @return
      */
-    public boolean getFirstBooleanAttribute(String attrib) {
-        if (!hasNodes()) throw new IllegalArgumentException("no such node " + attrib);
+    public Boolean getFirstBooleanValue(String attrib) {
+        if (!hasNodes()) return null;
         for (Node n : getNodes()) {
             NamedNodeMap namedNodeMap = n.getAttributes();
             Node nn = namedNodeMap.getNamedItem(attrib);
             if (nn != null) {
                 String x = nn.getNodeValue();
                 if (isTrivial(x)) {
-                    throw new IllegalArgumentException("no value for " + attrib);
+                    return null;
                 }
-                Boolean b = toBoolean(x);
-                if(b!=null) return b;
-                throw new IllegalArgumentException("illegal boolean value \"" + x + "\" for attribute " + attrib);
+                Boolean b = StringUtils.toBoolean(x);
+                if (b != null) return b;
+                throw new IllegalArgumentException("Could not parse " + x + " as a long");
             }
         }
-        throw new IllegalArgumentException("no such node " + attrib);
-
+        throw new IllegalArgumentException("No such value for attribute >" + attrib + "<");
     }
 
-    public long getFirstLongAttribute(String attrib) {
-        if (!hasNodes()) throw new IllegalArgumentException("no such node " + attrib);
-        List<String> x = getAttributes( attrib);
+    /**
+     * Return the value as a long {@link Long}. If no such value, a null is returned. If
+     * the value fails to parse as  a long, an illegal argument exception is raised
+     *
+     * @param attrib
+     * @return
+     */
+    public Long getFirstLongAttribute(String attrib) {
+        if (!hasNodes()) return null;
+        List<String> x = getAttributes(attrib);
         if (x.isEmpty()) {
-            throw new IllegalArgumentException("no value for " + attrib);
+            return null;
         }
-        for(String s : x) {
-            try {
-                return Long.parseLong(s);
-            } catch (NumberFormatException nfx) {
-            }
+        String s = x.get(0);
+        try {
+            return Long.parseLong(s);
+        } catch (NumberFormatException nfx) {
+            throw new IllegalArgumentException("Could not parse " + s + " as a long for attribute >" + attrib + "<");
         }
-        throw new IllegalArgumentException("Could not parse \"" + x + "\" as a long for " + attrib);
     }
 
     /**
      * Get the first attribute that is a long. If no such attribute, return the default value.
+     *
      * @param attrib
      * @param defaultValue
      * @return
@@ -353,7 +421,7 @@ public class CFNode {
     public long getFirstLongAttribute(String attrib, long defaultValue) {
         if (!hasNodes()) return defaultValue;
         try {
-            return getFirstLongAttribute( attrib);
+            return getFirstLongAttribute(attrib);
         } catch (IllegalArgumentException nfx) {
         }
         return defaultValue;

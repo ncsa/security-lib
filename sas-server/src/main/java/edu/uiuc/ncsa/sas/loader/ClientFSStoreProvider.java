@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.sas.loader;
 import edu.uiuc.ncsa.sas.client.SASClient;
 import edu.uiuc.ncsa.sas.storage.FSClientStore;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
 import edu.uiuc.ncsa.security.storage.FSProvider;
 import edu.uiuc.ncsa.security.storage.FileStore;
@@ -20,7 +21,11 @@ public class ClientFSStoreProvider<T extends FileStore> extends FSProvider<T> {
     public ClientFSStoreProvider(ConfigurationNode config,  MapConverter converter, Provider<? extends SASClient> clientProvider) {
         super(config, StorageConfigurationTags.FILE_STORE, "clients", converter);
         this.clientProvider= clientProvider;
+    }
 
+    public ClientFSStoreProvider(CFNode config, MapConverter converter, Provider<? extends SASClient> clientProvider) {
+        super(config, StorageConfigurationTags.FILE_STORE, "clients", converter);
+        this.clientProvider= clientProvider;
     }
 
     Provider<? extends SASClient> clientProvider;

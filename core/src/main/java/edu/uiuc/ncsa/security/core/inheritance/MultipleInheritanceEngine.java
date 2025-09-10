@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.security.core.inheritance;
 
+import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
+
 import java.util.*;
 
 /**
@@ -122,7 +124,11 @@ public class MultipleInheritanceEngine {
                 }
                 checkedAliases.add(currentKey);
                 currentKey = currentValue;
-                currentValue = unresolvedAliases.get(currentKey).getAlias();
+                AliasAndOverrides y = unresolvedAliases.get(currentKey);
+                if(y == null){
+                    throw new MyConfigurationException("Unresolvable alias for \"" + currentKey + "\". Check the spelling, or is one of your includes missing?");
+                }
+                currentValue = y.getAlias();
                 runningList.addAll(unresolvedAliases.get(currentKey).getOverrides());
             }
             List<String> xxx = new ArrayList<>();

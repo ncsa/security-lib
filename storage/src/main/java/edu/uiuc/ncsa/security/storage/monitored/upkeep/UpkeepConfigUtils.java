@@ -1,9 +1,12 @@
 package edu.uiuc.ncsa.security.storage.monitored.upkeep;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.monitored.Monitored;
 import edu.uiuc.ncsa.security.storage.monitored.MonitoredKeys;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
@@ -13,6 +16,7 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 import java.io.File;
 import java.security.SecureRandom;
 import java.text.ParseException;
+import java.time.LocalTime;
 import java.util.*;
 
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
@@ -144,8 +148,97 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
         return upkeepConfiguration;
     }
 
+    /**
+     * Port to use CFNode
+     * @param upkeepNode
+     * @return
+     */
+    public static UpkeepConfiguration processUpkeep(CFNode upkeepNode) {
+        UpkeepConfiguration upkeepConfiguration = new UpkeepConfiguration();
+        if (upkeepNode == null || !upkeepNode.getName().equals(UPKEEP_TAG)) {
+            //  upkeepConfiguration.setEnabled(false);
+            return null;
+        }
+        upkeepConfiguration.setEnabled(upkeepNode.getFirstBooleanValue( UPKEEP_ENABLED, true));
+        upkeepConfiguration.setDebug(upkeepNode.getFirstBooleanValue( UPKEEP_DEBUG, false));
+        upkeepConfiguration.setTestOnly(upkeepNode.getFirstBooleanValue( UPKEEP_TEST_ONLY, false));
+        upkeepConfiguration.setAlarms(getAlarms(upkeepNode, UPKEEP_ALARMS));
+        upkeepConfiguration.setVerbose(upkeepNode.getFirstBooleanValue( UPKEEP_VERBOSE, false));
+        upkeepConfiguration.setSkipVersions(doSkipVersions(upkeepNode));
+
+        upkeepConfiguration.setVerbose(upkeepNode.getFirstBooleanValue( RULE_SKIP_VERSIONS, true));
+        upkeepConfiguration.setOutput(upkeepNode.getFirstAttribute(UPKEEP_OUTPUT));
+        String raw = upkeepNode.getFirstAttribute( UPKEEP_RUN_COUNT);
+        if (!isTrivial(raw)) {
+            try {
+                upkeepConfiguration.setRunCount(Integer.parseInt(raw));
+            } catch (NumberFormatException nfx) {
+                upkeepConfiguration.setRunCount(UPKEEP_DEFAULT_RUN_COUNT);
+            }
+        }
+        raw = upkeepNode.getFirstAttribute( UPKEEP_INTERVAL);
+        // contract is to use default interval if neither alarms nor interval is set.
+        if (isTrivial(raw)) {
+            if (!upkeepConfiguration.hasAlarms()) {
+                upkeepConfiguration.setInterval(UPKEEP_DEFAULT_INTERVAL);
+            }
+        } else {
+            upkeepConfiguration.setInterval(XMLConfigUtil.getValueSecsOrMillis(raw, true));
+        }
+        List<CFNode> ruleNodes = upkeepNode.getChildren(RULE_TAG);
+        for (CFNode ruleNode : ruleNodes) {
+            RuleList rule = createRuleList(ruleNode);
+            if (rule != null) {
+                upkeepConfiguration.add(rule);
+            }
+        }
+        // Now to process extends clauses
+        for (RuleList ruleList : upkeepConfiguration.getRuleList()) {
+            if (ruleList.getExtendsList() != null && !ruleList.getExtendsList().isEmpty()) {
+                RuleList targetRL = new RuleList();
+                /*
+                  This is very simple-minded. The assumption is that these lists are well-behaved.
+                  Future improvement would be to recurse all the extensions for cycles and
+                  rank dependencies but that is a large-scale undertaking.
+
+                  Mebbe...
+
+                The argument for keeping is really dumb is that this facility is for deleting things
+                from stores and a mistake might be very costly indeed to recover from. Making this stupid and
+                prone to just failing outright means the administrator has to do the work and can't just
+                throw configurations at it.
+                 */
+
+                for (String rlName : ruleList.getExtendsList()) {
+                    RuleList sourceRL = upkeepConfiguration.getRulesMap().get(rlName);
+                    if (sourceRL == null) {
+                        throw new IllegalArgumentException("Cannot find rule with name \"" + rlName + "\"");
+                    } else {
+                        targetRL = doExtension(sourceRL, targetRL);
+                    }
+                } //end for
+                targetRL = doExtension(ruleList, targetRL); // add the source at the end
+                targetRL.setEnabled(ruleList.isEnabled()); // this is not set in the method.
+                targetRL.setName(ruleList.getName());
+                // now list surgery
+                upkeepConfiguration.getRulesMap().put(targetRL.getName(), targetRL);
+                for (int i = 0; i < upkeepConfiguration.getRuleList().size(); i++) {
+                    if (upkeepConfiguration.getRuleList().get(i).getName().equals(targetRL.getName())) {
+                        upkeepConfiguration.getRuleList().set(i, targetRL);
+                        break;
+                    }
+                }
+            }
+        }
+        return upkeepConfiguration;
+    }
+
+
     protected static Boolean doSkipVersions(ConfigurationNode node) {
         return getaBoolean(node, RULE_SKIP_VERSIONS);
+    }
+    protected static Boolean doSkipVersions(CFNode node) {
+        return node.getFirstBooleanValue( RULE_SKIP_VERSIONS); // CFNode does this right, so don't need local util
     }
 
     private static Boolean getaBoolean(ConfigurationNode node, String ruleSkipVersions) {
@@ -164,8 +257,14 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
         return null;
     }
 
+    protected static Boolean doSkipCollateral(CFNode node) {
+        return doSkipCollateral(node.getFirstAttribute( RULE_SKIP_COLLATERAL));
+    }
     protected static Boolean doSkipCollateral(ConfigurationNode node) {
-        String raw = getFirstAttribute(node, RULE_SKIP_COLLATERAL);
+        return doSkipCollateral(getFirstAttribute(node, RULE_SKIP_COLLATERAL));
+    }
+
+    private static Boolean doSkipCollateral(String raw) {
         if (!isTrivial(raw)) {
             if (raw.equals("true")) {
                 return Boolean.TRUE;
@@ -199,6 +298,36 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
         secureRandom.nextBytes(b);
         return "anon_" + b32Encode(b).toLowerCase();
     }
+    protected static RuleEntry createRuleEntry(CFNode ruleEntryNode) {
+        RuleEntry ruleEntry = null;
+        switch (ruleEntryNode.getName()) {
+            case DATE_TAG:
+                String type = ruleEntryNode.getFirstAttribute( DATE_TYPE);
+                String when = ruleEntryNode.getFirstAttribute( DATE_WHEN);
+                String rawDate = ruleEntryNode.getFirstAttribute( DATE_VALUE);
+                DateValue dateValue = createDateValue(rawDate);
+                ruleEntry = new DateEntry(type, when, dateValue);
+                break;
+            case ID_TAG:
+                Object obj = ruleEntryNode.getValue();
+                if (!(obj instanceof String)) {
+                    throw new IllegalArgumentException("unknown id type \"" + obj + "\"");
+                }
+                String v = (String) obj;
+                if (isTrivial(v)) {
+                    throw new IllegalArgumentException("missing value for " + ID_TAG + " element");
+                }
+
+                IDEntry idEntry = new IDEntry(ruleEntryNode.getFirstBooleanValue( ID_REGEX_FLAG, false), (String) obj);
+                idEntry.setNegation(ruleEntryNode.getFirstBooleanValue( ID_NOT_FLAG, false));
+                ruleEntry = idEntry;
+                break;
+            default:
+                throw new MyConfigurationException("unknown rule type \"" + ruleEntryNode.getName() + "\"");
+        }
+        return ruleEntry;
+    }
+
 
     protected static RuleEntry createRuleEntry(ConfigurationNode ruleEntryNode) {
         RuleEntry ruleEntry = null;
@@ -229,6 +358,40 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
         }
         return ruleEntry;
     }
+
+    private static RuleList createRuleList(CFNode ruleNode) {
+        RuleList ruleList = new RuleList();
+        ruleList.setEnabled(ruleNode.getFirstBooleanValue( RULE_ENABLED, true));
+        ruleList.setAction(ruleNode.getFirstAttribute( RULE_ACTION));
+        ruleList.setVerbose(ruleNode.getFirstBooleanValue( UPKEEP_VERBOSE, false));
+        ruleList.setSkipVersions(doSkipVersions(ruleNode));
+        ruleList.setSkipCollateral(doSkipCollateral(ruleNode));
+        String rawList = ruleNode.getFirstAttribute(RULE_EXTENDS);
+        if (!isTrivial(rawList)) {
+            List<String> rr = new ArrayList<>();
+            StringTokenizer tokenizer = new StringTokenizer(rawList, ",");
+            while (tokenizer.hasMoreTokens()) {
+                rr.add(tokenizer.nextToken().trim());
+            }
+            ruleList.setExtendsList(rr);
+        }
+
+        String name = ruleNode.getFirstAttribute(RULE_NAME);
+        if (isTrivial(name)) {
+            name = getRandomRuleName();
+        }
+        ruleList.setName(name);
+        // need to process in order
+        List<CFNode> kids = ruleNode.getChildren();
+        for (CFNode kid : kids) {
+            RuleEntry ruleEntry = createRuleEntry(kid);
+            if (ruleEntry != null) {
+                ruleList.add(ruleEntry);
+            }
+        }
+        return ruleList;
+    }
+
 
     private static RuleList createRuleList(ConfigurationNode ruleNode) {
         RuleList ruleList = new RuleList();
@@ -383,6 +546,29 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
 
         return monitoreds;
     }
+    public  static Collection<LocalTime> getAlarms(ConfigurationNode node, String tag) {
+        return getAlarms(getFirstAttribute(node, tag));
+    }
 
+    public static Collection<LocalTime> getAlarms(CFNode node, String tag) {
+        return getAlarms(node.getFirstAttribute( tag));
+    }
+    public  static Collection<LocalTime> getAlarms(String raw) {
+        Collection<LocalTime> alarms = null;
+        if (!StringUtils.isTrivial(raw)) {
+            alarms = new TreeSet<>();  // sorts them.
+            String[] ta = raw.split(",");
+            // get all the times that parse correctly
+            for (String time : ta) {
+                try {
+                    alarms.add(LocalTime.parse(time.trim()));
+                } catch (Throwable t) {
+                    DebugUtil.error(Configurations.class, "cannot parse alarm date \"" + ta + "\"");
+                    // do nothing
+                }
+            }
+        }
+        return alarms;
+    }
 
 }

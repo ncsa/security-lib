@@ -25,6 +25,21 @@ import java.util.*;
 
 import static edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations.*;
 
+/**
+ * Loads teh configuration from the file or other source. Typical idiom for use:
+ * <pre>
+ *         FileInputStream fis = getFileInputStream("alias/cfg-alias.xml");
+ *         {@link CFLoader} config = new CFLoader();
+ *         {@link CFBundle} bundle = config.loadBundle(fis, "service");
+ *         {@link CFNode} node = bundle.getNamedConfig("A");
+ * </pre>
+ * In this case, a file with a relative path is loaded, the bundle created
+ * for the given tag (so all of the tags named "service" are in the resulting bundle)
+ * and then a specific configuration of type "service" with
+ * name "A" is retrieved. This is the top node
+ * for that configuration. All environment variables and inheritence has been resolved,
+ * so you can just use the CFNode's methods.
+ */
 public class CFLoader {
     public static final String FILE_TAG = "file";
     public static final String INCLUDE_TAG = "include";
@@ -375,21 +390,15 @@ public class CFLoader {
                     visitedFiles.add(currentFile);
                     File x = new File(currentFile);
                     if (x.isDirectory()) {
-                        if (DebugUtil.isTraceEnabled()) {
-                            System.out.println("Configuration error: The file named \"" + currentFile + "\" is a directory. Skipping...");
-                        }
-                        continue;
+                            throw new MyConfigurationException("Included file \"" + currentFile + "\" is a directory.");
                     }
                     if (!x.exists()) {
-                        if (DebugUtil.isTraceEnabled()) {
-                            System.out.println("Configuration error: The file named \"" + currentFile + "\" does not exist. Skipping...");
-                        }
-                        continue;
+                            throw new MyConfigurationException("included file \"" + currentFile + "\" does not exist.");
                     }
                     if (x.canRead()) {
                         Document doc = loadDocument(x);
-                        System.out.println("resolveFiles: loaded doc");
-                        printDocument(doc, System.out);
+                        //System.out.println("resolveFiles: loaded doc");
+                        //printDocument(doc, System.out);
                         resolveFileReferences(rootDoc, doc.getDocumentElement(), stack, visitedFiles);
                         Node root = doc.getDocumentElement();
                         NodeList kids = root.getChildNodes();
@@ -405,8 +414,8 @@ public class CFLoader {
                                 rootDoc.getDocumentElement().appendChild(importedNode);
                             }
                         }
-                        System.out.println("resolveFiles: root  doc post");
-                        printDocument(rootDoc, System.out);
+                     //   System.out.println("resolveFiles: root  doc post");
+                     //   printDocument(rootDoc, System.out);
                     } else {
                         if (DebugUtil.isTraceEnabled()) {
                             System.out.println("Configuration error: The file named \"" + currentFile + "\" cannot be read (permission issue?). Skipping...");

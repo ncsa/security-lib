@@ -1,0 +1,6 @@
+<!--
+      The correct behavior is that if a file does not exist, an error should be raised at load time.
+-->
+<config>
+    <file include="/bad/path/argle-bargle-4.xml"/>
+</config>

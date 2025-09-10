@@ -1,4 +1,6 @@
 <config>
     <file include="/home/ncsa/dev/ncsa-git/security-lib/core/src/test/resources/cfg_tests/file/include-test-B.xml"/>
-    <include_test name="A">included A</include_test>
+    <include_test name="A">included A</include_test>\
+    <include_test name="P" alias="C"/>
+
 </config>

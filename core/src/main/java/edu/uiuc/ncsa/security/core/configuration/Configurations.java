@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.security.core.configuration;
 
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.SubnodeConfiguration;
@@ -14,8 +13,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -331,7 +328,7 @@ public class Configurations {
      * @param tag
      * @return
      */
-    public static Collection<LocalTime> getAlarms(ConfigurationNode node, String tag) {
+/*    public static Collection<LocalTime> getAlarms(ConfigurationNode node, String tag) {
         Collection<LocalTime> alarms = null;
         String raw = getFirstAttribute(node, tag);
         if (!StringUtils.isTrivial(raw)) {
@@ -349,6 +346,5 @@ public class Configurations {
             DebugUtil.trace(Configurations.class, tag + " found: " + alarms);
         }
         return alarms;
-
-    }
+    }*/
 }

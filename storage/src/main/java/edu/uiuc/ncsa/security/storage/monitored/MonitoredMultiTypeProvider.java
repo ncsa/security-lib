@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.storage.monitored;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEventListener;
@@ -14,11 +15,18 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
  * <p>Created by Jeff Gaynor<br>
  * on 2/16/24 at  6:35 PM
  */
+/*
+    Several classes in OA4MP extend this, but it is not used in the security library directly.
+ */
 public abstract class MonitoredMultiTypeProvider<T> extends MultiTypeProvider<T> {
     public MonitoredMultiTypeProvider() {
     }
 
     public MonitoredMultiTypeProvider(ConfigurationNode config, boolean disableDefaultStore, MyLoggingFacade logger, String type, String target) {
+        super(config, disableDefaultStore, logger, type, target);
+    }
+
+    public MonitoredMultiTypeProvider(CFNode config, boolean disableDefaultStore, MyLoggingFacade logger, String type, String target) {
         super(config, disableDefaultStore, logger, type, target);
     }
 
@@ -56,19 +64,45 @@ public abstract class MonitoredMultiTypeProvider<T> extends MultiTypeProvider<T>
      */
     protected void injectUpkeep() {
         if (upkeepConfiguration == null) {
-            ConfigurationNode upkeepNode = Configurations.getFirstNode(getConfig(), UpkeepConfigUtils.UPKEEP_TAG);
-            if (upkeepNode != null) {
-                try{
-                    upkeepConfiguration = UpkeepConfigUtils.processUpkeep(Configurations.getFirstNode(getConfig(), UpkeepConfigUtils.UPKEEP_TAG));
-                    for (CfgEventListener c : getListeners()) {
-                        if (c instanceof MonitoredStoreInterface) {
-                            ((MonitoredStoreInterface) c).setUpkeepConfiguration(getUpkeepConfiguration());
-                        }
+            if(hasCFNode()){
+                cfInjectUpkeep();
+            }else {
+                cnInjectUpkeep();
+            }
+        }
+    }
+
+    private void cfInjectUpkeep() {
+        CFNode upkeepNode = getCFNode().getFirstNode( UpkeepConfigUtils.UPKEEP_TAG);
+        if (upkeepNode != null) {
+            try{
+                upkeepConfiguration = UpkeepConfigUtils.processUpkeep(getCFNode().getFirstNode( UpkeepConfigUtils.UPKEEP_TAG));
+                for (CfgEventListener c : getListeners()) {
+                    if (c instanceof MonitoredStoreInterface) {
+                        ((MonitoredStoreInterface) c).setUpkeepConfiguration(getUpkeepConfiguration());
                     }
-                }catch(Throwable t){
-                    System.err.println("could not load up keep configuration for " + getClass().getSimpleName() + ":" + t.getMessage());
-                    throw t;
                 }
+            }catch(Throwable t){
+                System.err.println("could not load up keep configuration for " + getClass().getSimpleName() + ":" + t.getMessage());
+                throw t;
+            }
+        }
+    }
+
+
+    private void cnInjectUpkeep() {
+        ConfigurationNode upkeepNode = Configurations.getFirstNode(getConfig(), UpkeepConfigUtils.UPKEEP_TAG);
+        if (upkeepNode != null) {
+            try{
+                upkeepConfiguration = UpkeepConfigUtils.processUpkeep(Configurations.getFirstNode(getConfig(), UpkeepConfigUtils.UPKEEP_TAG));
+                for (CfgEventListener c : getListeners()) {
+                    if (c instanceof MonitoredStoreInterface) {
+                        ((MonitoredStoreInterface) c).setUpkeepConfiguration(getUpkeepConfiguration());
+                    }
+                }
+            }catch(Throwable t){
+                System.err.println("could not load up keep configuration for " + getClass().getSimpleName() + ":" + t.getMessage());
+                throw t;
             }
         }
     }

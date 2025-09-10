@@ -1,14 +1,12 @@
 package edu.uiuc.ncsa.security.storage;
 
 import edu.uiuc.ncsa.security.core.Initializable;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
-import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfigUtils;
-import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.File;
@@ -22,7 +20,7 @@ import java.io.IOException;
  * <p>Created by Jeff Gaynor<br>
  * on 1/10/12 at  2:11 PM
  */
-public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
+public abstract class FSProvider<T extends FileStore> extends AbstractUpkeepStoreProvider<T> {
     protected static final String PATH_KEY = StorageConfigurationTags.FS_PATH;
     protected static final String INDEX_KEY = StorageConfigurationTags.FS_INDEX;
     protected static final String DATA_KEY = StorageConfigurationTags.FS_DATA;
@@ -64,7 +62,6 @@ public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
     public FSProvider(ConfigurationNode config, String type, String target, MapConverter converter) {
         super(config, type, target);
         this.converter = converter;
-
     }
 
 
@@ -146,6 +143,10 @@ public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
         return fs;
     }
 
+    public FSProvider(CFNode config, String type, String target, MapConverter converter) {
+        super(config, type, target);
+        this.converter = converter;
+    }
     /**
      * Put the actual instantiation of the store here. {@link #get()} does the grunt work of getting everything
      * out of the configuration for you and checking that it all works as planned.
@@ -156,27 +157,4 @@ public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
      */
     protected abstract T produce(File dataPath, File indexPath, boolean removeEmptyFiles, boolean removeFailedFiles);
 
-    public UpkeepConfiguration getUpkeepConfiguration() {
-        return upkeepConfiguration;
-    }
-
-    public void setUpkeepConfiguration(UpkeepConfiguration upkeepConfiguration) {
-        this.upkeepConfiguration = upkeepConfiguration;
-    }
-
-    UpkeepConfiguration upkeepConfiguration;
-
-    @Override
-    public void setConfig(ConfigurationNode config) {
-        super.setConfig(config);
-        ConfigurationNode upkeepNode = Configurations.getFirstNode(getConfig(), UpkeepConfigUtils.UPKEEP_TAG);
-        if (upkeepNode != null) {
-            try {
-                upkeepConfiguration = UpkeepConfigUtils.processUpkeep(Configurations.getFirstNode(getConfig(), UpkeepConfigUtils.UPKEEP_TAG));
-            }catch (Throwable t){
-                System.err.println("could not load configuration for " + getClass().getSimpleName() + ":" + t.getMessage());
-                throw t;
-            }
-        }
-    }
 }

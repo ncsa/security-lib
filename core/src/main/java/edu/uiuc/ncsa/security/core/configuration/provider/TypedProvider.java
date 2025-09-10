@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.security.core.configuration.provider;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.apache.commons.configuration.tree.DefaultConfigurationNode;
 
@@ -39,6 +41,23 @@ public abstract class TypedProvider<T> extends HierarchicalConfigProvider<T> {
         this.type = type;
         this.target = target;
     }
+    public TypedProvider(CFNode cfNode, String type, String target) {
+        super(cfNode)  ;
+        this.type = type;
+        this.target = target;
+    }
+
+
+    public CFNode getParentCFNode() {
+        return parentCFNode;
+    }
+
+    public void setParentCFNode(CFNode parentCFNode) {
+        this.parentCFNode = parentCFNode;
+    }
+
+    CFNode parentCFNode;
+    protected boolean hasParentCFNode(){return parentCFNode != null;}
 
     public TypedProvider() {
     }
@@ -65,9 +84,19 @@ public abstract class TypedProvider<T> extends HierarchicalConfigProvider<T> {
 
     @Override
     protected boolean checkEvent(CfgEvent cfgEvent) {
-        if (cfgEvent.getConfiguration().getName().equals(getType()) && !cfgEvent.getConfiguration().getChildren(getTarget()).isEmpty()) {
+  /*      if (cfgEvent.getConfiguration().getName().equals(getType()) && !cfgEvent.getConfiguration().getChildren(getTarget()).isEmpty()) {
             setTypeConfig(cfgEvent.getConfiguration());
-            setConfig((ConfigurationNode) cfgEvent.getConfiguration().getChildren(getTarget()).get(0));
+            setConfig(cfgEvent.getConfiguration().getChildren(getTarget()).get(0));
+            return true;
+        }*/
+        if (cfgEvent.getName().equals(getType()) && cfgEvent.hasChildren(getTarget())) {
+            if(hasCFNode()){
+                setParentCFNode(cfgEvent.getCFNode());
+                setCFNode((CFNode) cfgEvent.getChildren(getTarget()).get(0));
+            }else{
+                setTypeConfig(cfgEvent.getConfiguration());
+                setConfig((ConfigurationNode) cfgEvent.getChildren(getTarget()).get(0));
+            }
             return true;
         }
         return false;
@@ -80,9 +109,17 @@ public abstract class TypedProvider<T> extends HierarchicalConfigProvider<T> {
      * @return
      */
     public String getTypeAttribute(String key) {
-        List list = getTypeConfig().getAttributes(key);
+        List list;
+        if(hasParentCFNode()){
+            list = getParentCFNode().getAttributes(key);
+        }else{
+            list = getTypeConfig().getAttributes(key);
+        }
         if (list.isEmpty()) {
             return null;
+        }
+        if(hasParentCFNode()){
+            return getParentCFNode().getNodeContents();
         }
         DefaultConfigurationNode node = (DefaultConfigurationNode) list.get(0);
         return node.getValue().toString();
@@ -90,7 +127,7 @@ public abstract class TypedProvider<T> extends HierarchicalConfigProvider<T> {
 
     protected String getTypeAttribute(String key, String defaultValue) {
         String x = getTypeAttribute(key);
-        if (x == null) {
+        if (StringUtils.isTrivial(x)) {
             x = defaultValue;
         }
         return x;
@@ -100,7 +137,7 @@ public abstract class TypedProvider<T> extends HierarchicalConfigProvider<T> {
     public int getTypeIntAttribute(String key, int defaultValue) {
         String x = getTypeAttribute(key);
 
-        if (x == null) {
+        if (StringUtils.isTrivial(x)) {
             return defaultValue;
         }
         // this might fail if the integer is of the wrong format. That is ok and no default should be supplied.

@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.mail;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.HierarchicalConfigProvider;
@@ -25,11 +26,18 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
     public MailUtilProvider(ConfigurationNode config) {
         super(config);
     }
+    public MailUtilProvider(CFNode config) {
+        super(config);
+    }
 
     @Override
     protected boolean checkEvent(CfgEvent cfgEvent) {
-        if (cfgEvent.getConfiguration().getName().equals(MAIL)) {
-            setConfig(cfgEvent.getConfiguration());
+        if (cfgEvent.getName().equals(MAIL)) {
+            if(hasCFNode()){
+                setCFNode(cfgEvent.getCFNode());
+            }else {
+                setConfig(cfgEvent.getConfiguration());
+            }
             return true;
         }
         return false;

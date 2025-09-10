@@ -19,6 +19,8 @@ public class StringUtils {
     public static boolean JUSTIFY_LEFT = false;
     public static boolean JUSTIFY_RIGHT = true;
     public static String ELLIPSIS = "...";
+    public static String[] LOGICAL_TRUES = new String[]{"true", "ok", "yes", "1", "on", "yup", "yeah", "enable", "enabled"};
+    public static String[] LOGICAL_FALSES = new String[]{"false", "no", "0", "off", "nope", "nay", "disable", "disabled"};
 
     /**
      * Right justify, so for the given width, the string is padded on the right. Note that
@@ -1138,5 +1140,42 @@ public class StringUtils {
         }
         output.add(sb.toString()); // add last token
         return output;
+    }
+
+    /**
+     * Convert a string to a boolean if it parses, null otherwise. Case matters so "TRUE"
+     * will fail. Uses {@link #LOGICAL_TRUES} and {@link #LOGICAL_FALSES}.
+     * @param x
+     * @return
+     */
+    public static Boolean toBoolean(String x) {
+        return toBoolean(x, false);
+    }
+
+    /**
+     * Case insensitive conversion of a string to a boolean or null if it does not parse.
+     * Both "TRUE" and "true" work. Uses {@link #LOGICAL_TRUES} and {@link #LOGICAL_FALSES}.
+     * @param x
+     * @param ignoreCase
+     * @return
+     */
+    public static Boolean toBoolean(String x, boolean ignoreCase) {
+        for(String y : LOGICAL_TRUES){
+            if(ignoreCase){
+                if(x.equalsIgnoreCase(y)){return Boolean.TRUE;}
+            }else {
+                if (x.equals(y)) {
+                    return Boolean.TRUE;
+                }
+            }
+        }
+        for(String y : LOGICAL_FALSES){
+            if(ignoreCase){
+                if(x.equalsIgnoreCase(y)){return Boolean.FALSE;}
+            }else{
+                if(x.equals(y)){return Boolean.FALSE;}
+            }
+        }
+       return null;
     }
 }

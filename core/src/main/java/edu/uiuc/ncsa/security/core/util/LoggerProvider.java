@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.core.util;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;
@@ -56,12 +57,89 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
     }
 
     public LoggerProvider(ConfigurationNode configurationNode) {
-        this.configurationNode = configurationNode;
-        setup();
+        setup(configurationNode);
+    }
+    public LoggerProvider(CFNode cfNode) {
+        setup(cfNode);
+    }
+
+    protected void setup(CFNode cfNode) {
+        if (cfNode == null) return;
+        logFile = cfNode.getFirstAttribute( LOG_FILE_NAME);
+        loggerName = cfNode.getFirstAttribute( LOGGER_NAME);
+        String rawDebug = cfNode.getFirstAttribute( DEBUG_ENABLED);
+        String rawLogLevel = cfNode.getFirstAttribute( LOG_LEVEL);
+        if (rawDebug == null) {
+            if (rawLogLevel == null) {
+                logLevel = Level.INFO;
+            } else {
+                rawLogLevel = rawLogLevel.toLowerCase();
+                switch (rawLogLevel) {
+                    case LOG_LEVEL_OFF:
+                        logLevel = Level.OFF;
+                        break;
+                    case LOG_LEVEL_TRACE:
+                        logLevel = Level.FINEST;
+                        break;
+                    case LOG_LEVEL_INFO:
+                        logLevel = Level.INFO;
+                        break;
+                    case LOG_LEVEL_ERROR:
+                        logLevel = Level.SEVERE;
+                        break;
+                    case LOG_LEVEL_WARN:
+                        logLevel = Level.WARNING;
+                        break;
+                    default:
+                        logLevel = MyLoggingFacade.DEFAULT_LOG_LEVEL;
+                        break;
+                }
+            }
+        } else {
+            try {
+                boolean debugOn = Boolean.parseBoolean(rawDebug);
+                if (debugOn) {
+                    logLevel = Level.FINEST;
+                } else {
+                    logLevel = MyLoggingFacade.DEFAULT_LOG_LEVEL;
+                }
+            } catch (Throwable tttt) {
+                logLevel = MyLoggingFacade.DEFAULT_LOG_LEVEL;
+            }
+        }
+        try {
+            if (Boolean.parseBoolean(cfNode.getFirstAttribute(DEBUG_ENABLED))) {
+                logLevel = Level.FINEST;
+            }
+        } catch (Exception x) {
+            // do nothing
+            logLevel = Level.INFO;
+        }
+        try {
+            fileCount = Integer.parseInt(cfNode.getFirstAttribute(LOG_FILE_COUNT));
+        } catch (Exception x) {
+            fileCount = 1;
+        }
+        try {
+            maxFileSize = Integer.parseInt(cfNode.getFirstAttribute(LOG_FILE_SIZE));
+        } catch (Exception e) {
+            maxFileSize = 1000000;
+        }
+        try {
+            appendOn = Boolean.parseBoolean(cfNode.getFirstAttribute( APPEND_ENABLED));
+        } catch (Exception e) {
+            appendOn = true;
+        }
+        try {
+            disableLog4j = Boolean.parseBoolean(cfNode.getFirstAttribute( DISABLE_LOG4J));
+        } catch (Exception e) {
+            disableLog4j = false;
+        }
+
     }
 
 
-    protected void setup() {
+    protected void setup(ConfigurationNode configurationNode) {
         if (configurationNode == null) return;
         logFile = getFirstAttribute(configurationNode, LOG_FILE_NAME);
         loggerName = getFirstAttribute(configurationNode, LOGGER_NAME);
@@ -136,7 +214,7 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
 
     }
 
-    ConfigurationNode configurationNode;
+ //   ConfigurationNode configurationNode;
     MyLoggingFacade logger;
 
     String logFileName = null;

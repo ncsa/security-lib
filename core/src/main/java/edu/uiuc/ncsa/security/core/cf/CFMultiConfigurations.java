@@ -224,21 +224,8 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
      * @param node
      * @return
      */
-    public static CFNode getChildren(CFNode node, String name) {
+    public static List<CFNode> getChildren(CFNode node, String name) {
         return node.getChildren(name);
-/*
-        List<Node> kids = new ArrayList<>();
-        for (Node n : node.getNodes()) {
-            NodeList nodeList = n.getChildNodes();
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node nn = nodeList.item(i);
-                if (nn.getNodeName().equals(name)) {
-                    kids.add(nn);
-                }
-            }
-        }
-        return new CFNode(kids);
-*/
     }
 
     /**
@@ -284,34 +271,17 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
      */
     public static String getNodeContents(CFNode node, String name, String defaultValue) {
         return node.getNodeContents(name, defaultValue);
-/*
-        if (!node.hasNodes()) {
-            return defaultValue;
-        }
-        for (Node n : node.getNodes()) {
-            System.out.println(n.getNodeName() + " " + n.getNodeValue());
-            NodeList kids = n.getChildNodes();
-            for (int i = 0; i < kids.getLength(); i++) {
-                Node nn = kids.item(i);
-                System.out.println(nn.getNodeName() + " " + nn.getNodeValue() + " text=" + nn.getTextContent());
-                if (nn.getNodeName().equals(name)) {
-                    String out = nn.getTextContent();
-                    if(out != null) {
-                        return out;
-                    }else{
-                        out = nn.getNodeValue();
-                        if(out != null) {
-                            return out;
-                        }
-                        return defaultValue;
-                    }
-                }
-            }
+    }
 
-
-            }
-        return defaultValue;
-*/
+    /**
+     * Synonym for {@link #getNodeContents(CFNode, String, String)} for backwards compatility.
+     * @param node
+     * @param name
+     * @param defaultValue
+     * @return
+     */
+    public static String getNodeValue(CFNode node, String name, String defaultValue) {
+        return getNodeContents(node, name, defaultValue);
     }
 
     /**
@@ -332,6 +302,16 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
     }
 
     /**
+     * Synonym fir {@link #getNodeContents(CFNode, String)} for backwards compatibility
+     * @param node
+     * @param name
+     * @return
+     */
+    public static String getNodeValue(CFNode node, String name) {
+        return getNodeContents(node,name);
+    }
+
+    /**
      * Finds the first attribute with the given name and then converts to boolean.
      * If the conversion fails, the default is returned. This supports values of
      * true, false, on, off.
@@ -342,15 +322,7 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
      * @return
      */
     public static boolean getFirstBooleanValue(CFNode node, String attrib, boolean defaultValue) {
-        return node.getFirstBooleanAttribute(attrib, defaultValue);
-/*
-        if (!node.hasNodes()) return defaultValue;
-        try {
-            return getFirstBooleanValue(node, attrib);
-        } catch (IllegalArgumentException illegalArgumentException) {
-            return defaultValue;
-        }
-*/
+        return node.getFirstBooleanValue(attrib, defaultValue);
     }
 
     /**
@@ -362,7 +334,7 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
      * @return
      */
     public static boolean getFirstBooleanValue(CFNode node, String attrib) {
-        return node.getFirstBooleanAttribute(attrib);
+        return node.getFirstBooleanValue(attrib);
 /*
         if (!node.hasNodes()) throw new IllegalArgumentException("no such node " + attrib);
         for (Node n : node.getNodes()) {
