@@ -64,7 +64,7 @@ public abstract class HierarchicalConfigProvider<T> implements Provider<T>, CfgE
         this.cfNode = cfNode;
     }
 
-    ;
+
 
     public boolean hasCFNode() {
         return cfNode != null;
@@ -96,17 +96,18 @@ public abstract class HierarchicalConfigProvider<T> implements Provider<T>, CfgE
      * @return
      */
     public String getAttribute(String key) {
-        List list;
         if (hasCFNode()) {
-            list = getCFNode().getAttributes(key);
-        } else {
-            list = getConfig().getAttributes(key);
+            List<String> list = getCFNode().getAttributes(key);
+            if (list.isEmpty()) {
+                return null;
+            }
+            return list.get(0);
         }
+            if(getConfig() == null) {return null;} // possible there is no config node.
+           List<ConfigurationNode> list = getConfig().getAttributes(key);
+
         if (list.isEmpty()) {
             return null;
-        }
-        if (hasCFNode()) {
-            return ((CFNode) list.get(0)).getNodeContents();
         }
         DefaultConfigurationNode node = (DefaultConfigurationNode) list.get(0);
         return node.getValue().toString();

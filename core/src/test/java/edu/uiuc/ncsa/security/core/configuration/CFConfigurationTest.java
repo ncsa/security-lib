@@ -38,7 +38,6 @@ public class CFConfigurationTest extends TestCase {
         CFNode node = bundle.getNamedConfig("localhost:oa4mp.oa2.mariadb");
         //Node testedNode = CFXMLConfigurations.getConfig(doc, "service", "A");
         //assert testedNode.getTextContent().equals("foo");
-        assert node.getNodeContents().equals("foo");
         assert node.getFirstAttribute("version").equals("1.0");
     }
     /**

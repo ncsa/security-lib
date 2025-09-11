@@ -41,14 +41,18 @@ public abstract class TypedProvider<T> extends HierarchicalConfigProvider<T> {
         this.type = type;
         this.target = target;
     }
+
     public TypedProvider(CFNode cfNode, String type, String target) {
-        super(cfNode)  ;
+        super(cfNode);
         this.type = type;
         this.target = target;
     }
 
 
     public CFNode getParentCFNode() {
+        if(parentCFNode == null){
+            parentCFNode = getCFNode().getParent();
+        };
         return parentCFNode;
     }
 
@@ -56,8 +60,11 @@ public abstract class TypedProvider<T> extends HierarchicalConfigProvider<T> {
         this.parentCFNode = parentCFNode;
     }
 
-    CFNode parentCFNode;
-    protected boolean hasParentCFNode(){return parentCFNode != null;}
+    CFNode parentCFNode = null;
+
+    protected boolean hasParentCFNode() {
+        return parentCFNode != null;
+    }
 
     public TypedProvider() {
     }
@@ -90,10 +97,10 @@ public abstract class TypedProvider<T> extends HierarchicalConfigProvider<T> {
             return true;
         }*/
         if (cfgEvent.getName().equals(getType()) && cfgEvent.hasChildren(getTarget())) {
-            if(hasCFNode()){
+            if (cfgEvent.hasCFNode()) {
                 setParentCFNode(cfgEvent.getCFNode());
                 setCFNode((CFNode) cfgEvent.getChildren(getTarget()).get(0));
-            }else{
+            } else {
                 setTypeConfig(cfgEvent.getConfiguration());
                 setConfig((ConfigurationNode) cfgEvent.getChildren(getTarget()).get(0));
             }
@@ -109,17 +116,16 @@ public abstract class TypedProvider<T> extends HierarchicalConfigProvider<T> {
      * @return
      */
     public String getTypeAttribute(String key) {
-        List list;
-        if(hasParentCFNode()){
-            list = getParentCFNode().getAttributes(key);
-        }else{
-            list = getTypeConfig().getAttributes(key);
+        if (hasParentCFNode()) {
+            List<String> list = getParentCFNode().getAttributes(key);
+            if (list.isEmpty()) {
+                return null;
+            }
+            return list.get(0);
         }
+        List<ConfigurationNode> list = getTypeConfig().getAttributes(key);
         if (list.isEmpty()) {
             return null;
-        }
-        if(hasParentCFNode()){
-            return getParentCFNode().getNodeContents();
         }
         DefaultConfigurationNode node = (DefaultConfigurationNode) list.get(0);
         return node.getValue().toString();
@@ -155,10 +161,10 @@ public abstract class TypedProvider<T> extends HierarchicalConfigProvider<T> {
     @Override
     public String toString() {
         String className = getClass().getSimpleName();
-        if(className.length() == 0){
-            className="<anonymous>";
+        if (className.length() == 0) {
+            className = "<anonymous>";
         }
-        return className + "[type=" + getType()+", target=" + getTarget() + ", cfg node=" + (getConfig().getName()==null?"(null)":getConfig().getName()) + "]";
+        return className + "[type=" + getType() + ", target=" + getTarget() + ", cfg node=" + (getConfig().getName() == null ? "(null)" : getConfig().getName()) + "]";
     }
 
 

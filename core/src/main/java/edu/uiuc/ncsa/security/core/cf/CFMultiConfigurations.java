@@ -173,16 +173,10 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
      * @return
      */
     public static String getFirstAttribute(CFNode node, String name) {
-        return node.getFirstAttribute(name);
-/*
-        for (Node n : node.getNodes()) {
-            String x = CFXMLConfigurations.getFirstAttribute(n, name);
-            if (!StringUtils.isTrivial(x)) {
-                return x;
-            }
+        if(node == null) {
+            throw new IllegalArgumentException("No such value for attribute >" + name + "<");
         }
-        return null;
-*/
+        return node.getFirstAttribute(name);
     }
 
     /**
@@ -194,24 +188,8 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
      * @return
      */
     public static CFNode getFirstNode(CFNode node, String name) {
+        if(node == null) {return null;}
         return node.getFirstNode(name);
-/*
-        for (Node n : node.getNodes()) {
-            NodeList nodeList = n.getChildNodes();
-            if (nodeList.getLength() != 0) {
-                for (int i = 0; i < nodeList.getLength(); i++) {
-                    Node nn = nodeList.item(i);
-                    String x = CFXMLConfigurations.getFirstAttribute(nn, name);
-                    if (name.equals(x)) {
-                        List<Node> rcList = new ArrayList<>();
-                        rcList.add(nn);
-                        return new CFNode(rcList);
-                    }
-                }
-            }
-        }
-        return null;
-*/
     }
 
     /**
@@ -225,6 +203,9 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
      * @return
      */
     public static List<CFNode> getChildren(CFNode node, String name) {
+        if(node == null) {
+            throw new IllegalArgumentException("No such node");
+        }
         return node.getChildren(name);
     }
 
@@ -241,21 +222,8 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
      * @return
      */
     public static CFNode getAllNodes(CFNode node, String name) {
+        if(node == null) {return null;}
         return node.getNodes(name);
-/*
-        List<Node> returnedNodes = new ArrayList<>();
-        if (!node.hasNodes()) return new CFNode(returnedNodes);
-        for (Node n : node.getNodes()) {
-            NodeList nodeList = n.getChildNodes();
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node nn = nodeList.item(i);
-                if (nn.getNodeName().equals(name)) {
-                    returnedNodes.add(nn);
-                }
-            }
-        }
-        return new CFNode(returnedNodes);
-*/
     }
 
     /**
@@ -270,6 +238,7 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
      * @return
      */
     public static String getNodeContents(CFNode node, String name, String defaultValue) {
+        if(node == null) {return defaultValue;}
         return node.getNodeContents(name, defaultValue);
     }
 
@@ -281,6 +250,7 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
      * @return
      */
     public static String getNodeValue(CFNode node, String name, String defaultValue) {
+        if(node == null) {return defaultValue;}
         return getNodeContents(node, name, defaultValue);
     }
 
@@ -297,6 +267,9 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
      */
 
     public static String getNodeContents(CFNode node, String name) {
+        if(node == null) {
+            throw new IllegalArgumentException("No such value for attribute >" + name  + "<");
+        }
         return node.getNodeContents(name);
         //return getNodeContents(node, name, null);
     }
@@ -322,6 +295,7 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
      * @return
      */
     public static boolean getFirstBooleanValue(CFNode node, String attrib, boolean defaultValue) {
+        if(node == null) {return defaultValue;}
         return node.getFirstBooleanValue(attrib, defaultValue);
     }
 
@@ -334,53 +308,22 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
      * @return
      */
     public static boolean getFirstBooleanValue(CFNode node, String attrib) {
-        return node.getFirstBooleanValue(attrib);
-/*
-        if (!node.hasNodes()) throw new IllegalArgumentException("no such node " + attrib);
-        for (Node n : node.getNodes()) {
-            NamedNodeMap namedNodeMap = n.getAttributes();
-            Node nn = namedNodeMap.getNamedItem(attrib);
-            if (nn != null) {
-                String x = nn.getNodeValue();
-                if (isTrivial(x)) {
-                    throw new IllegalArgumentException("no value for " + attrib);
-                }
-                if (x.equalsIgnoreCase("true") || x.equalsIgnoreCase("on")) return true;
-                if (x.equalsIgnoreCase("false") || x.equalsIgnoreCase("off")) return false;
-                throw new IllegalArgumentException("illegal boolean value \"" + x + "\" for attribute " + attrib);
-            }
+        if(node == null) {
+            throw new IllegalArgumentException("No such value for attribute >" + attrib + "<");
         }
-        throw new IllegalArgumentException("no such node " + attrib);
-*/
-
+        return node.getFirstBooleanValue(attrib);
     }
 
     public static long getFirstLongValue(CFNode node, String attrib) {
+        if(node == null) {
+            throw new IllegalArgumentException("No such value for attribute >" + attrib + "<");
+        }
         return node.getFirstLongAttribute(attrib);
-/*
-        if (!node.hasNodes()) throw new IllegalArgumentException("no such node " + attrib);
-        String x = getFirstAttribute(node, attrib);
-        if (isTrivial(x)) {
-            throw new IllegalArgumentException("no value for " + attrib);
-        }
-        try {
-            return Long.parseLong(x);
-        } catch (NumberFormatException nfx) {
-            throw new IllegalArgumentException("Could not parse \"" + x + "\" as a long for " + attrib);
-        }
-*/
     }
 
     public static long getFirstLongValue(CFNode node, String attrib, long defaultValue) {
+        if(node == null) {return defaultValue;}
         return node.getFirstLongAttribute(attrib, defaultValue);
-/*
-        if (!node.hasNodes()) return defaultValue;
-        try {
-            return getFirstLongValue(node, attrib);
-        } catch (IllegalArgumentException nfx) {
-        }
-        return defaultValue;
-*/
     }
 
     /**
@@ -393,23 +336,11 @@ public class CFMultiConfigurations implements MultiConfigurationsInterface {
      * @return
      */
     public static String getAttributeInNode(CFNode node, String nodeName, String attributeName) {
-        return node.getAttributeInNode(nodeName, attributeName);
-/*
-        for (Node n : node.getNodes()) {
-            Node node1 = CFXMLConfigurations.getFirstNode(n, nodeName);
-            if (node1 != null) {
-                NamedNodeMap namedNodeMap = node1.getAttributes();
-                for (int i = 0; i < namedNodeMap.getLength(); i++) {
-                    Node nn = namedNodeMap.item(i);
-                    if (nn.getNodeName().equals(attributeName)) {
-                        return nn.getNodeValue();
-                    }
-                }
+        if(node == null) {
+            throw new IllegalArgumentException("No such node >" + nodeName + "<");
 
-            }
         }
-        return null;
-*/
+        return node.getAttributeInNode(nodeName, attributeName);
     }
 
 }

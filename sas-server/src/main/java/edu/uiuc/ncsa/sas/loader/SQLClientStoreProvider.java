@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.SQLStoreProvider;
+import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionParameters;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 
 /**
@@ -33,5 +34,10 @@ public class SQLClientStoreProvider<T extends SQLStore> extends SQLStoreProvider
     public T get() {
         ClientTable clientTable = new ClientTable(new ClientKeys(), getSchema(), getPrefix(), getTablename());
         return newInstance(clientTable);
+    }
+
+    @Override
+    public String getSchema() {
+        return ((DerbyConnectionParameters)getConnectionPool().getConnectionParameters()).getSchema();
     }
 }

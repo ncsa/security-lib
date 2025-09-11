@@ -100,6 +100,9 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
      * @return
      */
     protected String checkValue(String key, String defaultValue) {
+        if(hasCFNode()){
+            return getCFNode().getFirstAttribute(key, defaultValue);
+        }
         if(getConfig() == null) return defaultValue;
         String x = getAttribute(key);
         if (x != null) return x;
@@ -109,6 +112,9 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
     }
 
     protected int checkValue(String key, int defaultValue) {
+        if(hasCFNode()){
+            return (int) getCFNode().getFirstLongAttribute(key, defaultValue);
+        }
         if(getConfig() == null) return defaultValue;
         String x = getAttribute(key);
         if (x != null) return Integer.parseInt(x);
@@ -126,14 +132,18 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
      * @return
      */
     protected long checkTime(String key, long defaultValue) {
-        if(getConfig() == null) return defaultValue;
-        String x = getAttribute(key);
+        if(getConfig() == null && !hasCFNode()) return defaultValue;
+        String x = getAttribute(key);; // call handles both CFNode and ConfNode
+
         if(x!= null) return XMLConfigUtil.getValueSecsOrMillis(x);
         if (defaultValue != -1) return defaultValue;
         throw new MyConfigurationException("Error: no long value specified for " + key);
     }
 
     protected long checkValue(String key, long defaultValue) {
+        if(hasCFNode()){
+            return getCFNode().getFirstLongAttribute(key, defaultValue);
+        }
         if(getConfig() == null) return defaultValue;
         String x = getAttribute(key);
         if (x != null) return Long.parseLong(x);
@@ -142,6 +152,9 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
     }
 
     protected boolean checkValue(String key, boolean defaultValue) {
+        if(hasCFNode()){
+            return getCFNode().getFirstBooleanValue(key, defaultValue);
+        }
         if(getConfig() == null) return defaultValue;
         String x = getAttribute(key);
         if (x != null) return Boolean.parseBoolean(x);

@@ -71,6 +71,12 @@ public class CFNode {
         return null;
     }
 
+    public String getFirstAttribute(String name, String defaultValue) {
+       String attribute = getFirstAttribute(name);
+       if (attribute == null) return defaultValue;
+        return attribute;
+    }
+
     /**
      * Returns all attributes as strings.
      *
@@ -200,29 +206,55 @@ public class CFNode {
     }
 
     /**
-     * Get <b>all</b> child nodes.
+     * Get non-text (so type is text or comment) child nodes.
      *
      * @return
      */
     public List<CFNode> getChildren() {
+        return getChildren(true);
+    }
+
+    /**
+     * Return children with possible filtering for text nodes. In most applications you do not want just whitespace.
+     * @param nonTextOnly
+     * @return
+     */
+    public List<CFNode> getChildren(boolean nonTextOnly) {
         List<CFNode> kids = new ArrayList<>();
         for (Node n : getNodes()) {
             NodeList nodeList = n.getChildNodes();
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node nn = nodeList.item(i);
-                kids.add(new CFNode(nn));
+                if (nonTextOnly) {
+                    switch (nn.getNodeType()) {
+                        case Node.TEXT_NODE:
+                        case Node.COMMENT_NODE:
+                            break;
+                        default:
+                            kids.add(new CFNode(nn));
+                    }
+
+                } else {
+                    kids.add(new CFNode(nn));
+                }
             }
         }
         return kids;
     }
 
+    public CFNode getParent() {
+        if (!hasNodes()) return null;
+        return new CFNode(nodes.get(0).getParentNode());
+    }
     /**
      * Synonym for {@link #getNodeContents()}
+     *
      * @return
      */
-    public String getValue(){
+    public String getValue() {
         return getNodeContents();
     }
+
     /**
      * Convenience method to get the zero-th node or null if there is none. In many cases you know
      * there is exactly a single node and you just want that.
@@ -390,6 +422,16 @@ public class CFNode {
         throw new IllegalArgumentException("No such value for attribute >" + attrib + "<");
     }
 
+    public Boolean hasAttribute(String attrib) {
+        if (!hasNodes()) return false;
+        for (Node n : getNodes()) {
+            NamedNodeMap namedNodeMap = n.getAttributes();
+            Node nn = namedNodeMap.getNamedItem(attrib);
+            if (nn != null) return true;
+        }
+        return false;
+    }
+
     /**
      * Return the value as a long {@link Long}. If no such value, a null is returned. If
      * the value fails to parse as  a long, an illegal argument exception is raised
@@ -421,7 +463,9 @@ public class CFNode {
     public long getFirstLongAttribute(String attrib, long defaultValue) {
         if (!hasNodes()) return defaultValue;
         try {
-            return getFirstLongAttribute(attrib);
+            Long out= getFirstLongAttribute(attrib);
+            if(out == null) return defaultValue;
+            return out;
         } catch (IllegalArgumentException nfx) {
         }
         return defaultValue;

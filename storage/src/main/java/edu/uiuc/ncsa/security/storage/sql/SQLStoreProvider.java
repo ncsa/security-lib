@@ -6,7 +6,6 @@ import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.storage.AbstractUpkeepStoreProvider;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionParameters;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
@@ -18,10 +17,10 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 public abstract class SQLStoreProvider<T extends Store> extends AbstractUpkeepStoreProvider<T> {
 
     public String getSchema() {
-        if(getConnectionPool().getConnectionParameters() instanceof DerbyConnectionParameters){
+ /*       if(getConnectionPool().getConnectionParameters() instanceof DerbyConnectionParameters){
             // Special case since file store and memory store may have this overridden
             return ((DerbyConnectionParameters)getConnectionPool().getConnectionParameters()).getSchema();
-        }
+        }*/
     return getTypeAttribute(SCHEMA);
     }
 
@@ -133,6 +132,10 @@ public abstract class SQLStoreProvider<T extends Store> extends AbstractUpkeepSt
     ConnectionPoolProvider<? extends ConnectionPool> connectionPoolProvider;
 
     protected ConnectionPool getConnectionPool() {
+        if(!connectionPoolProvider.hasCFNode() && hasCFNode()) {
+            connectionPoolProvider.setCFNode(getParentCFNode());
+
+        }
         if (connectionPoolProvider.getConfig() == null) {
             connectionPoolProvider.setConfig(getTypeConfig());
         }

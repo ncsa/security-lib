@@ -46,25 +46,31 @@ public class CfgEvent extends EventObject {
     }
 
     CFNode cfNode;
-    protected boolean hasCFNode() {return cfNode != null;}
-    public String getName(){
-        if(hasCFNode()){
 
+    protected boolean hasCFNode() {
+        return cfNode != null;
+    }
+
+    public String getName() {
+        if (hasCFNode()) {
+            return cfNode.getName();
         }
         return configuration.getName();
     }
+
     List children = null;
 
     public List getChildren(String name) {
-        if(children == null){
-            if(hasCFNode()){
+        if (children == null) {
+            if (hasCFNode()) {
                 children = cfNode.getChildren(name);
-            }else{
+            } else {
                 children = configuration.getChildren(name);
             }
         }
         return children;
     }
+
     public boolean hasChildren(String name) {
         return !getChildren(name).isEmpty();
     }

@@ -238,7 +238,8 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
         return getaBoolean(node, RULE_SKIP_VERSIONS);
     }
     protected static Boolean doSkipVersions(CFNode node) {
-        return node.getFirstBooleanValue( RULE_SKIP_VERSIONS); // CFNode does this right, so don't need local util
+        if(node.hasAttribute(RULE_SKIP_VERSIONS)) return node.getFirstBooleanValue( RULE_SKIP_VERSIONS);
+        return null;
     }
 
     private static Boolean getaBoolean(ConfigurationNode node, String ruleSkipVersions) {
@@ -382,7 +383,9 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
         }
         ruleList.setName(name);
         // need to process in order
-        List<CFNode> kids = ruleNode.getChildren();
+        // Have to get specific tags or we get all the whitespace as nodes too...
+        List<CFNode> kids = ruleNode.getChildren(DATE_TAG);
+        kids.addAll(ruleNode.getChildren(ID_TAG));
         for (CFNode kid : kids) {
             RuleEntry ruleEntry = createRuleEntry(kid);
             if (ruleEntry != null) {
