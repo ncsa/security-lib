@@ -26,6 +26,27 @@ public class BeanUtils {
     }
 
     /**
+     * Check two string with the option of doing so case insensitively.
+     * @param x
+     * @param y
+     * @param ignoreCase
+     * @return
+     */
+    public static boolean checkEquals(String x, String y, boolean ignoreCase) {
+        if (x == y) return true;
+        if (x == null) {
+            if (y == null) {
+                return true;
+            }
+            return y.equals(x);
+        }
+        if(ignoreCase){
+            return x.equalsIgnoreCase(y);
+        }
+        return x.equals(y);
+    }
+
+    /**
      * This presupposes that nulls are not permitted, so if one of the objects is null, it cannot possible
      * be equal to the other, e.g. comparing URIs.
      *
@@ -44,6 +65,24 @@ public class BeanUtils {
             if (y == null) {
                 return false;
             }
+        }
+        return x.equals(y);
+    }
+
+    public static boolean checkNoNulls(String x, String y, boolean ignoreCase) {
+        if (x == y) return true;
+        if (x == null) {
+            if (y == null) {
+                return true;
+            }
+            return false;
+        } else {
+            if (y == null) {
+                return false;
+            }
+        }
+        if(ignoreCase){
+            return x.equalsIgnoreCase(y);
         }
         return x.equals(y);
     }
