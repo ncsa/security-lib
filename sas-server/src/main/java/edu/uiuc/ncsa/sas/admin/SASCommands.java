@@ -3,21 +3,25 @@ package edu.uiuc.ncsa.sas.admin;
 import edu.uiuc.ncsa.sas.SASEnvironment;
 import edu.uiuc.ncsa.sas.client.ClientKeys;
 import edu.uiuc.ncsa.sas.client.SASClient;
-import edu.uiuc.ncsa.sas.loader.SASConfigurationLoader;
+import edu.uiuc.ncsa.sas.loader.SASCFConfigurationLoader;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.cf.CFBundle;
+import edu.uiuc.ncsa.security.core.cf.CFLoader;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.cli.StoreCommands;
+import edu.uiuc.ncsa.security.util.cli.ArgumentNotFoundException;
 import edu.uiuc.ncsa.security.util.cli.CLIDriver;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import edu.uiuc.ncsa.security.util.crypto.KeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.KeyPair;
@@ -151,15 +155,38 @@ public class SASCommands extends StoreCommands {
         }
         InputLine inputLine = new InputLine(vector); // now we have a bunch of utilities for this
 
+        String fileName = inputLine.getNextArgFor(CONFIG_FILE_FLAG);
+        if(fileName == null) {
+            throw new ArgumentNotFoundException(CONFIG_FILE_FLAG);
+        }
+        File configFile = new File(fileName);
+        if(!configFile.exists()) {
+            throw new IllegalArgumentException("config file does not exist");
+        }
+        if(!configFile.isFile()) {
+            throw new IllegalArgumentException("config file is not a file");
+        }
         String cfgname = inputLine.hasArg(CONFIG_NAME_FLAG) ? inputLine.getNextArgFor(CONFIG_NAME_FLAG) : "default";
+        // Load using CF system
+        CFLoader cfLoader = new CFLoader();
+        CFBundle bundle = cfLoader.loadBundle(new FileInputStream(fileName), CONFIG_TAG_NAME);
+        CFNode cfNode = bundle.getNamedConfig(cfgname);
+        SASCFConfigurationLoader loader = new SASCFConfigurationLoader(cfNode);
+
 //      Old style -- single inheritance
-        ConfigurationNode node = XMLConfigUtil.findConfiguration(
+        /*
+           ConfigurationNode node = XMLConfigUtil.findConfiguration(
                 inputLine.getNextArgFor(CONFIG_FILE_FLAG),
                 cfgname, CONFIG_TAG_NAME);
+      SASConfigurationLoader loader = new SASConfigurationLoader(node);
+
+*/
 
         // New style -- multi-inheritance.
-        //     ConfigurationNode node = XMLConfigUtil.findMultiNode(inputLine.getNextArgFor(CONFIG_FILE_FLAG), cfgname, CONFIG_TAG_NAME );
-        SASConfigurationLoader loader = new SASConfigurationLoader(node);
+        /*
+             ConfigurationNode node = XMLConfigUtil.findMultiNode(inputLine.getNextArgFor(CONFIG_FILE_FLAG), cfgname, CONFIG_TAG_NAME );
+            SASConfigurationLoader loader = new SASConfigurationLoader(node);\
+         */
 
         SASEnvironment SASEnvironment1 = loader.load();
         SASCommands SASCommands = new SASCommands(SASEnvironment1);

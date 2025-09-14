@@ -9,10 +9,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="https://github.com/ncsa/security-lib/issues/56">
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="BeanUtil improvements">
+      <change afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/loader/SASCFConfigurationLoader.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/BeanUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/BeanUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/Bootstrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/Bootstrapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/admin/SASCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/admin/SASCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/loader/SASBootstrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/loader/SASBootstrapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/loader/SASConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/loader/SASConfigurationLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/ssl/SSLConfigurationUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/ssl/SSLConfigurationUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -169,11 +172,11 @@
       <recent name="edu.uiuc.ncsa.security.util" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="edu.uiuc.ncsa.sas.loader" />
       <recent name="edu.uiuc.ncsa.security.core.configuration" />
       <recent name="edu.uiuc.ncsa.security.core.cf" />
       <recent name="edu.uiuc.ncsa.security.core.util" />
       <recent name="edu.uiuc.ncsa.security.util.cli" />
-      <recent name="edu.uiuc.ncsa.security.storage.cli" />
     </key>
   </component>
   <component name="RunManager" selected="JUnit.configuration in core">

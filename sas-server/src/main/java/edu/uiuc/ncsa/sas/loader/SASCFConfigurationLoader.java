@@ -11,13 +11,12 @@ import edu.uiuc.ncsa.sas.storage.SASClientStoreProvider;
 import edu.uiuc.ncsa.sas.thing.action.ActionDeserializer;
 import edu.uiuc.ncsa.sas.thing.response.ResponseSerializer;
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.core.configuration.Configurations;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import edu.uiuc.ncsa.security.storage.DBConfigLoader;
-import org.apache.commons.configuration.tree.ConfigurationNode;
+import edu.uiuc.ncsa.security.storage.CFDBConfigLoader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,13 +27,13 @@ import java.util.StringTokenizer;
  * <p>Created by Jeff Gaynor<br>
  * on 8/16/22 at  1:00 PM
  */
-public class SASConfigurationLoader<T extends SASEnvironment> extends DBConfigLoader<T> {
+public class SASCFConfigurationLoader<T extends SASEnvironment> extends CFDBConfigLoader<T> {
 
-    public SASConfigurationLoader(ConfigurationNode node, MyLoggingFacade logger) {
+    public SASCFConfigurationLoader(CFNode node, MyLoggingFacade logger) {
         super(node, logger);
     }
 
-    public SASConfigurationLoader(ConfigurationNode node) {
+    public SASCFConfigurationLoader(CFNode node) {
         super(node);
     }
 
@@ -59,7 +58,7 @@ public class SASConfigurationLoader<T extends SASEnvironment> extends DBConfigLo
     protected List<String> getAccessList(){
         if(accessList == null){
                     accessList = new ArrayList<>();
-            String raw = Configurations.getFirstAttribute(cn, "accessList");
+            String raw = cn.getFirstAttribute("accessList");
             if(!StringUtils.isTrivial(raw)){
                 StringTokenizer stringTokenizer = new StringTokenizer(raw, ",");
                 while(stringTokenizer.hasMoreTokens()){
