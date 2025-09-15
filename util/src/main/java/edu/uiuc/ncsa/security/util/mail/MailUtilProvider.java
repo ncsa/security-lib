@@ -26,6 +26,7 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
     public MailUtilProvider(ConfigurationNode config) {
         super(config);
     }
+
     public MailUtilProvider(CFNode config) {
         super(config);
     }
@@ -33,9 +34,9 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
     @Override
     protected boolean checkEvent(CfgEvent cfgEvent) {
         if (cfgEvent.getName().equals(MAIL)) {
-            if(hasCFNode()){
+            if (hasCFNode()) {
                 setCFNode(cfgEvent.getCFNode());
-            }else {
+            } else {
                 setConfig(cfgEvent.getConfiguration());
             }
             return true;
@@ -58,13 +59,16 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
         if (me != null) {
             return me;
         }
-
-        me = oldME();
+        if (hasCFNode()) {
+            me = oldME(getCFNode());
+        } else {
+            me = oldME(getConfig());
+        }
         return me;
     }
 
 
-    protected MailEnvironment oldME() {
+    protected MailEnvironment oldME(ConfigurationNode node) {
         try {
             String x = getAttribute(MAIL_PORT, "-1");
             int port = Integer.parseInt(x); // if this bombs, catch it.
@@ -75,11 +79,10 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
                     getAttribute(MAIL_PASSWORD, "changeme"), //password
                     getAttribute(MAIL_USERNAME, null), //from
                     getAttribute(MAIL_RECIPIENTS), //recipients
-                    Configurations.getNodeValue(getConfig(), MAIL_MESSAGE_TEMPLATE),// message template
-                    Configurations.getNodeValue(getConfig(), MAIL_SUBJECT_TEMPLATE), // subject template
+                    Configurations.getNodeValue(node, MAIL_MESSAGE_TEMPLATE),// message template
+                    Configurations.getNodeValue(node, MAIL_SUBJECT_TEMPLATE), // subject template
                     Boolean.parseBoolean(getAttribute(MAIL_USE_SSL, "false")), //use ssl
                     Boolean.parseBoolean(getAttribute(MAIL_START_TLS, "false"))); //use start tls (mostly for gmail)
-
             return me;
 
         } catch (Throwable t) {
@@ -88,7 +91,31 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
             }
             throw new MyConfigurationException("Error: Could not create mail environment.", t);
         }
+    }
 
+    protected MailEnvironment oldME(CFNode node) {
+        try {
+            String x = getAttribute(MAIL_PORT, "-1");
+            int port = Integer.parseInt(x); // if this bombs, catch it.
+            MailEnvironment me = new MailEnvironment(
+                    Boolean.parseBoolean(getAttribute(MAIL_ENABLED, "false")), //enabled
+                    getAttribute(MAIL_SERVER, "none"), //server
+                    port, //port
+                    getAttribute(MAIL_PASSWORD, "changeme"), //password
+                    getAttribute(MAIL_USERNAME, null), //from
+                    getAttribute(MAIL_RECIPIENTS), //recipients
+                    node.getNodeContents(MAIL_MESSAGE_TEMPLATE),// message template
+                    node.getNodeContents(MAIL_SUBJECT_TEMPLATE), // subject template
+                    Boolean.parseBoolean(getAttribute(MAIL_USE_SSL, "false")), //use ssl
+                    Boolean.parseBoolean(getAttribute(MAIL_START_TLS, "false"))); //use start tls (mostly for gmail)
+            return me;
+
+        } catch (Throwable t) {
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
+            }
+            throw new MyConfigurationException("Error: Could not create mail environment.", t);
+        }
     }
 
     protected boolean hasAttribute(ConfigurationNode node, String name) {
@@ -143,9 +170,43 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
         return map;
     }
 
+    protected Map<String, Object> getRawConfig(CFNode node) {
+        HashMap<String, Object> map = new HashMap<>();
+
+        if (node.hasAttribute(MAIL_NAME)) map.put(MAIL_NAME, node.getFirstAttribute(MAIL_NAME));
+        if (node.hasAttribute(MAIL_PARENT)) map.put(MAIL_PARENT, node.getFirstAttribute(MAIL_PARENT));
+        if (node.hasAttribute(MAIL_PORT)) map.put(MAIL_PORT, node.getFirstLongAttribute(MAIL_PORT));
+        if (node.hasAttribute(MAIL_ENABLED))
+            map.put(MAIL_ENABLED, node.getFirstBooleanValue(MAIL_ENABLED)); //enabled
+        if (node.hasAttribute(MAIL_SERVER)) map.put(MAIL_SERVER, node.getFirstAttribute(MAIL_SERVER));
+        if (node.hasAttribute(MAIL_PASSWORD)) map.put(MAIL_PASSWORD, node.getFirstAttribute(MAIL_PASSWORD));
+        if (node.hasAttribute(MAIL_USERNAME)) map.put(MAIL_USERNAME, node.getFirstAttribute(MAIL_USERNAME));
+        if (node.hasAttribute(MAIL_RECIPIENTS)) map.put(MAIL_RECIPIENTS, node.getFirstAttribute(MAIL_RECIPIENTS));
+        if (node.hasAttribute(MAIL_USE_SSL))
+            map.put(MAIL_USE_SSL, node.getFirstBooleanValue(MAIL_USE_SSL));
+        if (node.hasAttribute(MAIL_START_TLS))
+            map.put(MAIL_START_TLS, node.getFirstBooleanValue(MAIL_START_TLS));
+
+        String template = node.getNodeContents(MAIL_MESSAGE_TEMPLATE);// message template
+        if (template != null && !template.isEmpty()) {
+            map.put(MAIL_MESSAGE_TEMPLATE, template);
+        }
+        template = node.getNodeContents(MAIL_SUBJECT_TEMPLATE); // subject template
+        if (template != null && !template.isEmpty()) {
+            map.put(MAIL_SUBJECT_TEMPLATE, template);
+        }
+
+        return map;
+    }
+
     protected Map<String, Map> parseIt() {
         // create an initial map of global values.
-        Map<String, Object> globalValues = getRawConfig(getConfig());
+        Map<String, Object> globalValues;
+        if (hasCFNode()) {
+            globalValues = getRawConfig(getCFNode());
+        } else {
+            globalValues = getRawConfig(getConfig());
+        }
 
         Map<String, Map> allMaps = new HashMap<>();
         if (!globalValues.isEmpty()) {
@@ -153,8 +214,8 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
             globalValues.remove(MAIL_PARENT);
             allMaps.put(MAIL_CONFIG_ROOT, globalValues);
         }
-        List<ConfigurationNode> kids = getConfig().getChildren();
-        for (ConfigurationNode kid : kids) {
+        List<CFNode> kids = getCFNode().getChildren(MAIL_COMPONENT);
+        for (CFNode kid : kids) {
             if (kid.getName().equals(MAIL_COMPONENT)) {
                 Map<String, Object> rawMap = getRawConfig(kid);
                 if (rawMap.containsKey(MAIL_NAME)) {

@@ -23,7 +23,7 @@ public class ServletMailUtilProvider extends MailUtilProvider {
 
     @Override
     public MailUtil get() {
-        if (getConfig() == null) {
+        if (getCFNode() == null && getConfig() == null) {
             return new ServletMailUtil();
         }
         return new ServletMailUtil(getME());
