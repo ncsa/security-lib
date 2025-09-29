@@ -24,6 +24,11 @@ public class BasicIdentifier implements Identifier {
     }
 
     @Override
+    public boolean isTrivial() {
+        return StringUtils.isTrivial(idString);
+    }
+
+    @Override
     public URI getUri() {
         return id;
     }

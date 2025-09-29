@@ -5,10 +5,20 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.util.EntityUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -262,10 +272,11 @@ public class HeaderUtils {
      *     scope=openid&scope=profile&scope=org.oa4mp%3Auserinfo%20read%3A%2Fpublic%2Fbob&...
      * </pre>
      * Then invoking this with a delimiter of " " (a blank) yields the scope list of
-     *<pre>
+     * <pre>
      *     [openid,profile,org.oa4mp:userinfo,read:/public/bob]
-     *</pre>
+     * </pre>
      * Note that this returns faithfully what was passed, so if a value is repeated, that is returned too.
+     *
      * @param req
      * @param key
      * @param delimiter
@@ -274,21 +285,95 @@ public class HeaderUtils {
     public static List<String> getParameters(HttpServletRequest req, String key, String delimiter) {
         List<String> output = new ArrayList<>();
         String[] values = req.getParameterValues(key);
-        if(values == null){
+        if (values == null) {
             return new ArrayList<>();
         }
         //String[] values = new String[]{"openid","   profile   ", "  org.oa4mp:userinfo   read:/public/bob   "};
         boolean trivialDelimiter = delimiter == null || delimiter.isEmpty();
-        for(String value : values) {
-            if(!trivialDelimiter) {
+        for (String value : values) {
+            if (!trivialDelimiter) {
                 StringTokenizer st = new StringTokenizer(value, delimiter);
-                while(st.hasMoreTokens()) {
+                while (st.hasMoreTokens()) {
                     output.add(st.nextToken().trim());
                 }
-            }else{
+            } else {
                 output.add(value.trim());
             }
         }
         return output;
+    }
+
+    /**
+     * Debug: Echo the request to standard out. This is a very low level debugging utility.
+     *
+     * @param httpRequestBase
+     * @throws IOException
+     */
+    public static void echoRequest(HttpRequestBase httpRequestBase) throws IOException {
+        System.out.println("\n----- Echo request -----");
+        System.out.println(httpRequestBase);
+        if (httpRequestBase instanceof HttpPost) {
+            HttpPost httpPost = (HttpPost) httpRequestBase;
+            System.out.println("    Content-Type: " + httpPost.getEntity().getContentType());
+            System.out.println("Content-Encoding: " + httpPost.getEntity().getContentEncoding());
+            System.out.println("  Content-Length: " + httpPost.getEntity().getContentLength());
+            InputStream inputStream = httpPost.getEntity().getContent();
+            // We must tread carefully here or the stream will be consumed and un-usable.
+            // If it's a byte array, we can do this safely
+            if (inputStream instanceof ByteArrayInputStream) {
+                String content = new String(((ByteArrayInputStream) inputStream).readAllBytes(), "UTF-8");
+                System.out.println("         Content:\n" + content);
+            } else {
+                System.out.println("         Content: (cannot read " + inputStream.getClass().getCanonicalName() + ")");
+            }
+        }
+
+        System.out.println("----- End echo request -----\n");
+    }
+
+    /**
+     * Debug: If the response was an error, echo it
+     *
+     * @param t
+     */
+    public static void echoErrorResponse(Throwable t) {
+        System.out.println("\n----- Echo response -----");
+        System.out.println("ERROR!");
+        System.out.println(t.getMessage());
+        System.out.println("----- End echo response -----\n");
+    }
+
+    // next couple of methods are for https://github.com/ncsa/security-lib/issues/59
+
+    /**
+     * Debug: echo the response. This means reading the stream, so return the content if any.
+     * If there is {@link HttpStatus#SC_NO_CONTENT},return the empty string.
+     *
+     * @param entity     - may be null
+     * @param statusLine - must not be null
+     * @return
+     * @throws IOException
+     */
+    public static String echoResponse(HttpEntity entity, StatusLine statusLine) throws IOException {
+        System.out.println("\n----- Echo response -----");
+        if (entity != null && entity.getContentType() != null) {
+            System.out.println("Content Type: " + entity.getContentType().getValue());
+        } else {
+            System.out.println("Content Type: (none)");
+        }
+        if (statusLine.getStatusCode() == HttpStatus.SC_NO_CONTENT) {
+            System.out.println("----- End echo response -----\n");
+            return "";
+        }
+        String x;
+        if (entity == null) {
+            x = "(no content)";
+        } else {
+            x = EntityUtils.toString(entity, StandardCharsets.UTF_8);
+        }
+        System.out.println("Status: " + statusLine.getStatusCode());
+        System.out.println("Raw Response: \n" + x);
+        System.out.println("----- End echo response -----\n");
+        return x;
     }
 }

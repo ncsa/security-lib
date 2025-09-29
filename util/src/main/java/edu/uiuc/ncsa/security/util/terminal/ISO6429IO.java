@@ -287,7 +287,7 @@ public class ISO6429IO implements IOInterface {
                         currentCol0 = 0;
                     }
                     if (0 < currentCol0 && 0 < currentLine.length()) {
-                        currentCol0 = Math.max(0, currentCol0 - 1);
+                        currentCol0 = Math.max(0, currentLine.length() - 1); // keep it in the line
                         currentLine = currentLine.deleteCharAt(currentCol0);
                         terminal.setCursorCol(startCol + currentCol0);
                         print(currentLine.substring(currentCol0) + " "); // blanks out last char

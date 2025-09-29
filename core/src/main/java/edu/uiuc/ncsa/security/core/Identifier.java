@@ -18,4 +18,10 @@ public interface Identifier extends Comparable, Serializable {
      * @return
      */
     URI getUri();
+
+    /**
+     * Is the underlying URI trivial, i.e. null or an empty string?
+     * @return
+     */
+    boolean isTrivial();
 }
