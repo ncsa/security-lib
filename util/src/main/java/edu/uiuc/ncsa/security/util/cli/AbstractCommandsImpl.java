@@ -171,6 +171,7 @@ public abstract class AbstractCommandsImpl implements Commands {
      * The reason output is turned off is to allow for loading components, libraries that may or may
      * not play so nicely and spit out tons of confusing messages to the user. If verbose is enabled,
      * everything is printed.
+     *
      * @param inputLine
      * @throws Throwable
      */
@@ -189,8 +190,8 @@ public abstract class AbstractCommandsImpl implements Commands {
         }
         try {
             load(inputLine);
-        }catch(Throwable t) {
-            if(getDriver().isVerbose()){
+        } catch (Throwable t) {
+            if (getDriver().isVerbose()) {
                 t.printStackTrace();
             }
             warn("Error loading " + t.getMessage());
@@ -320,11 +321,13 @@ public abstract class AbstractCommandsImpl implements Commands {
             getDriver().getLogger().error(x);
         }
     }
+
     public void error(String x, Throwable t) {
         if (hasLogger()) {
-            getDriver().getLogger().error(x,t);
+            getDriver().getLogger().error(x, t);
         }
     }
+
     /**
      * Used when reading lines to check is the user typed a "y" for yes.
      *
@@ -617,4 +620,22 @@ public abstract class AbstractCommandsImpl implements Commands {
     public IOInterface getIOInterface() {
         return getDriver().getIOInterface();
     }
+
+    /**
+     * Take (newly created) {@link CommonCommands2} and initialize its driver. This should
+     * be called once, right after creation. It is a type of configuration injection.
+     *
+     * @param cli
+     * @param commands
+     */
+    /* NOTE: If this changes, update ConfigurableCommandsImpl, which re-uses this. */
+    public void configureCommands(CLIDriver cli, AbstractCommandsImpl commands) throws Throwable {
+        CLIDriver driver = commands.getDriver();
+        driver.setIOInterface(cli.getIOInterface());
+        driver.addCommands(commands);
+        if (this instanceof ComponentManager) { // extensions may fulfill this
+            driver.setComponentManager((ComponentManager) this);
+        }
+    }
+
 }

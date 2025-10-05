@@ -214,14 +214,29 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
             globalValues.remove(MAIL_PARENT);
             allMaps.put(MAIL_CONFIG_ROOT, globalValues);
         }
-        List<CFNode> kids = getCFNode().getChildren(MAIL_COMPONENT);
-        for (CFNode kid : kids) {
-            if (kid.getName().equals(MAIL_COMPONENT)) {
-                Map<String, Object> rawMap = getRawConfig(kid);
-                if (rawMap.containsKey(MAIL_NAME)) {
-                    allMaps.put(rawMap.get(MAIL_NAME).toString(), rawMap);
-                } else {
-                    allMaps.put(MAIL_CONFIG_DEFAULT_NAME, rawMap);
+        if(hasCFNode()){
+            List<CFNode> kids = getCFNode().getChildren(MAIL_COMPONENT);
+            for (CFNode kid : kids) {
+                if (kid.getName().equals(MAIL_COMPONENT)) {
+                    Map<String, Object> rawMap = getRawConfig(kid);
+                    if (rawMap.containsKey(MAIL_NAME)) {
+                        allMaps.put(rawMap.get(MAIL_NAME).toString(), rawMap);
+                    } else {
+                        allMaps.put(MAIL_CONFIG_DEFAULT_NAME, rawMap);
+                    }
+                }
+            }
+
+        }else{
+            List<ConfigurationNode> kids = getConfig().getChildren();
+            for (ConfigurationNode kid : kids) {
+                if (kid.getName().equals(MAIL_COMPONENT)) {
+                    Map<String, Object> rawMap = getRawConfig(kid);
+                    if (rawMap.containsKey(MAIL_NAME)) {
+                        allMaps.put(rawMap.get(MAIL_NAME).toString(), rawMap);
+                    } else {
+                        allMaps.put(MAIL_CONFIG_DEFAULT_NAME, rawMap);
+                    }
                 }
             }
         }

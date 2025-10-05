@@ -3,8 +3,10 @@ package edu.uiuc.ncsa.security.util.cli;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.DoubleHashMap;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import org.w3c.dom.CharacterData;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -44,8 +46,34 @@ public class HelpUtil {
     }
 
     /**
+     * Take <b>all</b> the state and entries from another help util and copy them.
+     * This allows you to have a base set of help and extend it, so add the help
+     * first, then do an loading that is needed for specific help.
+     *
+     * @param helpUtil
+     */
+    public void addHelp(HelpUtil helpUtil) {
+        if (helpUtil.getAltLookup() != null) {
+            for (String key : helpUtil.getAltLookup().keySet()) {
+                if (!getAltLookup().containsKey(key)) {
+                    getAltLookup().put(key, helpUtil.getAltLookup().get(key));
+                }
+            }
+        }
+        if (helpUtil.getOnlineHelp() != null) {
+            for (String key : helpUtil.getOnlineHelp().keySet()) {
+                if (!getOnlineHelp().containsKey(key)) {
+                    getOnlineHelp().put(key, helpUtil.getOnlineHelp().get(key));
+                }
+            }
+        }
+        setReverseCharLookupMap(helpUtil.getReverseCharLookupMap());
+    }
+
+    /**
      * This is a mop with key being the topic, value being the alternative, e.g.
      * has_value vs. ∈ in QDL.
+     *
      * @return
      */
     public DoubleHashMap<String, String> getAltLookup() {
@@ -74,7 +102,8 @@ public class HelpUtil {
     }
 
     /**
-     * Loads the given InputStream containing the help file.
+     * Loads the given InputStream containing the help file. Note that existing entries will
+     * be overwritten, allowing for overriding entries.
      *
      * @param helpStream
      * @return
@@ -98,27 +127,50 @@ public class HelpUtil {
                     if (!StringUtils.isTrivial(altName)) {
                         altLookup.put(name, altName);
                     }
-                    Node x = eElement.getElementsByTagName("body")
-                            .item(0);
-                    Node child = x.getFirstChild().getNextSibling();
-                    CharacterData cd = (CharacterData) child;
-                    if (cd != null && cd.getTextContent() != null) {
-                        onlineHelp.put(name, cd.getTextContent());
+                    Node x = eElement.getElementsByTagName("body").item(0);
+                    String content = getNodeContents(x);
+                    if (content != null) {
+                        onlineHelp.put(name, content);
                     }
                     // Process examples
-                    x = eElement.getElementsByTagName("example")
-                            .item(0);
-                    if (x != null) {
-                        child = x.getFirstChild().getNextSibling();
-                        cd = (CharacterData) child;
-                        if (cd != null && cd.getTextContent() != null) {
-                            onlineExamples.put(name, cd.getTextContent());
-                        }
+                    x = eElement.getElementsByTagName("example").item(0);
+                    content = getNodeContents(x);
+                    if (content != null) {
+                        onlineExamples.put(name, content);
                     }
                 }
             }
         }
         return true;
+    }
+
+    /**
+     * Root around for the actual content of the node if there is text, ignoring nodes that are
+     * whitespace only.
+     * @param node
+     * @return
+     */
+    protected String getNodeContents(Node node) {
+        // Fixes https://github.com/ncsa/security-lib/issues/60
+        if (node == null) {
+            return null;
+        }
+        NodeList kids = node.getChildNodes();
+        for (int i = 0; i < kids.getLength(); i++) {
+            Node nn = kids.item(i);
+            String out = nn.getTextContent();
+            if (!StringUtils.isTrivial(out)) {
+                System.out.println("out1: " + out);
+                return out;
+            } else {
+                out = nn.getNodeValue();
+                if (!StringUtils.isTrivial(out)) {
+                    System.out.println("out2: " + out);
+                    return out;
+                }
+            }
+        }
+        return null;
     }
 
     protected String[] resolveRealHelpName(String text) {
@@ -139,6 +191,7 @@ public class HelpUtil {
 
     /**
      * Returns true if there were results printed, false otherwise.
+     *
      * @param inputLine
      * @return
      */
@@ -146,9 +199,9 @@ public class HelpUtil {
         boolean doOnlineExample = inputLine.hasArg(ONLINE_HELP_EXAMPLE_FLAG);
         inputLine.removeSwitch(ONLINE_HELP_EXAMPLE_FLAG);
         String name;
-        if(inputLine.getArgCount() == 0){
+        if (inputLine.getArgCount() == 0) {
             name = ONLINE_HELP_COMMAND; // default, print a listing of all help.
-        }else{
+        } else {
             name = inputLine.getArg(1);
         }
         boolean isRegex = inputLine.hasArg("-r");
@@ -175,7 +228,7 @@ public class HelpUtil {
 
         if (names == null) {
             return false; // nothing to show
-        }else{
+        } else {
             String realName = names[0];
             if (doOnlineExample) {
                 String x = getHelpTopicExample(realName);
@@ -203,6 +256,7 @@ public class HelpUtil {
 
     /**
      * Use this to get an example for a topic. It returns null if no such example.
+     *
      * @param text
      * @return
      */
@@ -219,6 +273,7 @@ public class HelpUtil {
 
     /**
      * Use this to get help for a topic. It returns null if no such topic.
+     *
      * @param text
      * @return
      */

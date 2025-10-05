@@ -19,13 +19,19 @@ import java.util.Stack;
 import java.util.logging.Level;
 
 /**
- * Basic implementation of Commands. This supports loading configurations.
+ * Basic implementation of Commands. This is used for loading a single component (e.g. in the
+ * OA4MP command line client) and supports loading configurations.
  * <b>NOTE</b> This does not actually run commands! It is a top-level class that delegates to its
  * command implementations (such as for stores, keys). Therefore, you should not put code here
  * that actually executes things. The contract of this is that it manages logging, loading configurations
  * and instantiating the actual {@link Commands} implementations that do everything.
  * <p>Created by Jeff Gaynor<br>
  * on 5/20/13 at  11:35 AM
+ */
+/*
+   This should probably be folded into ConfigurableCommandsImpl2, but the extension of this class
+   is veyr complex so that would be a large task. Better to keep this separate for now. Mostly
+   new classes should use ConfigurableCommandsImpl2.
  */
 public abstract class ConfigurableCommandsImpl implements Commands {
     protected ConfigurableCommandsImpl(MyLoggingFacade logger) {
@@ -577,6 +583,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         }
         CLIDriver cli = new CLIDriver();
         cli.setIOInterface(getIOInterface());
+        cli.getHelpUtil().addHelp(getDriver().getHelpUtil());
         cli.addCommands(commands);
         cli.setEnv(getGlobalEnv());
         if (this instanceof ComponentManager) {
@@ -591,6 +598,23 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         }
         commandStack.pop(); // remove previous driver
         return true;
+    }
+
+    /**
+     * Take (newly created) {@link CommonCommands2} and initialize its driver. This should
+     * be called once, right after creation. It is a type of configuration injection.
+     * @param cli
+     * @param commands
+     */
+    /* NOTE This is taken verbatim from AbstractCommandsImpl, which is definitive. */
+
+    public  void configureCommands(CLIDriver cli, CommonCommands commands ) throws Throwable {
+        CLIDriver driver = commands.getDriver();
+        driver.setIOInterface(cli.getIOInterface());
+        driver.addCommands(commands);
+        if (this instanceof ComponentManager) { // extensions may fulfill this
+            driver.setComponentManager((ComponentManager) this);
+        }
     }
 
     /**

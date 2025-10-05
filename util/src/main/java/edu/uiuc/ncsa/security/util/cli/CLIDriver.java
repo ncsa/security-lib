@@ -134,7 +134,7 @@ public class CLIDriver {
                 commonCommands.setVerbose(isVerbose());
                 commonCommands.setPrintOuput(!isOutputOn());
             }
-            xxx.setDriver(this);
+     //       xxx.setDriver(this);
         }
         setCLICommands(cci);
 

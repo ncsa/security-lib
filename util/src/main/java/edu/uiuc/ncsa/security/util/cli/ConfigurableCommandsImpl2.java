@@ -16,6 +16,7 @@ import java.util.Stack;
 
 /**
  * Basic implementation of Commands that supports loading configurations.
+ * It is intended as a the superclass for commands that have multiple components.
  * <b>NOTE</b> This does not actually run commands! It is a top-level class that delegates to its
  * command implementations (such as for stores, keys). Therefore, you should not put code here
  * that actually executes things. The contract of this is that it manages logging, loading configurations
@@ -224,7 +225,7 @@ public abstract class ConfigurableCommandsImpl2 extends AbstractCommandsImpl {
         say("load " + LIST_CFGS + "= list all configurations in the current file");
         say("load " + LIST_CFGS + " config_file= list all configurations in the given file. Does not change configuration file.");
         say("You can set these using the positions of the arguments. Optionally you can also designate them with switches:");
-        say("load [" + CONFIG_FILE_OPTION + "|" + CONFIG_FILE_LONG_OPTION  + "] config_file + [" +
+        say("load [" + CONFIG_FILE_OPTION + "|" + CONFIG_FILE_LONG_OPTION + "] config_file + [" +
                 CONFIG_NAME_OPTION + " | " + CONFIG_NAME_LONG_OPTION + " ] config_name");
         say("The advantage of flags is that order does not matter. Note that if you use switches, you must use both.");
         say("\nExample\n");
@@ -232,7 +233,7 @@ public abstract class ConfigurableCommandsImpl2 extends AbstractCommandsImpl {
         say("loads the configuration named \"default\" from the file named \"config.xml\" in the directory \"/var/www/config\"\n");
         say("Note that after a load, any new configuration file becomes the default for future load operations.");
         say("Or the equivalent");
-        say("   load "+ CONFIG_NAME_OPTION+" default " + CONFIG_FILE_OPTION + " /var/www/config/config.xml \n");
+        say("   load " + CONFIG_NAME_OPTION + " default " + CONFIG_FILE_OPTION + " /var/www/config/config.xml \n");
 
     }
 
@@ -456,22 +457,26 @@ public abstract class ConfigurableCommandsImpl2 extends AbstractCommandsImpl {
     protected boolean switchOrRun(InputLine inputLine, CommonCommands2 commands) {
         boolean switchComponent = 1 < inputLine.getArgCount();
 
-        CLIDriver currentDriver = commandStack.peek();
-
-
-        if (currentDriver.getCLICommands().length == 1) {
-            if (currentDriver.getCLICommands()[0].getName().equals(commands.getName())) {
-                // already currently running.
-                return true;
+        if(!commandStack.isEmpty()){
+            CLIDriver currentDriver = commandStack.peek();
+            if (currentDriver.getCLICommands().length == 1) {
+                if (currentDriver.getCLICommands()[0].getName().equals(commands.getName())) {
+                    // already currently running.
+                    return true;
+                }
             }
         }
-        CLIDriver cli = new CLIDriver();
+
+        // not in stack, add it and start.
+        CLIDriver cli = commands.getDriver();
+/*        CLIDriver cli = new CLIDriver();
         cli.setIOInterface(getIOInterface());
+        cli.getHelpUtil().addHelp(getHelpUtil());
         cli.addCommands(commands);
         //cli.setEnv(getGlobalEnv());
         if (this instanceof ComponentManager) {
             cli.setComponentManager((ComponentManager) this);
-        }
+        }*/
         commandStack.push(cli);
         if (switchComponent) {
             inputLine.removeArgAt(0); // removes original arg ("use")
@@ -479,9 +484,10 @@ public abstract class ConfigurableCommandsImpl2 extends AbstractCommandsImpl {
         } else {
             cli.start();
         }
-        commandStack.pop(); // remove previous driver
+        commandStack.pop(); // remove it on exit
         return true;
     }
+
 
     /**
      * Zeroth element of the command stack is the root instance of this class. The should

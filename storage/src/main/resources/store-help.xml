@@ -1,127 +1,127 @@
 <html>
     <entry id="archive">
-    <body>
-    <![CDATA[Command.
+        <body>
+            <![CDATA[Command.
 Create and manage a copy of an object. This is stored with a version number appended to the
 identifier.]]>
-    </body>
+        </body>
     </entry>
     <entry id="commands">
-    <body>
-    <![CDATA[A complete list of commands supported by this component.
+        <body>
+            <![CDATA[A complete list of commands supported by this component.
 
 Syntax:
 /commands.]]>
-    </body>
+        </body>
     </entry>
     <entry id="id">
-    <body>
-    <![CDATA[You may set an identifier for use in the current session and this will
+        <body>
+            <![CDATA[You may set an identifier for use in the current session and this will
 be used to reference any object.
 
 See also: clear_id, get_id]]>
-    </body>
+        </body>
     </entry>
     <entry id="decode">
-    <body>
-    <![CDATA[Command.
+        <body>
+            <![CDATA[Command.
 Takes a string encoded in base 64 or base 32 and decodes it.
 
 See also: encode]]>
-    </body>
+        </body>
     </entry>
     <entry id="encode">
-    <body>
-    <![CDATA[Command.
+        <body>
+            <![CDATA[Command.
 Takes a given string and encodes it into base 32 or 64 as per request.
 
 See also: decode]]>
-    </body>
+        </body>
     </entry>
     <entry id="deserialize">
-    <body>
-    <![CDATA[Command.
+        <body>
+            <![CDATA[Command.
 Takes the stored XML version of the object and reads it into the current store.
 
 See also: serialize]]>
-    </body>
+        </body>
     </entry>
     <entry id="list_keys">
-    <body>
-    <![CDATA[A complete list of all keys supported by this component.
+        <body>
+            <![CDATA[A complete list of all keys supported by this component.
 
 Syntax:
 list_keys]]>
-    </body>
+        </body>
     </entry>
     <entry id="serialize">
-    <body>
-    <![CDATA[Command.
+        <body>
+            <![CDATA[Command.
 Takes the current object and creates and XML version of it. This may be stored in a file
 or simply printed to the console.
 
 See also: deserialize]]>
-    </body>
+        </body>
     </entry>
 
     <entry id="copy">
-    <body>
-    <![CDATA[Command.
+        <body>
+            <![CDATA[Command.
 Create a copy of an object, assigning it a new id.]]>
-    </body>
+        </body>
     </entry>
     <entry id="create">
-    <body>
-    <![CDATA[Command.
+        <body>
+            <![CDATA[Command.
 Creates a new object in the store. You will then be prompted to fill in each attribute for the
 object in turn.]]>
-    </body>
+        </body>
     </entry>
     <entry id="edit">
-    <body>
-    <![CDATA[Command.
+        <body>
+            <![CDATA[Command.
 Edit the current object's serialized form in an external editor (usually vim or nano).
 Exiting the editor updates the object.]]>
-    </body>
+        </body>
     </entry>
     <entry id="list_keys">
-    <body>
-    <![CDATA[Command.
+        <body>
+            <![CDATA[Command.
 List the keys for all the properties of this object.]]>
-    </body>
+        </body>
     </entry>
     <entry id="ls">
-    <body>
-    <![CDATA[Command.
+        <body>
+            <![CDATA[Command.
 List the current object or other objects.]]>
-    </body>
+        </body>
     </entry>
     <entry id="change_id">
-    <body>
-    <![CDATA[Command.
+        <body>
+            <![CDATA[Command.
 Change the id of the current object. Note that this should only be done with
 very good reason.
 
 See also: copy]]>
-    </body>
+        </body>
     </entry>
     <entry id="rm">
-    <body>
-    <![CDATA[Command.
+        <body>
+            <![CDATA[Command.
 Either remove an object or remove a property from the current object.]]>
-    </body>
+        </body>
     </entry>
     <entry id="rs">
-    <body>
-    <![CDATA[Command.
+        <body>
+            <![CDATA[Command.
 Result set management. This command allows for a variety of operations on result sets.
 
 See also: results]]>
-    </body>
+        </body>
     </entry>
     <entry id="results">
-    <body>
-    <![CDATA[Results are static sets of output from a search that are named and may be
+        <body>
+            <![CDATA[Results are static sets of output from a search that are named and may be
 queried separately.
 Creation and management
 -----------------------
@@ -205,32 +205,32 @@ Caveat: Result sets are static! This means that an update will update the stored
         objects that the result set references. If you alter the stored object(s)
         you will need to refresh your result set accordingly.
 ]]>
-    </body>
+        </body>
     </entry>
     <entry id="search">
-    <body>
-    <![CDATA[Command.
+        <body>
+            <![CDATA[Command.
 Search the store, You may search on a given property and may do so in several
 ways. Consult the online help for this, in particular the --ex (note the double
 hyphen) option will print many examples.]]>
-    </body>
+        </body>
     </entry>
 
     <entry id="size">
-    <body>
-    <![CDATA[Command.
+        <body>
+            <![CDATA[Command.
 The number of entries in the store.]]>
-    </body>
+        </body>
     </entry>
     <entry id="update">
-    <body>
-    <![CDATA[Command.
+        <body>
+            <![CDATA[Command.
 A wide-ranging command that allows you to update an entire object, prompting you for
 each property, or update a specific property.]]>
-    </body>
+        </body>
     </entry>
     <entry id="version">
-    <body><![CDATA[The current version of OA4MP is 6.x-SNAPSHOT.]]></body>
+        <body><![CDATA[The current version of OA4MP is 6.x-SNAPSHOT.]]></body>
     </entry>
     <entry id="index">
         <body><![CDATA[
@@ -256,7 +256,7 @@ For operations on result sets proper, see --help for the rs command.
     </entry>
 
     <entry id="qdl_lists">
-    <body><![CDATA[
+        <body><![CDATA[
 Note on QDL lists,
 All of the keys for the current store are put into QDL, assigning their name to the
 value, so you do not need to quote those.
@@ -271,7 +271,7 @@ However, in conjunction with run_qdl, you may have arbitrarily complex statement
 Note that if you should terminate every list statement with ^^ if you do any.
 For the vast majority of lists, just use simple syntax, E.g.
 rs show -attr [client_id,description] c842]]>
-    </body>
+        </body>
     </entry>
     <entry id="set_id">
         <body><![CDATA[You may set the id for this store for every operation that requires one
@@ -296,9 +296,9 @@ See also: index, clear_id, get_id]]>
         </body>
     </entry>
 </html>
-<!-- Template
-    <entry id="">
-        <body><![CDATA[]]>
-        </body>
-    </entry>
--->
+        <!-- Template
+            <entry id="">
+                <body><![CDATA[]]>
+                </body>
+            </entry>
+        -->

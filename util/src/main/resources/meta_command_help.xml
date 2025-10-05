@@ -3,7 +3,7 @@
     <body>
     <![CDATA[Metacommands are commands that are applied to the current component.
 For instance, as you type, a history of everything you type is created. This may
-be viewed, older commands can  be executed from this history, thj history
+be viewed, older commands can  be executed from this history, the history
 may be saved and loaded. This is the structure around the component to allow
 for using that component. Another example is the // metacommand, which allows you
 to call up another component and issue a single command to it. This is quite useful
