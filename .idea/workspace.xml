@@ -9,19 +9,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="https://github.com/ncsa/security-lib/issues/59 fix.">
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/SASCFConfigurationLoader.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/class-use/SASCFConfigurationLoader.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/CFLoggingConfigLoader.MyLoggerProvider.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/CFLoggingConfigLoader.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/CFLoggingConfigLoader.MyLoggerProvider.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/CFLoggingConfigLoader.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/AbstractUpkeepStoreProvider.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/CFDBConfigLoader.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/AbstractUpkeepStoreProvider.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/CFDBConfigLoader.html" afterDir="false" />
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="https://github.com/ncsa/security-lib/issues/60">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cf/CFNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cf/CFNode.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/alt-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/alt-index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/allclasses-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/allclasses-index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/allclasses.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/allclasses.html" afterDir="false" />
@@ -96,12 +85,14 @@
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/package-use.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/io/package-use.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/ClientFSStoreProvider.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/ClientFSStoreProvider.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/SASBootstrapper.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/SASBootstrapper.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/SASCFConfigurationLoader.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/SASCFConfigurationLoader.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/SASConfigurationLoader.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/SASConfigurationLoader.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/SASExceptionHandler.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/SASExceptionHandler.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/SASServletInitializer.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/SASServletInitializer.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/SQLClientStoreProvider.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/SQLClientStoreProvider.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/class-use/ClientFSStoreProvider.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/class-use/ClientFSStoreProvider.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/class-use/SASBootstrapper.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/class-use/SASBootstrapper.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/class-use/SASCFConfigurationLoader.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/class-use/SASCFConfigurationLoader.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/class-use/SASConfigurationLoader.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/class-use/SASConfigurationLoader.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/class-use/SASExceptionHandler.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/class-use/SASExceptionHandler.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/class-use/SASServletInitializer.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/sas/loader/class-use/SASServletInitializer.html" afterDir="false" />
@@ -383,6 +374,8 @@
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/BeanUtils.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/BeanUtils.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/Benchmarker.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/Benchmarker.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/BitSetUtil.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/BitSetUtil.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/CFLoggingConfigLoader.MyLoggerProvider.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/CFLoggingConfigLoader.MyLoggerProvider.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/CFLoggingConfigLoader.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/CFLoggingConfigLoader.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/ConfigurationLoader.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/ConfigurationLoader.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/DateUtils.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/DateUtils.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/DebugConstants.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/DebugConstants.html" afterDir="false" />
@@ -417,6 +410,8 @@
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/BeanUtils.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/BeanUtils.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/Benchmarker.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/Benchmarker.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/BitSetUtil.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/BitSetUtil.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/CFLoggingConfigLoader.MyLoggerProvider.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/CFLoggingConfigLoader.MyLoggerProvider.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/CFLoggingConfigLoader.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/CFLoggingConfigLoader.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/ConfigurationLoader.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/ConfigurationLoader.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/DateUtils.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/DateUtils.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/DebugConstants.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/core/util/class-use/DebugConstants.html" afterDir="false" />
@@ -524,8 +519,10 @@
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/servlet/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/servlet/package-summary.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/servlet/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/servlet/package-tree.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/servlet/package-use.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/servlet/package-use.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/AbstractUpkeepStoreProvider.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/AbstractUpkeepStoreProvider.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/AggregateStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/AggregateStore.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/AggregateStoreProvider.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/AggregateStoreProvider.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/CFDBConfigLoader.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/CFDBConfigLoader.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/DBConfigLoader.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/DBConfigLoader.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/FSInitializer.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/FSInitializer.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/FSProvider.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/FSProvider.html" afterDir="false" />
@@ -539,8 +536,10 @@
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/MonitoredStoreInterface.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/MonitoredStoreInterface.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/StoreInitializer.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/StoreInitializer.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/XMLMap.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/XMLMap.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/AbstractUpkeepStoreProvider.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/AbstractUpkeepStoreProvider.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/AggregateStore.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/AggregateStore.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/AggregateStoreProvider.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/AggregateStoreProvider.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/CFDBConfigLoader.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/CFDBConfigLoader.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/DBConfigLoader.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/DBConfigLoader.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/FSInitializer.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/FSInitializer.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/FSProvider.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/edu/uiuc/ncsa/security/storage/class-use/FSProvider.html" afterDir="false" />
@@ -987,7 +986,6 @@
       <change beforePath="$PROJECT_DIR$/docs/apidocs/overview-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/overview-tree.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/package-search-index.zip" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/package-search-index.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/serialized-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/serialized-form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/type-search-index.js" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/type-search-index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/type-search-index.zip" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/type-search-index.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/cli/help.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/cli/help.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/cli/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/cli/index.html" afterDir="false" />
@@ -1009,14 +1007,6 @@
       <change beforePath="$PROJECT_DIR$/docs/project-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/project-info.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/store_commands/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/store_commands/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/summary.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/resources/store-help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/resources/store-help.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/AbstractCommandsImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/AbstractCommandsImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl2.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl2.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/HelpUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/HelpUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailUtilProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailUtilProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/resources/meta_command_help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/resources/meta_command_help.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -1640,7 +1630,7 @@
       <workItem from="1754563190060" duration="35916000" />
       <workItem from="1757587058797" duration="18228000" />
       <workItem from="1758279548285" duration="28080000" />
-      <workItem from="1759145760587" duration="63177000" />
+      <workItem from="1759145760587" duration="66350000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -1985,7 +1975,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="110" />
+    <option name="localTasksCounter" value="111" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1994,7 +1984,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Added utility to get all HTTP header parameters properly parsed." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/43 and website" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/44" />
     <MESSAGE value="Rerolled website" />
@@ -2019,7 +2008,8 @@
     <MESSAGE value="Merged CF port into main" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/56" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/59 fix." />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/59 fix." />
+    <MESSAGE value="https://github.com/ncsa/security-lib/issues/60" />
+    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/60" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
