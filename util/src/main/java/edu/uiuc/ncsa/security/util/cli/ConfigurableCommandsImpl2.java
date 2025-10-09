@@ -272,7 +272,7 @@ public abstract class ConfigurableCommandsImpl2 extends AbstractCommandsImpl {
     public static final String CONFIG_NAME_LONG_OPTION = "-configName";
 
     @Override
-    protected void initHelp() throws Throwable {
+    public void initHelp() throws Throwable {
         super.initHelp();
         getHelpUtil().load("/cci_help.xml");
 

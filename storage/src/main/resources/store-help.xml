@@ -245,9 +245,19 @@ You may get an index by
 How to specify the range of indices used in a result set.
 ( -range  | -- ) (integer | list | iterator)
 Examples of ranges are: 5 (integer), [2,4,5] (a list), [2;7] integers from to through 6 inclusive.
-Negative indices are allowed and mean to take from the end of the list, so
+
+E.g. Negative indices
+
+These are allowed and mean to take from the end of the list, so
 my_command -- -1  my_set
 returns the last element in the result set name my_set.
+
+E.g. Passing an index to a command
+
+ls -l -- 2 -rs my_set
+
+This assumes a result set named my_set and will use the entry at index 2
+
 Note that while you may specify arguments this way, result sets are static and operations will
 be carried out on the actual stored object.
 

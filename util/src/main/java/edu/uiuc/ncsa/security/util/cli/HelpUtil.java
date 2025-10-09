@@ -160,12 +160,10 @@ public class HelpUtil {
             Node nn = kids.item(i);
             String out = nn.getTextContent();
             if (!StringUtils.isTrivial(out)) {
-                System.out.println("out1: " + out);
                 return out;
             } else {
                 out = nn.getNodeValue();
                 if (!StringUtils.isTrivial(out)) {
-                    System.out.println("out2: " + out);
                     return out;
                 }
             }

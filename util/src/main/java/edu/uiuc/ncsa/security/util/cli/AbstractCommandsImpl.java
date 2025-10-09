@@ -344,7 +344,7 @@ public abstract class AbstractCommandsImpl implements Commands {
         return getDriver().getHelpUtil();
     }
 
-    protected void initHelp() throws Throwable {
+    public void initHelp() throws Throwable {
         getHelpUtil().load("/common_commands_help.xml");
         getHelpUtil().load("/meta_command_help.xml");
     }

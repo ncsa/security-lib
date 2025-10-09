@@ -49,9 +49,7 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.*;
  * on 5/20/13 at  3:22 PM
  */
 public abstract class StoreCommands2 extends CommonCommands2 {
- /*   public StoreCommands(MyLoggingFacade logger) throws Throwable {
-        super(logger);
-    }*/
+
 
     public StoreCommands2(CLIDriver driver) {
         super(driver);
@@ -1576,8 +1574,8 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         }
         // case 3: a result set is given
         RSRecord rs = getResultSets().get(lastArg);
-
         if (rs != null) {
+            inputLine.removeSwitchAndValue(RESULT_SET_KEY);
             String key = null;
             if (inputLine.hasArg(RS_RANGE_KEY)) {
                 key = RS_RANGE_KEY;
@@ -1600,7 +1598,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                     out = new FoundIdentifiables(true, rs.rs);
                 }
             }
-            inputLine.removeLastArg();
+         //   inputLine.removeLastArg();
             return out;
         }
         try {
@@ -2288,14 +2286,14 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         say("Searches the creation_ts keys as dates, returning all that are before Jan 2, 20201.");
         say("This also stores the result under the name last_year. See also the rs command help");
         say("E.g. search for all approvals by date and status");
-        say("search >status none -date approval_ts -after 2025-03-01T00:00:0");
+        sayi("search >status none -date approval_ts -after 2025-03-01T00:00:0");
         say("searches for all approvals after the given date of March 1, 2025 at midnight.");
         say("E.g.");
         sayi("clients>search " + KEY_SHORTHAND_PREFIX + "email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\" " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year_email");
         say("Searches per date as in the previous example and further restricts it to matching the given key.");
         say("This also stores the result under the name last_year_email. See also the rs command help");
         say("E.g.");
-        say("clients>search " + KEY_SHORTHAND_PREFIX + "client_id " + SEARCH_RETURNED_ATTRIBUTES_FLAG + " email " +
+        sayi("clients>search " + KEY_SHORTHAND_PREFIX + "client_id " + SEARCH_RETURNED_ATTRIBUTES_FLAG + " email " +
                 SEARCH_SHORT_REGEX_FLAG + ".*fnal\\.gov " + RESULT_SET_KEY + " fnal_emails");
         say("searches for clients whose id ends in fnal.gov, returning only the contact email and stashing the output");
         say("into a result set called \"email\" (which can be saved to external storage for, say, for sending mass notifications.)");
@@ -2303,13 +2301,13 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         say("E.g. A date search");
         say("This searches by client id for clients created between the given dates. It stores the result");
         say("in the result set named 's234'");
-        say("clients>search >client_id -r .*234.* -date creation_ts -after 2020-05-01 -before 2020-05-30 -rs s234");
+        sayi("clients>search >client_id -r .*234.* -date creation_ts -after 2020-05-01 -before 2020-05-30 -rs s234");
         say("got 4 matches");
         say("E.g. getting the most recent entries");
-        say("clients>search " + NEXT_N_COMMAND + " 15");
+        sayi("clients>search " + NEXT_N_COMMAND + " 15");
         say("This returns the most recent 15 entries to this store. An argument of -15 woudl return the oldest 15.");
         say("E.g. search for a subset");
-        say("clients>search -n 5 -out [name, creation_ts, client_id]");
+        sayi("clients>search -n 5 -out [name, creation_ts, client_id]");
         say("\nSee also: rs");
     }
 
@@ -4038,7 +4036,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     }
 
     @Override
-    protected void initHelp() throws Throwable {
+    public void initHelp() throws Throwable {
         super.initHelp();
         getHelpUtil().load("/basic-help.xml");
         getHelpUtil().load("/store-help.xml");
