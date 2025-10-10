@@ -5,12 +5,12 @@
     <parent>
         <artifactId>security-lib</artifactId>
         <groupId>edu.uiuc.ncsa.security</groupId>
-        <version>6.x-SNAPSHOT</version>
+        <version>6.2.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>skin</artifactId>
-    <version>6.x-SNAPSHOT</version>
+    <version>6.2.2</version>
     <groupId>edu.uiuc.ncsa.security.skin</groupId>
     <name>skin</name>
 
