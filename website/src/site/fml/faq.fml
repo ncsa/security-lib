@@ -21,25 +21,37 @@
           Mostly these are specialized and do common operations that may be much
           more complex in other packages. For instance, the crypto module has X 509 certificate
           and key utilities that use native Java, so you don't have to import some
-          huge stack of code to do them.
+          huge stack of code to do them. All of these started as gosh darned good ideas that ended up
+          being generalized for all projects.
       </answer>
     </faq>
     <faq id="configurations">
       <question>What is the configurations package?</question>
       <answer>This is a set of tools that allows you to parse XML configurations and turn them
       into a runtime environment. It supports aliases, includes (so can import other configurations)
-      multiple inheritence and several other nice features. </answer>
+      multiple inheritence, variables (so useful!) and several other nice features. </answer>
     </faq>
     <faq id="stores">
       <question>What is the Store package?</question>
       <answer>The store package models a persistent map with a unique key. It has implementations for
       in-memory, file system and SQL (various vendors are supported).
-        This therefore implements a very common construct in programming.</answer>
+        This therefore implements a very common construct in programming. The programming interface is
+        the standard java.util.Map, so these can be very seamlessly integrated into your project.</answer>
     </faq>
     <faq id="cli">
       <question>What is the CLI package?</question>
       <answer>CLI - Command Line Interface. This is a set of tools that lets you create
       command line interfaces to darned near anything.</answer>
     </faq>
+        <faq id="upkeep">
+          <question>What is the Upkeep package?</question>
+          <answer>Used with stores. These may be monitored (so last accessed times and some
+          other information is kept in a monitored store) and in turn garbage collection
+          can be enabled and configured to run at regular intervals. If you have a store, say,
+          backing a service, that accumulates entries which need to be periodically removed,
+          this automates it. It permits logical connectives and a variety of other tools
+          fro decision making.</answer>
+        </faq>
+
   </part>
 </faqs>

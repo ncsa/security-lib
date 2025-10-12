@@ -22,6 +22,14 @@
   </skin>
 
   <body>
+      <menu name="Security Library Projects">
+          <item name="CLI" href="cli/index.html"/>
+          <item name="Configurations" href="pdf/configurations.pdf"/>
+          <item name="Installer" href="pdf/installer.pdf"/>
+          <item name="SAS Reference" href="pdf/SAS-protocol.pdf"/>
+          <item name="Store commands" href="store_commands/index.html"/>
+          <item name="Store upkeep" href="pdf/upkeep.pdf"/>
+      </menu>
 
       <menu name="Related Projects">
         <item name="CILogon" href="https://www.cilogon.org/" />
@@ -29,9 +37,6 @@
         <item name="OA4MP" href="https://oa4mp.org/"/>
         <item name="QDL" href="https://qdl-lang.org/"/>
         <item name="Crypt8" href="https://ncsa.github.io/crypto-java8/"/>
-        <item name="Store commands" href="store_commands/index.html"/>
-        <item name="CLI" href="cli/index.html"/>
-        <item name="SAS Reference" href="pdf/SAS-protocol.pdf"/>
       </menu>
       <menu ref="reports"/>
   </body>
