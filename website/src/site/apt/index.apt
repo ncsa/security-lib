@@ -39,6 +39,9 @@ Useful Reference Manuals
   * {{{./pdf/SAS-protocol.pdf}The SAS Reference}} The reference for running sessions of applications on your
     web server.     
 
+  * {{{./pdf/configurations.pdf}The Configurations Reference}} The reference for the XML configuration system. It has many nice features (like variable support,
+  multiple inheritence) and is made to be very straightforward.
+
 Javadocs
 
     *{{{./apidocs/index.html}Javadoc}}
