@@ -101,6 +101,7 @@
             <groupId>jakarta.mail</groupId>
             <artifactId>jakarta.mail-api</artifactId>
             <version>2.1.2</version>
+            <scope>provided</scope>
         </dependency>
         <!--
             Note on dependencies with mail. Jakarta mail succeeds Java Mail, but is part of Jakarta EE

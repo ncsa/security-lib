@@ -9,15 +9,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="6.2.2 checkin, includes website rebuild. Corrected a minor bit of bookeeping with indices in the CLI.">
-      <change afterPath="$PROJECT_DIR$/docs/pdf/index.html" afterDir="false" />
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="https://github.com/ncsa/security-lib/issues/61, added index,html page for PDFs. Tweaked a lot of help.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/apt/index.apt" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/apt/index.apt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/website/src/site/fml/faq.fml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/fml/faq.fml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/site.xml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/site.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/alt-index.xhtml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/xhtml/alt-index.xhtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/configurations/overview.xhtml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/xhtml/configurations/single-inheritance.xhtml" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -985,7 +980,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="113" />
+    <option name="localTasksCounter" value="114" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -994,7 +989,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Rerolled website" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/45" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/46 Promoted result sets to first order objects. This makes a lot of batch processing vastly easier." />
     <MESSAGE value="website update" />
@@ -1019,7 +1013,8 @@
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/60" />
     <MESSAGE value="6.2.2 checkin, includes website rebuild" />
     <MESSAGE value="6.2.2 checkin, includes website rebuild. Corrected a minor bit of bookeeping with indices in the CLI." />
-    <option name="LAST_COMMIT_MESSAGE" value="6.2.2 checkin, includes website rebuild. Corrected a minor bit of bookeeping with indices in the CLI." />
+    <MESSAGE value="https://github.com/ncsa/security-lib/issues/61, added index,html page for PDFs. Tweaked a lot of help." />
+    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/61, added index,html page for PDFs. Tweaked a lot of help." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">

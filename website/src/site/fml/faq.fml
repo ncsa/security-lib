@@ -26,7 +26,7 @@
       </answer>
     </faq>
     <faq id="configurations">
-      <question>What is the configurations package?</question>
+      <question>What is the Configurations package?</question>
       <answer>This is a set of tools that allows you to parse XML configurations and turn them
       into a runtime environment. It supports aliases, includes (so can import other configurations)
       multiple inheritence, variables (so useful!) and several other nice features. </answer>
