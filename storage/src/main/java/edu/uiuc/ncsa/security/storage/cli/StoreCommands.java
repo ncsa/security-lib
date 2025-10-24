@@ -465,7 +465,7 @@ public abstract class StoreCommands extends CommonCommands {
         if (showHelp(inputLine)) {
             if (inputLine.hasArg("-ex")) {
                 showSearchHelpExamples();
-            }else{
+            } else {
                 showSearchHelp();
             }
             return;
@@ -546,7 +546,7 @@ public abstract class StoreCommands extends CommonCommands {
         if (hasDate) {
             dateField = inputLine.getNextArgFor(SEARCH_DATE_FLAG);
             inputLine.removeSwitchAndValue(SEARCH_DATE_FLAG);
-            if(!getKeys().allKeys().contains(dateField)) {
+            if (!getKeys().allKeys().contains(dateField)) {
                 say("The date field \"" + dateField + "\" does not exist.");
                 return;
             }
@@ -1570,7 +1570,9 @@ public abstract class StoreCommands extends CommonCommands {
         RSRecord rs = getResultSets().get(lastArg);
 
         if (rs != null) {
+
             String key = null;
+            inputLine = extractIndexKeys(inputLine);
             if (inputLine.hasArg(RS_RANGE_KEY)) {
                 key = RS_RANGE_KEY;
             } else if (inputLine.hasArg(RS_RANGE_SHORT_KEY)) {
@@ -1626,6 +1628,36 @@ public abstract class StoreCommands extends CommonCommands {
         return null;
     }
 
+    /**
+     * Static utility to take an index argument like --4 and split it into -- 4.
+     * This typo happens a lot (it's an idiom in Unix several command line tools)
+     * so since everyone keeps doing it, we'll make it an official idiom for indices.
+     *
+     * @param inputLine
+     * @return
+     */
+
+    // Fix https://github.com/ncsa/security-lib/issues/62
+    public static InputLine extractIndexKeys(InputLine inputLine) {
+        ArrayList<String> args = new ArrayList<>(inputLine.getArgs().size() + 2);
+        boolean gotOne = false;
+        for (String x : inputLine.getArgs()) {
+            args.add(inputLine.getCommand());
+            if (x.startsWith(RS_RANGE_SHORT_KEY)) {
+                if (x.length() > RS_RANGE_SHORT_KEY.length()) {
+                    gotOne = true;
+                    args.add(RS_RANGE_SHORT_KEY);
+                    args.add(x.substring(RS_RANGE_SHORT_KEY.length()));
+                }
+            } else {
+                args.add(x);
+            }
+        }
+        if (gotOne) {
+            return new InputLine(args);
+        }
+        return inputLine;
+    }
 
     protected void oldrm(InputLine inputLine) throws Throwable {
         FoundIdentifiables identifiables = findItem(inputLine);
@@ -1901,7 +1933,7 @@ public abstract class StoreCommands extends CommonCommands {
                 }
             }
             // Fix https://github.com/ncsa/security-lib/issues/52
-           allEntries = listEntries(loadAllEntries(), listSingleLines, listMultiLines); // list it all
+            allEntries = listEntries(loadAllEntries(), listSingleLines, listMultiLines); // list it all
             return;
         }
         String key = getKeyArg(inputLine, true); // grab if there, remove it
@@ -1923,7 +1955,7 @@ public abstract class StoreCommands extends CommonCommands {
                 }
                 identifiables = new FoundIdentifiables(allEntries);
                 identifiables.setRS(false);
-            }else {
+            } else {
                 say("Sorry, no objects found.");
                 return;
             }
@@ -2958,10 +2990,10 @@ public abstract class StoreCommands extends CommonCommands {
                 say(center(key, width) + "|  " + center(Integer.toString(getResultSets().get(key).rs.size()), sizeWidth));
             }
             say("\n" + getResultSets().size() + " result sets processed");
-        }else{
+        } else {
             // case of a single result set.
             String name = inputLine.getLastArg();
-            if(!getResultSets().containsKey(name)){
+            if (!getResultSets().containsKey(name)) {
                 say("no such result set \"" + name + "\"");
                 return;
             }
@@ -3162,9 +3194,9 @@ public abstract class StoreCommands extends CommonCommands {
                     if (v instanceof JSON) {
                         say(((JSON) v).toString(1));
                     } else {
-                        if(v == null){
+                        if (v == null) {
                             say("(no value)");
-                        }else {
+                        } else {
                             say(v.toString());
                         }
                     }
@@ -3822,8 +3854,8 @@ public abstract class StoreCommands extends CommonCommands {
             return;
         }
         // Fixes https://github.com/ncsa/security-lib/issues/54
-        String key = getKeyArg(inputLine, false  );
-        if(key != null && null == getAndCheckKeyArg(inputLine)){
+        String key = getKeyArg(inputLine, false);
+        if (key != null && null == getAndCheckKeyArg(inputLine)) {
             say("unknown key \"" + key + "\"");
             return;
         }

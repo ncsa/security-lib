@@ -39,6 +39,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
+import static edu.uiuc.ncsa.security.storage.cli.StoreCommands.extractIndexKeys;
 import static edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfigUtils.processUpkeep;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.*;
 
@@ -1576,6 +1577,8 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         RSRecord rs = getResultSets().get(lastArg);
         if (rs != null) {
             inputLine.removeSwitchAndValue(RESULT_SET_KEY);
+            inputLine = extractIndexKeys(inputLine);
+
             String key = null;
             if (inputLine.hasArg(RS_RANGE_KEY)) {
                 key = RS_RANGE_KEY;

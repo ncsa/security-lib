@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.security.installer;
 
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -355,9 +354,8 @@ public class InstallConfigurationImporter {
         try {
             FileInputStream dirIS = new FileInputStream("/home/ncsa/dev/ncsa-git/security-lib/web-installer/src/main/resources/base/test-cfg2.yaml");
             FileInputStream setupIS = new FileInputStream("/home/ncsa/dev/ncsa-git/security-lib/web-installer/src/main/resources/setup.yaml");
-            Yaml yaml = new Yaml(new SafeConstructor());
+            Yaml yaml = new Yaml();
             Object dirs = yaml.load(dirIS);
-            yaml = new Yaml(new SafeConstructor());
             Object setup = yaml.load(setupIS);
             InstallConfigurationImporter icm = new InstallConfigurationImporter((List) setup);
             icm.initDirs((List) dirs);

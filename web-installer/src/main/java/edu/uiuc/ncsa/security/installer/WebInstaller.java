@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.installer;
 
 import edu.uiuc.ncsa.security.core.util.Pacer;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
@@ -290,8 +291,8 @@ public class WebInstaller {
         String inString = baos.toString(StandardCharsets.UTF_8);
         is.close();
         baos.close();
-
-        Yaml yaml = new Yaml(new SafeConstructor());
+        LoaderOptions loaderOptions = new LoaderOptions();
+        Yaml yaml = new Yaml(new SafeConstructor(loaderOptions));
         Object obj = yaml.load(inString);
         List outList;
         if (obj instanceof Map) {

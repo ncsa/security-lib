@@ -9,10 +9,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="https://github.com/ncsa/security-lib/issues/61, added index,html page for PDFs. Tweaked a lot of help.">
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Integrate web changes into 6.2.2, deploying">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/website/src/site/fml/faq.fml" beforeDir="false" afterPath="$PROJECT_DIR$/website/src/site/fml/faq.fml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/docs/configurations.odt" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/docs/configurations.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/resources/store-help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/resources/store-help.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-installer/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/InstallConfigurationImporter.java" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/InstallConfigurationImporter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,7 +75,7 @@
   &quot;associatedIndex&quot;: 2
 }</component>
   <component name="ProjectId" id="2L40iExtc4jFxuf0gN3ADT1vesV" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+  <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectReloadState">
@@ -113,6 +119,7 @@
     "Java Scratch.Scratch_5.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
@@ -458,8 +465,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-125ca727e0f0-intellij.indexing.shared.core-IU-243.23654.189" />
-        <option value="bundled-js-predefined-d6986cc7102b-822845ee3bb5-JavaScript-IU-243.23654.189" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26830.84" />
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-IU-252.26830.84" />
       </set>
     </attachedChunks>
   </component>
@@ -636,6 +643,11 @@
       <workItem from="1757587058797" duration="18228000" />
       <workItem from="1758279548285" duration="28080000" />
       <workItem from="1759145760587" duration="93188000" />
+      <workItem from="1760643217495" duration="599000" />
+      <workItem from="1760644047042" duration="508000" />
+      <workItem from="1760644837396" duration="70000" />
+      <workItem from="1760644924107" duration="649000" />
+      <workItem from="1761133176914" duration="16735000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -1082,17 +1094,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/InstallConfigurationImporter.java</url>
-          <line>363</line>
+          <line>361</line>
           <option name="timeStamp" value="71" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/InstallConfigurationImporter.java</url>
-          <line>226</line>
+          <line>225</line>
           <option name="timeStamp" value="90" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/InstallConfigurationImporter.java</url>
-          <line>214</line>
+          <line>213</line>
           <option name="timeStamp" value="91" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1122,7 +1134,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>3054</line>
+          <line>3084</line>
           <option name="timeStamp" value="105" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1187,7 +1199,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java</url>
-          <line>369</line>
+          <line>370</line>
           <option name="timeStamp" value="152" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1222,7 +1234,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java</url>
-          <line>4035</line>
+          <line>4065</line>
           <option name="timeStamp" value="194" />
         </line-breakpoint>
       </breakpoints>

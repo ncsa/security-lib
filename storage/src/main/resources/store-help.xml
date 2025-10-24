@@ -246,6 +246,14 @@ How to specify the range of indices used in a result set.
 ( -range  | -- ) (integer | list | iterator)
 Examples of ranges are: 5 (integer), [2,4,5] (a list), [2;7] integers from to through 6 inclusive.
 
+It is acceptable if you are using the short version of the range argument, --, to omit the space
+after between it and its argument, so
+
+  ls -l --5 N
+
+is a fine way to list result set N's element numner 5. Also works for lists and negative
+indices.
+
 E.g. Negative indices
 
 These are allowed and mean to take from the end of the list, so
