@@ -9,9 +9,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="https://github.com/ncsa/security-lib/issues/62 make the space after -- optional when specifying result sets.">
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Website rebuild">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/alt-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/alt-index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/allclasses-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/allclasses-index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/allclasses.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/allclasses.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/allpackages-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/allpackages-index.html" afterDir="false" />
@@ -980,31 +979,16 @@
       <change beforePath="$PROJECT_DIR$/docs/apidocs/help-doc.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/help-doc.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/index-all.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/index-all.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/apidocs/member-search-index.js" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/member-search-index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/member-search-index.zip" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/member-search-index.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/overview-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/overview-summary.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/overview-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/overview-tree.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/package-search-index.zip" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/package-search-index.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/serialized-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/serialized-form.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/apidocs/type-search-index.zip" beforeDir="false" afterPath="$PROJECT_DIR$/docs/apidocs/type-search-index.zip" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/cli/help.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/cli/help.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/cli/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/cli/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/dependencies.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/dependencies.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/dependency-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/dependency-info.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/distribution-management.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/distribution-management.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/faq.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/faq.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/markdown-velocity.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/markdown-velocity.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/markdown.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/markdown.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/pdf/SAS-protocol.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/SAS-protocol.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/pdf/configurations.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/configurations.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/pdf/installer.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/installer.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docs/pdf/upkeep.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/docs/pdf/upkeep.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/plugin-management.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/plugin-management.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/plugins.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/plugins.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/project-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/project-info.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/store_commands/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/store_commands/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/docs/summary.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -1634,7 +1618,7 @@
       <workItem from="1760644047042" duration="508000" />
       <workItem from="1760644837396" duration="70000" />
       <workItem from="1760644924107" duration="649000" />
-      <workItem from="1761133176914" duration="27592000" />
+      <workItem from="1761133176914" duration="28213000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -1979,7 +1963,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="115" />
+    <option name="localTasksCounter" value="116" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1988,7 +1972,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="https://github.com/ncsa/security-lib/issues/46 Promoted result sets to first order objects. This makes a lot of batch processing vastly easier." />
     <MESSAGE value="website update" />
     <MESSAGE value="Mostly formatting updates in the CLI to support result set printing." />
     <MESSAGE value="Fix https://github.com/ncsa/security-lib/issues/49" />
@@ -2013,7 +1996,8 @@
     <MESSAGE value="6.2.2 checkin, includes website rebuild. Corrected a minor bit of bookeeping with indices in the CLI." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/61, added index,html page for PDFs. Tweaked a lot of help." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/62 make the space after -- optional when specifying result sets." />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/62 make the space after -- optional when specifying result sets." />
+    <MESSAGE value="Website rebuild" />
+    <option name="LAST_COMMIT_MESSAGE" value="Website rebuild" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
