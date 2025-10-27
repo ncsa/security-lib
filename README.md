@@ -8,7 +8,7 @@ several libraries, e.g. This is how the storage library would be referenced
 <dependency>
     <groupId>edu.uiuc.ncsa.security</groupId>
     <artifactId>storage</artifactId>
-    <version>6.x-SNAPSHOT</version>
+    <version>6.2.3</version>
     <scope>compile</scope>
 </dependency>
 ```
@@ -53,7 +53,7 @@ project does not currently use `$NCSA_DEV_OUTPUT`.
                          
 # Rolling a release
 
-The critical part is to replace the SNAPSHOT tag (e.g. 6.x-SNAPSHOT)
+The critical part is to replace the SNAPSHOT tag (e.g. 6.2.3)
 globally with your preferred version. Note that this tag will also be found in
 java files (so the system is aware of the current release version), so this
 change does not merely affect the pom.xml files. You should also be sure before
