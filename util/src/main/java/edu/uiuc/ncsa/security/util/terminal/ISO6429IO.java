@@ -298,7 +298,7 @@ public class ISO6429IO implements IOInterface {
                 case Delete:
                     currentCol0 = terminal.getCursorCol() - startCol;
 
-                    if (0 < currentCol0 && currentCol0 < currentLine.length()) {
+                    if (0 <= currentCol0 && currentCol0 < currentLine.length()) {
                         currentCol0 = Math.min(startCol + currentLine.length() - 1, currentCol0);
 
                         currentLine = currentLine.deleteCharAt(currentCol0);
@@ -307,6 +307,8 @@ public class ISO6429IO implements IOInterface {
                         currentCol0 = startCol + currentCol0;
                         terminal.setCursorCol(currentCol0);
                     }
+                    // Fix https://github.com/ncsa/security-lib/issues/63
+                    break;
                 case End:
                     currentCol0 = startCol + currentLine.length();
                     terminal.setCursorCol(currentCol0);
