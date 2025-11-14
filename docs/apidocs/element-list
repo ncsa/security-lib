@@ -43,6 +43,7 @@ edu.uiuc.ncsa.security.util.cli.batch
 edu.uiuc.ncsa.security.util.cli.editing
 edu.uiuc.ncsa.security.util.cli.json_edit
 edu.uiuc.ncsa.security.util.configuration
+edu.uiuc.ncsa.security.util.events
 edu.uiuc.ncsa.security.util.help
 edu.uiuc.ncsa.security.util.json
 edu.uiuc.ncsa.security.util.jwk

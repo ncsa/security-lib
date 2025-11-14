@@ -94,7 +94,7 @@ public class MailUtil implements MailUtilInterface {
             // Note that the source of the event has to be a stable object like a service since
             // intervals are keyed off  of it.
             if(sentMessageTimestamps.containsKey(notificationEvent.getSource().hashCode())){
-               if(sentMessageTimestamps.get(notificationEvent.getSource().hashCode())<System.currentTimeMillis()-getMailEnvironment().getThrottle_interval()) {
+               if(sentMessageTimestamps.get(notificationEvent.getSource().hashCode())<System.currentTimeMillis()-getMailEnvironment().getThrottleInterval()) {
                    if(DebugUtil.isTraceEnabled()) {
                        DebugUtil.trace(this, "Throttling message for " + notificationEvent.getSource().getClass().getSimpleName());
                    }
