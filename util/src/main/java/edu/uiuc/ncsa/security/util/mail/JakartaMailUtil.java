@@ -1,12 +1,14 @@
 package edu.uiuc.ncsa.security.util.mail;
 
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.util.events.NotificationEvent;
 import jakarta.mail.Session;
 
 import javax.naming.NamingException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -28,7 +30,7 @@ public class JakartaMailUtil implements MailUtilInterface {
 
     public JakartaMailUtil() {
         try {
-            mailEnvironment = new MailEnvironment(false, null, -1, null, null, null, null, null, false, false);
+            mailEnvironment = new MailEnvironment(false, null, -1, null, null, null, null, null, false, false, -1L);
         } catch (Throwable x) {
             warn("Error: could not create mail environment:" + x);
         }
@@ -48,8 +50,15 @@ public class JakartaMailUtil implements MailUtilInterface {
 
     MailEnvironment mailEnvironment;
 
-    synchronized public boolean sendMessage(String subjectTemplate, String messageTemplate, Map replacements) {
-        return sendMessage(subjectTemplate, messageTemplate, replacements, null);
+    synchronized public boolean sendMessage(NotificationEvent notificationEvent,
+                                            String subjectTemplate,
+                                            String messageTemplate,
+                                            Map replacements) {
+        return sendMessage(notificationEvent,
+                           subjectTemplate,
+                messageTemplate,
+                replacements,
+                null);
     }
 
     /**
@@ -63,27 +72,29 @@ public class JakartaMailUtil implements MailUtilInterface {
      * @param replacements
      * @return
      */
-    synchronized public boolean sendMessage(String subjectTemplate,
+    synchronized public boolean sendMessage(NotificationEvent notificationEvent,
+                                            String subjectTemplate,
                                             String messageTemplate,
                                             Map replacements,
                                             String newRecipients) {
         if (!isEnabled()) {
             return true;
         }
-
-        // return OLDsendMessage(subjectTemplate, messageTemplate, replacements, newRecipients);
-        return NEWsendMessage(subjectTemplate, messageTemplate, replacements, newRecipients);
-    }
-
-    synchronized public boolean NEWsendMessage(String subjectTemplate,
-                                               String messageTemplate,
-                                               Map replacements,
-                                               String newRecipients) {
+        if(notificationEvent!=null && getMailEnvironment().isThrottleEnabled()){
+            // Note that the source of the event has to be a stable object like a service since
+            // intervals are keyed off  of it.
+            if(sentMessageTimestamps.containsKey(notificationEvent.getSource().hashCode())){
+                if(sentMessageTimestamps.get(notificationEvent.getSource().hashCode())<System.currentTimeMillis()-getMailEnvironment().getThrottle_interval())
+                    return false;
+            }
+            sentMessageTimestamps.put(notificationEvent.getSource().hashCode(), System.currentTimeMillis());
+        }
         JakartaMailSenderThread mst = new JakartaMailSenderThread(this, subjectTemplate, messageTemplate, replacements, newRecipients);
         mst.start();
         return true;
     }
 
+    HashMap<Integer, Long> sentMessageTimestamps = new HashMap<>();
 
 
     /**
@@ -97,10 +108,10 @@ public class JakartaMailUtil implements MailUtilInterface {
      */
     // Probable fix for CIL-324: a sudden attempt to send many messages causes strange failures.
     // This looks like a synchronization issue, so this method is now synchronized.
-    synchronized public boolean sendMessage(Map replacements) {
+    synchronized public boolean sendMessage(NotificationEvent notificationEvent, Map replacements) {
 
         try {
-            return sendMessage(getSubjectTemplate(), getMessageTemplate(), replacements);
+            return sendMessage(notificationEvent, getSubjectTemplate(), getMessageTemplate(), replacements);
         } catch (IOException e) {
             info("got exception sending message:");
             for (Object key : replacements.keySet()) {

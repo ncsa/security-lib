@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.security.servlet;
+package edu.uiuc.ncsa.security.util.events;
 
 import java.util.EventObject;
 

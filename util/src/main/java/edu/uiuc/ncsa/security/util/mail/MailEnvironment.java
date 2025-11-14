@@ -46,7 +46,8 @@ public class MailEnvironment extends AbstractEnvironment implements MailConfigur
             String messageTemplate,
             String subjectTemplate,
             boolean useSSL,
-            boolean starttls) throws Exception {
+            boolean starttls,
+            long throttleInterval) throws Exception {
         this.from = from;
         this.mailEnabled = mailEnabled;
         this.messageTemplate = messageTemplate;
@@ -57,6 +58,7 @@ public class MailEnvironment extends AbstractEnvironment implements MailConfigur
         this.subjectTemplate = subjectTemplate;
         this.useSSL = useSSL;
         this.starttls = starttls;
+        this.throttle_interval = throttleInterval;
     }
 
 
@@ -215,6 +217,18 @@ public class MailEnvironment extends AbstractEnvironment implements MailConfigur
     public  boolean starttls = false;
     public String username;
 
+    public boolean isThrottleEnabled(){
+        return 0 <  throttle_interval ;
+    }
+    public long getThrottle_interval() {
+        return throttle_interval;
+    }
+
+    public void setThrottle_interval(long throttle_interval) {
+        this.throttle_interval = throttle_interval;
+    }
+
+    long throttle_interval = -1L;
 
 
     public List<String> parseRecipients(String x) throws AddressException {

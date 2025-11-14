@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * <h1>Experimental</h1>
  * This extension of XProperties allows for loading XProperties with template
  * resolution by flag -- use system and JVM properties or by supplying
  * a template file. Each line is read and processed with the template,

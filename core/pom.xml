@@ -44,11 +44,11 @@
              <version>2.4</version>
              <classifier>jdk15</classifier>
          </dependency>
-         <dependency>
+<!--         <dependency>
              <groupId>org.apache.abdera</groupId>
              <artifactId>abdera-extensions-json</artifactId>
              <version>1.0</version>
-         </dependency>
+         </dependency>-->
 
      </dependencies>
     <build>

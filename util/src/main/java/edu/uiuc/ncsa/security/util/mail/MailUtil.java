@@ -1,12 +1,15 @@
 package edu.uiuc.ncsa.security.util.mail;
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.util.events.NotificationEvent;
 
 import javax.mail.Session;
 import javax.naming.NamingException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -30,7 +33,7 @@ public class MailUtil implements MailUtilInterface {
 
     public MailUtil() {
         try {
-            mailEnvironment = new MailEnvironment(false, null, -1, null, null, null, null, null, false, false);
+            mailEnvironment = new MailEnvironment(false, null, -1, null, null, null, null, null, false, false, -1L);
         } catch (Throwable x) {
             warn("Error: could not create mail environment:" + x);
         }
@@ -53,8 +56,15 @@ public class MailUtil implements MailUtilInterface {
     MailEnvironment mailEnvironment;
 
     @Override
-    synchronized public boolean sendMessage(String subjectTemplate, String messageTemplate, Map replacements) {
-        return sendMessage(subjectTemplate, messageTemplate, replacements, null);
+    synchronized public boolean sendMessage(NotificationEvent notificationEvent,
+                                            String subjectTemplate,
+                                            String messageTemplate,
+                                            Map replacements) {
+        return sendMessage(notificationEvent,
+                subjectTemplate,
+                messageTemplate,
+                replacements,
+                null);
     }
 
 
@@ -63,7 +73,7 @@ public class MailUtil implements MailUtilInterface {
      * This allows for sending with a specific subject and message template. This is useful for
      * internally generated messages that may need a lot of customization on the fly. Remember that
      * a template has string delimited with ${KEY} which the replacements map (KEY, VALUE pairs) will
-     * render into VALUES.
+     * render into its VALUE.
      *
      * @param subjectTemplate
      * @param messageTemplate
@@ -71,27 +81,34 @@ public class MailUtil implements MailUtilInterface {
      * @return
      */
     @Override
-    synchronized public boolean sendMessage(String subjectTemplate,
+    synchronized public boolean sendMessage(NotificationEvent notificationEvent,
+                                            String subjectTemplate,
                                             String messageTemplate,
                                             Map replacements,
                                             String newRecipients) {
         if (!isEnabled()) {
             return true;
         }
-
-        // return OLDsendMessage(subjectTemplate, messageTemplate, replacements, newRecipients);
-        return NEWsendMessage(subjectTemplate, messageTemplate, replacements, newRecipients);
-    }
-
-    synchronized public boolean NEWsendMessage(String subjectTemplate,
-                                               String messageTemplate,
-                                               Map replacements,
-                                               String newRecipients) {
+        // Fix https://github.com/ncsa/security-lib/issues/65
+        if(notificationEvent!=null && getMailEnvironment().isThrottleEnabled()){
+            // Note that the source of the event has to be a stable object like a service since
+            // intervals are keyed off  of it.
+            if(sentMessageTimestamps.containsKey(notificationEvent.getSource().hashCode())){
+               if(sentMessageTimestamps.get(notificationEvent.getSource().hashCode())<System.currentTimeMillis()-getMailEnvironment().getThrottle_interval()) {
+                   if(DebugUtil.isTraceEnabled()) {
+                       DebugUtil.trace(this, "Throttling message for " + notificationEvent.getSource().getClass().getSimpleName());
+                   }
+                   return false;
+               }
+            }
+            sentMessageTimestamps.put(notificationEvent.getSource().hashCode(), System.currentTimeMillis());
+        }
         MailSenderThread mst = new MailSenderThread(this, subjectTemplate, messageTemplate, replacements, newRecipients);
         mst.start();
         return true;
     }
 
+    HashMap<Integer, Long> sentMessageTimestamps = new HashMap<>();
 
 
     /**
@@ -106,10 +123,14 @@ public class MailUtil implements MailUtilInterface {
     // Probable fix for CIL-324: a sudden attempt to send many messages causes strange failures.
     // This looks like a synchronization issue, so this method is now synchronized.
     @Override
-    synchronized public boolean sendMessage(Map replacements) {
+    synchronized public boolean sendMessage(NotificationEvent notificationEvent,
+                                            Map replacements) {
 
         try {
-            return sendMessage(getSubjectTemplate(), getMessageTemplate(), replacements);
+            return sendMessage(notificationEvent,
+                    getSubjectTemplate(),
+                    getMessageTemplate(),
+                    replacements);
         } catch (IOException e) {
             info("got exception sending message:");
             for (Object key : replacements.keySet()) {

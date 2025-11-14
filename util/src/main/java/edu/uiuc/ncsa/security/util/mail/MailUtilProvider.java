@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.HierarchicalConfigProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
+import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.util.ArrayList;
@@ -72,6 +73,11 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
         try {
             String x = getAttribute(MAIL_PORT, "-1");
             int port = Integer.parseInt(x); // if this bombs, catch it.
+            String y = getAttribute(MAIL_THROTTLE_INTERVAL, "none");
+            long throttleInterval = -1L;
+            if (!y.equals("none")) {
+                throttleInterval = XMLConfigUtil.getValueSecsOrMillis(y, true);
+            }
             MailEnvironment me = new MailEnvironment(
                     Boolean.parseBoolean(getAttribute(MAIL_ENABLED, "false")), //enabled
                     getAttribute(MAIL_SERVER, "none"), //server
@@ -82,7 +88,8 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
                     Configurations.getNodeValue(node, MAIL_MESSAGE_TEMPLATE),// message template
                     Configurations.getNodeValue(node, MAIL_SUBJECT_TEMPLATE), // subject template
                     Boolean.parseBoolean(getAttribute(MAIL_USE_SSL, "false")), //use ssl
-                    Boolean.parseBoolean(getAttribute(MAIL_START_TLS, "false"))); //use start tls (mostly for gmail)
+                    Boolean.parseBoolean(getAttribute(MAIL_START_TLS, "false")),
+                    throttleInterval); //use start tls (mostly for gmail)
             return me;
 
         } catch (Throwable t) {
@@ -97,6 +104,11 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
         try {
             String x = getAttribute(MAIL_PORT, "-1");
             int port = Integer.parseInt(x); // if this bombs, catch it.
+            String y = getAttribute(MAIL_THROTTLE_INTERVAL, "none");
+            long throttleInterval = -1L;
+            if (!y.equals("none")) {
+                throttleInterval = XMLConfigUtil.getValueSecsOrMillis(y, true);
+            }
             MailEnvironment me = new MailEnvironment(
                     Boolean.parseBoolean(getAttribute(MAIL_ENABLED, "false")), //enabled
                     getAttribute(MAIL_SERVER, "none"), //server
@@ -107,7 +119,9 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
                     node.getNodeContents(MAIL_MESSAGE_TEMPLATE),// message template
                     node.getNodeContents(MAIL_SUBJECT_TEMPLATE), // subject template
                     Boolean.parseBoolean(getAttribute(MAIL_USE_SSL, "false")), //use ssl
-                    Boolean.parseBoolean(getAttribute(MAIL_START_TLS, "false"))); //use start tls (mostly for gmail)
+                    Boolean.parseBoolean(getAttribute(MAIL_START_TLS, "false")),
+                    throttleInterval); //use start tls (mostly for gmail)
+
             return me;
 
         } catch (Throwable t) {
@@ -158,6 +172,9 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
         if (hasAttribute(node, MAIL_START_TLS))
             map.put(MAIL_START_TLS, Boolean.parseBoolean(getAttribute(node, MAIL_START_TLS)));
 
+        if(hasAttribute(node, MAIL_THROTTLE_INTERVAL)){
+            map.put(MAIL_THROTTLE_INTERVAL, XMLConfigUtil.getValueSecsOrMillis(getAttribute(node, MAIL_THROTTLE_INTERVAL), true));
+        }
         String template = Configurations.getNodeValue(node, MAIL_MESSAGE_TEMPLATE);// message template
         if (template != null && !template.isEmpty()) {
             map.put(MAIL_MESSAGE_TEMPLATE, template);
@@ -186,6 +203,9 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
             map.put(MAIL_USE_SSL, node.getFirstBooleanValue(MAIL_USE_SSL));
         if (node.hasAttribute(MAIL_START_TLS))
             map.put(MAIL_START_TLS, node.getFirstBooleanValue(MAIL_START_TLS));
+        if(node.hasAttribute( MAIL_THROTTLE_INTERVAL)){
+            map.put(MAIL_THROTTLE_INTERVAL, XMLConfigUtil.getValueSecsOrMillis(node.getFirstAttribute(MAIL_THROTTLE_INTERVAL), true));
+        }
 
         String template = node.getNodeContents(MAIL_MESSAGE_TEMPLATE);// message template
         if (template != null && !template.isEmpty()) {

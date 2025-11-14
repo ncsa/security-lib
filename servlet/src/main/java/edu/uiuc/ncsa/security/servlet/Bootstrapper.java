@@ -45,7 +45,7 @@ public abstract class Bootstrapper implements ServletContextListener {
     /**
      * Toggles using new (CF) configurations or sticks with the old Apache.
      */
-    protected boolean useCF = false;
+    protected boolean useCF = true;
     /**
      * Entry point for this class. The web server calls (once) this when the system starts.
      * @param event

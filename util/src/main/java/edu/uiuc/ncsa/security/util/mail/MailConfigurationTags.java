@@ -37,26 +37,27 @@ import edu.uiuc.ncsa.security.core.configuration.ConfigurationTags;
  * on 4/3/12 at  1:01 PM
  */
 public interface MailConfigurationTags extends ConfigurationTags {
-    public static final String MAIL_COMPONENT = "entry";
-    public static final String MAIL = "mail";
+    String MAIL_COMPONENT = "entry";
+    String MAIL = "mail";
 
-    public static final String MAIL_ENABLED = "enabled";
-    public static final String MAIL_USE_SSL = "useSSL";
-    public static final String MAIL_START_TLS = "starttls";
-    public static final String MAIL_SERVER = "server";
-    public static final String MAIL_USERNAME = "username";
-    public static final String MAIL_PASSWORD = "password";
-    public static final String MAIL_PORT = "port";
-    public static final String MAIL_RECIPIENTS = "recipients";
-    public static final String MAIL_MESSAGE_TEMPLATE = "messageTemplate";
-    public static final String MAIL_SUBJECT_TEMPLATE = "subjectTemplate";
-    public static final String MAIL_FAIL_ON_MISSING_CONFIG = "failOnMissingConfig";
-    public static final String MAIL_NAME = "name";
-    public static final String MAIL_PARENT = "parent";
+    String MAIL_ENABLED = "enabled";
+    String MAIL_USE_SSL = "useSSL";
+    String MAIL_START_TLS = "starttls";
+    String MAIL_SERVER = "server";
+    String MAIL_USERNAME = "username";
+    String MAIL_PASSWORD = "password";
+    String MAIL_PORT = "port";
+    String MAIL_RECIPIENTS = "recipients";
+    String MAIL_MESSAGE_TEMPLATE = "messageTemplate";
+    String MAIL_SUBJECT_TEMPLATE = "subjectTemplate";
+    String MAIL_FAIL_ON_MISSING_CONFIG = "failOnMissingConfig";
+    String MAIL_NAME = "name";
+    String MAIL_PARENT = "parent";
+    String MAIL_THROTTLE_INTERVAL = "throttleInterval";
 
-    public static final String MAIL_CONFIG_DEFAULT_NAME = "default";
-    public static final String MAIL_CONFIG_ROOT="root";
-    public static final String MAIL_CONFIG_ADMIN="admin";
-    public static final String MAIL_CONFIG_HELP="help"; // For notifications that require actions
-    public static final String MAIL_CONFIG_ALERTS="alerts"; // For notifications that do not require action.
+    String MAIL_CONFIG_DEFAULT_NAME = "default";
+    String MAIL_CONFIG_ROOT="root";
+    String MAIL_CONFIG_ADMIN="admin";
+    String MAIL_CONFIG_HELP="help"; // For notifications that require actions
+    String MAIL_CONFIG_ALERTS="alerts"; // For notifications that do not require action.
 }

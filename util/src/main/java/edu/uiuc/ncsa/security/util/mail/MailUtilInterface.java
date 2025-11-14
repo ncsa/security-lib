@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.util.mail;
 
 import edu.uiuc.ncsa.security.core.Logable;
+import edu.uiuc.ncsa.security.util.events.NotificationEvent;
 
 import java.util.Map;
 
@@ -13,14 +14,19 @@ public interface MailUtilInterface extends Logable {
 
     MailEnvironment getMailEnvironment();
 
-    boolean sendMessage(String subjectTemplate, String messageTemplate, Map replacements);
+    boolean sendMessage(NotificationEvent notificationEvent,
+                        String subjectTemplate,
+                        String messageTemplate,
+                        Map replacements);
 
-    boolean sendMessage(String subjectTemplate,
+    boolean sendMessage(NotificationEvent notificationEvent,
+                        String subjectTemplate,
                         String messageTemplate,
                         Map replacements,
                         String newRecipients);
 
     // Probable fix for CIL-324: a sudden attempt to send many messages causes strange failures.
     // This looks like a synchronization issue, so this method is now synchronized.
-    boolean sendMessage(Map replacements);
+    boolean sendMessage(NotificationEvent notificationEvent,
+                        Map replacements);
 }
