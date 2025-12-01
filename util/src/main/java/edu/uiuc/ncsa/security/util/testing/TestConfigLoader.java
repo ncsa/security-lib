@@ -1,14 +1,11 @@
 package edu.uiuc.ncsa.security.util.testing;
 
-import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
+import edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations;
+import edu.uiuc.ncsa.security.core.util.CFLoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * This loads a configuration of tests from a configuration file.
@@ -31,7 +28,7 @@ import java.util.StringTokenizer;
 
 
  */
-public abstract class TestConfigLoader<T extends TestEnvironment> extends LoggingConfigLoader<T> {
+public abstract class TestConfigLoader<T extends TestEnvironment> extends CFLoggingConfigLoader<T> {
     public static final String TEST_TAG = "test";
     public static final String TEST_NAME_TAG = "name";
     /**
@@ -46,18 +43,22 @@ public abstract class TestConfigLoader<T extends TestEnvironment> extends Loggin
     public static final String DATA_NAME_TAG = "name";
 
 
-    public TestConfigLoader(ConfigurationNode node) {
-        super(node);
+    public TestConfigLoader(String defaultFile, String defaultName, CFNode node, MyLoggingFacade logger) {
+        super(defaultFile, defaultName, node, logger);
     }
 
-    public TestConfigLoader(ConfigurationNode node, MyLoggingFacade logger) {
+    public TestConfigLoader(CFNode node, MyLoggingFacade logger) {
         super(node, logger);
     }
 
-    public static void main(String[] args) {
+    public TestConfigLoader(CFNode node) {
+        super(node);
+    }
+
+    public static void main(String[] args) throws Throwable {
         // Args are file path and config name
-        ConfigurationNode cn = XMLConfigUtil.findConfiguration(args[0], args[1], TEST_TAG);
-        TestConfigLoader<TestEnvironment> t = new TestConfigLoader<TestEnvironment>(cn) {
+        CFNode service = CFXMLConfigurations.findConfiguration(args[0], args[1], TEST_TAG);
+        TestConfigLoader<TestEnvironment> t = new TestConfigLoader<TestEnvironment>(service) {
             @Override
             public String getVersionString() {
                 return "1.0";
@@ -86,9 +87,10 @@ public abstract class TestConfigLoader<T extends TestEnvironment> extends Loggin
             data.put(TestData.TEST_ENABLE_KEY, Boolean.TRUE); // default is to run test
             // First, grab all of the attributes -- in particular the name
             boolean hasName = false;
-            for (int i = 0; i < cn.getAttributeCount(); i++) {
-                attribName = cn.getAttribute(i).getName();
-                attribValue = cn.getAttribute(i).getValue().toString();
+            Map<String,String> attributes = cn.getAttributes();
+            for (String key : attributes.keySet()) {
+                attribName = key    ;
+                attribValue = attributes.get(key);
                 switch (attribName) {
                     case TEST_NAME_TAG:
                         testName = attribValue;
@@ -109,14 +111,15 @@ public abstract class TestConfigLoader<T extends TestEnvironment> extends Loggin
             testMap.put(testName, data);
 
             // Now we create the individual data elements for the test and stash them in the testData object.
-            List<ConfigurationNode> dataNodes = cn.getChildren(DATA_TAG);
-            for (ConfigurationNode dataNode : dataNodes) {
+            List<CFNode> dataNodes = cn.getChildren(DATA_TAG);
+            for (CFNode dataNode : dataNodes) {
                 Object entry = null;
                 String name = null;
                 boolean isList = false;
-                for (int i = 0; i < dataNode.getAttributeCount(); i++) {
-                    attribName = dataNode.getAttribute(i).getName();
-                    attribValue = dataNode.getAttribute(i).getValue().toString();
+                attributes = dataNode.getAttributes();
+                for (String key : attributes.keySet()) {
+                    attribName = key;
+                    attribValue = attributes.get(key);
                     Object x = dataNode.getValue();
                     if (x == null) {
                         continue; //nothing to do

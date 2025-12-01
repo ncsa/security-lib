@@ -33,7 +33,7 @@ public class CFXMLConfigurations {
 
     /**
      * Top-level tag for all configurations this system understands
-      */
+     */
     public static final String CONFIGURATION_TAG = "config";
 
 
@@ -206,7 +206,7 @@ public class CFXMLConfigurations {
 
     /**
      * Loads the named configuration that resides under the tagName, e.g. tagName might be
-     *  'my-server'. This supports aliases too, so if the top level
+     * 'my-server'. This supports aliases too, so if the top level
      * tag contains an alias="x" attribute, then the configuration named "x" is loaded instead. This
      * allows for things like a "default" or "current" configuration which need never change once deployed.
      * The aim is to make this all as configuration driven as possible.
@@ -304,12 +304,13 @@ public class CFXMLConfigurations {
 
     /**
      * Utility to print a DOM document. This is really basic, just a debugging tool really.
+     *
      * @param doc
      * @param out
      * @throws IOException
      * @throws TransformerException
      */
-    public static void printDocument(Document doc, OutputStream out)  {
+    public static void printDocument(Document doc, OutputStream out) {
         try {
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer transformer = tf.newTransformer();
@@ -321,23 +322,90 @@ public class CFXMLConfigurations {
 
             transformer.transform(new DOMSource(doc),
                     new StreamResult(new OutputStreamWriter(out, "UTF-8")));
-        }catch(Throwable t) {
+        } catch (Throwable t) {
             System.out.println("Could not print DOM document");
             t.printStackTrace();
         }
     }
-    public static String printNode(Node node)  {
+
+    public static String printNode(Node node) {
         String nv = node.getNodeName();
         String content = node.getTextContent();
-        String out = "node[name=" + node.getNodeName() ;
-        if(!StringUtils.isTrivial(nv)) {
-            out += ",value=" + nv ;
+        String out = "node[name=" + node.getNodeName();
+        if (!StringUtils.isTrivial(nv)) {
+            out += ",value=" + nv;
         }
-        if(!StringUtils.isTrivial(content)) {
-            out += ",content=" + content ;
+        if (!StringUtils.isTrivial(content)) {
+            out += ",content=" + content;
         }
-        out +=  "]";
+        out += "]";
         return out;
+    }
+
+    /**
+     * Finds the given {@link CFNode} for a configuration. The input stream is
+     * not closed at the end operation.
+     *
+     * @param inputStream   - inpout stream to the xml file
+     * @param configType - the tag name for the configuration
+     * @param configName - the name attribute of the configuration.
+     * @return The configuration
+     */
+    public static CFNode findConfiguration(InputStream inputStream, String configType, String configName) {
+        try {
+            CFBundle bundle = new CFLoader.Builder()
+                    .tagname(configType)
+                    .inputStream(inputStream)
+                    .build()
+                    .loadBundle();
+            CFNode node = bundle.getNamedConfig(configName);
+            if (node == null) {
+                throw new MyConfigurationException("configuration named \"" + configName + "\" not found");
+            }
+            return node;
+        } catch (Throwable t) {
+            throw new MyConfigurationException("cannot load configuration file:" + t.getMessage(), t);
+        }
+    }
+
+    /**
+     * Get a configuration by name of with a given type (tag name) from a file
+     * @param fileName
+     * @param configType
+     * @param configName
+     * @return
+     */
+    public static CFNode findConfiguration(String fileName, String configType, String configName) {
+        File file = new File(fileName);
+        if (file.isDirectory()) {
+            throw new MyConfigurationException("configuration file is a directory");
+        }
+        if (!file.exists()) {
+            throw new MyConfigurationException("configuration file does not exist");
+        }
+        if (file.canRead()) {
+            throw new MyConfigurationException("configuration file canot be read");
+        }
+        FileInputStream fis = null;
+        try {
+             fis = new FileInputStream(file);
+            CFNode node = findConfiguration(fis, configType, configName);
+            return node;
+        } catch (MyConfigurationException t) {
+            throw t;
+        }catch(Throwable t) { // basically to catch IO errors creating the file input stream.
+            throw new MyConfigurationException("cannot load configuration file:" + t.getMessage(), t);
+        }finally {
+            if(fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    throw new MyConfigurationException("Cannot close file stream", e);
+                }
+
+            }
+
+        }
     }
 
 }

@@ -1,13 +1,13 @@
 package edu.uiuc.ncsa.security.util.cli;
 
+import edu.uiuc.ncsa.security.core.cf.CFNode;
+import edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
 import edu.uiuc.ncsa.security.util.testing.TestConfigLoader;
 import edu.uiuc.ncsa.security.util.testing.TestEnvironment;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.util.HashMap;
 
@@ -41,11 +41,11 @@ public class TestCCI extends ConfigurableCommandsImpl2 {
     }
 
     public static class TCL extends TestConfigLoader<TestEnvironment> {
-        public TCL(ConfigurationNode node) {
+        public TCL(CFNode node) {
             super(node);
         }
 
-        public TCL(ConfigurationNode node, MyLoggingFacade logger) {
+        public TCL(CFNode node, MyLoggingFacade logger) {
             super(node, logger);
         }
 
@@ -74,8 +74,9 @@ public class TestCCI extends ConfigurableCommandsImpl2 {
 
     @Override
     protected TCL figureOutLoader(String fileName, String configName) throws Throwable {
-        ConfigurationNode node =
-                XMLConfigUtil.findConfiguration(fileName, configName, getComponentName());
+
+        CFNode node =
+                CFXMLConfigurations.findConfiguration(fileName, configName, getComponentName());
         return new TCL(node);
     }
 

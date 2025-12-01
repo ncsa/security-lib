@@ -103,7 +103,6 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
         if(hasCFNode()){
             return getCFNode().getFirstAttribute(key, defaultValue);
         }
-        if(getConfig() == null) return defaultValue;
         String x = getAttribute(key);
         if (x != null) return x;
         if (defaultValue != null) return defaultValue;
@@ -115,7 +114,6 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
         if(hasCFNode()){
             return (int) getCFNode().getFirstLongAttribute(key, defaultValue);
         }
-        if(getConfig() == null) return defaultValue;
         String x = getAttribute(key);
         if (x != null) return Integer.parseInt(x);
         if (defaultValue != -1) return defaultValue;
@@ -132,7 +130,7 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
      * @return
      */
     protected long checkTime(String key, long defaultValue) {
-        if(getConfig() == null && !hasCFNode()) return defaultValue;
+        if(!hasCFNode()) return defaultValue;
         String x = getAttribute(key);; // call handles both CFNode and ConfNode
 
         if(x!= null) return XMLConfigUtil.getValueSecsOrMillis(x);
@@ -144,7 +142,6 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
         if(hasCFNode()){
             return getCFNode().getFirstLongAttribute(key, defaultValue);
         }
-        if(getConfig() == null) return defaultValue;
         String x = getAttribute(key);
         if (x != null) return Long.parseLong(x);
         if (defaultValue != -1) return defaultValue;
@@ -155,7 +152,6 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
         if(hasCFNode()){
             return getCFNode().getFirstBooleanValue(key, defaultValue);
         }
-        if(getConfig() == null) return defaultValue;
         String x = getAttribute(key);
         if (x != null) return Boolean.parseBoolean(x);
         return defaultValue;

@@ -9,7 +9,6 @@ import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import java.io.File;
 import java.util.List;
 
-import static edu.uiuc.ncsa.security.core.configuration.Configurations.getFirstAttribute;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
@@ -113,7 +112,7 @@ public class DerbyConnectionPoolProvider extends ConnectionPoolProvider<Connecti
     }
 
     public String getCreateScriptPath() {
-        return getFirstAttribute(getConfig(), DERBY_CREATE_SCRIPT);
+        return getCFNode().getFirstAttribute(DERBY_CREATE_SCRIPT);
     }
 
     String username = "";
@@ -127,7 +126,7 @@ public class DerbyConnectionPoolProvider extends ConnectionPoolProvider<Connecti
         // Reminder that these are pulling the values from the XML configuration directly,
         // hence the check and default values.
         if (storeType == null) {
-            storeType = getFirstAttribute(getConfig(), DERBY_STORE_TYPE) == null ? DERBY_STORE_TYPE_MEMORY : getFirstAttribute(getConfig(), DERBY_STORE_TYPE);
+            storeType = getCFNode().getFirstAttribute(DERBY_STORE_TYPE) == null ? DERBY_STORE_TYPE_MEMORY : getCFNode().getFirstAttribute( DERBY_STORE_TYPE);
         }
         if (DERBY_STORE_TYPE_FILE.equals(storeType)) {
             if (getCreateScriptPath() != null) {
@@ -180,7 +179,7 @@ public class DerbyConnectionPoolProvider extends ConnectionPoolProvider<Connecti
 
     protected String getVar(String var, String key, String defaultValue) {
         if (isTrivial(var)) {
-            String x = getFirstAttribute(getConfig(), key);
+            String x = getCFNode().getFirstAttribute(key);
             if (x == null) {
                 return defaultValue;
             } else {

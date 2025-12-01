@@ -204,7 +204,7 @@ public abstract class StoreCommands extends CommonCommands {
             inputLine.removeSwitchAndValue(UPKEEP_FLAG_TEST);
             if (upkeepConfiguration != null) {
                 if (upkeepConfiguration.isTestOnly() != testOnly) {
-                    // The user want to run this in test mode only. Clone it
+                    // The user wants to run this in test mode only. Clone it
                     upkeepConfiguration = cloneConfiguration(upkeepConfiguration);
                     upkeepConfiguration.setTestOnly(testOnly);
                     configurationCloned = true;

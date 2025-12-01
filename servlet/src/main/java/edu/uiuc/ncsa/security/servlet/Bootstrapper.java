@@ -34,18 +34,7 @@ public abstract class Bootstrapper implements ServletContextListener {
       // no op. Override if needed.
     }
 
-    public boolean isUseCF() {
-        return useCF;
-    }
 
-    public void setUseCF(boolean useCF) {
-        this.useCF = useCF;
-    }
-
-    /**
-     * Toggles using new (CF) configurations or sticks with the old Apache.
-     */
-    protected boolean useCF = true;
     /**
      * Entry point for this class. The web server calls (once) this when the system starts.
      * @param event
@@ -66,8 +55,6 @@ public abstract class Bootstrapper implements ServletContextListener {
 
 
     public abstract ConfigurationLoader getConfigurationLoader(ServletContext servletContext) throws Exception;
-
-    public abstract ConfigurationLoader getConfigurationLoader(ConfigurationNode node) throws MyConfigurationException;
 
     public abstract ConfigurationLoader getConfigurationLoader(CFNode node) throws MyConfigurationException;
 

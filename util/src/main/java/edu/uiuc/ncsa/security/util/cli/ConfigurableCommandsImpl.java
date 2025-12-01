@@ -1,22 +1,25 @@
 package edu.uiuc.ncsa.security.util.cli;
 
-import edu.uiuc.ncsa.security.core.configuration.Configurations;
+import edu.uiuc.ncsa.security.core.cf.CFBundle;
+import edu.uiuc.ncsa.security.core.cf.CFLoader;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.*;
 import net.sf.json.JSONObject;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;
+
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
 
 /**
  * Basic implementation of Commands. This is used for loading a single component (e.g. in the
@@ -87,13 +90,13 @@ public abstract class ConfigurableCommandsImpl implements Commands {
             return;
         }
         if (inputLine.getArgCount() == 0) {
-            if (StringUtils.isTrivial(configName) && StringUtils.isTrivial(getConfigFile())) {
+            if (isTrivial(configName) && isTrivial(getConfigFile())) {
                 info("no configuration set");
                 sayv("no configuration set");
                 return;
             }
-            String m = StringUtils.isTrivial(configName) ? "no config name" : "current config name= \"" + configName;
-            m = m + " " + (StringUtils.isTrivial(getConfigFile()) ? "no file set" : ("from file " + getConfigFile()));
+            String m = isTrivial(configName) ? "no config name" : "current config name= \"" + configName;
+            m = m + " " + (isTrivial(getConfigFile()) ? "no file set" : ("from file " + getConfigFile()));
             info(m);
             sayv(m);
             return;
@@ -160,7 +163,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
             targetFilename = inputLine.getNextArgFor(FILE_SWITCH);
             inputLine.removeSwitchAndValue(FILE_SWITCH);
         }
-        if (StringUtils.isTrivial(targetFilename)) {
+        if (isTrivial(targetFilename)) {
             say("Sorry no configuration file specified.");
             return;
         }
@@ -199,8 +202,15 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         return names;
     }
 
-    protected List<String> listXMLConfigs(File target) throws Exception {
 
+    protected List<String> listXMLConfigs(File target) throws Exception {
+        CFBundle cfBundle  = new CFLoader.Builder()
+                .tagname(getComponentName())
+                .inputStream(new FileInputStream(target))
+                .build()
+                .loadBundle();
+        return cfBundle.getAllConfigNames();
+/* Using Apache Commond config
         XMLConfiguration xmlConfiguration = Configurations.getConfiguration(target);
         ConfigurationNode rootNode = xmlConfiguration.getRoot();
         List<String> names = new ArrayList<>(); // To keep sorted
@@ -210,8 +220,8 @@ public abstract class ConfigurableCommandsImpl implements Commands {
                 names.add(name);
             }
         }
+*/
 
-        return names;
     }
 
 
@@ -243,8 +253,6 @@ public abstract class ConfigurableCommandsImpl implements Commands {
 
 
     AbstractEnvironment environment;
-
-    ConfigurationNode configurationNode;
 
     /**
      * For the configuration. This is the tag name (e.g. "client" or "server") in the XML file.
@@ -533,7 +541,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
      */
     protected String padLineWithBlanks(String x, int width) {
         // argh!
-        return StringUtils.pad2(x, width);
+        return pad2(x, width);
     }
 
     public abstract void useHelp();

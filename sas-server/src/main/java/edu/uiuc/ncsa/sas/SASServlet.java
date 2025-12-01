@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.sas;
 import edu.uiuc.ncsa.sas.client.ClientProvider;
 import edu.uiuc.ncsa.sas.client.SASClient;
 import edu.uiuc.ncsa.sas.example.EchoExecutable;
-import edu.uiuc.ncsa.sas.loader.SASConfigurationLoader;
+import edu.uiuc.ncsa.sas.loader.SASCFConfigurationLoader;
 import edu.uiuc.ncsa.sas.thing.action.*;
 import edu.uiuc.ncsa.sas.thing.response.*;
 import edu.uiuc.ncsa.security.core.Identifier;
@@ -42,7 +42,7 @@ public class SASServlet extends HttpServlet implements Logable {
       is a largely self-contained class (so really not much cause to extend it) this should
       work. Until, of course, it does not.
      */
-    SASConfigurationLoader<? extends SASEnvironment> configurationLoader;
+    SASCFConfigurationLoader<? extends SASEnvironment> configurationLoader;
 
     public Initialization getInitialization() {
         return initialization;
@@ -54,11 +54,11 @@ public class SASServlet extends HttpServlet implements Logable {
 
     protected Initialization initialization;
 
-    public SASConfigurationLoader<? extends SASEnvironment> getConfigurationLoader() {
+    public SASCFConfigurationLoader<? extends SASEnvironment> getConfigurationLoader() {
         return configurationLoader;
     }
 
-    public void setConfigurationLoader(SASConfigurationLoader<? extends SASEnvironment> b) {
+    public void setConfigurationLoader(SASCFConfigurationLoader<? extends SASEnvironment> b) {
         configurationLoader = b;
     }
 

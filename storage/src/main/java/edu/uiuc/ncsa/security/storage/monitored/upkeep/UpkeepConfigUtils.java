@@ -10,16 +10,19 @@ import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.monitored.Monitored;
 import edu.uiuc.ncsa.security.storage.monitored.MonitoredKeys;
 import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
-import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.w3c.dom.Document;
 
-import java.io.File;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.FileInputStream;
 import java.security.SecureRandom;
 import java.text.ParseException;
 import java.time.LocalTime;
 import java.util.*;
 
-import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
+import static edu.uiuc.ncsa.security.core.configuration.Configurations.getFirstAttribute;
+import static edu.uiuc.ncsa.security.core.configuration.Configurations.getFirstBooleanValue;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.pad;
 import static edu.uiuc.ncsa.security.core.util.TokenUtil.b32Encode;
@@ -150,6 +153,7 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
 
     /**
      * Port to use CFNode
+     *
      * @param upkeepNode
      * @return
      */
@@ -159,16 +163,16 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
             //  upkeepConfiguration.setEnabled(false);
             return null;
         }
-        upkeepConfiguration.setEnabled(upkeepNode.getFirstBooleanValue( UPKEEP_ENABLED, true));
-        upkeepConfiguration.setDebug(upkeepNode.getFirstBooleanValue( UPKEEP_DEBUG, false));
-        upkeepConfiguration.setTestOnly(upkeepNode.getFirstBooleanValue( UPKEEP_TEST_ONLY, false));
+        upkeepConfiguration.setEnabled(upkeepNode.getFirstBooleanValue(UPKEEP_ENABLED, true));
+        upkeepConfiguration.setDebug(upkeepNode.getFirstBooleanValue(UPKEEP_DEBUG, false));
+        upkeepConfiguration.setTestOnly(upkeepNode.getFirstBooleanValue(UPKEEP_TEST_ONLY, false));
         upkeepConfiguration.setAlarms(getAlarms(upkeepNode, UPKEEP_ALARMS));
-        upkeepConfiguration.setVerbose(upkeepNode.getFirstBooleanValue( UPKEEP_VERBOSE, false));
+        upkeepConfiguration.setVerbose(upkeepNode.getFirstBooleanValue(UPKEEP_VERBOSE, false));
         upkeepConfiguration.setSkipVersions(doSkipVersions(upkeepNode));
 
-        upkeepConfiguration.setVerbose(upkeepNode.getFirstBooleanValue( RULE_SKIP_VERSIONS, true));
+        upkeepConfiguration.setVerbose(upkeepNode.getFirstBooleanValue(RULE_SKIP_VERSIONS, true));
         upkeepConfiguration.setOutput(upkeepNode.getFirstAttribute(UPKEEP_OUTPUT));
-        String raw = upkeepNode.getFirstAttribute( UPKEEP_RUN_COUNT);
+        String raw = upkeepNode.getFirstAttribute(UPKEEP_RUN_COUNT);
         if (!isTrivial(raw)) {
             try {
                 upkeepConfiguration.setRunCount(Integer.parseInt(raw));
@@ -176,7 +180,7 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
                 upkeepConfiguration.setRunCount(UPKEEP_DEFAULT_RUN_COUNT);
             }
         }
-        raw = upkeepNode.getFirstAttribute( UPKEEP_INTERVAL);
+        raw = upkeepNode.getFirstAttribute(UPKEEP_INTERVAL);
         // contract is to use default interval if neither alarms nor interval is set.
         if (isTrivial(raw)) {
             if (!upkeepConfiguration.hasAlarms()) {
@@ -237,8 +241,9 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
     protected static Boolean doSkipVersions(ConfigurationNode node) {
         return getaBoolean(node, RULE_SKIP_VERSIONS);
     }
+
     protected static Boolean doSkipVersions(CFNode node) {
-        if(node.hasAttribute(RULE_SKIP_VERSIONS)) return node.getFirstBooleanValue( RULE_SKIP_VERSIONS);
+        if (node.hasAttribute(RULE_SKIP_VERSIONS)) return node.getFirstBooleanValue(RULE_SKIP_VERSIONS);
         return null;
     }
 
@@ -259,8 +264,9 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
     }
 
     protected static Boolean doSkipCollateral(CFNode node) {
-        return doSkipCollateral(node.getFirstAttribute( RULE_SKIP_COLLATERAL));
+        return doSkipCollateral(node.getFirstAttribute(RULE_SKIP_COLLATERAL));
     }
+
     protected static Boolean doSkipCollateral(ConfigurationNode node) {
         return doSkipCollateral(getFirstAttribute(node, RULE_SKIP_COLLATERAL));
     }
@@ -299,13 +305,14 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
         secureRandom.nextBytes(b);
         return "anon_" + b32Encode(b).toLowerCase();
     }
+
     protected static RuleEntry createRuleEntry(CFNode ruleEntryNode) {
         RuleEntry ruleEntry = null;
         switch (ruleEntryNode.getName()) {
             case DATE_TAG:
-                String type = ruleEntryNode.getFirstAttribute( DATE_TYPE);
-                String when = ruleEntryNode.getFirstAttribute( DATE_WHEN);
-                String rawDate = ruleEntryNode.getFirstAttribute( DATE_VALUE);
+                String type = ruleEntryNode.getFirstAttribute(DATE_TYPE);
+                String when = ruleEntryNode.getFirstAttribute(DATE_WHEN);
+                String rawDate = ruleEntryNode.getFirstAttribute(DATE_VALUE);
                 DateValue dateValue = createDateValue(rawDate);
                 ruleEntry = new DateEntry(type, when, dateValue);
                 break;
@@ -319,8 +326,8 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
                     throw new IllegalArgumentException("missing value for " + ID_TAG + " element");
                 }
 
-                IDEntry idEntry = new IDEntry(ruleEntryNode.getFirstBooleanValue( ID_REGEX_FLAG, false), (String) obj);
-                idEntry.setNegation(ruleEntryNode.getFirstBooleanValue( ID_NOT_FLAG, false));
+                IDEntry idEntry = new IDEntry(ruleEntryNode.getFirstBooleanValue(ID_REGEX_FLAG, false), (String) obj);
+                idEntry.setNegation(ruleEntryNode.getFirstBooleanValue(ID_NOT_FLAG, false));
                 ruleEntry = idEntry;
                 break;
             default:
@@ -362,9 +369,9 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
 
     private static RuleList createRuleList(CFNode ruleNode) {
         RuleList ruleList = new RuleList();
-        ruleList.setEnabled(ruleNode.getFirstBooleanValue( RULE_ENABLED, true));
-        ruleList.setAction(ruleNode.getFirstAttribute( RULE_ACTION));
-        ruleList.setVerbose(ruleNode.getFirstBooleanValue( UPKEEP_VERBOSE, false));
+        ruleList.setEnabled(ruleNode.getFirstBooleanValue(RULE_ENABLED, true));
+        ruleList.setAction(ruleNode.getFirstAttribute(RULE_ACTION));
+        ruleList.setVerbose(ruleNode.getFirstBooleanValue(UPKEEP_VERBOSE, false));
         ruleList.setSkipVersions(doSkipVersions(ruleNode));
         ruleList.setSkipCollateral(doSkipCollateral(ruleNode));
         String rawList = ruleNode.getFirstAttribute(RULE_EXTENDS);
@@ -446,16 +453,19 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Throwable{
         // For testing only. Takes an XML file of exactly the configuration and creates a
         // configuration object. The alternative is to fire up, say, all of OA4MP to try
         // and debug it as part of a configuration.
         String testFile = "/home/ncsa/dev/ncsa-git/security-lib/storage/src/main/resources/upkeep_test.xml";
-        File f = new File(testFile);
+        FileInputStream f = new FileInputStream(testFile);
+        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        Document doc = builder.parse(f);
+        doc.getDocumentElement().normalize();
+        f.close();
 
-        XMLConfiguration xmlConfiguration = Configurations.getConfiguration(f);
-        ConfigurationNode root = xmlConfiguration.getRoot();
-        UpkeepConfiguration upkeepConfiguration = processUpkeep(root);
+        CFNode cfNode = new CFNode(doc.getDocumentElement());
+        UpkeepConfiguration upkeepConfiguration = processUpkeep(cfNode);
         System.out.println(upkeepConfiguration);
         List<String> actionList = new ArrayList<>(); // list of actions to check these against
         List<Monitored> monitoreds = getTestList(actionList);
@@ -483,6 +493,7 @@ public class UpkeepConfigUtils extends XMLConfigUtil {
 
         }
     }
+
 
     /*
     Gets a list of monitored items for testing applies

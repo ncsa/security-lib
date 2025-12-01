@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.security.util.cli;
 
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
+import edu.uiuc.ncsa.security.core.util.CFLoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import net.sf.json.JSONObject;
 
@@ -635,7 +635,7 @@ public abstract class CommonCommands implements Commands {
             versionHelp();
             return;
         }
-        say("* CLI (Command Line Interpreter) Version " + LoggingConfigLoader.VERSION_NUMBER);
+        say("* CLI (Command Line Interpreter) Version " + CFLoggingConfigLoader.VERSION_NUMBER);
     }
 
     protected void echoHelp() {

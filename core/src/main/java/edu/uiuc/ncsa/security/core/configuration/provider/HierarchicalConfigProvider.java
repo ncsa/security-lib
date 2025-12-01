@@ -1,8 +1,6 @@
 package edu.uiuc.ncsa.security.core.configuration.provider;
 
 import edu.uiuc.ncsa.security.core.cf.CFNode;
-import org.apache.commons.configuration.tree.ConfigurationNode;
-import org.apache.commons.configuration.tree.DefaultConfigurationNode;
 
 import javax.inject.Provider;
 import java.util.LinkedList;
@@ -70,19 +68,6 @@ public abstract class HierarchicalConfigProvider<T> implements Provider<T>, CfgE
         return cfNode != null;
     }
 
-    public ConfigurationNode getConfig() {
-        return config;
-    }
-
-    public void setConfig(ConfigurationNode config) {
-        this.config = config;
-    }
-
-    ConfigurationNode config;
-
-    public HierarchicalConfigProvider(ConfigurationNode config) {
-        this.config = config;
-    }
 
     public HierarchicalConfigProvider(CFNode cfNode) {
         this.cfNode = cfNode;
@@ -96,21 +81,11 @@ public abstract class HierarchicalConfigProvider<T> implements Provider<T>, CfgE
      * @return
      */
     public String getAttribute(String key) {
-        if (hasCFNode()) {
             List<String> list = getCFNode().getAttributes(key);
             if (list.isEmpty()) {
                 return null;
             }
             return list.get(0);
-        }
-            if(getConfig() == null) {return null;} // possible there is no config node.
-           List<ConfigurationNode> list = getConfig().getAttributes(key);
-
-        if (list.isEmpty()) {
-            return null;
-        }
-        DefaultConfigurationNode node = (DefaultConfigurationNode) list.get(0);
-        return node.getValue().toString();
     }
 
     /**
@@ -156,12 +131,7 @@ public abstract class HierarchicalConfigProvider<T> implements Provider<T>, CfgE
      */
     public boolean isA(String name) {
         String x;
-        if (hasCFNode()) {
             x = getCFNode().getName();
-        } else {
-
-            x = getConfig().getName();
-        }
         if (x == null || x.length() == 0) return false;
         return x.equals(name);
     }
@@ -174,29 +144,10 @@ public abstract class HierarchicalConfigProvider<T> implements Provider<T>, CfgE
      * @return
      */
     public boolean hasA(String name) {
-        if (hasCFNode()) {
             return 0 < getCFNode().getChildren(name).size();
-        }
-        return 0 < getConfig().getChildren(name).size();
     }
 
-    /**
-     * Return the given {@link ConfigurationNode}. This
-     *
-     * @param name
-     * @return
-     */
-    public ConfigurationNode getConfigurationAt(String name) {
-        if (hasCFNode()) {
-            throw new IllegalArgumentException("this configuration does not have an Apache ConfigurationNode!");
-        }
-        List
-                list = getConfig().getChildren(name);
-        if (list.isEmpty()) {
-            return null;
-        }
-        return (ConfigurationNode) list.get(0);
-    }
+
 
     /**
      * Checks that the event applies to this component. The type is the component and the target is Normally you set the component key as a static field in the

@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.util.cli;
 
-import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
+
+import edu.uiuc.ncsa.security.core.util.CFLoggingConfigLoader;
 
 /**
  * Utilities that are used by any reasonable implementation of the Commands
@@ -179,7 +180,7 @@ public abstract class CommonCommands2 extends AbstractCommandsImpl {
             versionHelp();
             return;
         }
-        say("* CLI (Command Line Interpreter) Version " + LoggingConfigLoader.VERSION_NUMBER);
+        say("* CLI (Command Line Interpreter) Version " + CFLoggingConfigLoader.VERSION_NUMBER);
     }
 
 }

@@ -20,25 +20,16 @@ public class SASBootstrapper extends Bootstrapper {
     public static final String SAS_CONFIG_TAG = "sas";
 
 
-    protected ConfigurationNode getNode(ServletContext servletContext) throws Exception {
-        return ServletXMLConfigUtil.findConfigurationNode(servletContext, SAS_CONFIG_FILE_KEY, SAS_CONFIG_NAME_KEY, SAS_CONFIG_TAG);
-    }
 
     protected CFNode getCFNode(ServletContext servletContext) throws Exception {
         return ServletXMLConfigUtil.findCFConfigurationNode(servletContext, SAS_CONFIG_FILE_KEY, SAS_CONFIG_NAME_KEY, SAS_CONFIG_TAG);
     }
     @Override
     public ConfigurationLoader getConfigurationLoader(ServletContext servletContext) throws Exception {
-        if(isUseCF()){
             return getConfigurationLoader(getCFNode(servletContext));
-        }
-        return getConfigurationLoader(getNode(servletContext));
     }
 
-    @Override
-    public ConfigurationLoader getConfigurationLoader(ConfigurationNode node) throws MyConfigurationException {
-        return new SASConfigurationLoader(node);
-    }
+
 
     @Override
     public Initialization getInitialization() {

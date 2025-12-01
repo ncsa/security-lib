@@ -19,7 +19,7 @@ import java.util.TreeSet;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
- * Utility class for getting configurations and things in them. Generally every call is
+ * Utility class for getting Apache configurations and things in them. Generally every call is
  * done anew, so anything you want to keep you should store.
  * <p>Created by Jeff Gaynor<br>
  * on 1/19/12 at  11:20 AM

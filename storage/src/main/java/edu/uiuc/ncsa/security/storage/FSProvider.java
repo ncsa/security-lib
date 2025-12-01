@@ -2,15 +2,14 @@ package edu.uiuc.ncsa.security.storage;
 
 import edu.uiuc.ncsa.security.core.Initializable;
 import edu.uiuc.ncsa.security.core.cf.CFNode;
-import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Creates Filestores. This centralizes all the general checking to create these. Specific providers are needed
@@ -31,7 +30,12 @@ public abstract class FSProvider<T extends FileStore> extends AbstractUpkeepStor
 
     public boolean isRemoveEmptyFiles() {
         if (removeEmptyFiles == null) {
-            String rawValue = Configurations.getFirstAttribute(getConfig(), StorageConfigurationTags.FS_REMOVE_EMPTY_FILES);
+            List<String> attr= getCFNode().getAttributes(StorageConfigurationTags.FS_REMOVE_EMPTY_FILES);
+            if (attr != null && attr.size() > 0) {
+                removeEmptyFiles = true; //default
+            }
+            String rawValue = attr.get(0);
+//            String rawValue = Configurations.getFirstAttribute(getConfig(), StorageConfigurationTags.FS_REMOVE_EMPTY_FILES);
             if (rawValue == null || rawValue.isEmpty()) {
                 removeEmptyFiles = true; //default
             }
@@ -46,9 +50,15 @@ public abstract class FSProvider<T extends FileStore> extends AbstractUpkeepStor
 
     public boolean isRemoveFailedFiles() {
         if (removeFailedFiles == null) {
-            String rawValue = Configurations.getFirstAttribute(getConfig(), StorageConfigurationTags.FS_REMOVE_FAILED_FILES);
+            List<String> attr= getCFNode().getAttributes(StorageConfigurationTags.FS_REMOVE_FAILED_FILES);
+            if (attr != null && attr.size() > 0) {
+                removeFailedFiles = false; //default
+            }
+            String rawValue = attr.get(0);
+
+//            String rawValue = Configurations.getFirstAttribute(getConfig(), StorageConfigurationTags.FS_REMOVE_FAILED_FILES);
             if (rawValue == null || rawValue.isEmpty()) {
-                removeEmptyFiles = false; //default
+                removeFailedFiles = false; //default
             }
             try {
                 removeFailedFiles = Boolean.parseBoolean(rawValue);
@@ -57,11 +67,6 @@ public abstract class FSProvider<T extends FileStore> extends AbstractUpkeepStor
             }
         }
         return removeFailedFiles;
-    }
-
-    public FSProvider(ConfigurationNode config, String type, String target, MapConverter converter) {
-        super(config, type, target);
-        this.converter = converter;
     }
 
 

@@ -8,7 +8,6 @@ import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
 import edu.uiuc.ncsa.security.storage.FSProvider;
 import edu.uiuc.ncsa.security.storage.FileStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;
 import java.io.File;
@@ -18,10 +17,6 @@ import java.io.File;
  * on 8/22/22 at  2:25 PM
  */
 public class ClientFSStoreProvider<T extends FileStore> extends FSProvider<T> {
-    public ClientFSStoreProvider(ConfigurationNode config,  MapConverter converter, Provider<? extends SASClient> clientProvider) {
-        super(config, StorageConfigurationTags.FILE_STORE, "clients", converter);
-        this.clientProvider= clientProvider;
-    }
 
     public ClientFSStoreProvider(CFNode config, MapConverter converter, Provider<? extends SASClient> clientProvider) {
         super(config, StorageConfigurationTags.FILE_STORE, "clients", converter);

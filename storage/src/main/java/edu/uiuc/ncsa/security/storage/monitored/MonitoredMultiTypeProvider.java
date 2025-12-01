@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.security.storage.monitored;
 
 import edu.uiuc.ncsa.security.core.cf.CFNode;
-import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEventListener;
 import edu.uiuc.ncsa.security.core.configuration.provider.MultiTypeProvider;
@@ -9,7 +8,6 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.storage.MonitoredStoreInterface;
 import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfigUtils;
 import edu.uiuc.ncsa.security.storage.monitored.upkeep.UpkeepConfiguration;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -22,9 +20,6 @@ public abstract class MonitoredMultiTypeProvider<T> extends MultiTypeProvider<T>
     public MonitoredMultiTypeProvider() {
     }
 
-    public MonitoredMultiTypeProvider(ConfigurationNode config, boolean disableDefaultStore, MyLoggingFacade logger, String type, String target) {
-        super(config, disableDefaultStore, logger, type, target);
-    }
 
     public MonitoredMultiTypeProvider(CFNode config, boolean disableDefaultStore, MyLoggingFacade logger, String type, String target) {
         super(config, disableDefaultStore, logger, type, target);
@@ -64,11 +59,7 @@ public abstract class MonitoredMultiTypeProvider<T> extends MultiTypeProvider<T>
      */
     protected void injectUpkeep() {
         if (upkeepConfiguration == null) {
-            if(hasCFNode()){
                 cfInjectUpkeep();
-            }else {
-                cnInjectUpkeep();
-            }
         }
     }
 
@@ -89,27 +80,4 @@ public abstract class MonitoredMultiTypeProvider<T> extends MultiTypeProvider<T>
         }
     }
 
-
-    private void cnInjectUpkeep() {
-        ConfigurationNode upkeepNode = Configurations.getFirstNode(getConfig(), UpkeepConfigUtils.UPKEEP_TAG);
-        if (upkeepNode != null) {
-            try{
-                upkeepConfiguration = UpkeepConfigUtils.processUpkeep(Configurations.getFirstNode(getConfig(), UpkeepConfigUtils.UPKEEP_TAG));
-                for (CfgEventListener c : getListeners()) {
-                    if (c instanceof MonitoredStoreInterface) {
-                        ((MonitoredStoreInterface) c).setUpkeepConfiguration(getUpkeepConfiguration());
-                    }
-                }
-            }catch(Throwable t){
-                System.err.println("could not load up keep configuration for " + getClass().getSimpleName() + ":" + t.getMessage());
-                throw t;
-            }
-        }
-    }
-
-    @Override
-    public void setConfig(ConfigurationNode config) {
-        super.setConfig(config);
-        injectUpkeep();
-    }
 }

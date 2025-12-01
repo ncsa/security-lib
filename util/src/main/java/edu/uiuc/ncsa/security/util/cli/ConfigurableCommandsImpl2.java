@@ -1,22 +1,22 @@
 package edu.uiuc.ncsa.security.util.cli;
 
-import edu.uiuc.ncsa.security.core.configuration.Configurations;
+import edu.uiuc.ncsa.security.core.cf.CFBundle;
+import edu.uiuc.ncsa.security.core.cf.CFLoader;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
 /**
  * Basic implementation of Commands that supports loading configurations.
- * It is intended as a the superclass for commands that have multiple components.
+ * It is intended as the superclass for commands that have multiple components.
  * <b>NOTE</b> This does not actually run commands! It is a top-level class that delegates to its
  * command implementations (such as for stores, keys). Therefore, you should not put code here
  * that actually executes things. The contract of this is that it manages logging, loading configurations
@@ -201,8 +201,13 @@ public abstract class ConfigurableCommandsImpl2 extends AbstractCommandsImpl {
     }
 
     protected List<String> listXMLConfigs(File target) throws Exception {
-
-        XMLConfiguration xmlConfiguration = Configurations.getConfiguration(target);
+        CFBundle cfBundle  = new CFLoader.Builder()
+                .tagname(getComponentName())
+                .inputStream(new FileInputStream(target))
+                .build()
+                .loadBundle();
+        return cfBundle.getAllConfigNames();
+/*        XMLConfiguration xmlConfiguration = Configurations.getConfiguration(target);
         ConfigurationNode rootNode = xmlConfiguration.getRoot();
         List<String> names = new ArrayList<>(); // To keep sorted
         for (ConfigurationNode node : rootNode.getChildren()) {
@@ -212,7 +217,7 @@ public abstract class ConfigurableCommandsImpl2 extends AbstractCommandsImpl {
             }
         }
 
-        return names;
+        return names;*/
     }
 
 

@@ -7,6 +7,9 @@ import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
+
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
  * Models a bundle of configurations.
@@ -113,4 +116,21 @@ public class CFBundle {
 
     CFMultiConfigurations multiConfigurations = null;
 
+    /**
+     * For this bundle, get all nodes and return a sorted list '
+     * of names. This allows you to display a list of named configurations
+     * and have the user select the one the need to load.
+     * @return
+     */
+    public List<String> getAllConfigNames() {
+    List<CFNode> nodes = getAllNodes();
+    TreeSet<String> names = new TreeSet<>();
+    for(CFNode node : nodes) {
+        String n = node.getFirstAttribute("name");
+        if(!isTrivial(n)) {
+            names.add(n);
+        }
+    }
+    return new ArrayList<>(names);
+}
 }

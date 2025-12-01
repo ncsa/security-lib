@@ -13,7 +13,7 @@ import java.util.List;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
- * Static utilities for working with XML configurations.
+ * Static utilities for working with XML configurations. This also handles times!
  * <p>Created by Jeff Gaynor<br>
  * on 3/23/12 at  8:23 AM
  */
@@ -233,7 +233,7 @@ public class XMLConfigUtil implements TimeConstants {
      * Quick double check of this class. Run it and peruse the output.
      * @param args
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Throwable{
         String[] values = new String[]{
                 "1000",
                 "300 sec",

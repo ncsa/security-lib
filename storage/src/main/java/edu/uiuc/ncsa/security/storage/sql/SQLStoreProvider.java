@@ -7,7 +7,6 @@ import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.storage.AbstractUpkeepStoreProvider;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 /**
  * For creating SQL-based stores
@@ -54,15 +53,7 @@ public abstract class SQLStoreProvider<T extends Store> extends AbstractUpkeepSt
     public static final String PREFIX = StorageConfigurationTags.SQL_PREFIX;
     public static final String SCHEMA = StorageConfigurationTags.SQL_SCHEMA;
 
-    protected SQLStoreProvider(ConfigurationNode config,
-                               ConnectionPoolProvider<? extends ConnectionPool> cpp,
-                               String type,
-                               String target,
-                               MapConverter converter) {
-        super(config, type, target);
-        connectionPoolProvider = cpp;
-        this.converter = converter;
-    }
+
     protected SQLStoreProvider(CFNode config,
                                ConnectionPoolProvider<? extends ConnectionPool> cpp,
                                String type,
@@ -73,18 +64,6 @@ public abstract class SQLStoreProvider<T extends Store> extends AbstractUpkeepSt
         this.converter = converter;
     }
 
-    protected SQLStoreProvider(ConfigurationNode config,
-                               ConnectionPoolProvider<? extends ConnectionPool> cpp,
-                               String type,
-                               String target,
-                               String tablename,
-                               MapConverter converter
-    ) {
-        super(config, type, target);
-        connectionPoolProvider = cpp;
-        this.tablename = tablename;
-        this.converter = converter;
-    }
     protected SQLStoreProvider(CFNode config,
                                ConnectionPoolProvider<? extends ConnectionPool> cpp,
                                String type,
@@ -134,11 +113,8 @@ public abstract class SQLStoreProvider<T extends Store> extends AbstractUpkeepSt
     protected ConnectionPool getConnectionPool() {
         if(!connectionPoolProvider.hasCFNode() && hasCFNode()) {
             connectionPoolProvider.setCFNode(getParentCFNode());
+        }
 
-        }
-        if (connectionPoolProvider.getConfig() == null) {
-            connectionPoolProvider.setConfig(getTypeConfig());
-        }
         return connectionPoolProvider.get();
     }
 
