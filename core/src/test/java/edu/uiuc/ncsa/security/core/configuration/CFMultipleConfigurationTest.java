@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.security.core.configuration;
 
 import edu.uiuc.ncsa.security.core.MultiConfigurationsInterface;
 import edu.uiuc.ncsa.security.core.inheritance.MultipleInheritanceEngine;
-import org.apache.commons.configuration.ConfigurationException;
 
 
 /**
@@ -20,7 +19,7 @@ import org.apache.commons.configuration.ConfigurationException;
 public class CFMultipleConfigurationTest extends AbstractMultipleConfigurationTest {
 
     @Override
-    protected MultiConfigurationsInterface getConfiguration(String filename) throws ConfigurationException {
+    protected MultiConfigurationsInterface getConfiguration(String filename) {
        return getCFConfiguration(filename);
     }
 

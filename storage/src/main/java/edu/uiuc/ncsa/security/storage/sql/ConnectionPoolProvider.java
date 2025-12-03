@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.security.storage.sql;
 
 import edu.uiuc.ncsa.security.core.configuration.provider.HierarchicalConfigProvider;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 
 /**
  * Creates a {@link ConnectionPool} from a configuration.
@@ -123,7 +123,7 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
 
     /**
      * Checks long value assuming it is time. No units means it is passed back, but look at
-     * the documentation in {@link XMLConfigUtil#getValueSecsOrMillis(String)}. IOf you just need
+     * the documentation in {@link TimeUtil#getValueSecsOrMillis(String)}. IOf you just need
      * a long value, use {@link #checkValue(String, long)}.
      * @param key
      * @param defaultValue
@@ -133,7 +133,7 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
         if(!hasCFNode()) return defaultValue;
         String x = getAttribute(key);; // call handles both CFNode and ConfNode
 
-        if(x!= null) return XMLConfigUtil.getValueSecsOrMillis(x);
+        if(x!= null) return TimeUtil.getValueSecsOrMillis(x);
         if (defaultValue != -1) return defaultValue;
         throw new MyConfigurationException("Error: no long value specified for " + key);
     }

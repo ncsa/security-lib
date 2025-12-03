@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.XMLConverter;
-import edu.uiuc.ncsa.security.core.configuration.Configurations;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.ObjectNotFoundException;
@@ -28,9 +28,10 @@ import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.commons.configuration.tree.ConfigurationNode;
+import org.w3c.dom.Document;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -126,7 +127,37 @@ public abstract class StoreCommands extends CommonCommands {
     public static String UPKEEP_FLAG_RUN = "-run";
     public static String UPKEEP_FLAG_ENABLE = "-enable";
 
-    protected void showUpkeepHelp() {
+    protected void showUpkeepHelp(InputLine input) {
+        if(input.hasArg("-ex")){
+            say("Complete sample upkeep configuration:\n");
+            say("<upkeep testOnly=\"true\"\n" +
+                    "        debug=\"true\"\n" +
+                    "        enabled=\"true\"\n" +
+                    "        interval=\"2 min\"\n" +
+                    "        verbose=\"true\"\n" +
+                    "        runCount=\"1\"\n" +
+                    "        output=\"/tmp/out.json\"\n" +
+                    "        alarms=\"09:00:00,   16:00:00\"\n" +
+                    ">\n" +
+                    "    <rule name=\"whitelist\" action=\"retain\">                         <!-- Rule list -->\n" +
+                    "        <id regex=\"true\"><![CDATA[^localhost.*]]></id>\n" +
+                    "        <id regex=\"true\">^dev:.*</id>\n" +
+                    "    </rule>\n" +
+                    "\n" +
+                    "    <rule name=\"unused\"\n" +
+                    "          action=\"delete\"\n" +
+                    "          skipVersions=\"false\"\n" +
+                    "          verbose=\"false\">       <!-- Rule List -->\n" +
+                    "        <date type=\"created\" when=\"before\" value=\"6 hr\"></date>     <!-- rule entries -->\n" +
+                    "        <date type=\"accessed\" when=\"never\"></date>\n" +
+                    "    </rule>\n" +
+                    "\n" +
+                    "    <rule action=\"delete\"> <!-- unnamed rule -->\n" +
+                    "        <id regex=\"true\">^testScheme.*</id>\n" +
+                    "    </rule>\n" +
+                    "</upkeep>\n");
+            return;
+        }
         say("upkeep ["
                 + UPKEEP_FLAG_TEST + " (true | false) | "
                 + UPKEEP_FLAG_SHOW + " | "
@@ -139,9 +170,11 @@ public abstract class StoreCommands extends CommonCommands {
 
         say(StringUtils.RJustify(UPKEEP_FLAG_TEST, width) + " = true or false, all rules are tun in test mode only. This overrides individual rules settings.");
         say(StringUtils.RJustify(UPKEEP_FLAG_SHOW, width) + " = print the current configuration");
-        say(StringUtils.RJustify(UPKEEP_FLAG_CFG, width) + " = the full path to an XML configuration. This is exactly the upkeep block for a store, nothing else.");
         say(StringUtils.RJustify(UPKEEP_FLAG_RUN, width) + " = flag, if present, run upkeep for thr current store with the current configuration. A report is printed");
         say(StringUtils.RJustify(UPKEEP_FLAG_ENABLE, width) + " = true or false, enable or disable the entire current configuration");
+        say(StringUtils.RJustify(UPKEEP_FLAG_CFG, width) + " = the full path to an XML configuration. This is exactly the upkeep block for a store, nothing else.");
+        say("Run help with the -ex flag to see an example configuration.");
+
         say("Note that you cannot change the stored upkeep for the store, with this utility,");
         say("though you may load different one and " + UPKEEP_FLAG_RUN + "  it.");
         say();
@@ -157,7 +190,7 @@ public abstract class StoreCommands extends CommonCommands {
 
     public void upkeep(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
-            showUpkeepHelp();
+            showUpkeepHelp(inputLine);
             return;
         }
         if (!isMonitored()) {
@@ -179,8 +212,13 @@ public abstract class StoreCommands extends CommonCommands {
                 return;
             }
             try {
-                XMLConfiguration xmlConfiguration = Configurations.getConfiguration(file);
-                ConfigurationNode root = xmlConfiguration.getRoot();
+                FileInputStream f = new FileInputStream(file);
+                DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                Document doc = builder.parse(f);
+                doc.getDocumentElement().normalize();
+                f.close();
+
+                CFNode root = new CFNode(doc.getDocumentElement());
                 UpkeepConfiguration cfg = processUpkeep(root);
                 upkeepConfiguration = cfg;
             } catch (Throwable t) {

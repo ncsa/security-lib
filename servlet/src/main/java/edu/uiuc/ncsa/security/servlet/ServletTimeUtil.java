@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.security.core.cf.CFBundle;
 import edu.uiuc.ncsa.security.core.cf.CFLoader;
 import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
+import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 
 import javax.servlet.ServletContext;
 import java.io.File;
@@ -15,7 +15,7 @@ import java.io.InputStream;
  * <p>Created by Jeff Gaynor<br>
  * on 5/16/13 at  9:45 AM
  */
-public class ServletXMLConfigUtil extends XMLConfigUtil {
+public class ServletTimeUtil extends TimeUtil {
 
     /**
      * The contract is that any file in the servlet  context if absolute is a file on

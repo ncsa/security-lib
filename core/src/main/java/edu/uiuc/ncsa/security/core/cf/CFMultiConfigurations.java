@@ -14,7 +14,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
  * Configuration Utility that allows for inheritance from other configurations. This
- * also has sseveral static methods to help with migration of existing configurations.
+ * also has several static methods to help with migration of existing configurations.
  * For testing this see the MultipleInheritanceTest in the testing harness, which exercises
  * this very well.
  * <p>Created by Jeff Gaynor<br>

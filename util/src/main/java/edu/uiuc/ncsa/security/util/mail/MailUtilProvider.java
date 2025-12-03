@@ -5,8 +5,7 @@ import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.HierarchicalConfigProvider;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
-import org.apache.commons.configuration.tree.ConfigurationNode;
+import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,7 +62,7 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
             String y = getAttribute(MAIL_THROTTLE_INTERVAL, "none");
             long throttleInterval = -1L;
             if (!y.equals("none")) {
-                throttleInterval = XMLConfigUtil.getValueSecsOrMillis(y, true);
+                throttleInterval = TimeUtil.getValueSecsOrMillis(y, true);
             }
             MailEnvironment me = new MailEnvironment(
                     Boolean.parseBoolean(getAttribute(MAIL_ENABLED, "false")), //enabled
@@ -88,27 +87,7 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
         }
     }
 
-    protected boolean hasAttribute(ConfigurationNode node, String name) {
-        List<ConfigurationNode> attributes = node.getAttributes(name);
-        if (attributes != null && !attributes.isEmpty()) {
-            return true;
-        }
-        return false;
-    }
 
-    protected String getAttribute(ConfigurationNode node, String name) {
-        List<ConfigurationNode> attributes = node.getAttributes(name);
-        if (attributes == null || attributes.isEmpty()) {
-            return null;
-        }
-        Object attr = attributes.get(0).getValue();
-        if (attr == null) {
-            return null;
-        }
-        String attr0 = attr.toString();
-        if (attr0.isEmpty()) return null;
-        return attr0;
-    }
 
     // Get the attributes from each entry and stash it in a map. These have no resolution of inheritance.
 
@@ -129,7 +108,7 @@ public class MailUtilProvider extends HierarchicalConfigProvider<MailUtil> imple
         if (node.hasAttribute(MAIL_START_TLS))
             map.put(MAIL_START_TLS, node.getFirstBooleanValue(MAIL_START_TLS));
         if (node.hasAttribute(MAIL_THROTTLE_INTERVAL)) {
-            map.put(MAIL_THROTTLE_INTERVAL, XMLConfigUtil.getValueSecsOrMillis(node.getFirstAttribute(MAIL_THROTTLE_INTERVAL), true));
+            map.put(MAIL_THROTTLE_INTERVAL, TimeUtil.getValueSecsOrMillis(node.getFirstAttribute(MAIL_THROTTLE_INTERVAL), true));
         }
 
         String template = node.getNodeContents(MAIL_MESSAGE_TEMPLATE);// message template

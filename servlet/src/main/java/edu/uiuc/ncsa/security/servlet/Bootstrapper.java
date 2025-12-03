@@ -3,7 +3,6 @@ package edu.uiuc.ncsa.security.servlet;
 import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;

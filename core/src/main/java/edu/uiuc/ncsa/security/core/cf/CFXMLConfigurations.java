@@ -18,6 +18,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
+import java.net.URI;
 import java.time.LocalTime;
 import java.util.Collection;
 import java.util.HashMap;
@@ -53,7 +54,7 @@ public class CFXMLConfigurations {
     }
 
     /**
-     * Loads a file as a resource. This just returns the {@link Document}.
+     * Loads a file as a resource from a string. This just returns the {@link Document}.
      *
      * @param uri
      * @return
@@ -63,6 +64,17 @@ public class CFXMLConfigurations {
         return loadDocument(CFXMLConfigurations.class.getClassLoader().getResourceAsStream(uri));
     }
 
+    /**
+     * Loads a file as a resource from a URI. This just returns the {@link Document}.
+     *
+     * @param uri
+     * @return
+     * @throws MyConfigurationException
+     */
+
+    public static Document loadDocument(URI uri) throws MyConfigurationException {
+        return loadDocument(uri.toString());
+    }
 
     /**
      * Loads tjhe given inputStream. The stream is closed at the end. This just returns the {@link Document}.
@@ -346,9 +358,9 @@ public class CFXMLConfigurations {
      * Finds the given {@link CFNode} for a configuration. The input stream is
      * not closed at the end operation.
      *
-     * @param inputStream   - inpout stream to the xml file
-     * @param configType - the tag name for the configuration
-     * @param configName - the name attribute of the configuration.
+     * @param inputStream - input stream to the xml file
+     * @param configType  - the tag name for the configuration
+     * @param configName  - the name attribute of the configuration.
      * @return The configuration
      */
     public static CFNode findConfiguration(InputStream inputStream, String configType, String configName) {
@@ -369,7 +381,21 @@ public class CFXMLConfigurations {
     }
 
     /**
+     * Gets a configuration from a resource file.
+     * @param resource
+     * @param configType
+     * @param configName
+     * @return
+     */
+    public static CFNode findConfiguration(URI resource, String configType, String configName) {
+        return findConfiguration(CFXMLConfigurations.class.getClassLoader().getResourceAsStream(resource.toString()),
+                configType,
+                configName);
+    }
+
+    /**
      * Get a configuration by name of with a given type (tag name) from a file
+     *
      * @param fileName
      * @param configType
      * @param configName
@@ -383,20 +409,20 @@ public class CFXMLConfigurations {
         if (!file.exists()) {
             throw new MyConfigurationException("configuration file does not exist");
         }
-        if (file.canRead()) {
+        if (!file.canRead()) {
             throw new MyConfigurationException("configuration file canot be read");
         }
         FileInputStream fis = null;
         try {
-             fis = new FileInputStream(file);
+            fis = new FileInputStream(file);
             CFNode node = findConfiguration(fis, configType, configName);
             return node;
         } catch (MyConfigurationException t) {
             throw t;
-        }catch(Throwable t) { // basically to catch IO errors creating the file input stream.
+        } catch (Throwable t) { // basically to catch IO errors creating the file input stream.
             throw new MyConfigurationException("cannot load configuration file:" + t.getMessage(), t);
-        }finally {
-            if(fis != null) {
+        } finally {
+            if (fis != null) {
                 try {
                     fis.close();
                 } catch (IOException e) {

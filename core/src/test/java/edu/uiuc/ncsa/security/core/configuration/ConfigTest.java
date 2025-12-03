@@ -1,13 +1,13 @@
 package edu.uiuc.ncsa.security.core.configuration;
 
+import edu.uiuc.ncsa.security.core.cf.CFBundle;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
+import edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations;
 import junit.framework.TestCase;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Abstract class that allows for testing a configuration. This tests both Apache commons Configuration.
@@ -30,7 +30,7 @@ public abstract class ConfigTest extends TestCase {
      *
      * @return
      */
-    abstract protected XMLConfiguration getConfiguration() throws ConfigurationException;
+    abstract protected CFBundle getConfiguration() ;
 
     /**
      * The type of the configuration, aka the tag name for it.
@@ -39,34 +39,50 @@ public abstract class ConfigTest extends TestCase {
      */
     abstract protected String getConfigurationType();
 
-    protected XMLConfiguration getConfiguration(String resourceName) throws ConfigurationException {
+    protected CFBundle getConfiguration(String resourceName) {
         if (configuration == null) {
-            configuration = Configurations.getConfiguration(getClass().getResource(resourceName));
+            Document document = CFXMLConfigurations.loadDocument(resourceName);
+            configuration = new CFBundle(document, getConfigurationType());
         }
 
         return configuration;
     }
 
-    XMLConfiguration configuration;
+    CFBundle configuration;
 
 
-    protected ConfigurationNode getConfig(String configName) throws ConfigurationException {
+    /**
+     * gets a node by name from this configuration bundle.
+     *
+     * @param configName
+     * @return
+     */
+    protected CFNode getConfig(String configName) {
         return getConfig(getConfiguration(), configName);
     }
 
-    protected ConfigurationNode getConfig(XMLConfiguration cfg, String configName) throws ConfigurationException {
-        return Configurations.getConfig(cfg, getConfigurationType(), configName);
-    }
-
-    protected void printNodes(ConfigurationNode root) {
-        for (Object kid : root.getChildren()) {
-            ConfigurationNode cn = (ConfigurationNode) kid;
-            say("key=" + cn.getName() + ", value=" + cn.getValue());
-            printNodes(cn);
+    /*
+        protected ConfigurationNode getConfig(CFBundle cfg, String configName) throws ConfigurationException {
+            return Configurations.getConfig(cfg, getConfigurationType(), configName);
         }
-
+    */
+    protected CFNode getConfig(CFBundle cfg, String configName) {
+        return cfg.getNamedConfig(configName);
     }
-    protected void print(Document doc){
+
+    /*    protected void printNodes(CFNode root) {
+            for (Object kid : root.getChildren()) {
+                ConfigurationNode cn = (ConfigurationNode) kid;
+                say("key=" + cn.getName() + ", value=" + cn.getValue());
+                printNodes(cn);
+            }
+        }*/
+    protected void print(CFBundle bundle) {
+        List<CFNode> allNodes = bundle.getAllNodes();
+        for (CFNode node : allNodes) {
+            print(node);
+        }
+/*
         NodeList nodeList =  doc.getDocumentElement().getElementsByTagName("service");
         say("size =" + nodeList.getLength() + " elements");
         for (int i = 0; i < nodeList.getLength(); i++) {
@@ -76,16 +92,36 @@ public abstract class ConfigTest extends TestCase {
                 say("name= " + nodeMap.getNamedItem("name"));
             }
         }
+*/
     }
-    protected void print(Node node) {
-        NodeList nodeList =  node.getChildNodes();
-        say("size =" + nodeList.getLength() + " elements");
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node n = nodeList.item(i);
-            if (n.getNodeType() == Node.ELEMENT_NODE) {
+
+    /**
+     * Print the children of a given node.
+     *
+     * @param node
+     */
+    protected void print(CFNode node) {
+        List<CFNode> nodeList = node.getChildren();
+        String indent = "   ";
+        for (int i = 0; i < nodeList.size(); i++) {
+            CFNode n = nodeList.get(i);
+            Map<String, String> attributes = n.getAttributes();
+            say(attributes.get("name") + " size =" + nodeList.size() + " elements");
+            for (String key : attributes.keySet()) {
+                if (!attributes.get(key).equals("name")) {
+                    say(indent + "@" + key + "=" + attributes.get(key));
+                }
+            }
+            List<CFNode> kids = n.getChildren();
+            for (CFNode kid : kids) {
+                say(indent + kid.getName());
+            }
+/*
+            if (n.getANodeType() == Node.ELEMENT_NODE) {
                 NamedNodeMap nodeMap = n.getAttributes();
                 say("name= " + nodeMap.getNamedItem("name"));
             }
+*/
         }
     }
 

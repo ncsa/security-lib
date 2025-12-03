@@ -5,8 +5,7 @@ import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.servlet.Bootstrapper;
 import edu.uiuc.ncsa.security.servlet.Initialization;
-import edu.uiuc.ncsa.security.servlet.ServletXMLConfigUtil;
-import org.apache.commons.configuration.tree.ConfigurationNode;
+import edu.uiuc.ncsa.security.servlet.ServletTimeUtil;
 
 import javax.servlet.ServletContext;
 
@@ -22,7 +21,7 @@ public class SASBootstrapper extends Bootstrapper {
 
 
     protected CFNode getCFNode(ServletContext servletContext) throws Exception {
-        return ServletXMLConfigUtil.findCFConfigurationNode(servletContext, SAS_CONFIG_FILE_KEY, SAS_CONFIG_NAME_KEY, SAS_CONFIG_TAG);
+        return ServletTimeUtil.findCFConfigurationNode(servletContext, SAS_CONFIG_FILE_KEY, SAS_CONFIG_NAME_KEY, SAS_CONFIG_TAG);
     }
     @Override
     public ConfigurationLoader getConfigurationLoader(ServletContext servletContext) throws Exception {

@@ -1,10 +1,13 @@
 package edu.uiuc.ncsa.security.util.cli;
 
 import edu.uiuc.ncsa.security.core.Logable;
+import edu.uiuc.ncsa.security.core.cf.CFNode;
+import edu.uiuc.ncsa.security.core.cf.CFXMLConfigurations;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import edu.uiuc.ncsa.security.core.util.*;
-import edu.uiuc.ncsa.security.util.configuration.XMLConfigUtil;
-import org.apache.commons.configuration.tree.ConfigurationNode;
+import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
+import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
+import edu.uiuc.ncsa.security.core.util.LoggerProvider;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -113,15 +116,15 @@ public abstract class CLITool2 implements Logable {
      */
     public abstract void doIt() throws Exception;
 
-    protected ConfigurationNode getConfigurationNode() {
-        return configurationNode;
+    public CFNode getCfNode() {
+        return cfNode;
     }
 
-    protected void setConfigurationNode(ConfigurationNode configurationNode) {
-        this.configurationNode = configurationNode;
+    public void setCFNode(CFNode cfNode) {
+        this.cfNode = cfNode;
     }
 
-    ConfigurationNode configurationNode;
+    CFNode cfNode;
 
     /**
      * Sets up the configuration and runtime environment. This is called typically in the constructors before anything
@@ -136,7 +139,7 @@ public abstract class CLITool2 implements Logable {
         if (!hasConfigFile() || !hasConfigName()) {
             throw new MyConfigurationException("Error: no configuration set");
         }
-        setConfigurationNode(XMLConfigUtil.findConfiguration(getConfigFile(), getConfigName(), getComponentName()));
+        setCFNode(CFXMLConfigurations.findConfiguration(getConfigFile(), getConfigName(), getComponentName()));
     }
 
 

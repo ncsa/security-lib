@@ -3,13 +3,11 @@ package edu.uiuc.ncsa.security.util.cli.editing;
 import edu.uiuc.ncsa.security.core.cf.CFNode;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
@@ -45,39 +43,6 @@ public class EditorUtils {
         </editors>
 
       */
-    public static Editors getEditors(ConfigurationNode cn) {
-        Editors editors = new Editors(); // never null
-        if (cn == null) {
-            return editors;
-        }
-        ConfigurationNode node = getFirstNode(cn, EDITORS_TAG);
-        if (node != null) {
-            // Loop through all the editor elements
-            for (ConfigurationNode kid : node.getChildren(EDITOR_TAG)) {
-                String name = getFirstAttribute(kid, EDITOR_NAME_ATTR);
-                if (StringUtils.isTrivial(name)) {
-                    continue; // not a valid node.
-                }
-                EditorEntry qdlEditor = new EditorEntry();
-                qdlEditor.name = name;
-                qdlEditor.exec = getFirstAttribute(kid, EDITOR_EXEC_ATTR);
-                qdlEditor.clearScreen = getFirstBooleanValue(kid, EDITOR_CLEAR_SCREEN_ATTR, false);
-                for (ConfigurationNode arg : kid.getChildren(EDITOR_ARG_TAG)) {
-                    EditorArg qdlEditorArg = new EditorArg();
-                    String flag = getFirstAttribute(arg, EDITOR_ARG_FLAG_ATTR);
-                    if (isTrivial(flag)) {
-                        continue;
-                    }
-                    qdlEditorArg.flag = flag;
-                    qdlEditorArg.connector = getFirstAttribute(arg, EDITOR_ARG_CONNECTOR_ATTR);
-                    qdlEditorArg.value = getFirstAttribute(arg, EDITOR_ARG_VALUE_ATTR);
-                    qdlEditor.args.add(qdlEditorArg);
-                }
-                editors.put(qdlEditor);
-            }
-        }
-        return editors;
-    }
     public static Editors getEditors(CFNode cfNode) {
         Editors editors = new Editors(); // never null
         if (cfNode == null) {
