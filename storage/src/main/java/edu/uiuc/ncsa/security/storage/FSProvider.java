@@ -30,19 +30,20 @@ public abstract class FSProvider<T extends FileStore> extends AbstractUpkeepStor
 
     public boolean isRemoveEmptyFiles() {
         if (removeEmptyFiles == null) {
-            List<String> attr= getCFNode().getAttributes(StorageConfigurationTags.FS_REMOVE_EMPTY_FILES);
+            List<String> attr = getCFNode().getAttributes(StorageConfigurationTags.FS_REMOVE_EMPTY_FILES);
             if (attr != null && attr.size() > 0) {
+                String rawValue = attr.get(0);
+                if (rawValue == null || rawValue.isEmpty()) {
+                    removeEmptyFiles = true; //default
+                } else {
+                    try {
+                        removeEmptyFiles = Boolean.parseBoolean(rawValue);
+                    } catch (Throwable t) {
+                        removeEmptyFiles = true; // default
+                    }
+                }
+            } else {
                 removeEmptyFiles = true; //default
-            }
-            String rawValue = attr.get(0);
-//            String rawValue = Configurations.getFirstAttribute(getConfig(), StorageConfigurationTags.FS_REMOVE_EMPTY_FILES);
-            if (rawValue == null || rawValue.isEmpty()) {
-                removeEmptyFiles = true; //default
-            }
-            try {
-                removeEmptyFiles = Boolean.parseBoolean(rawValue);
-            } catch (Throwable t) {
-                removeEmptyFiles = true; // default
             }
         }
         return removeEmptyFiles;
@@ -50,20 +51,21 @@ public abstract class FSProvider<T extends FileStore> extends AbstractUpkeepStor
 
     public boolean isRemoveFailedFiles() {
         if (removeFailedFiles == null) {
-            List<String> attr= getCFNode().getAttributes(StorageConfigurationTags.FS_REMOVE_FAILED_FILES);
+            List<String> attr = getCFNode().getAttributes(StorageConfigurationTags.FS_REMOVE_FAILED_FILES);
             if (attr != null && attr.size() > 0) {
+                String rawValue = attr.get(0);
+                if (rawValue == null || rawValue.isEmpty()) {
+                    removeFailedFiles = false; //default
+                } else {
+                    try {
+                        removeFailedFiles = Boolean.parseBoolean(rawValue);
+                    } catch (Throwable t) {
+                        removeFailedFiles = false; // default
+                    }
+                }
+            } else {
                 removeFailedFiles = false; //default
-            }
-            String rawValue = attr.get(0);
 
-//            String rawValue = Configurations.getFirstAttribute(getConfig(), StorageConfigurationTags.FS_REMOVE_FAILED_FILES);
-            if (rawValue == null || rawValue.isEmpty()) {
-                removeFailedFiles = false; //default
-            }
-            try {
-                removeFailedFiles = Boolean.parseBoolean(rawValue);
-            } catch (Throwable t) {
-                removeFailedFiles = false; // default
             }
         }
         return removeFailedFiles;
@@ -152,6 +154,7 @@ public abstract class FSProvider<T extends FileStore> extends AbstractUpkeepStor
         super(config, type, target);
         this.converter = converter;
     }
+
     /**
      * Put the actual instantiation of the store here. {@link #get()} does the grunt work of getting everything
      * out of the configuration for you and checking that it all works as planned.
