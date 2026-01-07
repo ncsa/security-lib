@@ -49,6 +49,16 @@ return ecKey;
         if(jwk.getAlgorithm() != null) {
             algorithm = jwk.getAlgorithm().getName();
         }
+        // Fix https://github.com/ncsa/security-lib/issues/67
+        if(jwk.getExpirationTime()!=null){
+            expiresAt = jwk.getExpirationTime();
+        }
+        if(jwk.getIssueTime()!=null){
+            issuedAt = jwk.getIssueTime();
+        }
+        if(jwk.getNotBeforeTime()!=null){
+            notValidBefore = jwk.getNotBeforeTime();
+        }
         if(jwk.getKeyUse() != null) {
             use = jwk.getKeyUse().getValue();
         }
