@@ -189,6 +189,7 @@ abstract public class SQLConnectionImpl implements ConnectionParameters {
         if(json.containsKey(PASSWORD)) password = json.getString(PASSWORD);
         if(json.containsKey(USERNAME)) username = json.getString(USERNAME);
         if(json.containsKey(SCHEMA)) schema = json.getString(SCHEMA);
+        if(json.containsKey(DATABASE)) databaseName = json.getString(DATABASE);
         if(json.containsKey(HOST)) host = json.getString(HOST);
         if(json.containsKey(PORT)) port = json.getInt(PORT);
         if(json.containsKey(PARAMETERS)) parameters = json.getString(PARAMETERS);

@@ -116,6 +116,14 @@ public abstract class Table  {
     }
 
     /**
+     * Rather trivial statement to test if a key is in the database. This is intended to
+     * use minimal resources for the query.
+     * @return
+     */
+    public String createContainsKeysStatement(){
+        return "SELECT " + getPrimaryKeyColumnName() + " from " + getFQTablename() + " where " + getPrimaryKeyColumnName() + " =?";
+    }
+    /**
      * Returns the select statement for this table with one parameter for the primary key.
      * @return
      */
@@ -207,6 +215,9 @@ public abstract class Table  {
         String out = "UPDATE " + getFQTablename() + " SET ";
         boolean isFirst = true;
         for(String key : keys) {
+            if(key.equals(getPrimaryKeyColumnName())){
+                continue;
+            }
             out = out + (isFirst ? "" : ", ") + key + "=?";
             if (isFirst) {
                 isFirst = false;

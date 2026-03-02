@@ -353,7 +353,7 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         realSave(false, t);
     }
 
-    public Set<Identifier> keySet() {
+    public HashSet<Identifier> keySet() {
         checkPermissions();
         HashSet<Identifier> ids = new HashSet<Identifier>(); // have to work with a copy or get concurrent modification exceptions
         HashSet<String> failures = new HashSet<>(); // keep track of failures so we don't get in some weird loop.
@@ -615,12 +615,17 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
     }
 
     @Override
-    public void update(List<Identifier> ids, Map<String, Object> values) throws UnregisteredObjectException {
-         GenericStoreUtils.update(this, ids, values);
+    public void updateRS(List<Identifier> ids, Map<String, Object> values) throws UnregisteredObjectException {
+         GenericStoreUtils.updateRS(this, ids, values);
     }
 
     @Override
     public List<V> search(String key, boolean isNull) {
         return GenericStoreUtils.search(this, key, isNull);
+    }
+
+    @Override
+    public void update(Map<? extends Identifier, V> m) {
+        GenericStoreUtils.update(this, m);
     }
 }

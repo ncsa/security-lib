@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.security.core;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -41,13 +42,24 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
 
     /**
      * Mass update. For each id, update the keys with the new values. At the end of this operation, every entry in the id list
-     * has the same (key, value) pairs. This is used in processing StoreCommands RSRecords.
+     * has the same (key, value) pairs. This is specific to  processing StoreCommands RSRecords
+     * and not generally useful.
      * @param ids
      * @param values
      * @throws UnregisteredObjectException
      */
-    public void update(List<Identifier> ids, Map<String, Object>  values) throws UnregisteredObjectException;
+    public void updateRS(List<Identifier> ids, Map<String, Object>  values) throws UnregisteredObjectException;
 
+    /**
+     * MAss Update for list of entries. This batches up the entries if SQL.
+     * <h3>Nota Bene</h3>
+     * The objects must exist first. If not, use {@link #putAll(Map)}
+     * Only caveat is that all of the object must update date <i>same</i>
+     * attributes.
+     * @param m
+     */
+    public void update(Map<? extends Identifier,  V> m);
+    
     /**
      * Almost Identical to put(K,V) but since the object should have an identifier, passing along the key is redundant.
      * This persists the object in the store. Note that this returns void since the contract assumes that this is not
@@ -125,4 +137,6 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
 
      List<V> getMostRecent(int n, List<String> attributes);
 
+    @Override
+    HashSet<Identifier> keySet();
 }

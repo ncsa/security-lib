@@ -62,7 +62,7 @@ public abstract class MultiTypeProvider<T> extends TypedProvider<T> {
         }
         // if we get to here, return the default store.
         if (disableDefaultStore) {
-            throw new DefaultStoreDisabledException("Error: Default store is not enabled for this configuration.(" + getClass().getSimpleName() + ")");
+            throw new DefaultStoreDisabledException("Error: Default store is not enabled for configuration \""+ getCFNode().getFirstAttribute("name") + "\" (in " + getClass().getSimpleName() + ")");
         }
         return getDefaultStore();
     }

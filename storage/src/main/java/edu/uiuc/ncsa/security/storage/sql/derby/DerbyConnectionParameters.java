@@ -154,7 +154,7 @@ public class DerbyConnectionParameters extends SQLConnectionImpl {
         createJdbcUrls(); // this will set a bunch of other URLs.
     }
 
-    protected String bootPassword = null;
+    protected String bootPassword;
 
     public String getStoreType() {
         return storeType;

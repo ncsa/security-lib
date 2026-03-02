@@ -163,8 +163,8 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
 
     @Override
     public boolean removeByID(List<Identifier> identifiers) {
-        for(Identifier id : identifiers){
-            if(containsKey(id)){
+        for (Identifier id : identifiers) {
+            if (containsKey(id)) {
                 remove(id);
             }
         }
@@ -180,8 +180,8 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
     }
 
     @Override
-    public void update(List<Identifier> ids, Map<String, Object> values) throws UnregisteredObjectException {
-     GenericStoreUtils.update(this, ids, values);
+    public void updateRS(List<Identifier> ids, Map<String, Object> values) throws UnregisteredObjectException {
+        GenericStoreUtils.updateRS(this, ids, values);
     }
 
     @Override
@@ -189,4 +189,17 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
         return GenericStoreUtils.search(this, key, isNull);
     }
 
+    @Override
+    public void update(Map<? extends Identifier, V> m) {
+        GenericStoreUtils.update(this, m);
+    }
+
+    @Override
+    public HashSet<Identifier> keySet() {
+        Set<Identifier> allKeys = super.keySet();
+        if (allKeys instanceof HashSet) {
+            return (HashSet<Identifier>) allKeys;
+        }
+        return new HashSet<>(allKeys);
+    }
 }

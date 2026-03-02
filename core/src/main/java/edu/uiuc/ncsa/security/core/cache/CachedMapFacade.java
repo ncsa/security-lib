@@ -25,6 +25,7 @@ import java.util.Set;
  * <p>Created by Jeff Gaynor<br>
  * on Nov 12, 2010 at  11:31:47 AM
  */
+// Used in OA4MP, not in the security library.
 public abstract class CachedMapFacade<V extends Cacheable> implements Store<V> {
 
     public CachedMapFacade(Store<V> theStore) {
@@ -163,7 +164,7 @@ public abstract class CachedMapFacade<V extends Cacheable> implements Store<V> {
         return keySet().size();
     }
 
-    public Set<Identifier> keySet() {
+    public HashSet<Identifier> keySet() {
         if (hasStore()) {
             return getTheStore().keySet();
         }

@@ -15,11 +15,16 @@ import java.util.*;
  */
 public class TestMemStore<V extends JSONEntry> extends HashMap<Identifier, V> implements JSONStore<V> {
     @Override
-    public void update(List<Identifier> ids, Map<String, Object> values) throws UnregisteredObjectException {
+    public void updateRS(List<Identifier> ids, Map<String, Object> values) throws UnregisteredObjectException {
 
     }
 
-     @Override
+    @Override
+    public void update(Map<? extends Identifier, V> m) {
+
+    }
+
+    @Override
     public List<V> getAll() {
         LinkedList<V> returnValues = new LinkedList<>();
         returnValues.addAll(values());
@@ -102,5 +107,14 @@ public class TestMemStore<V extends JSONEntry> extends HashMap<Identifier, V> im
     @Override
     public List<V> getMostRecent(int n, List<String> attributes) {
         return null;
+    }
+
+    @Override
+    public HashSet<Identifier> keySet() {
+        Set<Identifier> keys = super.keySet();
+        if(keys instanceof HashSet){
+            return (HashSet<Identifier>) keys;
+        }
+        return new HashSet<>(keys);
     }
 }

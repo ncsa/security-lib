@@ -412,7 +412,8 @@ public class CLIDriver {
             case REPEAT_LAST_COMMAND:
                 cmdLine = doRepeatCommand(cmdLine);
                 storeLine = cmdLine == null; // if there is nothing in the buffer, cmdLine is null, don't store it.
-                return;
+               // return;
+                break;
             case HISTORY_LIST_COMMAND:
                 cmdLine = doHistory(cmdLine);
                 if (cmdLine == null) {

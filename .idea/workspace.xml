@@ -9,10 +9,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Apache Configurations removed from base Security Library.">
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="https://github.com/ncsa/security-lib/issues/67">
+      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/exceptions/ExpiredKeyException.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/docs/configurations.odt" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/docs/configurations.odt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JSONWebKey.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JSONWebKey.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/Store.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/Store.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cache/Cache.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cache/Cache.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cache/CachedMapFacade.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cache/CachedMapFacade.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/provider/MultiTypeProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/provider/MultiTypeProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/AggregateStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/AggregateStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/FileStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/FileStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/GenericStoreUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/GenericStoreUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/MemoryStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/MemoryStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLConnectionImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLConnectionImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionParameters.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionParameters.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/internals/Table.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/internals/Table.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/json/TestMemStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/json/TestMemStore.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -181,7 +194,7 @@
       <recent name="edu.uiuc.ncsa.security.util.cli" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.UpkeepConfigUtils">
+  <component name="RunManager" selected="Java Scratch.Scratch_5">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -310,26 +323,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="CFMultipleConfigurationTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="core" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.core.configuration.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="edu.uiuc.ncsa.security.core.configuration" />
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.configuration.CFMultipleConfigurationTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="moduleWithDependencies" />
-      </option>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" />
@@ -351,6 +344,13 @@
         <value defaultName="moduleWithDependencies" />
       </option>
       <dir value="$PROJECT_DIR$/core/src/test/java/edu/uiuc/ncsa/security/core/configuration" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Scratch_5" type="Java Scratch" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Scratch_5" />
+      <option name="SCRATCH_FILE_URL" value="file://$APPLICATION_CONFIG_DIR$/scratches/Scratch_5.java" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -450,7 +450,7 @@
       <item itemvalue="Application.SAS Client" />
       <item itemvalue="Application.WebInstaller" />
       <item itemvalue="Application.UpkeepConfigUtils" />
-      <item itemvalue="JUnit.CFMultipleConfigurationTest" />
+      <item itemvalue="Java Scratch.Scratch_5" />
       <item itemvalue="JUnit.configuration in core" />
       <item itemvalue="JUnit.ApacheMultipleInheritenceTest" />
       <item itemvalue="JUnit.ApacheConfigInheritenceTest" />
@@ -458,11 +458,11 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Java Scratch.Scratch_5" />
         <item itemvalue="Application.UpkeepConfigUtils" />
         <item itemvalue="JUnit.ApacheConfigInheritenceTest" />
         <item itemvalue="JUnit.ApacheMultipleInheritenceTest" />
         <item itemvalue="JUnit.configuration in core" />
-        <item itemvalue="JUnit.CFMultipleConfigurationTest" />
       </list>
     </recent_temporary>
   </component>
@@ -655,7 +655,12 @@
       <workItem from="1761688273465" duration="5547000" />
       <workItem from="1762196574242" duration="62866000" />
       <workItem from="1765196496080" duration="1838000" />
-      <workItem from="1767617973218" duration="3101000" />
+      <workItem from="1767617973218" duration="12557000" />
+      <workItem from="1768964479469" duration="817000" />
+      <workItem from="1769257144917" duration="32771000" />
+      <workItem from="1770982326064" duration="599000" />
+      <workItem from="1771414220318" duration="13565000" />
+      <workItem from="1771938963311" duration="33486000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -1000,7 +1005,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="123" />
+    <option name="localTasksCounter" value="124" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1009,7 +1014,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Fixed NPE I found in an edge case for formatting output" />
     <MESSAGE value="Migrate to 17" />
     <MESSAGE value="Fix https://github.com/ncsa/security-lib/issues/52" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/53 Removed functor code &amp; tests" />
@@ -1034,7 +1038,8 @@
     <MESSAGE value="Website straggler." />
     <MESSAGE value="Fix https://github.com/ncsa/security-lib/issues/66" />
     <MESSAGE value="Apache Configurations removed from base Security Library." />
-    <option name="LAST_COMMIT_MESSAGE" value="Apache Configurations removed from base Security Library." />
+    <MESSAGE value="https://github.com/ncsa/security-lib/issues/67" />
+    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/67" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -1157,7 +1162,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java</url>
-          <line>598</line>
+          <line>599</line>
           <option name="timeStamp" value="151" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1167,7 +1172,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$APPLICATION_CONFIG_DIR$/scratches/Scratch_5.java</url>
-          <line>65</line>
+          <line>23</line>
           <option name="timeStamp" value="155" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1189,11 +1194,6 @@
           <url>file://$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/configuration/EnvironmentProcessor.java</url>
           <line>150</line>
           <option name="timeStamp" value="178" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$APPLICATION_CONFIG_DIR$/scratches/Scratch_5.java</url>
-          <line>30</line>
-          <option name="timeStamp" value="193" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/terminal/ISO6429Terminal.java</url>

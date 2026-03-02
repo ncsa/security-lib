@@ -172,7 +172,7 @@ public class GenericStoreUtils {
     }
 
     /**
-     * Generic implementation of {@link Store#update(List, Map)} and will loop through the elements doing the update
+     * Generic implementation of {@link Store#updateRS(List, Map)} and will loop through the elements doing the update
      * one at a time. If the store has the capability at all for batch processing, implement it. This is for things
      * like {@link MemoryStore}s and {@link FileStore}s that have no such ability. Note that part of the contract is
      * that the element must exist and an exception is thrown of there is no such element.
@@ -180,7 +180,7 @@ public class GenericStoreUtils {
      * @param ids
      * @param values
      */
-    public static <V extends Identifiable> void  update(Store<V>  store, List<Identifier> ids, Map<String, Object>  values){
+    public static <V extends Identifiable> void updateRS(Store<V>  store, List<Identifier> ids, Map<String, Object>  values){
         XMLConverter<V> xmlConverter = store.getXMLConverter();
         for(Identifier id : ids){
             V v = store.get(id);
@@ -192,6 +192,31 @@ public class GenericStoreUtils {
               oldObject.putAll(values);
               store.save(xmlConverter.fromMap(oldObject, null)); // creates a new object
         }
+    }
+
+    /**
+     * Implements {@link Store#update(Map)} for generic stores.This uses iteration
+     * and is not intended for large stores. If your store is large, use an
+     * {@link edu.uiuc.ncsa.security.storage.sql.SQLStore} or one of its
+     * many and variegated subclasses.
+     * @param store
+     * @param m
+     */
+    public static <V extends Identifiable> void update(Store<V> store, Map<? extends Identifier, V> m) {
+        XMLConverter<V> xmlConverter = store.getXMLConverter();
+        for(Identifier id : m.keySet()){
+            V v = store.get(id);
+            if(v==null){
+                throw new UnregisteredObjectException("No object in the store with id "+id+" found for update");
+            }
+            Map<String, Object> oldObject = new HashMap<>();
+            Map<String, Object> newObject = new HashMap<>();
+            xmlConverter.toMap(v, oldObject);
+            xmlConverter.toMap(m.get(id), newObject);
+            oldObject.putAll(newObject);
+            store.save(xmlConverter.fromMap(oldObject, null)); // creates a new object
+        }
+
     }
     public static <V extends Identifiable> List<V> search(Store<V>  store, String key, boolean isNull) {
         ArrayList<V> results = new ArrayList();

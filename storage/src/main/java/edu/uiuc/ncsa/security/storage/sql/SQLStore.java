@@ -22,8 +22,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.sql.*;
-import java.util.Date;
 import java.util.*;
+import java.util.Date;
 
 /**
  * Top-level SQL store object. A store is simply a logical analog of a hash table, where the key
@@ -126,7 +126,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     }
 
     @Override
-    public void update(List<Identifier> ids, Map<String, Object> map) throws UnregisteredObjectException {
+    public void updateRS(List<Identifier> ids, Map<String, Object> map) throws UnregisteredObjectException {
         List<String> keys = new ArrayList<>(map.size());
         // we peel the keys off since we have to manage the order of them and it is not guaranteed in Java
         keys.addAll(map.keySet());
@@ -137,27 +137,45 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         }
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
-        /*
-        String insertEmployeeSQL = "INSERT INTO EMPLOYEE(ID, NAME, DESIGNATION) "
- + "VALUES (?,?,?)";
-PreparedStatement employeeStmt = connection.prepareStatement(insertEmployeeSQL);
-for(int i = 0; i < EMPLOYEES.length; i++){
-    String employeeId = UUID.randomUUID().toString();
-    employeeStmt.setString(1,employeeId);
-    employeeStmt.setString(2,EMPLOYEES[i]);
-    employeeStmt.setString(3,DESIGNATIONS[i]);
-    employeeStmt.addBatch();
-}
-employeeStmt.executeBatch();
-         */
         try {
-
             PreparedStatement stmt = c.prepareStatement(getTable().createUpdateStatement(keys));
             for(int i = 0; i < ids.size(); i++){
                 for(int j = 0; j < values.size(); j++){
                     stmt.setObject(j+1, values.get(j));
                 }
                 stmt.setString(values.size(), ids.get(i).toString());
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
+            stmt.close();
+            releaseConnection(cr);
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error in mass update :"   + e.getMessage() , e);
+        }
+    }
+
+    @Override
+    public void update(Map<? extends Identifier, V> m) {
+        if(m ==null || m.isEmpty()){ return;}
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+        V v = m.values().iterator().next(); // get one for reading keys
+        try {
+            ColumnMap columnMap = depopulate(v);
+            // Now the trick is that the keys must be an ordered list
+            TreeSet<String> sortedKeys = new TreeSet();
+            sortedKeys.addAll(columnMap.keySet()); // alphabetize them
+            List<String> keys = new ArrayList<>(sortedKeys);
+            PreparedStatement stmt = c.prepareStatement(getTable().createUpdateStatement(keys));
+            for(Identifier id : m.keySet()){
+                 columnMap = depopulate(m.get(id));
+                 int objIndex = 1;
+                 for(int i = 0; i < keys.size(); i++){
+                     if(keys.get(i).equals(getTable().getPrimaryKeyColumnName())) continue; // skip it if they send it
+                     stmt.setObject(objIndex++, getAsSQLObject(columnMap.get(keys.get(i))));
+                 }
+                 stmt.setString(keys.size(), id.toString()); // sets the primary key
                 stmt.addBatch();
             }
             stmt.executeBatch();
@@ -604,7 +622,8 @@ employeeStmt.executeBatch();
 
         boolean rc = false;
         try {
-            PreparedStatement stmt = c.prepareStatement(getTable().createSelectStatement());
+//            PreparedStatement stmt = c.prepareStatement(getTable().createSelectStatement());
+            PreparedStatement stmt = c.prepareStatement(getTable().createContainsKeysStatement());
             stmt.setString(1, identifier.toString());
             stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content of x as per JDBC spec.
             ResultSet rs = stmt.getResultSet();
@@ -705,15 +724,46 @@ employeeStmt.executeBatch();
     }
 
     /**
-     * A terrifically inefficient way to add these since it loops. If you need this to work better, override and optimize.
-     *
+     * This creates new values or does an update for existing ones. As such
+     * it fulfills the contract for {@link Map}.
      * @param m
      */
     @Override
     public void putAll(Map<? extends Identifier, ? extends V> m) {
+        HashSet<Identifier> keys = keySet(); // this class returns a hash set
+        Map<Identifier, V> updateValues = new HashMap<>();
+        Map<Identifier, V> newValues = new HashMap<>();
+        for(Identifier key : m.keySet()) {
+            if(keys.contains(key)) {
+                // exists so update
+                updateValues.put(key, m.get(key));
+            }else{
+                newValues.put(key,m.get(key));
+            }
+        }
+        update(updateValues);
+        // now add the new ones
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+        try {
+            PreparedStatement stmt = c.prepareStatement(getTable().createInsertStatement());
+            for(Identifier id : newValues.keySet()){
+                doRegisterStatement(stmt, newValues.get(id));
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
+            stmt.close();
+            releaseConnection(cr);
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error in mass update :"   + e.getMessage() , e);
+        }
+
+        /*
         for (Map.Entry e : m.entrySet()) {
             register((V) e.getValue());
         }
+*/
     }
 
 
@@ -734,7 +784,7 @@ employeeStmt.executeBatch();
     }
 
 
-    public Set<Identifier> keySet() {
+    public HashSet<Identifier> keySet() {
         HashSet<Identifier> keys = new HashSet<Identifier>();
 
         String query = "Select " + getTable().getPrimaryKeyColumnName() + " from " + getTable().getFQTablename();
@@ -1002,10 +1052,11 @@ employeeStmt.executeBatch();
 
     /**
      * This is to take an SQL script for e.g. creating a database and return a list of
-     * statements. It is not a clever parser at all. It strips out comments
+     * statements. It is not a clever parser at all! It strips out comments
      * and anything that ends with a ; is a statement. Mostly the assumption
      * is that this is a set of table create statements and ceate index statements.
-     * Anything else is at your own risk.
+     * Anything else is at your own risk. However, it will process all of the
+     * simple scripts that OA4MP provides in the base distribution.
      *
      * @param fileName either the name of a resource or the fully qualified path to the file.
      * @return

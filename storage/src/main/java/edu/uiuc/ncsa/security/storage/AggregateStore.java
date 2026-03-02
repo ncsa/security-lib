@@ -28,7 +28,12 @@ public class AggregateStore<V extends Store> implements Store {
     }
 
     @Override
-    public void update(List ids, Map values) throws UnregisteredObjectException {
+    public void update(Map m) {
+
+    }
+
+    @Override
+    public void updateRS(List ids, Map values) throws UnregisteredObjectException {
        throw new NotImplementedException("implement me!");
     }
 
@@ -227,7 +232,7 @@ public class AggregateStore<V extends Store> implements Store {
     }
 
     @Override
-    public Set keySet() {
+    public HashSet keySet() {
         HashSet<Identifier> set = new HashSet<Identifier>();
         for (Store s : stores) {
             set.addAll(s.keySet());

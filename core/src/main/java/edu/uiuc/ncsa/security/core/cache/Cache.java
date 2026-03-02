@@ -170,8 +170,12 @@ public class Cache implements Map<Identifier, CachedObject> {
         getTheRealCache().putAll(m);
     }
 
-    public Set<Identifier> keySet() {
-        return getTheRealCache().keySet();
+    public HashSet<Identifier> keySet() {
+        Set<Identifier> keys =  getTheRealCache().keySet();
+        if(keys instanceof HashSet){
+            return (HashSet<Identifier>) keys;
+        }
+        return new HashSet<>(keys);
     }
 
     public Collection<CachedObject> values() {
