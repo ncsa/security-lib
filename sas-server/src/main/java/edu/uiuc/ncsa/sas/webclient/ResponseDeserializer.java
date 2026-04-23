@@ -3,8 +3,8 @@ package edu.uiuc.ncsa.sas.webclient;
 import edu.uiuc.ncsa.sas.SASConstants;
 import edu.uiuc.ncsa.sas.exceptions.SASException;
 import edu.uiuc.ncsa.sas.thing.response.*;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;

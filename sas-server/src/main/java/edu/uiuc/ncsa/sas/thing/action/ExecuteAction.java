@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.sas.thing.action;
 
 import edu.uiuc.ncsa.sas.SASConstants;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 
 import java.nio.charset.StandardCharsets;

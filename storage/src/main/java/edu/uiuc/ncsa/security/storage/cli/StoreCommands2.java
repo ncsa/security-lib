@@ -24,10 +24,10 @@ import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.cli.editing.EditorEntry;
 import edu.uiuc.ncsa.security.util.cli.editing.EditorUtils;
-import net.sf.json.JSON;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
+import org.kordamp.json.JSON;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
+import org.kordamp.json.JSONSerializer;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -522,6 +522,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                 return;
             }
         }
+        // -sNull takes true or false as its argument. The key is the name of the attribute.
         Boolean isNullCase = null;
         boolean checkNullCase = inputLine.hasArg(SEARCH_IS_NULL_FLAG);
         if (checkNullCase) {
@@ -2351,6 +2352,8 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         say("This returns the most recent 15 entries to this store. An argument of -15 woudl return the oldest 15.");
         say("E.g. search for a subset");
         sayi("clients>search -n 5 -out [name, creation_ts, client_id]");
+        say("E.g. search for a null field, named key_name");
+        sayi("clients>search >key_name -isNull true");
         say("\nSee also: rs");
     }
 

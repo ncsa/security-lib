@@ -38,11 +38,16 @@
              <artifactId>javax.inject</artifactId>
              <version>1</version>
          </dependency>
-         <dependency>
+<!--         <dependency>
              <groupId>net.sf.json-lib</groupId>
              <artifactId>json-lib</artifactId>
              <version>2.4</version>
              <classifier>jdk15</classifier>
+         </dependency>-->
+         <dependency>
+             <groupId>org.kordamp.json</groupId>
+             <artifactId>json-lib-core</artifactId>
+             <version>3.2.0</version>
          </dependency>
 <!--         <dependency>
              <groupId>org.apache.abdera</groupId>

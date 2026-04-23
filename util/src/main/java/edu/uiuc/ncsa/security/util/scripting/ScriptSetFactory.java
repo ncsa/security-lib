@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.security.util.scripting;
 
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import javax.inject.Provider;
 

@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.security.storage.sql.derby;
 
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.sql.SQLConnectionImpl;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.io.File;
 

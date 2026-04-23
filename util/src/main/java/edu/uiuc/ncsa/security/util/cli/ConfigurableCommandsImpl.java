@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.*;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;

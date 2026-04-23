@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.storage.cli;
 
 import edu.uiuc.ncsa.security.core.Identifiable;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 
 import java.util.ArrayList;
@@ -137,4 +138,12 @@ public class FoundIdentifiables extends ArrayList<Identifiable> {
     }
 
     boolean givenID = false;
+
+    public List<Identifier> getIdentifiers(){
+        List<Identifier> identifiers = new ArrayList<>(size());
+        for(Identifiable i: this){
+            identifiers.add(i.getIdentifier());
+        }
+        return identifiers;
+    }
 }

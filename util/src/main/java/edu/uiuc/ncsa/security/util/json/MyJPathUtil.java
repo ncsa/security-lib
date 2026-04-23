@@ -1,9 +1,9 @@
 package edu.uiuc.ncsa.security.util.json;
 
 import edu.uiuc.ncsa.security.util.cli.json_edit.JSONPaths;
-import net.sf.json.JSON;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSON;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 
 import java.util.Date;
 

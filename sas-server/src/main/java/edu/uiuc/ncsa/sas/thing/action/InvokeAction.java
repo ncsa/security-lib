@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.sas.thing.action;
 
 import edu.uiuc.ncsa.sas.Executable;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 
 /**
  * Invoke a specific method in the {@link Executable} implementation.

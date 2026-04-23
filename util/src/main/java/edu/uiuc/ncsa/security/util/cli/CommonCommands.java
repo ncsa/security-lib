@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.CFLoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.io.*;
 import java.util.Date;

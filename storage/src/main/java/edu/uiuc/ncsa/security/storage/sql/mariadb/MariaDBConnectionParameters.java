@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.security.storage.sql.mariadb;
 
 import edu.uiuc.ncsa.security.storage.sql.SQLConnectionImpl;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 /**
  * <p>Created by Jeff Gaynor<br>

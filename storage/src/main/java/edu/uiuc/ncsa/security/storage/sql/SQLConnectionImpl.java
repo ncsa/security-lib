@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.security.storage.sql;
 
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import static edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider.*;
 

@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.sas.client;
 import edu.uiuc.ncsa.security.core.DateComparable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableImpl;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.security.PublicKey;
 import java.util.Date;

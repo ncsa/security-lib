@@ -101,6 +101,36 @@ return ecKey;
         }
     }
 
+    /**
+     * Is the current key expired? I.e., is
+     * <pre>
+     *     exp < now
+     * </pre>
+     * @return
+     */
+    public boolean isExpired(){
+        return expiresAt != null && expiresAt.before(new Date());
+    }
+
+    /**
+     * Is the current key valid yet?, I.e., is
+     * <pre>
+     *     now < nbf (not before)
+     * </pre>
+     * @return
+     */
+    public boolean isValid(){
+        return notValidBefore == null || notValidBefore.after(new Date());
+    }
+
+    /**
+     * Get the keys size (bit count).
+     * @return
+     */
+    public int getSize(){
+        return getJOSEJWK().size();
+    }
+
     public JWK getJOSEJWK() {
         return JOSEJWK;
     }

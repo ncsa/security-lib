@@ -9,7 +9,7 @@ import edu.uiuc.ncsa.security.util.cli.batch.DDParser;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import edu.uiuc.ncsa.security.util.terminal.ISO6429IO;
 import edu.uiuc.ncsa.security.util.terminal.ISO6429Terminal;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;

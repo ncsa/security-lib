@@ -2,8 +2,8 @@ package edu.uiuc.ncsa.security.util.json;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableImpl;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -82,7 +82,7 @@ public class JSONEntry extends IdentifiableImpl {
      * Procedures are stored as JSON arrays of string. When one is gotten, it is returned as a list of strings.
      * @return
      */
-    public List<String> getProcedure(){
+    public List getProcedure(){
         if(rawContent == null){
             return new LinkedList<>();
         }

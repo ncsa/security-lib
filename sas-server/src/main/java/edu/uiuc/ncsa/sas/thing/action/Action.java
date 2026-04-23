@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.sas.thing.action;
 
 import edu.uiuc.ncsa.sas.SASConstants;
 import edu.uiuc.ncsa.sas.thing.Thing;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 /**
  * Models an actions, such as logon, execute, logoff, etc.

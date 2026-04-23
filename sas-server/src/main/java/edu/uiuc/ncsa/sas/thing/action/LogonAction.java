@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.sas.thing.action;
 
 import edu.uiuc.ncsa.sas.SASConstants;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 /**
  * <p>Created by Jeff Gaynor<br>

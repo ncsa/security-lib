@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.FileUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.io.*;
 import java.util.Date;

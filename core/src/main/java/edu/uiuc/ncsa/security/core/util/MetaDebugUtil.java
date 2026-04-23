@@ -1,7 +1,8 @@
 package edu.uiuc.ncsa.security.core.util;
 
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import net.sf.json.JSONObject;
+//import org.kordamp.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.Date;

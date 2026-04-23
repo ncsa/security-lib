@@ -513,7 +513,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     @Override
     public List<V> search(String key, boolean isNull) {
         String searchString = "select *  from " + getTable().getFQTablename() +
-                " where ? is " + (isNull ? "" : " not ") + " null " ;
+                " where ? is" + (isNull ? "" : " NOT") + " NULL" ;
 
         List<V> values = new ArrayList<>();
         ConnectionRecord cr = getConnection();

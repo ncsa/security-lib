@@ -3,9 +3,9 @@ package edu.uiuc.ncsa.security.util.json;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.CircularReferenceException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import net.sf.json.JSON;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSON;
+import org.kordamp.json.JSONArray;
+import org.kordamp.json.JSONObject;
 
 import java.util.HashSet;
 import java.util.Set;

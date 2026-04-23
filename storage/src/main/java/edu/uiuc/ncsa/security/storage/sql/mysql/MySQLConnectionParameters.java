@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.security.storage.sql.mysql;
 
 import edu.uiuc.ncsa.security.storage.sql.SQLConnectionImpl;
-import net.sf.json.JSONObject;
+import org.kordamp.json.JSONObject;
 
 import java.util.TimeZone;
 

@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.security.core.util;
 
 
-import net.sf.json.JSON;
-import net.sf.json.JSONSerializer;
+import org.kordamp.json.JSON;
+import org.kordamp.json.JSONSerializer;
 
 import java.math.BigDecimal;
 import java.util.*;
