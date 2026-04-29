@@ -2984,7 +2984,14 @@ public abstract class StoreCommands extends CommonCommands {
             // if no name is given, use the stored one.
             name = jsonObject.getString("name");
         }
-        JSONArray fields = jsonObject.getJSONArray("fields");
+        JSONArray xxx = jsonObject.getJSONArray("fields");
+        List<String> fields = new ArrayList<>(xxx.size());
+        for(Object o : xxx){
+            if(o instanceof String){
+                fields.add((String)o);
+
+            }
+        }
         JSONArray entries = jsonObject.getJSONArray("entries");
         List<Identifiable> x = new ArrayList<>(entries.size());
         MapConverter mapConverter = (MapConverter) getStore().getXMLConverter();

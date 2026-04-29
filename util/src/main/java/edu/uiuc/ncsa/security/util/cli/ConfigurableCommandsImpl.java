@@ -295,11 +295,11 @@ public abstract class ConfigurableCommandsImpl implements Commands {
     public static final String CONFIG_NAME_OPTION = "-name";
     public static final String CONFIG_NAME_LONG_OPTION = "-name";
 
-    public Map<Object, Object> getGlobalEnv() {
+    public Map getGlobalEnv() {
         return globalEnv;
     }
 
-    Map<Object, Object> globalEnv;
+    Map globalEnv;
     String currentEnvFile = null;
 
     protected void readEnv(String path, boolean verbose) {

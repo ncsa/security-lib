@@ -9,57 +9,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Commit, also testing to see if I can get Gtihub authentication to work.">
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Tryingt o migrate from old net.sf JSON library to something without a bunch of the bugs.">
+      <change afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/json/MyJSONUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/core/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/MetaDebugUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/MetaDebugUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/client/ClientConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/client/ClientConverter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/client/SASClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/client/SASClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/action/Action.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/action/Action.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/action/ActionDeserializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/action/ActionDeserializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/action/ExecuteAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/action/ExecuteAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/action/InvokeAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/action/InvokeAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/action/LogonAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/action/LogonAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/action/NewKeyAction.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/action/NewKeyAction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/response/LogoffResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/response/LogoffResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/response/LogonResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/response/LogonResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/response/NewKeyResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/response/NewKeyResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/response/OutputResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/response/OutputResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/response/PromptResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/response/PromptResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/response/Response.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/response/Response.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/response/ResponseSerializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/thing/response/ResponseSerializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/ResponseDeserializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/src/main/java/edu/uiuc/ncsa/sas/webclient/ResponseDeserializer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/HeaderUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/HeaderUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServiceClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServiceClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/FoundIdentifiables.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/FoundIdentifiables.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/data/MapConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/data/MapConverter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/UpkeepResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/monitored/upkeep/UpkeepResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLConnectionImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLConnectionImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionParameters.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/derby/DerbyConnectionParameters.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/mariadb/MariaDBConnectionParameters.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/mariadb/MariaDBConnectionParameters.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/mysql/MySQLConnectionParameters.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/mysql/MySQLConnectionParameters.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/postgres/PostgresConnectionParameters.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/postgres/PostgresConnectionParameters.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/AbstractCommandsImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/AbstractCommandsImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CommonCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CommonCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/json_edit/JSONEditor.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/json_edit/JSONEditor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/json_edit/JSONNodeUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/json_edit/JSONNodeUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/json/Ingester.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/json/Ingester.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/json/JSONEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/json/JSONEntry.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/json/MyJPathUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/json/MyJPathUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/json/PreProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/json/PreProcessor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JSONWebKey.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JSONWebKey.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JSONWebKeyUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JSONWebKeyUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JWKUtil2.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JWKUtil2.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/scripting/ScriptSetFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/scripting/ScriptSetFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/test/java/edu/uiuc/ncsa/security/util/JSONPreprocessorTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/test/java/edu/uiuc/ncsa/security/util/JSONPreprocessorTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -116,6 +72,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="DEPENDENCY_CHECKER_PROBLEMS_TAB" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2
 }</component>
@@ -136,60 +95,60 @@
     <option name="sortByType" value="true" />
     <option name="sortKey" value="BY_TYPE" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.CLIDriver.executor": "Debug",
-    "Application.CertUtil.executor": "Run",
-    "Application.DDParser.executor": "Run",
-    "Application.HeaderUtils.executor": "Run",
-    "Application.InputLine.executor": "Run",
-    "Application.SAS Client.executor": "Run",
-    "Application.SASCLIDriver.executor": "Run",
-    "Application.SASCommands.executor": "Debug",
-    "Application.SASWatcher.executor": "Run",
-    "Application.StoreArchiver.executor": "Run",
-    "Application.StringUtils.executor": "Run",
-    "Application.TestCCI.executor": "Run",
-    "Application.TestCommands.executor": "Run",
-    "Application.TestConfigLoader.executor": "Run",
-    "Application.UpkeepConfigUtils.executor": "Debug",
-    "Application.WebClientConfig.executor": "Run",
-    "Application.WebInstaller.executor": "Debug",
-    "DefaultHtmlFileTemplate": "HTML File",
-    "JUnit.ApacheConfigInheritenceTest.executor": "Run",
-    "JUnit.ApacheMultipleInheritenceTest.executor": "Run",
-    "JUnit.CFMultipleInheritanceTest.executor": "Debug",
-    "JUnit.Configurations2Test.executor": "Run",
-    "JUnit.configuration in core.executor": "Run",
-    "Java Scratch.Scratch.executor": "Run",
-    "Java Scratch.Scratch_5.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "JSON",
-    "jdk.selected.JAVA_MODULE": "11 (2)",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/security-lib/docs/pdf",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.5883041",
-    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.CLIDriver.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.CertUtil.executor&quot;: &quot;Run&quot;,
+    &quot;Application.DDParser.executor&quot;: &quot;Run&quot;,
+    &quot;Application.HeaderUtils.executor&quot;: &quot;Run&quot;,
+    &quot;Application.InputLine.executor&quot;: &quot;Run&quot;,
+    &quot;Application.SAS Client.executor&quot;: &quot;Run&quot;,
+    &quot;Application.SASCLIDriver.executor&quot;: &quot;Run&quot;,
+    &quot;Application.SASCommands.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.SASWatcher.executor&quot;: &quot;Run&quot;,
+    &quot;Application.StoreArchiver.executor&quot;: &quot;Run&quot;,
+    &quot;Application.StringUtils.executor&quot;: &quot;Run&quot;,
+    &quot;Application.TestCCI.executor&quot;: &quot;Run&quot;,
+    &quot;Application.TestCommands.executor&quot;: &quot;Run&quot;,
+    &quot;Application.TestConfigLoader.executor&quot;: &quot;Run&quot;,
+    &quot;Application.UpkeepConfigUtils.executor&quot;: &quot;Debug&quot;,
+    &quot;Application.WebClientConfig.executor&quot;: &quot;Run&quot;,
+    &quot;Application.WebInstaller.executor&quot;: &quot;Debug&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;JUnit.ApacheConfigInheritenceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ApacheMultipleInheritenceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.CFMultipleInheritanceTest.executor&quot;: &quot;Debug&quot;,
+    &quot;JUnit.Configurations2Test.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.configuration in core.executor&quot;: &quot;Run&quot;,
+    &quot;Java Scratch.Scratch.executor&quot;: &quot;Run&quot;,
+    &quot;Java Scratch.Scratch_5.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;JSON&quot;,
+    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;11 (2)&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/security-lib/docs/pdf&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.5883041&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "XML"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;XML&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/docs/pdf" />
@@ -697,7 +656,8 @@
       <workItem from="1771938963311" duration="35752000" />
       <workItem from="1772487688103" duration="94518000" />
       <workItem from="1775654784209" duration="3190000" />
-      <workItem from="1776167449231" duration="2424000" />
+      <workItem from="1776167449231" duration="29009000" />
+      <workItem from="1777489545805" duration="3092000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -1042,7 +1002,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="125" />
+    <option name="localTasksCounter" value="126" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1051,7 +1011,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Fix https://github.com/ncsa/security-lib/issues/52" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/53 Removed functor code &amp; tests" />
     <MESSAGE value="Batch file processign with indices. This should be kept, but probably best replaced by hijacking System.in" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/54" />
@@ -1076,7 +1035,8 @@
     <MESSAGE value="Apache Configurations removed from base Security Library." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/67" />
     <MESSAGE value="Commit, also testing to see if I can get Gtihub authentication to work." />
-    <option name="LAST_COMMIT_MESSAGE" value="Commit, also testing to see if I can get Gtihub authentication to work." />
+    <MESSAGE value="Tryingt o migrate from old net.sf JSON library to something without a bunch of the bugs." />
+    <option name="LAST_COMMIT_MESSAGE" value="Tryingt o migrate from old net.sf JSON library to something without a bunch of the bugs." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">

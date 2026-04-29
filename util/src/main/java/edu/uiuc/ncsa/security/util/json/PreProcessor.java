@@ -90,7 +90,8 @@ public class PreProcessor {
 
     public JSON execute(JSONObject object, Set<String> ids) {
         JSONObject newObject = new JSONObject();
-        for (Object key : object.keySet()) {
+        for (Object xxx : object.keySet()) { // has to be a string
+            String key = xxx.toString();
             if (key.toString().equals(IMPORT_DIRECTIVE)) {
                 Object storeKeyObject = object.get(key);
                 Identifier storeKey = null;
@@ -117,7 +118,8 @@ public class PreProcessor {
                         // The next snippet allows for over-rides: If there is already an existing key/value then
                         // it is preserved. The stored object never has the right of way.
                         storedObj = (JSONObject) execute(storedObj, ids); // return JSON object since that cannot change here.
-                        for(Object key2 : storedObj.keySet()){
+                        for(Object yyy : storedObj.keySet()){
+                            String key2 = yyy.toString();
                             if(!newObject.containsKey(key2)){
                                 newObject.put(key2, storedObj.get(key2));
                             }
