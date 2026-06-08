@@ -340,16 +340,34 @@ public class InputLine {
         return parsedInput.get(0).toLowerCase();
     }
 
+    /**
+     * Get the last argument for this input list.
+     * @return
+     */
     public String getLastArg() {
-        if (size() == 0) {
+        if (size() == 1) {
             throw new ArgumentNotFoundException();
         }
         return getArg(size() - 1);
     }
 
+    /**
+     * Does this input line have a last argument?
+     * @return
+     */
+    public boolean hasLastArg() {
+        if (size() == 1) {return false;}
+        return true;
+    }
+
+    /**
+     * Set the last argument for this input line. If there is no last argument, it adds it.
+     * @param newValue
+     */
     public void setLastArg(String newValue) {
-        if (size() == 0) {
-            throw new ArgumentNotFoundException();
+        if (size() == 1) {
+            parsedInput.add(newValue);
+            return;
         }
         parsedInput.set(size() - 1, newValue);
     }

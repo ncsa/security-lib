@@ -81,6 +81,7 @@ return ecKey;
                 }
                 if (jwk.getKeyType().getValue().equals("EC")) {
                     rsaKey = false; ecKey = true;octetKey=false;
+                    curve = jwk.toECKey().getCurve().getName();
                     privateKey = jwk.toECKey().toPrivateKey();
                     publicKey = jwk.toECKey().toPublicKey();
                     return;

@@ -2449,10 +2449,16 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     // search >client_id -r .*234.* -rs all-234
     private Date getDateFromArg(InputLine inputLine, String arg) throws ParseException {
         String computedDateString = inputLine.getNextArgFor(arg);
+        inputLine.removeSwitchAndValue(arg);
         if (computedDateString.equals("now")) {
             return new Date();
         }
-        inputLine.removeSwitchAndValue(arg);
+        try{
+            long l = Long.parseLong(computedDateString);
+            return new Date(l);
+        }catch(NumberFormatException e){
+            // benign error, try to parse it as a date.
+        }
         if (-1 == computedDateString.indexOf("T")) {
             // then there is no time, just a date. Convert to ISO
             computedDateString = computedDateString + "T00:00:00" + getTzOffset();

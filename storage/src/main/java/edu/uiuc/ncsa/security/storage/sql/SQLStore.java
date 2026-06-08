@@ -25,6 +25,8 @@ import java.sql.*;
 import java.util.*;
 import java.util.Date;
 
+import static java.sql.Types.BIGINT;
+
 /**
  * Top-level SQL store object. A store is simply a logical analog of a hash table, where the key
  * is the primary key. This in practice may front multiple tables. This implements several of the
@@ -420,11 +422,22 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             if (hasKey) {
                 stmt.setString(pIndex++, condition);
             }
+            // Fix for https://github.com/ncsa/security-lib/issues/70. Use the table type of the reuqested data field
+            // to set the correct value.
             if (hasAfter) {
-                stmt.setDate(pIndex++, new java.sql.Date(after.getTime()));
+                if(getTable().getColumnDescriptor().get(dateField).getType() == BIGINT){
+                    stmt.setLong(pIndex++, after.getTime());
+                }else{
+                    stmt.setDate(pIndex++, new java.sql.Date(after.getTime()));
+                }
             }
             if (hasBefore) {
-                stmt.setDate(pIndex++, new java.sql.Date(before.getTime()));
+                if(getTable().getColumnDescriptor().get(dateField).getType() == BIGINT){
+                    stmt.setLong(pIndex++, before.getTime());
+                }else{
+                    java.sql.Date dd = new java.sql.Date(before.getTime());
+                    stmt.setDate(pIndex++, dd);
+                }
             }
             stmt.executeQuery();
             ResultSet rs = stmt.getResultSet();

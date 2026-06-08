@@ -209,8 +209,8 @@ public class GenericStoreUtils {
             if(v==null){
                 throw new UnregisteredObjectException("No object in the store with id "+id+" found for update");
             }
-            Map<String, Object> oldObject = new HashMap<>();
-            Map<String, Object> newObject = new HashMap<>();
+            XMLMap oldObject = new XMLMap();
+            Map newObject = new XMLMap();
             xmlConverter.toMap(v, oldObject);
             xmlConverter.toMap(m.get(id), newObject);
             oldObject.putAll(newObject);

@@ -422,7 +422,7 @@ public class JWKUtil2 implements Serializable {
      *
      * @return
      */
-    protected String createID() {
+    public String createID() {
         return createID(getIdLength());
     }
 

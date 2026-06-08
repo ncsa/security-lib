@@ -486,6 +486,7 @@ public abstract class StoreCommands extends CommonCommands {
     public static final String SEARCH_BEFORE_TS_FLAG = "-before";
     public static final String SEARCH_AFTER_TS_FLAG = "-after";
     public static final String SEARCH_DATE_FLAG = "-date";
+    public static final String SEARCH_LONG_DATE_FLAG = "-long_date";
     public static final String SEARCH_IS_NULL_FLAG = "-isNull";
 
     public HashMap<String, RSRecord> getResultSets() {
@@ -2468,10 +2469,16 @@ public abstract class StoreCommands extends CommonCommands {
     // search >client_id -r .*234.* -rs all-234
     private Date getDateFromArg(InputLine inputLine, String arg) throws ParseException {
         String computedDateString = inputLine.getNextArgFor(arg);
+        inputLine.removeSwitchAndValue(arg);
         if (computedDateString.equals("now")) {
             return new Date();
         }
-        inputLine.removeSwitchAndValue(arg);
+        try{
+            long l = Long.parseLong(computedDateString);
+            return new Date(l);
+        }catch(NumberFormatException e){
+            // benign error, try to parse it as a date.
+        }
         if (-1 == computedDateString.indexOf("T")) {
             // then there is no time, just a date. Convert to ISO
             computedDateString = computedDateString + "T00:00:00" + getTzOffset();

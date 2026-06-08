@@ -10,12 +10,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Tryingt o migrate from old net.sf JSON library to something without a bunch of the bugs.">
-      <change afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/json/MyJSONUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/IdentifiableMap.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/GenericStoreUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/GenericStoreUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/json/PreProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/json/PreProcessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/InputLine.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/InputLine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JSONWebKey.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JSONWebKey.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JWKUtil2.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JWKUtil2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -42,7 +46,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="Change_id" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -128,7 +132,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;JSON&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;jdk.selected.JAVA_MODULE&quot;: &quot;11 (2)&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/security-lib/docs/pdf&quot;,
@@ -658,6 +662,9 @@
       <workItem from="1775654784209" duration="3190000" />
       <workItem from="1776167449231" duration="29009000" />
       <workItem from="1777489545805" duration="3092000" />
+      <workItem from="1778503172626" duration="599000" />
+      <workItem from="1778611402176" duration="2601000" />
+      <workItem from="1779104733646" duration="59800000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -1011,7 +1018,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="https://github.com/ncsa/security-lib/issues/53 Removed functor code &amp; tests" />
     <MESSAGE value="Batch file processign with indices. This should be kept, but probably best replaced by hijacking System.in" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/54" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/54 part 2. Misc. cleanup" />
@@ -1036,7 +1042,8 @@
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/67" />
     <MESSAGE value="Commit, also testing to see if I can get Gtihub authentication to work." />
     <MESSAGE value="Tryingt o migrate from old net.sf JSON library to something without a bunch of the bugs." />
-    <option name="LAST_COMMIT_MESSAGE" value="Tryingt o migrate from old net.sf JSON library to something without a bunch of the bugs." />
+    <MESSAGE value="Trying to refactor change_id code. Did not work since too many overrides in OA4MP. Good ideas though, may/should revisit." />
+    <option name="LAST_COMMIT_MESSAGE" value="Trying to refactor change_id code. Did not work since too many overrides in OA4MP. Good ideas though, may/should revisit." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -1129,7 +1136,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/InputLine.java</url>
-          <line>770</line>
+          <line>788</line>
           <option name="timeStamp" value="106" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
