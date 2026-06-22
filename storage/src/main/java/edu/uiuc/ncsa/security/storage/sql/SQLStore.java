@@ -714,6 +714,10 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
 
     public V remove(Object key) {
         V oldObject = null;
+        if (key.getClass().isInstance(oldObject)){ // cheap trick to see if the key is an instance of the class parameter.
+            oldObject = (V) key;
+            key = oldObject.getIdentifier();
+        }
         try {
             oldObject = get(key);
         } catch (GeneralException x) {

@@ -486,7 +486,6 @@ public abstract class StoreCommands extends CommonCommands {
     public static final String SEARCH_BEFORE_TS_FLAG = "-before";
     public static final String SEARCH_AFTER_TS_FLAG = "-after";
     public static final String SEARCH_DATE_FLAG = "-date";
-    public static final String SEARCH_LONG_DATE_FLAG = "-long_date";
     public static final String SEARCH_IS_NULL_FLAG = "-isNull";
 
     public HashMap<String, RSRecord> getResultSets() {
@@ -2321,6 +2320,7 @@ public abstract class StoreCommands extends CommonCommands {
         say(blanks + "YYYY-MM-DD or time, e.g. 2021-04-05T13:00:00Z");
         say(blanks + "would at 1 pm in UTC. If you do not supply a final Z or other timezone");
         say(blanks + "(+-HH:mm) then your current timezone is used.");
+        say("You may also use ms from the epoch, e.g. 1780704000000");
         say(blanks + "To search on a date range (i.e. between two times) specify both your");
         say(blanks + "before and after dates. Date searches are inclusive of the dates.");
         say(blanks + "For SQL stores you may search booleans as 1 (true) or 0 false.");
@@ -2374,6 +2374,10 @@ public abstract class StoreCommands extends CommonCommands {
         say("This returns the most recent 15 entries to this store. An argument of -15 woudl return the oldest 15.");
         say("E.g. search for a subset");
         say("clients>search -n 5 -out [name, creation_ts, client_id]");
+        say("E.g. search for dates using ISO or integers, the follolwing are identical:\n");
+        sayi("search >vi oa4mp:/vi/default -date exp -before 1780704000000\n");
+        say("as well as\n");
+        sayi("search >vi oa4mp:/vi/default -date exp -before 2026-06-05T00:00:00Z");
         say("\nSee also: rs");
     }
 
@@ -4086,6 +4090,7 @@ public abstract class StoreCommands extends CommonCommands {
         sayi("     Only use this if e.g. the store itself cannot load the object and removing it is the only path forward.");
         showKeyShorthandHelp();
         printIndexHelp(false);
+        say("You may, of courese, specify a result set and remove all entries.");
         say("E.g.");
         sayi("rm " + KEY_SHORTHAND_PREFIX + "error_uri foo:bar");
         sayi("Removes the value of the property 'error_uri' from the object with id foo:bar");
