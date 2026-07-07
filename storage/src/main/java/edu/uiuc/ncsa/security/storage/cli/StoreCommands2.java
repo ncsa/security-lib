@@ -61,6 +61,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         this(driver);
         this.environment = environment;
     }
+
     public StoreCommands2(AbstractEnvironment environment) throws Throwable {
         this((CLIDriver) null);
         this.environment = environment;
@@ -135,7 +136,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     public static String UPKEEP_FLAG_ENABLE = "-enable";
 
     protected void showUpkeepHelp(InputLine inputLine) throws Exception {
-        if(inputLine.hasArg("-ex")){
+        if (inputLine.hasArg("-ex")) {
             say("Complete sample upkeep configuration:\n");
             say("<upkeep testOnly=\"true\"\n" +
                     "        debug=\"true\"\n" +
@@ -512,7 +513,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         if (showHelp(inputLine)) {
             if (inputLine.hasArg("-ex")) {
                 showSearchHelpExamples();
-            }else{
+            } else {
                 showSearchHelp();
             }
             return;
@@ -594,7 +595,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         if (hasDate) {
             dateField = inputLine.getNextArgFor(SEARCH_DATE_FLAG);
             inputLine.removeSwitchAndValue(SEARCH_DATE_FLAG);
-            if(!getKeys().allKeys().contains(dateField)) {
+            if (!getKeys().allKeys().contains(dateField)) {
                 say("The date field \"" + dateField + "\" does not exist.");
                 return;
             }
@@ -1339,7 +1340,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
 
     private void showClearIDHelp() {
         say("clear_id");
-        sayi("Usage: Clears the current defualt identifier.");
+        sayi("Usage: Clears the current default identifier.");
         say("See also: set_id, get_id");
     }
 
@@ -1642,7 +1643,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                     out = new FoundIdentifiables(true, rs.rs);
                 }
             }
-         //   inputLine.removeLastArg();
+            //   inputLine.removeLastArg();
             return out;
         }
         try {
@@ -1951,7 +1952,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                 }
             }
             // Fix https://github.com/ncsa/security-lib/issues/52
-           allEntries = listEntries(loadAllEntries(), listSingleLines, listMultiLines); // list it all
+            allEntries = listEntries(loadAllEntries(), listSingleLines, listMultiLines); // list it all
             return;
         }
         String key = getKeyArg(inputLine, true); // grab if there, remove it
@@ -1961,22 +1962,19 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         // for the index. Therefore, if nothing comes back grom findItems
         // they mean to do this on the whole store.
         boolean useAll = (!hasID()) && inputLine.getArgCount() == 0;
-        FoundIdentifiables identifiables = findItem(inputLine);
-        if (identifiables == null) {
-            if (useAll) {
-                if (allEntries == null || allEntries.size() == 0) {
-                    loadAllEntries();
-                }
-                if (allEntries == null || allEntries.size() == 0) {
-                    say("Sorry, no objects found.");
-                    return;
-                }
-                identifiables = new FoundIdentifiables(allEntries);
-                identifiables.setRS(false);
-            }else {
+        FoundIdentifiables identifiables;
+        if (useAll) {
+            if (allEntries == null || allEntries.size() == 0) {
+                loadAllEntries();
+            }
+            if (allEntries == null || allEntries.size() == 0) {
                 say("Sorry, no objects found.");
                 return;
             }
+            identifiables = new FoundIdentifiables(allEntries);
+            identifiables.setRS(false);
+        } else {
+            identifiables = findItem(inputLine);
         }
 
         if (key != null) {
@@ -2453,10 +2451,10 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         if (computedDateString.equals("now")) {
             return new Date();
         }
-        try{
+        try {
             long l = Long.parseLong(computedDateString);
             return new Date(l);
-        }catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             // benign error, try to parse it as a date.
         }
         if (-1 == computedDateString.indexOf("T")) {
@@ -2973,9 +2971,9 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         }
         JSONArray xxx = jsonObject.getJSONArray("fields");
         List<String> fields = new ArrayList<>(xxx.size());
-        for(Object o : xxx){
-            if(o instanceof String){
-                fields.add((String)o);
+        for (Object o : xxx) {
+            if (o instanceof String) {
+                fields.add((String) o);
             }
         }
         JSONArray entries = jsonObject.getJSONArray("entries");
@@ -3021,10 +3019,10 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                 say(center(key, width) + "|  " + center(Integer.toString(getResultSets().get(key).rs.size()), sizeWidth));
             }
             say("\n" + getResultSets().size() + " result sets processed");
-        }else{
+        } else {
             // case of a single result set.
             String name = inputLine.getLastArg();
-            if(!getResultSets().containsKey(name)){
+            if (!getResultSets().containsKey(name)) {
                 say("no such result set \"" + name + "\"");
                 return;
             }
@@ -3225,9 +3223,9 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                     if (v instanceof JSON) {
                         say(((JSON) v).toString(1));
                     } else {
-                        if(v == null){
+                        if (v == null) {
                             say("(no value)");
-                        }else {
+                        } else {
                             say(v.toString());
                         }
                     }
@@ -3885,8 +3883,8 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             return;
         }
         // Fixes https://github.com/ncsa/security-lib/issues/54
-        String key = getKeyArg(inputLine, false  );
-        if(key != null && null == getAndCheckKeyArg(inputLine)){
+        String key = getKeyArg(inputLine, false);
+        if (key != null && null == getAndCheckKeyArg(inputLine)) {
             say("unknown key \"" + key + "\"");
             return;
         }
@@ -4341,6 +4339,8 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             inputLine.reparse();
             return list;
         }
+        // Singleton
+        inputLine.removeSwitchAndValue(key);
         return "[" + keyArg + "]";
     }
 

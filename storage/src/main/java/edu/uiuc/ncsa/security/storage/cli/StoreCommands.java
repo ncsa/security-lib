@@ -1329,7 +1329,7 @@ public abstract class StoreCommands extends CommonCommands {
 
     private void showClearIDHelp() {
         say("clear_id");
-        sayi("Usage: Clears the current defualt identifier.");
+        sayi("Usage: Clears the current default identifier.");
         say("See also: set_id, get_id");
     }
 
@@ -4366,6 +4366,7 @@ public abstract class StoreCommands extends CommonCommands {
             inputLine.reparse();
             return list;
         }
+        inputLine.removeSwitchAndValue(key);
         return "[" + keyArg + "]";
     }
 

@@ -9,10 +9,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Fix for https://github.com/ncsa/security-lib/issues/70">
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Added edge case to SQLStore for removing by object, not just ID">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -88,7 +88,6 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
     <option name="showMembers" value="true" />
-    <option name="showModules" value="false" />
     <option name="sortByType" value="true" />
     <option name="sortKey" value="BY_TYPE" />
   </component>
@@ -659,7 +658,9 @@
       <workItem from="1778611402176" duration="2601000" />
       <workItem from="1779104733646" duration="88674000" />
       <workItem from="1781435502453" duration="325000" />
-      <workItem from="1781435880280" duration="21930000" />
+      <workItem from="1781435880280" duration="22641000" />
+      <workItem from="1782815347439" duration="622000" />
+      <workItem from="1783250213160" duration="8430000" />
     </task>
     <task id="LOCAL-00001" summary="Removed a ton of old, unused code. Added version info to online help.">
       <created>1675465508314</created>
@@ -1004,7 +1005,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="127" />
+    <option name="localTasksCounter" value="128" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1013,7 +1014,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="https://github.com/ncsa/security-lib/issues/54" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/54 part 2. Misc. cleanup" />
     <MESSAGE value="web installer improvements" />
     <MESSAGE value="Routine checkin" />
@@ -1038,7 +1038,8 @@
     <MESSAGE value="Tryingt o migrate from old net.sf JSON library to something without a bunch of the bugs." />
     <MESSAGE value="Trying to refactor change_id code. Did not work since too many overrides in OA4MP. Good ideas though, may/should revisit." />
     <MESSAGE value="Fix for https://github.com/ncsa/security-lib/issues/70" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix for https://github.com/ncsa/security-lib/issues/70" />
+    <MESSAGE value="Added edge case to SQLStore for removing by object, not just ID" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added edge case to SQLStore for removing by object, not just ID" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
