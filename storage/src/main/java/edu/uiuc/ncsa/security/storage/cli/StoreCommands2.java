@@ -1163,17 +1163,22 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         int i = 0;
         getSortable().setState(null);
         entries = getSortable().sort(entries);
+        int countLength = Integer.toString(entries.size()).length();
+
         for (Identifiable x : entries) {
             if (lineList) {
                 longFormat(x);
                 say("----");
             } else {
-                say((i++) + ". " + format(x));
+                say(formatCounter(i++, countLength) + ". " + format(x));
             }
         }
         return entries;
     }
-
+    protected String formatCounter(int count, int countLength) {
+        String s = Integer.toString(count);
+        return StringUtils.RJustify(s, countLength);
+    }
     protected void showCreateHelp() {
         say("create [id]\n");
         sayi("Usage: Create a new entry in the currently active store.");

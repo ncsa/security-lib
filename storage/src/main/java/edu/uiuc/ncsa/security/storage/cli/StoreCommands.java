@@ -128,7 +128,7 @@ public abstract class StoreCommands extends CommonCommands {
     public static String UPKEEP_FLAG_ENABLE = "-enable";
 
     protected void showUpkeepHelp(InputLine input) {
-        if(input.hasArg("-ex")){
+        if (input.hasArg("-ex")) {
             say("Complete sample upkeep configuration:\n");
             say("<upkeep testOnly=\"true\"\n" +
                     "        debug=\"true\"\n" +
@@ -1152,15 +1152,21 @@ public abstract class StoreCommands extends CommonCommands {
         int i = 0;
         getSortable().setState(null);
         entries = getSortable().sort(entries);
+        int countLength = Integer.toString(entries.size()).length();
         for (Identifiable x : entries) {
             if (lineList) {
                 longFormat(x);
                 say("----");
             } else {
-                say((i++) + ". " + format(x));
+                say(formatCounter(i++, countLength) + ". " + format(x));
             }
         }
         return entries;
+    }
+
+    protected String formatCounter(int count, int countLength) {
+        String s = Integer.toString(count);
+        return StringUtils.RJustify(s, countLength);
     }
 
     protected void showCreateHelp() {
@@ -2477,10 +2483,10 @@ public abstract class StoreCommands extends CommonCommands {
         if (computedDateString.equals("now")) {
             return new Date();
         }
-        try{
+        try {
             long l = Long.parseLong(computedDateString);
             return new Date(l);
-        }catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             // benign error, try to parse it as a date.
         }
         if (-1 == computedDateString.indexOf("T")) {
@@ -2997,9 +3003,9 @@ public abstract class StoreCommands extends CommonCommands {
         }
         JSONArray xxx = jsonObject.getJSONArray("fields");
         List<String> fields = new ArrayList<>(xxx.size());
-        for(Object o : xxx){
-            if(o instanceof String){
-                fields.add((String)o);
+        for (Object o : xxx) {
+            if (o instanceof String) {
+                fields.add((String) o);
 
             }
         }

@@ -58,4 +58,18 @@ public class JSONWebKeys extends HashMap<String, JSONWebKey> implements Serializ
         }
         put(webKey.id, webKey);
     }
+
+    /**
+     * Set if this set is a normalized set from another set of keys. See {@link JWKUtil2#normalize(JSONWebKeys)}
+     * @return
+     */
+    public boolean isNormalized() {
+        return normalized;
+    }
+
+    public void setNormalized(boolean normalized) {
+        this.normalized = normalized;
+    }
+
+    boolean normalized = false;
 }

@@ -103,25 +103,25 @@ return ecKey;
     }
 
     /**
-     * Is the current key expired? I.e., is
+     * Is the current key expired? I.e., is the expiration before now
      * <pre>
      *     exp < now
      * </pre>
      * @return
      */
     public boolean isExpired(){
-        return expiresAt != null && expiresAt.before(new Date());
+        return expiresAt != null && (expiresAt).before(new Date());
     }
 
     /**
-     * Is the current key valid yet?, I.e., is
+     * Is the current key valid yet?, I.e., is now after the not before time.
      * <pre>
      *     now < nbf (not before)
      * </pre>
      * @return
      */
     public boolean isValid(){
-        return notValidBefore == null || notValidBefore.after(new Date());
+        return notValidBefore == null || (new Date()).after(notValidBefore);
     }
 
     /**

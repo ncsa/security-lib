@@ -2,17 +2,17 @@ package edu.uiuc.ncsa.security.util.jwk;
 
 import com.nimbusds.jose.Algorithm;
 import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.*;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.kordamp.json.JSON;
 import org.kordamp.json.JSONArray;
 import org.kordamp.json.JSONObject;
 import org.kordamp.json.JSONSerializer;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -437,4 +437,46 @@ public class JWKUtil2 implements Serializable {
     protected String bigIntToString(BigInteger bigInteger) {
         return Base64.encodeBase64URLSafeString(bigInteger.toByteArray());
     }
-}
+    /**
+     * This will snoop the web keys and return the unexpired, valid key from the set.
+     * If possible, it will set the default ID to the same algorithm as the previous
+     * default. It is up to you to, e.g., update the keystore if the set has been normalized
+     * (check the {@link JSONWebKeys#isNormalized()} method.)
+     * @param jsonWebKeys
+     * @return
+     */
+    public JSONWebKeys normalize(JSONWebKeys jsonWebKeys) {
+        boolean doDefaultID = jsonWebKeys.hasDefaultKey();
+        boolean defaultKeyValid = true;
+        boolean defaultKeyExpired = false;
+        String defaultID = null;
+        String defaultAlg = null; // algorithm of current default
+        JSONWebKeys normalizedJsonWebKeys = new JSONWebKeys(null);
+        String fallbackDefaultID = null;
+        if(doDefaultID) {
+            defaultID = jsonWebKeys.getDefaultKeyID();
+            defaultAlg = jsonWebKeys.getDefault().algorithm;
+            defaultKeyValid = jsonWebKeys.getDefault().isValid();
+            defaultKeyExpired = jsonWebKeys.getDefault().isExpired();
+            if(defaultKeyValid && !defaultKeyExpired) {
+               normalizedJsonWebKeys.setDefaultKeyID(defaultID); // should not change
+                doDefaultID = false; // do it won't get reset below
+            }
+        }
+        for(String k : jsonWebKeys.keySet()){
+            JSONWebKey currentJWK = jsonWebKeys.get(k);
+            if(currentJWK.isValid() && !currentJWK.isExpired()){ // retain it
+                normalizedJsonWebKeys.put(currentJWK);
+                if(doDefaultID && !currentJWK.id.equals(defaultID)){
+                    if(defaultAlg.equals(currentJWK.algorithm)){
+                        normalizedJsonWebKeys.setDefaultKeyID(currentJWK.id);
+                    }
+                }
+            }else{
+                normalizedJsonWebKeys.setNormalized(true); // Something changed.
+            }
+        }
+        return normalizedJsonWebKeys;
+    }
+
+  }
