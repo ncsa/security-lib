@@ -1102,6 +1102,25 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     protected abstract String format(Identifiable identifiable);
 
     /**
+     * Similar to {@link #format(Identifiable), this passes the offset from the left
+     * margin. This is, in fact, always called. If the offset does nothing. just
+     * pass the call on to that method. This is mostly used by stores whose short format
+     * includes line breaks.
+     * @param identifiable
+     * @param offset
+     * @return
+     */
+    protected abstract String format(Identifiable identifiable, int offset );
+
+    /**
+     * This is the column header printed before the short format list command. It is optional.
+     *
+     * @param offset -- the number of columns on the left the system is using for numbers.
+     * @return
+     */
+    protected abstract String columnHeader(int offset);
+
+    /**
      * Give a long (multi-line) formatted object. This should allow users to see everything cleanly.
      * This assumes the long format, not the verbose
      *
@@ -1164,21 +1183,28 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         getSortable().setState(null);
         entries = getSortable().sort(entries);
         int countLength = Integer.toString(entries.size()).length();
-
+        if (!lineList) {
+            String header = columnHeader(countLength);
+            if(!isTrivial(header)) {
+                say(header);
+            }
+        }
         for (Identifiable x : entries) {
             if (lineList) {
                 longFormat(x);
                 say("----");
             } else {
-                say(formatCounter(i++, countLength) + ". " + format(x));
+                say(formatCounter(i++, countLength) + ". " + format(x, countLength));
             }
         }
         return entries;
     }
+
     protected String formatCounter(int count, int countLength) {
         String s = Integer.toString(count);
         return StringUtils.RJustify(s, countLength);
     }
+
     protected void showCreateHelp() {
         say("create [id]\n");
         sayi("Usage: Create a new entry in the currently active store.");

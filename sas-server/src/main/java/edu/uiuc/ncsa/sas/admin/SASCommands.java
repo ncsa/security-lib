@@ -28,6 +28,8 @@ import java.security.KeyPair;
 import java.util.List;
 import java.util.Vector;
 
+import static edu.uiuc.ncsa.security.core.util.StringUtils.pad2;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 8/15/22 at  2:48 PM
@@ -129,6 +131,13 @@ public class SASCommands extends StoreCommands {
 
     }
 
+    @Override
+    protected String columnHeader(int offset) {
+        return StringUtils.getBlanks(offset+1) +
+                pad2("name",20) + " | " +
+                pad2("identifier", 60) +
+                " | creation timestamp";
+    }
 
     @Override
     protected String format(Identifiable identifiable) {
@@ -136,12 +145,16 @@ public class SASCommands extends StoreCommands {
         String rc = "";
 
         String name = (client.getName() == null ? "no name" : client.getName());
-        name = StringUtils.pad2(name, 20);
-        rc = rc + name + " | " + StringUtils.pad2(identifiable.getIdentifierString(), 60);
+        name = pad2(name, 20);
+        rc = rc + name + " | " + pad2(identifiable.getIdentifierString(), 60);
         rc = rc + " | created on " + Iso8601.date2String(client.getCreationTS());
         return rc;
     }
 
+    @Override
+    protected String format(Identifiable identifiable, int offset) {
+        return format(identifiable);
+    }
 
     public static String CONFIG_NAME_FLAG = "-name";
     public static String CONFIG_FILE_FLAG = "-cfg";
