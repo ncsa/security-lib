@@ -73,6 +73,11 @@ been adopted and the Java Date and Calendar classes were mostly broken to boot.
  */
 public class Iso8601 {
     /**
+     * Every formatted ISO 8601 data from this utility has the same length.
+     */
+    public static final int ISO_8601_FORMAT_LENGTH = 24;
+
+    /**
      * Convert a date to a string in the format
      * <blockquote><pre>yyyy-MM-dd'T'HH:mm:ss.SSS'Z'</pre></blockquote>
      * where "Z" represents UTC.

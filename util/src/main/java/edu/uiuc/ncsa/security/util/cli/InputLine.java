@@ -222,6 +222,36 @@ public class InputLine {
     }
 
     /**
+     * truncates the input line at the arg and removes the arg. E.g. if that arg is
+     *
+     * <pre>
+     *     foo A B C D E F
+     * </pre>
+     * then truncate(C) returns
+     * <pre>
+     *     foo A B
+     * </pre>
+     * Also note that this works from the left, so
+     * <pre>
+     *     foo A B C P Q R C D E
+     * </pre>
+     * would be truncated on C to
+     * <pre>
+     *     foo A B
+     * </pre>
+     * @param arg
+     */
+    public void truncate(String arg){
+        ArrayList<String> newParsedInput = new ArrayList<>();
+        for(String s : parsedInput){
+            if(s.equals(arg)){
+                parsedInput = newParsedInput;
+                return;
+            }
+            newParsedInput.add(s);
+        }
+    }
+    /**
      * removes a list of switches and their values. This may be used for related switchs, e.g.
      * <pre>
      *     removeSwitchAndValue(MY_SWITCH, MY_SHORT_SWITCH, MY_SHORTER_SWITCH);
@@ -883,6 +913,9 @@ public class InputLine {
         System.out.println(inputLine1);
         inputLine1 = new InputLine("set_param", "-a", "scope", "read: write: x.y:");
         System.out.println(inputLine1);
+        inputLine1.truncate("scope");
+        System.out.println("after truncate at scope:" + inputLine1);
+        System.out.println("has scope? " + inputLine1.hasArg("scope"));
     }
 
     /**

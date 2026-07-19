@@ -52,6 +52,10 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.*;
  */
 public abstract class StoreCommands2 extends CommonCommands2 {
 
+    /**
+     * Spacer for all short format methods. This puts it in a central location.
+     */
+    public static final String STILE = " | ";
 
     public StoreCommands2(CLIDriver driver) {
         super(driver);
@@ -794,6 +798,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         while (start < 0) {
             start = start + values.size();
         }
+        int countLength = Integer.toString(limits.size()).length();
         for (Object key : limits) {
 
             int i;
@@ -837,7 +842,15 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                     }
                     table.add(row);
                 } else {
-                    say(format(identifiable));
+                    if(i == 0) {
+                        String header = columnHeader(countLength);
+                        if (!isTrivial(header)) {
+                            say(header);
+                        }
+                    }
+
+                    say(formatCounter(i++, countLength) + ". " + format(identifiable, countLength));
+                  //  say(format(identifiable,0));
                 }
 
             }
@@ -1173,7 +1186,10 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     }
 
 
-    protected List<Identifiable> listEntries(List<Identifiable> entries, boolean lineList, boolean verboseList) {
+    protected List<Identifiable> listEntries(List<Identifiable> entries,
+                                             boolean showVersions,
+                                             boolean lineList,
+                                             boolean verboseList) {
         if (entries.isEmpty()) {
             say("(no entries found)");
             return entries;
@@ -1190,6 +1206,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             }
         }
         for (Identifiable x : entries) {
+            if(StoreArchiver.isVersioned(x.getIdentifier()) && !showVersions) {continue;}
             if (lineList) {
                 longFormat(x);
                 say("----");
@@ -1870,10 +1887,13 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         say("ls [flags] [>key key | " + KEYS_FLAG + " list] index");
         sayi("Usage: Show information about an object or objects.");
         sayi("flags are");
+        sayi(StringUtils.RJustify(SHOW_HEADER, 4) + " = " + "List the header of the short form only.");
         sayi(StringUtils.RJustify(LINE_LIST_COMMAND, 4) + " = " + "line list of an object or all objects. Longer entries will be truncated.");
         sayi(StringUtils.RJustify(ALL_LIST_COMMAND, 4) + " = " + " list of **every** entry in the store. You have been warned.");
         sayi(StringUtils.RJustify(VERBOSE_COMMAND, 4) + " = " + "verbose list. All entries will be shown in their entirety.");
         sayi(StringUtils.RJustify(LOAD_ONLY_COMMAND, 4) + " = " + "Loads the entire store into memory, displaying nothing.");
+        sayi(StringUtils.RJustify(SHOW_VERSIONS_LIST_COMMAND, 4) + " = " + "Show versioned IDs as well");
+        sayi(StringUtils.RJustify(SHOW_VERSIONS_LIST_COMMAND, 4) + " = " + "Show versioned IDs as well");
         sayi(blanks + "Use with care! A really large store may swamp your machine and crash it.");
         sayi(blanks + "Note: If you are going to refer to objects by their numerical index, you will need to");
         say(blanks + "       load the store explicitly first with this flag.");
@@ -1892,17 +1912,26 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         sayi(blanks + "from the result set my_results. Remember that this prints what is in the store, not the result set");
         sayi(blanks + "To print the result set, use the rs command.");
         sayi("ls " + KEY_SHORTHAND_PREFIX + "cfg foo:bar = show the value of the cfg property in the object with ID foo:bar");
+        String colHeader = columnHeader(0);
+        if(!StringUtils.isTrivial(colHeader)) {
+            say("Short form of the listing has the header");
+            say(columnHeader(0));
+
+        }
     }
 
     protected final String LINE_LIST_COMMAND = "-l";
+    protected final String SHOW_VERSIONS_LIST_COMMAND = "-versions";
     protected final String ALL_LIST_COMMAND = "-E";
     protected final String LOAD_ONLY_COMMAND = "-load";
     protected final String VERBOSE_COMMAND = "-v";
+    protected final String SHOW_HEADER = "-header";
 
     protected boolean hasId() {
         return idList != null;
     }
 
+/*
     protected void oldls1(InputLine inputLine) throws Throwable {
 
         boolean listAll = inputLine.hasArg(ALL_LIST_COMMAND);
@@ -1950,8 +1979,18 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             }
         }
     }
+*/
 
     public void ls(InputLine inputLine) throws Throwable {
+        if(inputLine.hasArg(SHOW_HEADER)) {
+            String h = columnHeader(0);
+            if(StringUtils.isTrivial(h)) {
+                say("none");
+            }else {
+                say(h);
+            }
+            return;
+        }
         if (showHelp(inputLine)) {
             showLSHelp();
             return;
@@ -1961,6 +2000,9 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             say("all " + allEntries.size() + " entries from store loaded");
             return;
         }
+
+        boolean showVersions = inputLine.hasArg(SHOW_VERSIONS_LIST_COMMAND);
+        inputLine.removeSwitch(SHOW_VERSIONS_LIST_COMMAND);
         boolean listAll = inputLine.hasArg(ALL_LIST_COMMAND);
         boolean listSingleLines = inputLine.hasArg(LINE_LIST_COMMAND);
         boolean listMultiLines = inputLine.hasArg(VERBOSE_COMMAND);
@@ -1983,7 +2025,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                 }
             }
             // Fix https://github.com/ncsa/security-lib/issues/52
-            allEntries = listEntries(loadAllEntries(), listSingleLines, listMultiLines); // list it all
+            allEntries = listEntries(loadAllEntries(), showVersions, listSingleLines, listMultiLines); // list it all
             return;
         }
         String key = getKeyArg(inputLine, true); // grab if there, remove it
@@ -2046,6 +2088,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         }
 
         int count = 0;
+        int countLength = Integer.toString(identifiables.size()).length();
         for (Identifiable identifiable : identifiables) {
             if (identifiables.isRS()) { // list the stored version, not the one in the RS!
                 identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
@@ -2056,7 +2099,14 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                 if (listMultiLines) {
                     longFormat(identifiable, true);
                 } else {
-                    say(format(identifiable));
+                    if(count == 0) {
+                        String header = columnHeader(countLength);
+                        if (!isTrivial(header)) {
+                            say(header);
+                        }
+                    }
+                    say(formatCounter(count, countLength) + ". " + format(identifiable, countLength));
+                  //  say(format(identifiable));
                 }
             }
             count++;
@@ -3894,7 +3944,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     }
 
     protected String archiveFormat(Identifiable id) {
-        return format(id);
+        return format(id,0);
     }
 
 
