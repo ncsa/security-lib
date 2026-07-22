@@ -799,6 +799,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             start = start + values.size();
         }
         int countLength = Integer.toString(limits.size()).length();
+        int[] fieldWidths = fieldWidths(limits);
         for (Object key : limits) {
 
             int i;
@@ -843,13 +844,13 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                     table.add(row);
                 } else {
                     if(i == 0) {
-                        String header = columnHeader(countLength);
+                        String header = columnHeader(countLength, fieldWidths);
                         if (!isTrivial(header)) {
                             say(header);
                         }
                     }
 
-                    say(formatCounter(i++, countLength) + ". " + format(identifiable, countLength));
+                    say(formatCounter(i++, countLength) + ". " + format(identifiable, countLength, fieldWidths));
                   //  say(format(identifiable,0));
                 }
 
@@ -1123,7 +1124,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
      * @param offset
      * @return
      */
-    protected abstract String format(Identifiable identifiable, int offset );
+    protected abstract String format(Identifiable identifiable, int offset, int[] fieldWidths );
 
     /**
      * This is the column header printed before the short format list command. It is optional.
@@ -1131,7 +1132,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
      * @param offset -- the number of columns on the left the system is using for numbers.
      * @return
      */
-    protected abstract String columnHeader(int offset);
+    protected abstract String columnHeader(int offset, int[] fieldWidths);
 
     /**
      * Give a long (multi-line) formatted object. This should allow users to see everything cleanly.
@@ -1199,8 +1200,9 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         getSortable().setState(null);
         entries = getSortable().sort(entries);
         int countLength = Integer.toString(entries.size()).length();
+        int[] fieldWidths = fieldWidths(entries);
         if (!lineList) {
-            String header = columnHeader(countLength);
+            String header = columnHeader(countLength, fieldWidths);
             if(!isTrivial(header)) {
                 say(header);
             }
@@ -1211,7 +1213,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                 longFormat(x);
                 say("----");
             } else {
-                say(formatCounter(i++, countLength) + ". " + format(x, countLength));
+                say(formatCounter(i++, countLength) + ". " + format(x, countLength, fieldWidths));
             }
         }
         return entries;
@@ -1912,10 +1914,10 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         sayi(blanks + "from the result set my_results. Remember that this prints what is in the store, not the result set");
         sayi(blanks + "To print the result set, use the rs command.");
         sayi("ls " + KEY_SHORTHAND_PREFIX + "cfg foo:bar = show the value of the cfg property in the object with ID foo:bar");
-        String colHeader = columnHeader(0);
+        String colHeader = columnHeader(0, new int[0]);
         if(!StringUtils.isTrivial(colHeader)) {
             say("Short form of the listing has the header");
-            say(columnHeader(0));
+            say(columnHeader(0, new int[0]));
 
         }
     }
@@ -1983,7 +1985,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
 
     public void ls(InputLine inputLine) throws Throwable {
         if(inputLine.hasArg(SHOW_HEADER)) {
-            String h = columnHeader(0);
+            String h = columnHeader(0, new int[0]);
             if(StringUtils.isTrivial(h)) {
                 say("none");
             }else {
@@ -2089,6 +2091,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
 
         int count = 0;
         int countLength = Integer.toString(identifiables.size()).length();
+        int[] fieldWidths = fieldWidths(identifiables);
         for (Identifiable identifiable : identifiables) {
             if (identifiables.isRS()) { // list the stored version, not the one in the RS!
                 identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
@@ -2100,12 +2103,12 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                     longFormat(identifiable, true);
                 } else {
                     if(count == 0) {
-                        String header = columnHeader(countLength);
+                        String header = columnHeader(countLength, fieldWidths);
                         if (!isTrivial(header)) {
                             say(header);
                         }
                     }
-                    say(formatCounter(count, countLength) + ". " + format(identifiable, countLength));
+                    say(formatCounter(count, countLength) + ". " + format(identifiable, countLength, fieldWidths));
                   //  say(format(identifiable));
                 }
             }
@@ -2118,41 +2121,15 @@ public abstract class StoreCommands2 extends CommonCommands2 {
 
     }
 
-    /*public void ls1(InputLine inputLine) throws Throwable {
-        if (showHelp(inputLine)) {
-            showLSHelp();
-            return;
-        }
-
-        String key = getAndCheckKeyArg(inputLine);
-        if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
-            oldls1(inputLine);
-            return;
-        }
-        FoundIdentifiables identifiables = findItem(inputLine);
-        if (identifiables == null) {
-            say("object not found");
-            return;
-        }
-        if (inputLine.hasArg(KEYS_FLAG)) {
-            List<String> array = processList(inputLine, KEYS_FLAG);
-            for (Identifiable identifiable : identifiables) {
-                if (identifiables.isRS()) {
-                    identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
-                }
-                showEntries(identifiable, array, inputLine.hasArg(VERBOSE_COMMAND));
-            }
-            return;
-        }
-        if (key != null) {
-            for (Identifiable identifiable : identifiables) {
-                if (identifiables.isRS()) {
-                    identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
-                }
-                showEntry(identifiable, key, inputLine.hasArg(VERBOSE_COMMAND));
-            }
-        }
-    }*/
+    /**
+     * For a list of identifiables in a full listing, get the widths of the fields for the short format.
+     * This will be per implementation based on the fields of the short format.  You must set the values
+     * and manage them, these are simply passed. The goal is to allow you to find the widths so the output does
+     * not waste space.
+     * @param identifiables
+     * @return
+     */
+    public abstract int[] fieldWidths(List<Identifiable> identifiables);
 
     protected static String SIZE_ALL_FLAG = "-all";
     protected static String SIZE_VERSIONS_FLAG = "-versions";
@@ -3944,7 +3921,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     }
 
     protected String archiveFormat(Identifiable id) {
-        return format(id,0);
+        return format(id,0, new int[]{-1});
     }
 
 

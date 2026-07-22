@@ -786,7 +786,7 @@ public abstract class StoreCommands extends CommonCommands {
             start = start + values.size();
         }
         int countLength = limits.size();
-
+        int[] fieldWidths = fieldWidths(limits);
         for (Object key : limits) {
 
             int i;
@@ -830,7 +830,7 @@ public abstract class StoreCommands extends CommonCommands {
                     }
                     table.add(row);
                 } else {
-                    say(formatCounter(i++, countLength) + ". " + format(identifiable, countLength));
+                    say(formatCounter(i++, countLength) + ". " + format(identifiable, countLength, fieldWidths));
                     //say(format(identifiable,0));
                 }
 
@@ -1095,23 +1095,28 @@ public abstract class StoreCommands extends CommonCommands {
      */
     protected abstract String format(Identifiable identifiable);
 
+    public abstract int[] fieldWidths(List<Identifiable> identifiables);
+
     /**
      * Similar to {@link #format(Identifiable), this passes the offset from the left
      * margin. This is, in fact, always called. If the offset does nothing. just
      * pass the call on to that method. This is mostly used by stores whose short format
      * includes line breaks.
+     *
      * @param identifiable
      * @param offset
      * @return
      */
-    protected abstract String format(Identifiable identifiable, int offset );
+    protected abstract String format(Identifiable identifiable, int offset, int[] fieldWidths);
+
     /**
      * This is the column header printed before the short format list command. It is optional.
      *
      * @param offset -- the number of columns on the left the system is using for numbers.
      * @return
      */
-    protected abstract String columnHeader(int offset);
+    protected abstract String columnHeader(int offset, int[] fieldWidths);
+
     /**
      * Give a long (multi-line) formatted object. This should allow users to see everything cleanly.
      * This assumes the long format, not the verbose
@@ -1178,18 +1183,21 @@ public abstract class StoreCommands extends CommonCommands {
         entries = getSortable().sort(entries);
         int countLength = Integer.toString(entries.size()).length();
         if (!lineList) {
-            String header = columnHeader(countLength);
-            if(!isTrivial(header)) {
+            String header = columnHeader(countLength, new int[0]);
+            if (!isTrivial(header)) {
                 say(header);
             }
         }
+        int[] fieldWidths = fieldWidths(entries);
         for (Identifiable x : entries) {
-            if(StoreArchiver.isVersioned(x.getIdentifier()) && !showVersions) {continue;}
+            if (StoreArchiver.isVersioned(x.getIdentifier()) && !showVersions) {
+                continue;
+            }
             if (lineList) {
                 longFormat(x);
                 say("----");
             } else {
-                say(formatCounter(i++, countLength) + ". " + format(x, countLength));
+                say(formatCounter(i++, countLength) + ". " + format(x, countLength, fieldWidths));
             }
         }
         return entries;
@@ -1933,63 +1941,13 @@ public abstract class StoreCommands extends CommonCommands {
         return idList != null;
     }
 
-/*
-    protected void oldls1(InputLine inputLine) throws Throwable {
-
-        boolean listAll = inputLine.hasArg(ALL_LIST_COMMAND);
-        boolean listLines = inputLine.hasArg(LINE_LIST_COMMAND);
-        boolean isVerbose = inputLine.hasArg(VERBOSE_COMMAND);
-        inputLine.removeSwitch(ALL_LIST_COMMAND);
-        inputLine.removeSwitch(LINE_LIST_COMMAND);
-        inputLine.removeSwitch(VERBOSE_COMMAND);
-        // Any form of the all flag prints everything.
-        if (listAll) {
-            loadAllEntries();
-            listEntries(loadAllEntries(), listLines, isVerbose);
-            return;
-        }
-        // common case that they type just ls.
-        if (inputLine.getArgCount() == 0) {
-            listEntries(loadAllEntries(), listLines, isVerbose); // list it all
-            return;
-        }
-        FoundIdentifiables identifiables = findItem(inputLine);
-
-        if (identifiables == null) {
-            say("sorry, no such object. Check your id.");
-            return;
-        } else {// found something
-            int count = 0;
-            for (Identifiable identifiable : identifiables) {
-                if (identifiables.isRS()) { // list the stored version, not the one in the RS!
-                    identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
-                }
-                if (listLines) {
-                    longFormat(identifiable, false);
-                } else {
-                    if (isVerbose) {
-                        longFormat(identifiable, true);
-                    } else {
-                        say(format(identifiable));
-                    }
-                }
-                count++;
-                if (1 < count) {
-                    say("------ end " + identifiable.getIdentifierString()); // spacer when listing multiple
-                    say(); // add a blanks in between too...
-                }
-            }
-        }
-    }
-*/
-
     public void ls(InputLine inputLine) throws Throwable {
 
-        if(inputLine.hasArg(SHOW_HEADER)) {
-            String h = columnHeader(0);
-            if(StringUtils.isTrivial(h)) {
+        if (inputLine.hasArg(SHOW_HEADER)) {
+            String h = columnHeader(0, new int[0]);
+            if (StringUtils.isTrivial(h)) {
                 say("none");
-            }else {
+            } else {
                 say(h);
             }
             return;
@@ -2095,6 +2053,7 @@ public abstract class StoreCommands extends CommonCommands {
 
         int count = 0;
         int countLength = identifiables.size();
+        int[] fieldWidths = fieldWidths(identifiables);
         for (Identifiable identifiable : identifiables) {
             if (identifiables.isRS()) { // list the stored version, not the one in the RS!
                 identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
@@ -2105,7 +2064,7 @@ public abstract class StoreCommands extends CommonCommands {
                 if (listMultiLines) {
                     longFormat(identifiable, true);
                 } else {
-                    say(formatCounter(count, countLength) + ". " + format(identifiable, countLength));
+                    say(formatCounter(count, countLength) + ". " + format(identifiable, countLength, fieldWidths));
                     //say(format(identifiable,0));
                 }
             }
@@ -3949,7 +3908,7 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     protected String archiveFormat(Identifiable id) {
-        return format(id,0);
+        return format(id, 0, new int[]{-1});
     }
 
 

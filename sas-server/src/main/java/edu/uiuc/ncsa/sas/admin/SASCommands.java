@@ -132,7 +132,7 @@ public class SASCommands extends StoreCommands {
     }
 
     @Override
-    protected String columnHeader(int offset) {
+    protected String columnHeader(int offset, int[] fieldWidths) {
         return StringUtils.getBlanks(offset+1) +
                 pad2("name",20) + " | " +
                 pad2("identifier", 60) +
@@ -152,7 +152,12 @@ public class SASCommands extends StoreCommands {
     }
 
     @Override
-    protected String format(Identifiable identifiable, int offset) {
+    public int[] fieldWidths(List<Identifiable> identifiables) {
+        return new int[0];
+    }
+
+    @Override
+    protected String format(Identifiable identifiable, int offset, int[] fieldWidths) {
         return format(identifiable);
     }
 
