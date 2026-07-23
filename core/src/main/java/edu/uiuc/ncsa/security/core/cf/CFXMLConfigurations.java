@@ -402,6 +402,12 @@ public class CFXMLConfigurations {
      * @return
      */
     public static CFNode findConfiguration(String fileName, String configType, String configName) {
+        if(StringUtils.isTrivial(fileName)) {
+            throw new MyConfigurationException("No configuration file specified.");
+        }
+        if(StringUtils.isTrivial(configName)) {
+            throw new MyConfigurationException("No configuration name specified.");
+        }
         File file = new File(fileName);
         if (file.isDirectory()) {
             throw new MyConfigurationException("configuration file is a directory");
