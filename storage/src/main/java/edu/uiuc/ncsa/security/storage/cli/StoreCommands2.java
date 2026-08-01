@@ -799,7 +799,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             start = start + values.size();
         }
         int countLength = Integer.toString(limits.size()).length();
-        int[] fieldWidths = fieldWidths(limits);
+        int[] fieldWidths = fieldWidths(values);
         for (Object key : limits) {
 
             int i;
@@ -2089,6 +2089,20 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             return;
         }
 
+        printLS(identifiables, listSingleLines, listMultiLines, shortForm);
+    }
+
+    /**
+     * Machinery to do the actual printing for {@link #ls(InputLine)}.
+     * @param identifiables
+     * @param listSingleLines
+     * @param listMultiLines
+     * @param shortForm
+     */
+    protected void printLS(FoundIdentifiables identifiables,
+                           boolean listSingleLines,
+                           boolean listMultiLines,
+                           boolean shortForm) {
         int count = 0;
         int countLength = Integer.toString(identifiables.size()).length();
         int[] fieldWidths = fieldWidths(identifiables);
@@ -2109,7 +2123,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                         }
                     }
                     say(formatCounter(count, countLength) + ". " + format(identifiable, countLength, fieldWidths));
-                  //  say(format(identifiable));
+                    //  say(format(identifiable));
                 }
             }
             count++;
@@ -2118,9 +2132,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                 say(); // add a blanks in between too...
             }
         }
-
     }
-
     /**
      * For a list of identifiables in a full listing, get the widths of the fields for the short format.
      * This will be per implementation based on the fields of the short format.  You must set the values
@@ -2557,6 +2569,16 @@ public abstract class StoreCommands2 extends CommonCommands2 {
      */
     protected abstract int updateStorePermissions(Identifier newID, Identifier oldID, boolean copy);
 
+    /**
+     * If a new identifiable needs customizations before saving, override this.
+     * Note that this is the copy of the source and has no changes to it,
+     * but altering it will not alter the original.
+     * @param x
+     * @return
+     */
+    protected Identifiable preCopy(Identifiable x) {
+        return x;
+    }
     public void copy(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             showCopyHelp();
@@ -2606,6 +2628,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         }
 
         Identifiable source = (Identifiable) getStore().get(sourceId);
+        source = preCopy(source);
         // store is charged with making a valid, unused random id, so no need to check if that is requested.
         if (!forceIt && !randomID && getStore().containsKey(targetId)) {
             say("sorry, but \"" + targetId + "\" already exists. Consider using the " + FORCE_COPY_FLAG + " flag if you need to overwrite it.");
@@ -2654,7 +2677,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         }
     }
 
-    private void showCopyHelp() {
+    protected void showCopyHelp() {
         say("copy source target [" + FORCE_COPY_FLAG + "] [" + RANDOM_ID_FLAG + "] [" + SKIP_UPDATE_PERMISSIONS_FLAG + "]");
         sayi("Usage: Copy source to target");
         sayi(FORCE_COPY_FLAG + " - force it, so overwrite if the target exists.");

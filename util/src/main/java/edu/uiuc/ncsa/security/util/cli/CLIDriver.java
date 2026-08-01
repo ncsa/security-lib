@@ -219,7 +219,7 @@ public class CLIDriver {
 
     protected String doHistory(String cmdLine) {
         if (cmdLine.contains(HELP_SWITCH)) {
-            say(HISTORY_LIST_COMMAND + "[int] = either show the entire history (no argument)");
+            say(HISTORY_LIST_COMMAND + " [int] = either show the entire history (no argument)");
             say("  or execute the command at the given index. Note that signed indices are allowed,");
             say("  so the /h -1 would execute the very last command in the buffer, /h -2 executes");
             say("  the next to last, etc., Note that as ");
@@ -228,7 +228,7 @@ public class CLIDriver {
             return null; // do nothing
         }
         // Either of the following work:
-        //h == print history with line numbers
+        // /h == print history with line numbers
         // /h int = execute line # int, or print history if that fails
         StringTokenizer st = new StringTokenizer(cmdLine, " ");
         st.nextToken(); // This is the "/h" which we already know about
@@ -420,7 +420,8 @@ public class CLIDriver {
                     return;// if there is nothing in the buffer, cmdLine is null, don't store it.
                 }
                 storeLine = false;
-                return;
+                // Fix https://github.com/ncsa/security-lib/issues/71
+                break;
             case WRITE_BUFFER_COMMAND:
                 doBufferWrite(cmdLine);
                 return;

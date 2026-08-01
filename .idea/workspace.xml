@@ -9,9 +9,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Tweaks and clean up for CLI.">
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="CLI formatting improvements">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cf/CFXMLConfigurations.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/cf/CFXMLConfigurations.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JWKUtil2.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JWKUtil2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -33,7 +35,7 @@
     </option>
   </component>
   <component name="Git.Merge.Settings">
-    <option name="BRANCH" value="CF-port" />
+    <option name="BRANCH" value="format_cli" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -90,60 +92,60 @@
     <option name="sortByType" value="true" />
     <option name="sortKey" value="BY_TYPE" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.CLIDriver.executor&quot;: &quot;Debug&quot;,
-    &quot;Application.CertUtil.executor&quot;: &quot;Run&quot;,
-    &quot;Application.DDParser.executor&quot;: &quot;Run&quot;,
-    &quot;Application.HeaderUtils.executor&quot;: &quot;Run&quot;,
-    &quot;Application.InputLine.executor&quot;: &quot;Run&quot;,
-    &quot;Application.SAS Client.executor&quot;: &quot;Run&quot;,
-    &quot;Application.SASCLIDriver.executor&quot;: &quot;Run&quot;,
-    &quot;Application.SASCommands.executor&quot;: &quot;Debug&quot;,
-    &quot;Application.SASWatcher.executor&quot;: &quot;Run&quot;,
-    &quot;Application.StoreArchiver.executor&quot;: &quot;Run&quot;,
-    &quot;Application.StringUtils.executor&quot;: &quot;Run&quot;,
-    &quot;Application.TestCCI.executor&quot;: &quot;Run&quot;,
-    &quot;Application.TestCommands.executor&quot;: &quot;Run&quot;,
-    &quot;Application.TestConfigLoader.executor&quot;: &quot;Run&quot;,
-    &quot;Application.UpkeepConfigUtils.executor&quot;: &quot;Debug&quot;,
-    &quot;Application.WebClientConfig.executor&quot;: &quot;Run&quot;,
-    &quot;Application.WebInstaller.executor&quot;: &quot;Debug&quot;,
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;JUnit.ApacheConfigInheritenceTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ApacheMultipleInheritenceTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.CFMultipleInheritanceTest.executor&quot;: &quot;Debug&quot;,
-    &quot;JUnit.Configurations2Test.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.configuration in core.executor&quot;: &quot;Run&quot;,
-    &quot;Java Scratch.Scratch.executor&quot;: &quot;Run&quot;,
-    &quot;Java Scratch.Scratch_5.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;format__cli&quot;,
-    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;11 (2)&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/security-lib/docs/pdf&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.5883041&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.CLIDriver.executor": "Debug",
+    "Application.CertUtil.executor": "Run",
+    "Application.DDParser.executor": "Run",
+    "Application.HeaderUtils.executor": "Run",
+    "Application.InputLine.executor": "Run",
+    "Application.SAS Client.executor": "Run",
+    "Application.SASCLIDriver.executor": "Run",
+    "Application.SASCommands.executor": "Debug",
+    "Application.SASWatcher.executor": "Run",
+    "Application.StoreArchiver.executor": "Run",
+    "Application.StringUtils.executor": "Run",
+    "Application.TestCCI.executor": "Run",
+    "Application.TestCommands.executor": "Run",
+    "Application.TestConfigLoader.executor": "Run",
+    "Application.UpkeepConfigUtils.executor": "Debug",
+    "Application.WebClientConfig.executor": "Run",
+    "Application.WebInstaller.executor": "Debug",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "JUnit.ApacheConfigInheritenceTest.executor": "Run",
+    "JUnit.ApacheMultipleInheritenceTest.executor": "Run",
+    "JUnit.CFMultipleInheritanceTest.executor": "Debug",
+    "JUnit.Configurations2Test.executor": "Run",
+    "JUnit.configuration in core.executor": "Run",
+    "Java Scratch.Scratch.executor": "Run",
+    "Java Scratch.Scratch_5.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "master",
+    "jdk.selected.JAVA_MODULE": "11 (2)",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/security-lib/docs/pdf",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.5883041",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;XML&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "XML"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/docs/pdf" />
@@ -1005,7 +1007,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="131" />
+    <option name="localTasksCounter" value="132" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1014,7 +1016,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Changes from 6.2.1 to publish to maven central" />
     <MESSAGE value="Merged CF port into main" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/56" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/59 fix." />
@@ -1039,7 +1040,8 @@
     <MESSAGE value="Mostly small updates and refactoring to support key rotation. Most key utilities are in this package." />
     <MESSAGE value="Updates related to https://github.com/ncsa/oa4mp/issues/306. Putting a few abstract functions up in the class hierarchy where they belong." />
     <MESSAGE value="Tweaks and clean up for CLI." />
-    <option name="LAST_COMMIT_MESSAGE" value="Tweaks and clean up for CLI." />
+    <MESSAGE value="CLI formatting improvements" />
+    <option name="LAST_COMMIT_MESSAGE" value="CLI formatting improvements" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -1157,7 +1159,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java</url>
-          <line>599</line>
+          <line>600</line>
           <option name="timeStamp" value="151" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">

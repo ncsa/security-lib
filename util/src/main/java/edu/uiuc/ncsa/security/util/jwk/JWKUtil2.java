@@ -214,7 +214,9 @@ public class JWKUtil2 implements Serializable {
     public JSONWebKeys makePublic(JSONWebKeys keys) {
         JSONWebKeys newKeys = new JSONWebKeys(keys.getDefaultKeyID());
         for (String key : keys.keySet()) {
-            newKeys.put(makePublic(keys.get(key)));
+            JSONWebKey keyEntry = keys.get(key);
+            if(keyEntry == null) continue;
+            newKeys.put(makePublic(keyEntry));
         }
         // now we have a clone with no private keys, we need to c
         return newKeys;
