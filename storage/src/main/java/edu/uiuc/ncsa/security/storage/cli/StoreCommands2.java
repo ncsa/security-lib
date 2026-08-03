@@ -4425,6 +4425,15 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         return "[" + keyArg + "]";
     }
 
+    public void time(InputLine inputLine) throws Throwable {
+        if(showHelp(inputLine)) {
+            say("time");
+            sayi("Usage: This will print out the current time in  ISO 8602 format and  in milliseconds since the epoch.");
+            return;
+        }
+        Date now = new Date();
+        say("current time is " + Iso8601.date2String(now) + " = " + now.getTime() + " ms." );
+    }
 }
 
 
