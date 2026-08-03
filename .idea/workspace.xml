@@ -9,10 +9,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Fix https://github.com/ncsa/security-lib/issues/71 and a few formatting issues. Added cases of null JWKs in a utility.">
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="6.3.2 checkin + website">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,7 +36,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="6.3.1" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -123,7 +121,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "6.3.2",
     "jdk.selected.JAVA_MODULE": "11 (2)",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/home/ncsa/dev/ncsa-git/security-lib/docs/pdf",
@@ -1005,7 +1003,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="133" />
+    <option name="localTasksCounter" value="136" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1014,9 +1012,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="https://github.com/ncsa/security-lib/issues/56" />
-    <MESSAGE value="https://github.com/ncsa/security-lib/issues/59 fix." />
-    <MESSAGE value="https://github.com/ncsa/security-lib/issues/60" />
     <MESSAGE value="6.2.2 checkin, includes website rebuild" />
     <MESSAGE value="6.2.2 checkin, includes website rebuild. Corrected a minor bit of bookeeping with indices in the CLI." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/61, added index,html page for PDFs. Tweaked a lot of help." />
@@ -1039,7 +1034,10 @@
     <MESSAGE value="Tweaks and clean up for CLI." />
     <MESSAGE value="CLI formatting improvements" />
     <MESSAGE value="Fix https://github.com/ncsa/security-lib/issues/71 and a few formatting issues. Added cases of null JWKs in a utility." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix https://github.com/ncsa/security-lib/issues/71 and a few formatting issues. Added cases of null JWKs in a utility." />
+    <MESSAGE value="Checkin before 6.3.2 release." />
+    <MESSAGE value="6.3.2 checkin" />
+    <MESSAGE value="6.3.2 checkin + website" />
+    <option name="LAST_COMMIT_MESSAGE" value="6.3.2 checkin + website" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
