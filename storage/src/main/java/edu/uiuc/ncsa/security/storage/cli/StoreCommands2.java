@@ -2061,6 +2061,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             for (Identifiable identifiable : identifiables) {
                 if (identifiables.isRS()) {
                     identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
+                    if(identifiable == null) {continue;}
                 }
                 showEntry(identifiable, key, inputLine.hasArg(VERBOSE_COMMAND));
                 if (1 < identifiables.size()) {
@@ -2077,6 +2078,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             for (Identifiable identifiable : identifiables) {
                 if (identifiables.isRS()) {
                     identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
+                    if(identifiable == null) continue;
                 }
                 showEntrySubset(identifiable, keys, inputLine.hasArg(VERBOSE_COMMAND));
                 count++;
@@ -2109,6 +2111,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         for (Identifiable identifiable : identifiables) {
             if (identifiables.isRS()) { // list the stored version, not the one in the RS!
                 identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
+                if(identifiable == null) continue;
             }
             if (listSingleLines) {
                 longFormat(identifiable, false);
