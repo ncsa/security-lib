@@ -76,7 +76,7 @@ public class StoreArchiver {
      * @param id
      * @return
      */
-    public long getVersionNumber(Identifier id) {
+    public static long getVersionNumber(Identifier id) {
         URI uri = id.getUri();
         String fragment = uri.getFragment();
         if (StringUtils.isTrivial(fragment)) {
@@ -95,7 +95,7 @@ public class StoreArchiver {
      * @param id
      * @return
      */
-    public boolean isVersion(Identifier id) {
+    public static boolean isVersion(Identifier id) {
         return -1L != getVersionNumber(id);
     }
 
@@ -110,7 +110,7 @@ public class StoreArchiver {
      * @param version
      * @return
      */
-    public Identifier createVersionedID(Identifier id, long version) {
+    public static Identifier createVersionedID(Identifier id, long version) {
         URI uri = id.getUri();
         String s = uri.getFragment();
         if (s != null && s.contains(ARCHIVE_VERSION_TAG + ARCHIVE_VERSION_SEPARATOR_TAG)) {
@@ -330,15 +330,21 @@ public class StoreArchiver {
     }
 
     /**
-     * For a
+     * For a given ID and version number, save the object to the current
+     * store. This overwrites the existing object if present, so do check
+     * first.
      *
      * @param id
      * @param version
      * @return
+     * @throws IllegalArgumentException if the version does not exist
      */
     public boolean restore(Identifier id, Long version) {
         try {
             Identifiable identifiable = getVersion(id, version);
+            if (identifiable == null) {
+                throw new IllegalArgumentException("no such version:" + id + "#" + version);
+            }
             identifiable.setIdentifier(id);
             getStore().save(identifiable);
             return Boolean.TRUE;

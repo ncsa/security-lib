@@ -843,7 +843,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                     }
                     table.add(row);
                 } else {
-                    if(i == 0) {
+                    if (i == 0) {
                         String header = columnHeader(countLength, fieldWidths);
                         if (!isTrivial(header)) {
                             say(header);
@@ -851,7 +851,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                     }
 
                     say(formatCounter(i++, countLength) + ". " + format(identifiable, countLength, fieldWidths));
-                  //  say(format(identifiable,0));
+                    //  say(format(identifiable,0));
                 }
 
             }
@@ -1120,11 +1120,12 @@ public abstract class StoreCommands2 extends CommonCommands2 {
      * margin. This is, in fact, always called. If the offset does nothing. just
      * pass the call on to that method. This is mostly used by stores whose short format
      * includes line breaks.
+     *
      * @param identifiable
      * @param offset
      * @return
      */
-    protected abstract String format(Identifiable identifiable, int offset, int[] fieldWidths );
+    protected abstract String format(Identifiable identifiable, int offset, int[] fieldWidths);
 
     /**
      * This is the column header printed before the short format list command. It is optional.
@@ -1203,12 +1204,14 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         int[] fieldWidths = fieldWidths(entries);
         if (!lineList) {
             String header = columnHeader(countLength, fieldWidths);
-            if(!isTrivial(header)) {
+            if (!isTrivial(header)) {
                 say(header);
             }
         }
         for (Identifiable x : entries) {
-            if(StoreArchiver.isVersioned(x.getIdentifier()) && !showVersions) {continue;}
+            if (StoreArchiver.isVersioned(x.getIdentifier()) && !showVersions) {
+                continue;
+            }
             if (lineList) {
                 longFormat(x);
                 say("----");
@@ -1915,7 +1918,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         sayi(blanks + "To print the result set, use the rs command.");
         sayi("ls " + KEY_SHORTHAND_PREFIX + "cfg foo:bar = show the value of the cfg property in the object with ID foo:bar");
         String colHeader = columnHeader(0, new int[0]);
-        if(!StringUtils.isTrivial(colHeader)) {
+        if (!StringUtils.isTrivial(colHeader)) {
             say("Short form of the listing has the header");
             say(columnHeader(0, new int[0]));
 
@@ -1984,11 +1987,11 @@ public abstract class StoreCommands2 extends CommonCommands2 {
 */
 
     public void ls(InputLine inputLine) throws Throwable {
-        if(inputLine.hasArg(SHOW_HEADER)) {
+        if (inputLine.hasArg(SHOW_HEADER)) {
             String h = columnHeader(0, new int[0]);
-            if(StringUtils.isTrivial(h)) {
+            if (StringUtils.isTrivial(h)) {
                 say("none");
-            }else {
+            } else {
                 say(h);
             }
             return;
@@ -2061,7 +2064,9 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             for (Identifiable identifiable : identifiables) {
                 if (identifiables.isRS()) {
                     identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
-                    if(identifiable == null) {continue;}
+                    if (identifiable == null) {
+                        continue;
+                    }
                 }
                 showEntry(identifiable, key, inputLine.hasArg(VERBOSE_COMMAND));
                 if (1 < identifiables.size()) {
@@ -2078,7 +2083,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             for (Identifiable identifiable : identifiables) {
                 if (identifiables.isRS()) {
                     identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
-                    if(identifiable == null) continue;
+                    if (identifiable == null) continue;
                 }
                 showEntrySubset(identifiable, keys, inputLine.hasArg(VERBOSE_COMMAND));
                 count++;
@@ -2091,11 +2096,16 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             return;
         }
 
+        if (identifiables == null || identifiables.isEmpty()) {
+            say("no object found.");
+            return;
+        }
         printLS(identifiables, listSingleLines, listMultiLines, shortForm);
     }
 
     /**
      * Machinery to do the actual printing for {@link #ls(InputLine)}.
+     *
      * @param identifiables
      * @param listSingleLines
      * @param listMultiLines
@@ -2111,7 +2121,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         for (Identifiable identifiable : identifiables) {
             if (identifiables.isRS()) { // list the stored version, not the one in the RS!
                 identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
-                if(identifiable == null) continue;
+                if (identifiable == null) continue;
             }
             if (listSingleLines) {
                 longFormat(identifiable, false);
@@ -2119,7 +2129,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                 if (listMultiLines) {
                     longFormat(identifiable, true);
                 } else {
-                    if(count == 0) {
+                    if (count == 0) {
                         String header = columnHeader(countLength, fieldWidths);
                         if (!isTrivial(header)) {
                             say(header);
@@ -2136,11 +2146,13 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             }
         }
     }
+
     /**
      * For a list of identifiables in a full listing, get the widths of the fields for the short format.
      * This will be per implementation based on the fields of the short format.  You must set the values
      * and manage them, these are simply passed. The goal is to allow you to find the widths so the output does
      * not waste space.
+     *
      * @param identifiables
      * @return
      */
@@ -2576,12 +2588,14 @@ public abstract class StoreCommands2 extends CommonCommands2 {
      * If a new identifiable needs customizations before saving, override this.
      * Note that this is the copy of the source and has no changes to it,
      * but altering it will not alter the original.
+     *
      * @param x
      * @return
      */
     protected Identifiable preCopy(Identifiable x) {
         return x;
     }
+
     public void copy(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             showCopyHelp();
@@ -3750,6 +3764,33 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             if (rawID.startsWith("/")) {
                 rawID = rawID.substring(1);
             }
+            Identifier givenID = BasicIdentifier.newID(rawID);
+            if (StoreArchiver.isVersioned(givenID)) {
+                // Fix https://github.com/ncsa/security-lib/issues/73
+                // case is they have given the exact ID they want to restore
+                FoundIdentifiables identifiables = findItem(inputLine); // just get it
+                if (identifiables == null || identifiables.size() == 0) {
+                    say("sorry, but I could not find that item.");
+                    return;
+                }
+                if (identifiables.size() > 1) {
+                    say("sorry, but I found more than one item with that ID. Cannot restore.");
+                    return;
+                }
+                Identifier baseID = getStoreArchiver().getBaseID(givenID);
+                FoundIdentifiables existingObject = findItem(new InputLine("restore", baseID.toString())); // just get it
+                if (existingObject != null && existingObject.size() != 0) {
+                    if (!"y".equals(getInput("Object exists, are you sure you want to overwrite it? (y/n)", "n"))) {
+                        say("aborting restore");
+                        return;
+                    }
+                }
+                // great. Does nto currently exist, so just restore it.
+                long versionNumber = StoreArchiver.getVersionNumber(givenID);
+                getStoreArchiver().restore(baseID, versionNumber);
+                say("restored " + baseID);
+                return;
+            }
             String rawTargetVersion = inputLine.getNextArgFor(ARCHIVE_RESTORE_FLAG);
 
             boolean doLatest = rawTargetVersion.equals(ARCHIVE_LATEST_VERSION_ARG);
@@ -3766,8 +3807,10 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                 }
             }
             FoundIdentifiables identifiables = findItem(inputLine);
-            if (identifiables == null) {
-                say("sorry, no such object");
+            if (identifiables == null || identifiables.size() == 0) {
+                // Fix https://github.com/ncsa/security-lib/issues/72
+                getStoreArchiver().restore(givenID, targetVersion);
+                say("restored " + givenID + " with version " + targetVersion);
                 return;
             }
             // Give them one last chance
@@ -3944,10 +3987,15 @@ public abstract class StoreCommands2 extends CommonCommands2 {
                 "You may also use the word \"" + ARCHIVE_LATEST_VERSION_ARG + "\"");
         sayi(blanks + "to get the latest version.");
         sayi("Note that archive version numbers increase, so the highest number is the most recent.");
+        say("You may also directly specify the version number of the object you want to restore.");
+        say("E.g.");
+        say("archive -restore my:/object/123#version=2");
+        say("would restore version 2 of the object with id \"my:/object/123\"");
+        say("Since the version number is in the identifier, there is no need to specify it here.");
     }
 
     protected String archiveFormat(Identifiable id) {
-        return format(id,0, new int[]{-1});
+        return format(id, 0, new int[]{-1});
     }
 
 
@@ -4007,7 +4055,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             }
         }
         FoundIdentifiables identifiables = findItem(inputLine);
-        if (identifiables == null) {
+        if (identifiables == null || identifiables.size() == 0) {
             throw new ObjectNotFoundException("sorry, I could not find that object. Check your id.");
         }
         if (keys.size() == 1) {
@@ -4429,13 +4477,13 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     }
 
     public void time(InputLine inputLine) throws Throwable {
-        if(showHelp(inputLine)) {
+        if (showHelp(inputLine)) {
             say("time");
             sayi("Usage: This will print out the current time in  ISO 8602 format and  in milliseconds since the epoch.");
             return;
         }
         Date now = new Date();
-        say("current time is " + Iso8601.date2String(now) + " = " + now.getTime() + " ms." );
+        say("current time is " + Iso8601.date2String(now) + " = " + now.getTime() + " ms.");
     }
 }
 
