@@ -336,6 +336,10 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         realSave(false, t);
     }
 
+    @Override
+    public int[] update(List<V> m) {
+        return GenericStoreUtils.update(this, m);
+    }
 
     /**
      * Required by the map interface
@@ -343,7 +347,34 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
     public void clear() {
         initializer.init();
     }
+    @Override
+    public int[] register(List<V> value) {
+        int[] rcs = new int[value.size()];
+        for(int i=0;i<rcs.length;i++){
+            try {
+                register(value.get(i));
+                rcs[i]=1;
+            }catch (Throwable e){
+                rcs[i]=0;
+            }
+        }
+        return rcs;
+    }
 
+    @Override
+    public int[] save(List<V> value) {
+        int[] rcs = new int[value.size()];
+        int i = 0;
+        for(V v:value){
+            try{
+                save(v);
+                rcs[i++]=1;
+            }catch(Throwable e){
+                rcs[i++]=0;
+            }
+        }
+        return rcs;
+    }
 
     @Override
     public void save(V t) {

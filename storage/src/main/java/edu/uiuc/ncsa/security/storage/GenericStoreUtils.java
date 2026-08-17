@@ -146,6 +146,7 @@ public class GenericStoreUtils {
     /**
      * Convert an identifiable object to an {@link XMLMap}. This is useful for serializing
      * objects in the store, backing them up, etc.
+     *
      * @param store
      * @param identifiable
      * @return
@@ -159,6 +160,7 @@ public class GenericStoreUtils {
     /**
      * This will convert a map into an object. You must issue a save separately or
      * if you prefer, {@link #fromXMLAndSave(Store, XMLMap)}.
+     *
      * @param store
      * @param map
      * @return
@@ -167,7 +169,7 @@ public class GenericStoreUtils {
         return store.getXMLConverter().fromMap(map, null);
     }
 
-    public static void fromXMLAndSave(Store store, XMLMap map){
+    public static void fromXMLAndSave(Store store, XMLMap map) {
         store.save(fromXML(store, map));
     }
 
@@ -176,38 +178,40 @@ public class GenericStoreUtils {
      * one at a time. If the store has the capability at all for batch processing, implement it. This is for things
      * like {@link MemoryStore}s and {@link FileStore}s that have no such ability. Note that part of the contract is
      * that the element must exist and an exception is thrown of there is no such element.
+     *
      * @param store
      * @param ids
      * @param values
      */
-    public static <V extends Identifiable> void updateRS(Store<V>  store, List<Identifier> ids, Map<String, Object>  values){
+    public static <V extends Identifiable> void updateRS(Store<V> store, List<Identifier> ids, Map<String, Object> values) {
         XMLConverter<V> xmlConverter = store.getXMLConverter();
-        for(Identifier id : ids){
+        for (Identifier id : ids) {
             V v = store.get(id);
-              if(v==null){
-                  throw new UnregisteredObjectException("No object in the store with id "+id+" found for update");
-              }
-              Map<String, Object> oldObject = new HashMap<>();
-              xmlConverter.toMap(v, oldObject);
-              oldObject.putAll(values);
-              store.save(xmlConverter.fromMap(oldObject, null)); // creates a new object
+            if (v == null) {
+                throw new UnregisteredObjectException("No object in the store with id " + id + " found for update");
+            }
+            Map<String, Object> oldObject = new HashMap<>();
+            xmlConverter.toMap(v, oldObject);
+            oldObject.putAll(values);
+            store.save(xmlConverter.fromMap(oldObject, null)); // creates a new object
         }
     }
 
     /**
-     * Implements {@link Store#update(Map)} for generic stores.This uses iteration
+     * Implements {@link Store#update(Map)} for generic stores. This uses iteration
      * and is not intended for large stores. If your store is large, use an
      * {@link edu.uiuc.ncsa.security.storage.sql.SQLStore} or one of its
      * many and variegated subclasses.
+     *
      * @param store
      * @param m
      */
     public static <V extends Identifiable> void update(Store<V> store, Map<? extends Identifier, V> m) {
         XMLConverter<V> xmlConverter = store.getXMLConverter();
-        for(Identifier id : m.keySet()){
+        for (Identifier id : m.keySet()) {
             V v = store.get(id);
-            if(v==null){
-                throw new UnregisteredObjectException("No object in the store with id "+id+" found for update");
+            if (v == null) {
+                throw new UnregisteredObjectException("No object in the store with id " + id + " found for update");
             }
             XMLMap oldObject = new XMLMap();
             Map newObject = new XMLMap();
@@ -218,7 +222,29 @@ public class GenericStoreUtils {
         }
 
     }
-    public static <V extends Identifiable> List<V> search(Store<V>  store, String key, boolean isNull) {
+
+    public static <V extends Identifiable> int[] update(Store<V> store, List<V> m) {
+        XMLConverter<V> xmlConverter = store.getXMLConverter();
+        int[] rcs = new int[m.size()];
+        int i = 0;
+        for (V id : m) {
+            V v = store.get(id);
+            if (v == null) {
+                rcs[i++] = 0; // no object to update
+                continue;
+            }
+            XMLMap oldObject = new XMLMap();
+            Map newObject = new XMLMap();
+            xmlConverter.toMap(v, oldObject);
+            xmlConverter.toMap(id, newObject);
+            oldObject.putAll(newObject);
+            store.save(xmlConverter.fromMap(oldObject, null)); // creates a new object
+            rcs[i++] = 1;
+        }
+        return rcs;
+    }
+
+    public static <V extends Identifiable> List<V> search(Store<V> store, String key, boolean isNull) {
         ArrayList<V> results = new ArrayList();
         Collection<V> values = store.values();
         Iterator iterator = values.iterator();
@@ -227,11 +253,11 @@ public class GenericStoreUtils {
             XMLMap map = new XMLMap();
 
             store.getXMLConverter().toMap(v, map);
-            if(isNull && !map.containsKey(key)){
+            if (isNull && !map.containsKey(key)) {
                 results.add(store.getXMLConverter().fromMap(map, null));
             }
 
-            if(!isNull && map.containsKey(key)){
+            if (!isNull && map.containsKey(key)) {
                 results.add(store.getXMLConverter().fromMap(map, null));
             }
         }// end while

@@ -26,6 +26,25 @@ public class AggregateStore<V extends Store> implements Store {
             this.stores.add(s);
         }
     }
+/*
+    Partial implementation of the store interface. This should be completed if
+    we go back to using it, otherwise, we are keeping it for now pending more uses
+    and just want it to compile.
+ */
+    @Override
+    public int[] update(List m) {
+        return new int[0];
+    }
+
+    @Override
+    public int[] register(List value) {
+        return new int[0];
+    }
+
+    @Override
+    public int[] save(List value) {
+        return new int[0];
+    }
 
     @Override
     public void update(Map m) {

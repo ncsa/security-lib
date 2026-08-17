@@ -59,7 +59,18 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
      * @param m
      */
     public void update(Map<? extends Identifier,  V> m);
-    
+
+    /**
+     * Same as {@link #update(Map)} but returns the number of rows updated. THis
+     * requires the elements be in a list so there is a one to one correspondence.
+     * The returned values are an error if negative, otherwise the number
+     * of rows updated. A value fo 0 means the record could not be updated, i.e.,
+     * failed.
+     * @param m
+     * @return
+     */
+    public int[] update(List<V> m);
+
     /**
      * Almost Identical to put(K,V) but since the object should have an identifier, passing along the key is redundant.
      * This persists the object in the store. Note that this returns void since the contract assumes that this is not
@@ -68,6 +79,7 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
      * @param value
      */
     public void register(V value);
+    public int[] register(List<V> value);
 
     /**
      * Saves an object. This bridges the gap between SQL stores update and insert commands. Implementations should
@@ -76,6 +88,15 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
      * @param value
      */
     public void save(V value);
+
+    /**
+     * Saves a list of objects. This returns an integer code for each element in the list.
+     * A negative value indicates an error., otherwise it is the number of affecged elements
+     * in the list. A value of 0 means the record could not be updated.
+     * @param value
+     * @return
+     */
+    public int[] save(List<V> value);
 
     /**
      * Method to get every element in the store. This is useful for command line interfaces. Note

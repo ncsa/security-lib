@@ -102,6 +102,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
      * @param value
      */
     public void update(V value) {
+        if (value.isReadOnly()) {
+            throw new IllegalAccessException(value.getIdentifierString() + " is read only");
+        }
         update(value, false);
     }
 
@@ -161,19 +164,21 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     public void update(Map<? extends Identifier, V> m) {
         ArrayList<V> values = new ArrayList<>(m.size());
         values.addAll(m.values());
-        update2(values); // discard output
+        update(values); // discard output
     }
 
     /**
      * Runs update but returns the SQL return codes. A negative return code indicates error,
-     * otherwise it is the number of rows updated. A zero means the record could not be updated.
+     * otherwise, it is the number of rows updated. A zero means the record could not be updated.
      *
      * <p>Note this takes a list since the index of the list corresponds to the return code.</p>
      *
      * @param m
      * @return
+     * @throws IllegalAccessException if any of the values are read only.
      */
-    public int[] update2(List<V> m) {
+    @Override
+    public int[] update(List<V> m) {
         if (m == null || m.isEmpty()) {
             return new int[0];
         }
@@ -188,6 +193,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             List<String> keys = new ArrayList<>(sortedKeys);
             PreparedStatement stmt = c.prepareStatement(getTable().createUpdateStatement(keys));
             for (V value : m) {
+                if(v.isReadOnly()) {
+                    throw new IllegalAccessException(value.getIdentifierString() + " is read only");
+                }
                 columnMap = depopulate(value);
                 int objIndex = 1;
                 for (int i = 0; i < keys.size(); i++) {
@@ -292,6 +300,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
      * @throws SQLException
      */
     public void doRegisterStatement(PreparedStatement stmt, V value) throws SQLException {
+        if (value.isReadOnly()) {
+            throw new IllegalAccessException(value.getIdentifierString() + " is read only");
+        }
         Map<String, Object> map = depopulate(value);
         int i = 1;
         for (ColumnDescriptorEntry cde : getTable().getColumnDescriptor()) {
@@ -309,7 +320,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     }
 
     public int[] save(List<V> values) {
-        int[] rcs = update2(values);
+        int[] rcs = update(values);
         ArrayList<Integer> saveIndices = new ArrayList<>(rcs.length);
         ArrayList<V> toSave = new ArrayList<>(rcs.length);
         int index = 0;
@@ -344,6 +355,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
      * @param values
      * @return
      */
+    @Override
     public int[] register(List<V> values) {
 
         // Fix https://github.com/ncsa/security-lib/issues/74

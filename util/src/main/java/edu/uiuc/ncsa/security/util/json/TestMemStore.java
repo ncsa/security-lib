@@ -20,6 +20,21 @@ public class TestMemStore<V extends JSONEntry> extends HashMap<Identifier, V> im
     }
 
     @Override
+    public int[] update(List<V> m) {
+        return new int[0];
+    }
+
+    @Override
+    public int[] register(List<V> value) {
+        return new int[0];
+    }
+
+    @Override
+    public int[] save(List<V> value) {
+        return new int[0];
+    }
+
+    @Override
     public void update(Map<? extends Identifier, V> m) {
 
     }
