@@ -19,7 +19,7 @@ public class StringUtils {
     public static boolean JUSTIFY_LEFT = false;
     public static boolean JUSTIFY_RIGHT = true;
     public static String ELLIPSIS = "...";
-    public static String[] LOGICAL_TRUES = new String[]{"true", "ok", "yes", "1", "on", "yup", "yeah", "enable", "enabled"};
+    public static String[] LOGICAL_TRUES = new String[]{"true",  "yes", "1", "on", "yup", "yeah", "enable", "enabled", "ok"};
     public static String[] LOGICAL_FALSES = new String[]{"false", "no", "0", "off", "nope", "nay", "disable", "disabled"};
 
     /**

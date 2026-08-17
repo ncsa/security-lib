@@ -56,6 +56,7 @@ public class CLIDriver {
 
     public static final int OK_RC = 0;
     public static final int ABNORMAL_RC = -1;
+    public static final int EXCEPTION_RC = -100;
     public static final int USER_EXIT_RC = 10;
     public static final int SHUTDOWN_RC = -10;
     public static final int HELP_RC = 100;
@@ -490,8 +491,11 @@ public class CLIDriver {
                     // do nix.
                     break;
                 case ABNORMAL_RC:
+                    break; // error message should have been printed.
+                case EXCEPTION_RC:
                 default:
-                    say("Command \"" + cmdLine + "\" not found/understood. Try typing help or exit.");
+                    // Some other error happened. Print a message to that effect,
+                    say("Command \"" + cmdLine + "\" failed. Try typing help or exit.");
                     say("To see all commands currently available, type " + LIST_ALL_METHODS_COMMAND);
             }
         }
@@ -588,6 +592,7 @@ public class CLIDriver {
                         if (debug) {
                             say("Could not execute command. Message:" + nsmx.getMessage());
                         }
+                        return EXCEPTION_RC;
                     }
                 }
             }

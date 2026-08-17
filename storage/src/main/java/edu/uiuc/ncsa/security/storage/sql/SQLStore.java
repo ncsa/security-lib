@@ -133,7 +133,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         // we peel the keys off since we have to manage the order of them and it is not guaranteed in Java
         keys.addAll(map.keySet());
         List<Object> values = new ArrayList<>(map.size());
-        for(String key : keys){
+        for (String key : keys) {
             // lay them out in order and make sure SQL can understand them
             values.add(getAsSQLObject(map.get(key)));
         }
@@ -141,9 +141,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         Connection c = cr.connection;
         try {
             PreparedStatement stmt = c.prepareStatement(getTable().createUpdateStatement(keys));
-            for(int i = 0; i < ids.size(); i++){
-                for(int j = 0; j < values.size(); j++){
-                    stmt.setObject(j+1, values.get(j));
+            for (int i = 0; i < ids.size(); i++) {
+                for (int j = 0; j < values.size(); j++) {
+                    stmt.setObject(j + 1, values.get(j));
                 }
                 stmt.setString(values.size(), ids.get(i).toString());
                 stmt.addBatch();
@@ -153,16 +153,33 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             releaseConnection(cr);
         } catch (SQLException e) {
             destroyConnection(cr);
-            throw new GeneralException("Error in mass update :"   + e.getMessage() , e);
+            throw new GeneralException("Error in mass update :" + e.getMessage(), e);
         }
     }
 
     @Override
     public void update(Map<? extends Identifier, V> m) {
-        if(m ==null || m.isEmpty()){ return;}
+        ArrayList<V> values = new ArrayList<>(m.size());
+        values.addAll(m.values());
+        update2(values); // discard output
+    }
+
+    /**
+     * Runs update but returns the SQL return codes. A negative return code indicates error,
+     * otherwise it is the number of rows updated. A zero means the record could not be updated.
+     *
+     * <p>Note this takes a list since the index of the list corresponds to the return code.</p>
+     *
+     * @param m
+     * @return
+     */
+    public int[] update2(List<V> m) {
+        if (m == null || m.isEmpty()) {
+            return new int[0];
+        }
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
-        V v = m.values().iterator().next(); // get one for reading keys
+        V v = m.iterator().next(); // get one for reading keys
         try {
             ColumnMap columnMap = depopulate(v);
             // Now the trick is that the keys must be an ordered list
@@ -170,22 +187,24 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             sortedKeys.addAll(columnMap.keySet()); // alphabetize them
             List<String> keys = new ArrayList<>(sortedKeys);
             PreparedStatement stmt = c.prepareStatement(getTable().createUpdateStatement(keys));
-            for(Identifier id : m.keySet()){
-                 columnMap = depopulate(m.get(id));
-                 int objIndex = 1;
-                 for(int i = 0; i < keys.size(); i++){
-                     if(keys.get(i).equals(getTable().getPrimaryKeyColumnName())) continue; // skip it if they send it
-                     stmt.setObject(objIndex++, getAsSQLObject(columnMap.get(keys.get(i))));
-                 }
-                 stmt.setString(keys.size(), id.toString()); // sets the primary key
+            for (V value : m) {
+                columnMap = depopulate(value);
+                int objIndex = 1;
+                for (int i = 0; i < keys.size(); i++) {
+                    if (keys.get(i).equals(getTable().getPrimaryKeyColumnName())) continue; // skip it if they send it
+                    stmt.setObject(objIndex++, getAsSQLObject(columnMap.get(keys.get(i))));
+                }
+                stmt.setString(keys.size(), value.toString()); // sets the primary key
                 stmt.addBatch();
             }
-            stmt.executeBatch();
+            int[] rcs = stmt.executeBatch();
+            System.out.println("Update returned " + rcs.length + " rows");
             stmt.close();
             releaseConnection(cr);
+            return rcs;
         } catch (SQLException e) {
             destroyConnection(cr);
-            throw new GeneralException("Error in mass update :"   + e.getMessage() , e);
+            throw new GeneralException("Error in mass update :" + e.getMessage(), e);
         }
 
     }
@@ -207,6 +226,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
 
     /**
      * Turn into an object that can be set in an SQL statement.
+     *
      * @param oldObject
      * @return
      */
@@ -286,6 +306,65 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             }
         }
 
+    }
+
+    public int[] save(List<V> values) {
+        int[] rcs = update2(values);
+        ArrayList<Integer> saveIndices = new ArrayList<>(rcs.length);
+        ArrayList<V> toSave = new ArrayList<>(rcs.length);
+        int index = 0;
+        for (int rc : rcs) {
+            if (rc == 0) {
+                saveIndices.add(index); // list has the *index* of the element we need to process
+                toSave.add(values.get(index++));
+            }
+        } //end for
+        if (index == 0) { // nothing found to save.
+            return rcs;
+        }
+        toSave.subList(index, toSave.size()).clear(); //truncate unused elements
+        int[] rc2 = register(toSave);
+        // now create a new array with the indices of the elements that were saved.
+        int[] rc3 = new int[values.size()];
+        int saveIndex = 0;
+        for (int i = 0; i < rcs.length; i++) {
+            if(i == saveIndices.get(saveIndex)){
+                rc3[i] = saveIndices.get(saveIndex);
+                saveIndex++;
+            }else{
+                rc3[i] = rcs[i];
+            }
+        }
+        return rc3;
+    }
+
+    /**
+     * Batch save
+     *
+     * @param values
+     * @return
+     */
+    public int[] register(List<V> values) {
+
+        // Fix https://github.com/ncsa/security-lib/issues/74
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+        try {
+
+            PreparedStatement stmt = c.prepareStatement(getTable().createInsertStatement());
+            for (V value : values) {
+                doRegisterStatement(stmt, value);
+                stmt.addBatch();
+            }
+            int[] rcs = stmt.executeBatch();
+            stmt.close();
+            releaseConnection(cr);
+            return rcs;
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error: could not register objects with", e);
+        } finally {
+        }
     }
 
     public void register(V value) {
@@ -425,16 +504,16 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             // Fix for https://github.com/ncsa/security-lib/issues/70. Use the table type of the reuqested data field
             // to set the correct value.
             if (hasAfter) {
-                if(getTable().getColumnDescriptor().get(dateField).getType() == BIGINT){
+                if (getTable().getColumnDescriptor().get(dateField).getType() == BIGINT) {
                     stmt.setLong(pIndex++, after.getTime());
-                }else{
+                } else {
                     stmt.setDate(pIndex++, new java.sql.Date(after.getTime()));
                 }
             }
             if (hasBefore) {
-                if(getTable().getColumnDescriptor().get(dateField).getType() == BIGINT){
+                if (getTable().getColumnDescriptor().get(dateField).getType() == BIGINT) {
                     stmt.setLong(pIndex++, before.getTime());
-                }else{
+                } else {
                     java.sql.Date dd = new java.sql.Date(before.getTime());
                     stmt.setDate(pIndex++, dd);
                 }
@@ -526,7 +605,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     @Override
     public List<V> search(String key, boolean isNull) {
         String searchString = "select *  from " + getTable().getFQTablename() +
-                " where ? is" + (isNull ? "" : " NOT") + " NULL" ;
+                " where ? is" + (isNull ? "" : " NOT") + " NULL";
 
         List<V> values = new ArrayList<>();
         ConnectionRecord cr = getConnection();
@@ -714,7 +793,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
 
     public V remove(Object key) {
         V oldObject = null;
-        if (key.getClass().isInstance(oldObject)){ // cheap trick to see if the key is an instance of the class parameter.
+        if (key.getClass().isInstance(oldObject)) { // cheap trick to see if the key is an instance of the class parameter.
             oldObject = (V) key;
             key = oldObject.getIdentifier();
         }
@@ -743,6 +822,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     /**
      * This creates new values or does an update for existing ones. As such
      * it fulfills the contract for {@link Map}.
+     *
      * @param m
      */
     @Override
@@ -750,12 +830,12 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         HashSet<Identifier> keys = keySet(); // this class returns a hash set
         Map<Identifier, V> updateValues = new HashMap<>();
         Map<Identifier, V> newValues = new HashMap<>();
-        for(Identifier key : m.keySet()) {
-            if(keys.contains(key)) {
+        for (Identifier key : m.keySet()) {
+            if (keys.contains(key)) {
                 // exists so update
                 updateValues.put(key, m.get(key));
-            }else{
-                newValues.put(key,m.get(key));
+            } else {
+                newValues.put(key, m.get(key));
             }
         }
         update(updateValues);
@@ -764,7 +844,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         Connection c = cr.connection;
         try {
             PreparedStatement stmt = c.prepareStatement(getTable().createInsertStatement());
-            for(Identifier id : newValues.keySet()){
+            for (Identifier id : newValues.keySet()) {
                 doRegisterStatement(stmt, newValues.get(id));
                 stmt.addBatch();
             }
@@ -773,14 +853,8 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             releaseConnection(cr);
         } catch (SQLException e) {
             destroyConnection(cr);
-            throw new GeneralException("Error in mass update :"   + e.getMessage() , e);
+            throw new GeneralException("Error in mass update :" + e.getMessage(), e);
         }
-
-        /*
-        for (Map.Entry e : m.entrySet()) {
-            register((V) e.getValue());
-        }
-*/
     }
 
 

@@ -140,6 +140,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     public static String UPKEEP_FLAG_ENABLE = "-enable";
 
     protected void showUpkeepHelp(InputLine inputLine) throws Exception {
+        String methodName = getMethodName3();
         if (inputLine.hasArg("-ex")) {
             say("Complete sample upkeep configuration:\n");
             say("<upkeep testOnly=\"true\"\n" +
@@ -171,7 +172,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             return;
         }
 
-        say("upkeep ["
+        say(methodName + " ["
                 + UPKEEP_FLAG_TEST + " (true | false) | "
                 + UPKEEP_FLAG_SHOW + " | "
                 + UPKEEP_FLAG_CFG + " path | "
@@ -190,7 +191,6 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         say("Note that you cannot change the stored upkeep for the store, with this utility,");
         say("though you may load different one and " + UPKEEP_FLAG_RUN + "  it.");
         say();
-        say("");
         /*
     UPKEEP_FLAG_TEST
     UPKEEP_FLAG_SHOW
@@ -333,7 +333,8 @@ public abstract class StoreCommands2 extends CommonCommands2 {
 
     protected void showUpdateHelp() {
         String blanks = getBlanks(5);
-        say("update [" + KEY_FLAG + " key | list ] [" + VALUE_FLAG + " value | " + FILE_FLAG + " file_path ]" +
+        String methodName = getMethodName3();
+        say(methodName + " [" + KEY_FLAG + " key | list ] [" + VALUE_FLAG + " value | " + FILE_FLAG + " file_path ]" +
                 "[index] ");
         sayi("Usage: Update the properties of the object.");
         sayi(RJustify(KEY_FLAG, 8) + " - specify a single property for update");
@@ -347,33 +348,33 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         sayi("of the form [key0,key1,...]. (The list_keys command will tell what the keys are.)");
         showKeyShorthandHelp();
         say("E.g.");
-        sayi("update foo:bar");
+        sayi(methodName + " foo:bar");
         sayi("no arguments means to interactively ask for every attribute. foo:bar is the identifier for this object.");
         say("E.g. Update a property from a file");
-        sayi("update >cfg -file /path/to/file /foo:bar");
+        sayi(methodName + " >cfg -file /path/to/file /foo:bar");
         sayi("read the contents of the file (as a string) into the attribute. The shorthand for a single  ");
         sayi(blanks + "property was used here.");
         say("E.g. Mass update #1");
-        sayi("update -key cfg -file /path/to/file my_result_set");
+        sayi(methodName + " -key cfg -file /path/to/file my_result_set");
         sayi("read the contents of the file (as a string) into the attribute for every elements in the");
         sayi("result set named my_result_set.");
         say("E.g. Mass update #2, specify a file");
-        sayi("update " + KEY_SHORTHAND_PREFIX + "cfg -file /path/to/file " + RS_RANGE_SHORT_KEY + " [2,5,6] my_result_set");
+        sayi(methodName + " " + KEY_SHORTHAND_PREFIX + "cfg -file /path/to/file " + RS_RANGE_SHORT_KEY + " [2,5,6] my_result_set");
         sayi("Update items 2, 5 and 6 in the given result set.");
         say("E.g. Mass update #3, specify values");
-        sayi("update -key [allow_qdl,allow_custom_ids] -value [true,false] " + RS_RANGE_SHORT_KEY + " [2,5,6] my_result_set");
+        sayi(methodName + " -key [allow_qdl,allow_custom_ids] -value [true,false] " + RS_RANGE_SHORT_KEY + " [2,5,6] my_result_set");
         sayi("Update items 2, 5 and 6 in the given result set with the given values.");
         say("E.g. Mass update #4, entering values");
-        sayi("update -key [allow_qdl,allow_custom_ids] " + RS_RANGE_SHORT_KEY + " [2,5,6] my_result_set");
+        sayi(methodName + " -key [allow_qdl,allow_custom_ids] " + RS_RANGE_SHORT_KEY + " [2,5,6] my_result_set");
         sayi("Update items 2, 5 and 6. Since no values are specified, you will be prompted for the first");
         say(blanks + "pass and these will be applied to all other objects.");
 
         say("E.g. Update with explicit value");
-        sayi("update " + KEY_SHORTHAND_PREFIX + "name " + VALUE_FLAG + " \"My client\" foo:bar");
+        sayi(methodName + " " + KEY_SHORTHAND_PREFIX + "name " + VALUE_FLAG + " \"My client\" foo:bar");
         sayi("This changes the value of the 'name' attribute to 'My client' for the object with id 'foo:bar'");
         sayi("Note that no prompting is done! The value will be updated.");
         say("E.g. Update selected proeprties, being prompted for each");
-        sayi("update " + KEYS_FLAG + " [name,callback_uri] foo:bar");
+        sayi(methodName + " " + KEYS_FLAG + " [name,callback_uri] foo:bar");
         sayi("This would prompt to update the values for the 'name' and 'callback_uri' properties");
         sayi("of the object with id 'foo:bar'");
         sayi("A few notes.");
@@ -388,7 +389,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
 
 
     protected void showSerializeHelp() {
-        say("serialize  [-file path] index");
+        say(getMethodName3() + "  [-file path] index");
         sayi("Usage: XML serializes an object and either shows it on the ");
         sayi("   command line or put it in a file. Cf. deserialize.");
         printIndexHelp(true);
@@ -405,7 +406,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     }
 
     protected void showDeserializeHelp() {
-        say("deserialize  [-new] -file path [" + SHORT_UPDATE_FLAG + "|" + UPDATE_FLAG + "]");
+        say(getMethodName3() + "  [-new] -file path [" + SHORT_UPDATE_FLAG + "|" + UPDATE_FLAG + "]");
         sayi("Usage: Deserializes an object into the current store overwriting the contents. Cf. serialize.");
         sayi("This replaces the object with the given index in the store.\n");
         sayi("If the -new flag is used, it is assumed that the object should be new. This means that if there is an existing object");
@@ -927,7 +928,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
 
     public void edit(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("edit index");
+            say(getMethodName() + " index");
             sayi("Usage: Edit a single object in an external editor.");
             say("You must have configured an editor in the configuration for this to work.");
             say("If you have not, the default line editor will be used.");
@@ -1228,7 +1229,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     }
 
     protected void showCreateHelp() {
-        say("create [id]\n");
+        say(getMethodName3() + " [id]\n");
         sayi("Usage: Create a new entry in the currently active store.");
         sayi("where the id is a unique identifier for the object.");
         sayi("If you do not specify an");
@@ -1392,7 +1393,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     }
 
     private void showClearIDHelp() {
-        say("clear_id");
+        say(getMethodName3());
         sayi("Usage: Clears the current default identifier.");
         say("See also: set_id, get_id");
     }
@@ -1525,7 +1526,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     }
 
     private void showSetIDHElp() {
-        say("set_id [/]id | index = sets the current identifier.  All subsequent operations will ");
+        say(getMethodName3() + " [/]id | index = sets the current identifier.  All subsequent operations will ");
         say("use this identifier unless it is cleared or you explicitly override it.");
         say("The arguments may be the id, the escaped version (commonly used elsewhere, starts with \"/\") or the index.");
         say("The result will be the actual id of the object.");
@@ -1551,7 +1552,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     }
 
     private void showGetIDHelp() {
-        say("get_id");
+        say(getMethodName3());
         sayi("Usage: Show the current id if any.");
         sayi("See also: clear_id, set_id");
     }
@@ -1802,94 +1803,11 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         }
     }
 
-    /*
-     * Old version. Using it as a resource for rewrite.
-     *
-     * @param inputLine
-     * @throws IOException
-     */
-/*
-    protected void rm2(InputLine inputLine) throws Throwable {
-        if (showHelp(inputLine)) {
-            showRMHelp();
-            return;
-        }
-        boolean forceRemove = inputLine.hasArg(RM_FORCE_FLAG);
-        inputLine.removeSwitch(RM_FORCE_FLAG);
-        String key = getAndCheckKeyArg(inputLine);
-        boolean isRS = hasRS(inputLine);
-        if (isRS) {
-            RSRecord rsRecord = resultSets.get(inputLine.getNextArgFor(RESULT_SET_KEY));
-            if (rsRecord == null) {
-                say("no such stored result.");
-                return;
-            }
-            List<Identifier> identifiers = new ArrayList<>(rsRecord.rs.size());
-            for (Identifiable identifiable : rsRecord.rs) {
-                identifiers.add(identifiable.getIdentifier());
-            }
-            if (key != null || inputLine.hasArg(KEYS_FLAG)) {
-                say("removal of specific keys for result set not yet supported");
-                return;
-            }
-            say("removing " + identifiers.size() + " objects..");
-
-            getStore().remove(identifiers);
-            say("done!");
-            return;
-        }
-        if (forceRemove) {
-            // create a dummy and try that.
-            Identifier identifier = BasicIdentifier.newID(inputLine.getLastArg());
-            getStore().remove(identifier);
-            return;
-        }
-        List<Identifiable> identifiables = findItem(inputLine);
-        if (identifiables == null) {
-            say("Object not found");
-            return;
-        }
-        // if the request does not have new stuff, do old stuff.
-        if (key == null && !inputLine.hasArg(KEYS_FLAG)) {
-            oldrm(inputLine);
-            for (Identifiable identifiable : identifiables) {
-                rmCleanup(identifiable);
-            }
-            return;
-        }
-        if (inputLine.hasArg(KEYS_FLAG)) {
-            List<String> array = inputLine.getArgList(KEYS_FLAG);
-
-            if (array == null) {
-                say("sorry, but this requires a list for this option.");
-                return;
-            }
-            if (identifiables == null) {
-                say("sorry, I could not find that object. Check your id.");
-                return;
-            }
-            for (Identifiable identifiable : identifiables) {
-                removeEntries(identifiable, array);
-            }
-        }
-        if (key != null) {
-            if (identifiables == null) {
-                say("sorry, I could not find that object. Check your id.");
-                return;
-            }
-            for (Identifiable identifiable : identifiables) {
-                removeEntry(identifiable, key);
-
-            }
-            say("removed attribute \"" + key + "\"");
-        }
-    }
-    /
- */
 
     protected void showLSHelp() {
         String blanks = getBlanks(5);
-        say("ls [flags] [>key key | " + KEYS_FLAG + " list] index");
+        String name = getMethodName3();
+        say(name + " [flags] [>key key | " + KEYS_FLAG + " list] index");
         sayi("Usage: Show information about an object or objects.");
         sayi("flags are");
         sayi(StringUtils.RJustify(SHOW_HEADER, 4) + " = " + "List the header of the short form only.");
@@ -1906,22 +1824,21 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         sayi(KEYS_FLAG + " list -  a list of properties to display. You amy specify list or verbose");
         printIndexHelp(false);
         say("E.g.'s");
-        sayi("ls " + LINE_LIST_COMMAND + " " + ALL_LIST_COMMAND + " = line listing of entire store. This may be huge.");
-        sayi("ls " + LINE_LIST_COMMAND + " = line list of the currently active object.");
-        sayi("ls " + ALL_LIST_COMMAND + "  = short list of the entire store.");
-        sayi("ls " + LINE_LIST_COMMAND + " 4 = line list of the 4th item from the " + ALL_LIST_COMMAND + " or " + LOAD_ONLY_COMMAND + " command");
-        sayi("ls " + LINE_LIST_COMMAND + " /foo:bar = line list of the object with identifier foo:bar");
-        sayi("ls " + LINE_LIST_COMMAND + " foo:bar = line list of the object with identifier foo:bar");
-        sayi("ls " + VERBOSE_COMMAND + " foo:bar = verbose list of the object with identifier foo:bar");
-        sayi("ls " + KEYS_FLAG + " [client_id, create_date] my_results = prints only the client ids and create date");
+        sayi(name +" " + LINE_LIST_COMMAND + " " + ALL_LIST_COMMAND + " = line listing of entire store. This may be huge.");
+        sayi(name +" " + LINE_LIST_COMMAND + " = line list of the currently active object.");
+        sayi(name +" " + ALL_LIST_COMMAND + "  = short list of the entire store.");
+        sayi(name +" " + LINE_LIST_COMMAND + " 4 = line list of the 4th item from the " + ALL_LIST_COMMAND + " or " + LOAD_ONLY_COMMAND + " command");
+        sayi(name +" " + LINE_LIST_COMMAND + " /foo:bar = line list of the object with identifier foo:bar");
+        sayi(name +" " + LINE_LIST_COMMAND + " foo:bar = line list of the object with identifier foo:bar");
+        sayi(name +" " + VERBOSE_COMMAND + " foo:bar = verbose list of the object with identifier foo:bar");
+        sayi(name +" " + KEYS_FLAG + " [client_id, create_date] my_results = prints only the client ids and create date");
         sayi(blanks + "from the result set my_results. Remember that this prints what is in the store, not the result set");
         sayi(blanks + "To print the result set, use the rs command.");
-        sayi("ls " + KEY_SHORTHAND_PREFIX + "cfg foo:bar = show the value of the cfg property in the object with ID foo:bar");
+        sayi(name + " " + KEY_SHORTHAND_PREFIX + "cfg foo:bar = show the value of the cfg property in the object with ID foo:bar");
         String colHeader = columnHeader(0, new int[0]);
         if (!StringUtils.isTrivial(colHeader)) {
             say("Short form of the listing has the header");
             say(columnHeader(0, new int[0]));
-
         }
     }
 
@@ -1936,55 +1853,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         return idList != null;
     }
 
-/*
-    protected void oldls1(InputLine inputLine) throws Throwable {
 
-        boolean listAll = inputLine.hasArg(ALL_LIST_COMMAND);
-        boolean listLines = inputLine.hasArg(LINE_LIST_COMMAND);
-        boolean isVerbose = inputLine.hasArg(VERBOSE_COMMAND);
-        inputLine.removeSwitch(ALL_LIST_COMMAND);
-        inputLine.removeSwitch(LINE_LIST_COMMAND);
-        inputLine.removeSwitch(VERBOSE_COMMAND);
-        // Any form of the all flag prints everything.
-        if (listAll) {
-            loadAllEntries();
-            listEntries(loadAllEntries(), listLines, isVerbose);
-            return;
-        }
-        // common case that they type just ls.
-        if (inputLine.getArgCount() == 0) {
-            listEntries(loadAllEntries(), listLines, isVerbose); // list it all
-            return;
-        }
-        FoundIdentifiables identifiables = findItem(inputLine);
-
-        if (identifiables == null) {
-            say("sorry, no such object. Check your id.");
-            return;
-        } else {// found something
-            int count = 0;
-            for (Identifiable identifiable : identifiables) {
-                if (identifiables.isRS()) { // list the stored version, not the one in the RS!
-                    identifiable = (Identifiable) getStore().get(identifiable.getIdentifier());
-                }
-                if (listLines) {
-                    longFormat(identifiable, false);
-                } else {
-                    if (isVerbose) {
-                        longFormat(identifiable, true);
-                    } else {
-                        say(format(identifiable));
-                    }
-                }
-                count++;
-                if (1 < count) {
-                    say("------ end " + identifiable.getIdentifierString()); // spacer when listing multiple
-                    say(); // add a blanks in between too...
-                }
-            }
-        }
-    }
-*/
 
     public void ls(InputLine inputLine) throws Throwable {
         if (inputLine.hasArg(SHOW_HEADER)) {
@@ -2162,7 +2031,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     protected static String SIZE_VERSIONS_FLAG = "-versions";
 
     protected void showSizeHelp() {
-        say("size [" + SIZE_ALL_FLAG + " | " + SIZE_VERSIONS_FLAG + "]");
+        say(getMethodName3() + " [" + SIZE_ALL_FLAG + " | " + SIZE_VERSIONS_FLAG + "]");
         sayi("Usage: Prints out the number of  entries in the store ");
         sayi("This by default does not count versions.");
         sayi(SIZE_ALL_FLAG + " = include a count of everything, including versions");
@@ -2338,7 +2207,8 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     }
 
     protected void showSearchHelp() {
-        say("search ");
+        String name = getMethodName3();
+        say(name);
         sayi("[" + KEY_FLAG + " key | " + KEY_SHORTHAND_PREFIX + "key] ");
         sayi("[(" + SEARCH_REGEX_FLAG + "|" + SEARCH_SHORT_REGEX_FLAG + ") regex] ");
         sayi("[" + SEARCH_SIZE_FLAG + "] ");
@@ -2394,33 +2264,34 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     }
 
     protected void showSearchHelpExamples() {
+        String name = getMethodName3();
         say("All of these examples are in the client store, but the syntax works in any store.");
         say("Be aware that different stores have difference attributes.");
         say("E.g. ");
-        sayi("clients>search " + KEY_SHORTHAND_PREFIX + "client_id " + SEARCH_REGEX_FLAG + " \".*07028.*\"");
+        sayi("clients>"+ name + " " + KEY_SHORTHAND_PREFIX + "client_id " + SEARCH_REGEX_FLAG + " \".*07028.*\"");
         say("Searches for the client_id keys that contains '07028'");
         say("E.g.");
-        sayi("clients> search " + KEY_FLAG + " email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\"");
+        sayi("clients> " +name + " " + KEY_FLAG + " email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\"");
         say("Searches the email keys that contain 'bigstate.edu'.");
         say("Note that the period must be escaped for a regex.");
         say("E.g.");
-        sayi("clients>search " + KEY_SHORTHAND_PREFIX + "client_id " +
+        sayi("clients>" +name + " " + KEY_SHORTHAND_PREFIX + "client_id " +
                 SEARCH_RETURNED_ATTRIBUTES_FLAG + " [name, email] " +
                 SEARCH_SHORT_REGEX_FLAG + " " + ".*237.*");
         say("Searches the client_id keys that contain the string 237 and only print out the name and email from those.");
         say("E.g.");
-        sayi("clients>search " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year");
+        sayi("clients>" + name +" " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year");
         say("Searches the creation_ts keys as dates, returning all that are before Jan 2, 20201.");
         say("This also stores the result under the name last_year. See also the rs command help");
         say("E.g. search for all approvals by date and status");
-        sayi("search >status none -date approval_ts -after 2025-03-01T00:00:0");
+        sayi(name +" >status none -date approval_ts -after 2025-03-01T00:00:0");
         say("searches for all approvals after the given date of March 1, 2025 at midnight.");
         say("E.g.");
-        sayi("clients>search " + KEY_SHORTHAND_PREFIX + "email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\" " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year_email");
+        sayi(name + " " + KEY_SHORTHAND_PREFIX + "email " + SEARCH_SHORT_REGEX_FLAG + " \".*bigstate\\.edu.*\" " + SEARCH_DATE_FLAG + " creation_ts " + SEARCH_BEFORE_TS_FLAG + " 2021-01-02 " + SEARCH_RESULT_SET_NAME + " last_year_email");
         say("Searches per date as in the previous example and further restricts it to matching the given key.");
         say("This also stores the result under the name last_year_email. See also the rs command help");
         say("E.g.");
-        sayi("clients>search " + KEY_SHORTHAND_PREFIX + "client_id " + SEARCH_RETURNED_ATTRIBUTES_FLAG + " email " +
+        sayi(name  + " " + KEY_SHORTHAND_PREFIX + "client_id " + SEARCH_RETURNED_ATTRIBUTES_FLAG + " email " +
                 SEARCH_SHORT_REGEX_FLAG + ".*fnal\\.gov " + RESULT_SET_KEY + " fnal_emails");
         say("searches for clients whose id ends in fnal.gov, returning only the contact email and stashing the output");
         say("into a result set called \"email\" (which can be saved to external storage for, say, for sending mass notifications.)");
@@ -2428,15 +2299,15 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         say("E.g. A date search");
         say("This searches by client id for clients created between the given dates. It stores the result");
         say("in the result set named 's234'");
-        sayi("clients>search >client_id -r .*234.* -date creation_ts -after 2020-05-01 -before 2020-05-30 -rs s234");
+        sayi(name + " >client_id -r .*234.* -date creation_ts -after 2020-05-01 -before 2020-05-30 -rs s234");
         say("got 4 matches");
         say("E.g. getting the most recent entries");
-        sayi("clients>search " + NEXT_N_COMMAND + " 15");
+        sayi(name + " " + NEXT_N_COMMAND + " 15");
         say("This returns the most recent 15 entries to this store. An argument of -15 woudl return the oldest 15.");
         say("E.g. search for a subset");
-        sayi("clients>search -n 5 -out [name, creation_ts, client_id]");
+        sayi(name + " >client_id -n 5 -out [name, creation_ts, client_id]");
         say("E.g. search for a null field, named key_name");
-        sayi("clients>search >key_name -isNull true");
+        sayi(name + " >key_name -isNull true");
         say("\nSee also: rs");
     }
 
@@ -2695,7 +2566,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     }
 
     protected void showCopyHelp() {
-        say("copy source target [" + FORCE_COPY_FLAG + "] [" + RANDOM_ID_FLAG + "] [" + SKIP_UPDATE_PERMISSIONS_FLAG + "]");
+        say(getMethodName3() + " source target [" + FORCE_COPY_FLAG + "] [" + RANDOM_ID_FLAG + "] [" + SKIP_UPDATE_PERMISSIONS_FLAG + "]");
         sayi("Usage: Copy source to target");
         sayi(FORCE_COPY_FLAG + " - force it, so overwrite if the target exists.");
         sayi(RANDOM_ID_FLAG + " - create a random id for the target.");
@@ -3243,7 +3114,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
 
     protected void showResultSetHelp() {
         String blanks = getBlanks(5);
-        sayi("rs action [flags] rs_name.");
+        sayi(getMethodName3() + " action [flags] rs_name.");
         sayi("The list of actions is");
         sayi(RS_APPEND_ACTION + " A0 A1 ..  B - append result sets A0, A1... to B. B must not exist.");
         sayi(RS_CLEAR_ACTION + " - clear ALL results sets.");
@@ -3972,7 +3843,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
 
     protected void showArchiveHelp() {
         String blanks = StringUtils.getBlanks(5);
-        say("archive [" + ARCHIVE_VERSIONS_FLAG + "] | [" + ARCHIVE_RESTORE_FLAG + " version] | [" +
+        say(getMethodName3() + " [" + ARCHIVE_VERSIONS_FLAG + "] | [" + ARCHIVE_RESTORE_FLAG + " version] | [" +
                 ARCHIVE_SHOW_FLAG + " number | " + ARCHIVE_LATEST_VERSION_ARG + "] [index] - archive an object");
         say("Usage: This will either create a copy of the current version");
         sayi(blanks + "or restore a versioned object.");
@@ -4143,13 +4014,13 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     }
 
     protected void showListKeysHelp(InputLine inputLine) {
-        say("list_keys");
+        say(getMethodName3());
         sayi("Usage: This lists the keys of the current store.");
         sayi("The primary key will have a '*' added to the end of it");
         FormatUtil.printFormatListHelp(getIOInterface(), INDENT, inputLine);
     }
 
-    protected void showLSHelp3() {
+ /*   protected void showLSHelp3() {
         say("ls [" + LINE_LIST_COMMAND + "  | " + VERBOSE_COMMAND + " | " + ALL_LIST_COMMAND + "] | [" + KEY_FLAG + " key | " + KEYS_FLAG + " array] id");
         sayi("Usage: Lists information about the contents of the store, an entry and");
         sayi("   individual values of the entry.");
@@ -4182,11 +4053,12 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         sayi("foo:bar. ");
         sayi("\nSee also list_keys, search, archive");
     }
-
+*/
     public static String RM_FORCE_FLAG = "-force";
 
     protected void showRMHelp() {
-        say("rm [" + KEY_FLAG + " | " + KEYS_FLAG + " list] [" + RM_FORCE_FLAG + "] index");
+        String name = getMethodName3();
+        say( name + " [" + KEY_FLAG + " | " + KEYS_FLAG + " list] [" + RM_FORCE_FLAG + "] index");
         sayi("Usage: remove an object or removes a property (or list of them) from an object.");
         sayi("If you supply a list, all of the properties in the list will be removed");
         sayi("No list of keys means to remove the entire object from the store (!)");
@@ -4196,16 +4068,16 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         showKeyShorthandHelp();
         printIndexHelp(false);
         say("E.g.");
-        sayi("rm " + KEY_SHORTHAND_PREFIX + "error_uri foo:bar");
+        sayi(name + KEY_SHORTHAND_PREFIX + "error_uri foo:bar");
         sayi("Removes the value of the property 'error_uri' from the object with id foo:bar");
         say("E.g.");
-        sayi("rm /foo:bar");
+        sayi(name + " /foo:bar");
         sayi("removes the object with id foo:bar completely from the store");
         say("E.g.");
-        sayi("rm " + KEYS_FLAG + " [error_uri,home_uri] foo:bar");
+        sayi(name + " " + KEYS_FLAG + " [error_uri,home_uri] foo:bar");
         sayi("removes the values of the properties error_uri and home_uri from the object with id");
         sayi("equal to foo:bar");
-        sayi("rm " + RS_DROP_ACTION);
+        sayi(name + " " + RS_DROP_ACTION);
     }
 
     /**
@@ -4232,7 +4104,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
 
     public void clear_store(InputLine line) throws Exception {
         if (showHelp(line)) {
-            say("clear_store -- clear every entry in the current store");
+            say(getMethodName() + " -- clear every entry in the current store");
             say("This is mostly used in cases where there has been some great failure or");
             say("perhaps as a debugging aid. It will remove every entry in the currently");
             say("active store **unrecoverably**. Note this only works on precisely the current store,");
@@ -4307,7 +4179,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
 
     public void change_id(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("change_id new [" + SKIP_UPDATE_PERMISSIONS_FLAG + " on|off] index - change the identifier for a single client.");
+            say(getMethodName() + " new [" + SKIP_UPDATE_PERMISSIONS_FLAG + " on|off] index - change the identifier for a single client.");
             say(SKIP_UPDATE_PERMISSIONS_FLAG + " if on, change the identifier in any permissions too. Default is on");
             say("This will update all permissions. At the end of this operations, the");
             say("old identifier will not be in the system any longer.");
@@ -4377,9 +4249,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
             return uri.getPath().equals(uri.getSchemeSpecificPart());
         }
     }
- /*   protected boolean hasRS(InputLine inputLine) {
-        return inputLine.hasArg(RESULT_SET_KEY);
-    }*/
+
 
     /**
      * Does all the checks for a command that accepts a single store object.
@@ -4478,13 +4348,71 @@ public abstract class StoreCommands2 extends CommonCommands2 {
 
     public void time(InputLine inputLine) throws Throwable {
         if (showHelp(inputLine)) {
-            say("time");
+            say(getMethodName());
             sayi("Usage: This will print out the current time in  ISO 8602 format and  in milliseconds since the epoch.");
             return;
         }
         Date now = new Date();
         say("current time is " + Iso8601.date2String(now) + " = " + now.getTime() + " ms.");
     }
+
+    /**
+     * This returns the name of the method in this class that called it
+     * at the depth of the stack.
+     * It should be used in help methods only and is slow and fragile.
+     * There are any number of waysd to improve this, but it is not really
+     * a priority.
+     * <p>Typically, a depth of 2 is used if calling in the command method,
+     * and a depth of 3 if the help is delegated to another function.</p>
+     * <pre>
+     *     if(showHelp(inputLine)){
+     *         say(getMethodName() + ...);
+     *     }
+     * </pre>
+     * But
+     * <pre>
+     *     if(showHelp(inputLine)){
+     *         showXXXHelp();
+     *         return;
+     *     }
+     *
+     * </pre>
+     * then
+     * <pre>
+     *     protected void showXXXHelp(){
+     *         say(getMethodName(3) + ...);
+     *     }
+     * </pre>
+     * @return
+     */
+    protected String getMethodName(int depth){
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        String methodName = stackTrace[depth].getMethodName();
+        return methodName;
+    }
+
+    /*
+       Note that the next couple fo methods are private since any subclass that uses them
+       will automatically get the depth wrong. IN subclasses, use getMethodName(2)
+        or getMethodName(4) instead.
+     */
+    /**
+     * Convenience method for getMathodName(2). Call this for help that is in the method, rather than
+     * one that calls a showHelp method.
+     * @return
+     */
+    private String getMethodName(){
+        return getMethodName(2);
+    }
+
+    /**
+     * Convenience method for getMethodName(4)
+     * @return
+     */
+    private String getMethodName3(){
+        return getMethodName(4); // called by another method, so add 1 to depth
+    }
+
 }
 
 
