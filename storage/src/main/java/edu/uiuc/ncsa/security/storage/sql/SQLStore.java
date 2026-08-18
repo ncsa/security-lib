@@ -202,7 +202,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
                     if (keys.get(i).equals(getTable().getPrimaryKeyColumnName())) continue; // skip it if they send it
                     stmt.setObject(objIndex++, getAsSQLObject(columnMap.get(keys.get(i))));
                 }
-                stmt.setString(keys.size(), value.toString()); // sets the primary key
+                stmt.setString(keys.size(), value.getIdentifierString()); // sets the primary key
                 stmt.addBatch();
             }
             int[] rcs = stmt.executeBatch();
