@@ -9,9 +9,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="https://github.com/ncsa/security-lib/issues/74 add batch insert to SQL stores.&#10;&#10;Updated rest of stores">
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Cleanup adding register(List)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -1005,7 +1004,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="137" />
+    <option name="localTasksCounter" value="138" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1014,7 +1013,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="6.2.2 checkin, includes website rebuild. Corrected a minor bit of bookeeping with indices in the CLI." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/61, added index,html page for PDFs. Tweaked a lot of help." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/62 make the space after -- optional when specifying result sets." />
     <MESSAGE value="Website rebuild" />
@@ -1039,7 +1037,8 @@
     <MESSAGE value="Fix for https://github.com/ncsa/security-lib/issues/73 and https://github.com/ncsa/security-lib/issues/72" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/74 add batch insert to SQL stores." />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/74 add batch insert to SQL stores.&#10;&#10;Updated rest of stores" />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/74 add batch insert to SQL stores.&#10;&#10;Updated rest of stores" />
+    <MESSAGE value="Cleanup adding register(List)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Cleanup adding register(List)" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
