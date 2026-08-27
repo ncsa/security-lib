@@ -24,6 +24,7 @@ import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.cli.editing.EditorEntry;
 import edu.uiuc.ncsa.security.util.cli.editing.EditorUtils;
+import edu.uiuc.ncsa.security.util.configuration.TimeUtil;
 import org.kordamp.json.JSON;
 import org.kordamp.json.JSONArray;
 import org.kordamp.json.JSONObject;
@@ -3451,6 +3452,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     protected Object updateSingleValue(XMLMap map, String key) throws IOException {
         String currentValue = map.getString(key);
 
+
         JSON json = null;
         if (currentValue != null) {
             // edge case to avoid  a &^*%@! JSON null object.
@@ -3467,6 +3469,15 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         if (json == null) {
             // This handles every other value type...
             String newValue = getPropertyHelp(key, "Enter new value for " + key + " ", currentValue);
+            if(map.isLong(key)){
+               long newTime = TimeUtil.getValueSecsOrMillis(newValue);
+               if(map.getLong(key) == newTime){
+                   return false;
+               }else{
+                   map.put(key, newTime);
+                   return newTime;
+               }
+            }
             if (newValue.equals(currentValue)) {
                 return false;
             }

@@ -59,6 +59,30 @@ public class ColumnMap extends HashMap<String, Object> implements ConversionMap<
         return Long.parseLong(obj.toString());
     }
 
+    public boolean isTimestamp(String key){
+        if(!containsKey(key)){return false;}
+        return get(key) instanceof Timestamp;
+    }
+    public boolean isDate(String key){
+        if(!containsKey(key)){return false;}
+        return get(key) instanceof Date;
+    }
+    public boolean isString(String key){
+        if(!containsKey(key)){return false;}
+        return get(key) instanceof String;
+    }
+    public boolean isBoolean(String key){
+        if(!containsKey(key)){return false;}
+        return get(key) instanceof Boolean;
+    }
+    public boolean isInteger(String key){
+        if(!containsKey(key)){return false;}
+        return get(key) instanceof Integer;
+    }
+    public boolean isLong(String key){
+        if(!containsKey(key)){return false;}
+        return get(key) instanceof Long;
+    }
     /**
      * Returns zero if the value is null;
      *

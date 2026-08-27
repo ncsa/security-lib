@@ -41,6 +41,7 @@ public class TimeUtil implements TimeConstants {
      * @param x         un-parsed number
      * @param isSeconds no units means it is seconds (true) or milliseconds (false)
      * @return
+     * @throws IllegalArgumentException if the value cannot be parsed as a number
      */
     public static Long getValueSecsOrMillis(String x, boolean isSeconds) {
         if (isTrivial(x)) {
