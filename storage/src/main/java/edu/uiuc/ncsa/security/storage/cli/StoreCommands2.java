@@ -192,13 +192,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         say("Note that you cannot change the stored upkeep for the store, with this utility,");
         say("though you may load different one and " + UPKEEP_FLAG_RUN + "  it.");
         say();
-        /*
-    UPKEEP_FLAG_TEST
-    UPKEEP_FLAG_SHOW
-    UPKEEP_FLAG_CFG
-    UPKEEP_FLAG_RUN
-    UPKEEP_FLAG_ENABLE
-         */
+
     }
 
     public void upkeep(InputLine inputLine) throws Exception {
@@ -1906,7 +1900,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         String key = getKeyArg(inputLine, true); // grab if there, remove it
         List<String> keys = processList(inputLine, KEYS_FLAG);
 
-        // a this point, there should be nothing on the line except
+        // at this point, there should be nothing on the line except
         // for the index. Therefore, if nothing comes back grom findItems
         // they mean to do this on the whole store.
         boolean useAll = (!hasID()) && inputLine.getArgCount() == 0;
@@ -4031,40 +4025,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         FormatUtil.printFormatListHelp(getIOInterface(), INDENT, inputLine);
     }
 
- /*   protected void showLSHelp3() {
-        say("ls [" + LINE_LIST_COMMAND + "  | " + VERBOSE_COMMAND + " | " + ALL_LIST_COMMAND + "] | [" + KEY_FLAG + " key | " + KEYS_FLAG + " array] id");
-        sayi("Usage: Lists information about the contents of the store, an entry and");
-        sayi("   individual values of the entry.");
-        sayi("When listing multiple entries, tools will use the most numbers from the most recent call to this.");
-        sayi("A line listing is tabular and will shorten entries that are too long, ending them with " + ELLIPSIS);
-        sayi("A verbose command will format every bit of every entry within the margins.");
-        showKeyShorthandHelp();
-        say("E.g.");
-        sayi("ls " + LINE_LIST_COMMAND + "  " + ALL_LIST_COMMAND);
-        sayi("Prints out the line form of *every* object in this store. This may be simply huge");
-        say("E.g.");
-        sayi("ls");
-        sayi("Prints out the short form of *every* object in this store. This may also be huge.");
-        sayi("If you are using this to find things, you probably want to look at the search command");
-        say("E.g.");
-        sayi("ls " + LINE_LIST_COMMAND + "  /foo:bar");
-        sayi("Prints a line format for the entry with id foo:bar");
-        say("E.g.");
-        sayi("ls " + VERBOSE_COMMAND + " /foo:bar");
-        sayi("prints out a verbose listing of the entry with id foo:bar.");
-        say("E.g.");
-        sayi("ls " + KEY_FLAG + " id /foo:bar");
-        sayi(">   foo:bar");
-        sayi("Prints out the id property for the object with identifier foo:bar");
-        sayi("");
-        sayi("You may also supply a list of keys in an array of the form [key0,key1,...].");
-        say("E.g.");
-        sayi("ls " + KEYS_FLAG + " [id,callback_uris,create_ts] /foo:bar");
-        sayi("would print the id, callback_uri and create_ts properties for the object with id");
-        sayi("foo:bar. ");
-        sayi("\nSee also list_keys, search, archive");
-    }
-*/
+
     public static String RM_FORCE_FLAG = "-force";
 
     protected void showRMHelp() {
@@ -4403,7 +4364,7 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     }
 
     /*
-       Note that the next couple fo methods are private since any subclass that uses them
+       Note that the next couple of methods are private since any subclass that uses them
        will automatically get the depth wrong. IN subclasses, use getMethodName(2)
         or getMethodName(4) instead.
      */

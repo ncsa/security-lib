@@ -122,12 +122,6 @@ public class SASCommands extends StoreCommands {
             }
         }
 
-/*  At this point we don't use this field.r
-        if(isOK(getInput("Enter a configuration? (y/n)", ""))){
-
-        }
-*/
-
 
     }
 
@@ -191,20 +185,6 @@ public class SASCommands extends StoreCommands {
         CFNode cfNode = bundle.getNamedConfig(cfgname);
         SASCFConfigurationLoader loader = new SASCFConfigurationLoader(cfNode);
 
-//      Old style -- single inheritance
-        /*
-           ConfigurationNode node = XMLConfigUtil.findConfiguration(
-                inputLine.getNextArgFor(CONFIG_FILE_FLAG),
-                cfgname, CONFIG_TAG_NAME);
-      SASConfigurationLoader loader = new SASConfigurationLoader(node);
-
-*/
-
-        // New style -- multi-inheritance.
-        /*
-             ConfigurationNode node = XMLConfigUtil.findMultiNode(inputLine.getNextArgFor(CONFIG_FILE_FLAG), cfgname, CONFIG_TAG_NAME );
-            SASConfigurationLoader loader = new SASConfigurationLoader(node);\
-         */
 
         SASEnvironment SASEnvironment1 = loader.load();
         SASCommands SASCommands = new SASCommands(SASEnvironment1);
