@@ -36,6 +36,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -71,6 +74,8 @@ public abstract class StoreCommands2 extends CommonCommands2 {
         this((CLIDriver) null);
         this.environment = environment;
     }
+
+
 
     public AbstractEnvironment getEnvironment() {
         return environment;
@@ -4384,6 +4389,112 @@ public abstract class StoreCommands2 extends CommonCommands2 {
     private String getMethodName3(){
         return getMethodName(4); // called by another method, so add 1 to depth
     }
+
+    public static String HOCON_TO_HOCON = "-hocon";
+    public static String HOCON_TO_JSON = "-json";
+    public static String HOCON_SYNTAX = "-syntax";
+
+    /**
+     * HOCON/JSON utility to convert between them. We prefer HOCON since it is human
+     * readable, but not every system can handle it, so a utility to convert between
+     * them is useful. This also accepts files as arguments.
+     * @param inputLine
+     * @throws Exception
+     */
+    public void hocon(InputLine inputLine) throws Exception{
+        if(showHelp(inputLine)){
+            int width = 8;
+            say(getMethodName()
+                    + " [" + HOCON_TO_HOCON + " | " + HOCON_TO_JSON + "] "
+                    + "[" + CL_INPUT_FILE_FLAG +  " input_file] "
+                    + "[" + CL_OUTPUT_FILE_FLAG +  " output_file] "
+                    + " [" + HOCON_SYNTAX + "] " +
+                    "- let you check syntax on hocon, or convert JSON to HOCON, HOCON to JSON");
+            say(RJustify(HOCON_TO_HOCON,width) + " - convert to HOCON from JSON");
+            say(RJustify(HOCON_TO_JSON,width) + " - convert to JSON from HOCON");
+            say(RJustify(HOCON_SYNTAX,width) + " - (default) check syntax of input");
+            say(RJustify(CL_INPUT_FILE_FLAG,width) + " - specify an input file, rather than get it from the console");
+            say(RJustify(CL_OUTPUT_FILE_FLAG,width) + " - specify an output file, rather than write it to the console");
+            say();
+            say("This is a convenience utility that lets you check syntax and display JSON or HOCON.");
+            say("This is because some utilities and programs may or may not understand HOCON.");
+            say("Having a JSON syntax checker available is quite nice too.");
+            say("No arguments means to read from the console and do a syntax check.");
+            say("Do note that if the argument fails syntax, it cannot be formatted to HOCON or JSON.");
+            return;
+        }
+        String raw;
+        boolean isHocon = inputLine.hasArg(HOCON_TO_HOCON);
+        boolean isJson = inputLine.hasArg(HOCON_TO_JSON);
+        inputLine.removeSwitch(HOCON_TO_HOCON);
+        inputLine.removeSwitch(HOCON_TO_JSON);
+        boolean hasSyntaxSwitch = inputLine.hasArg(HOCON_SYNTAX);
+        boolean noSwitches = !hasSyntaxSwitch && !isHocon && !isJson;
+        inputLine.removeSwitch(HOCON_SYNTAX);
+        boolean hasInputFile = inputLine.hasArg(CL_INPUT_FILE_FLAG);
+        if(hasInputFile){
+            String fileName = inputLine.getNextArgFor(CL_INPUT_FILE_FLAG);
+            byte[] rawBytes = Files.readAllBytes(Path.of(fileName));
+            raw = new String(rawBytes);
+            inputLine.removeSwitchAndValue(CL_INPUT_FILE_FLAG);
+        }else{
+            raw = multiLineInput(null, "");
+        }
+        boolean hasOutputFile = inputLine.hasArg(CL_OUTPUT_FILE_FLAG);
+        String outputFileName = null;
+        if(hasOutputFile){
+             outputFileName = inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG);
+            inputLine.removeSwitchAndValue(CL_OUTPUT_FILE_FLAG);
+        }
+// Now for HOCON
+        Config config = ConfigFactory.parseString(raw);
+        ConfigRenderOptions hoconOptions = ConfigRenderOptions.defaults()
+                .setJson(false)               // false enables HOCON format, true outputs JSON
+                .setFormatted(true)           // pretty-print the output
+                .setComments(true)            // Preserve original comments
+                .setOriginComments(false);    // Do not allow for parser chatter
+
+        ConfigRenderOptions jsonOptions = ConfigRenderOptions.concise();
+        JSONObject json;
+        String out = "";
+        try {
+
+            json = JSONObject.fromObject(config.root().render(jsonOptions));
+            if(hasSyntaxSwitch || noSwitches){
+                out = "syntax is valid";
+                if(hasOutputFile){
+                    Files.write(Path.of(outputFileName), out.getBytes(Charset.forName("UTF-8")));
+                }else {
+                    say(out);
+                }
+            }
+        }catch(Throwable throwable){
+            out = "Error parsing input:" + throwable.getMessage();
+            if(hasOutputFile){
+                Files.write(Path.of(outputFileName), out.getBytes(Charset.forName("UTF-8")));
+            }
+            say(out);
+            return;
+        }
+
+        if(isJson){
+            if(hasOutputFile){
+                out = out + "\n" + json.toString(1);
+            }else {
+                say(json.toString(1));
+            }
+        }
+        if(isHocon){
+            if(hasOutputFile){
+                out = out + "\n" + config.root().render(hoconOptions);
+            }
+            say(config.root().render(hoconOptions));
+        }
+        if(hasOutputFile){
+            Files.write(Path.of(outputFileName), out.getBytes(Charset.forName("UTF-8")));
+        }
+    }
+
 
 }
 

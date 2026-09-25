@@ -24,8 +24,8 @@ public abstract class AbstractCommandsImpl implements Commands {
     public static final String NO_HEADER = "-noHeader";
     public static final String SILENT = "-silent";
     public static final String LOGO = "-logo";
-    protected String CL_OUTPUT_FILE_FLAG = "-out";
-    protected String CL_INPUT_FILE_FLAG = "-in";
+    public static final String CL_INPUT_FILE_FLAG = "-in";
+    public static final String CL_OUTPUT_FILE_FLAG = "-out";
 
     String ENV_ADD_FLAG = "-add";
     String ENV_OVERWRITE_FLAG = "-overwrite";
