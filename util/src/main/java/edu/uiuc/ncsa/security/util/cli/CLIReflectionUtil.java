@@ -11,7 +11,7 @@ import java.util.HashMap;
  */
 public class CLIReflectionUtil {
     static Method[] objectM = Object.class.getMethods(); // list of standard methods in java.lang.Object
-    static Modifier mod = new Modifier(); // just need a dummy instance
+   // static Modifier mod = new Modifier(); // just need a dummy instance
 
     /**
      * Returns true if the methodName is one of the java.lang.Object basic methods (e.g. toString()).
@@ -23,8 +23,8 @@ public class CLIReflectionUtil {
     public static boolean isJavaObjectMethod(String methodName, int mods) {
         for (int i1 = 0; i1 < objectM.length; i1++) {
             int objMods = objectM[i1].getModifiers();
-            if (!mod.isPublic(mods) || mod.isStatic(mods) || //
-                    !mod.isPublic(objMods) || mod.isStatic(objMods) || //
+            if (!Modifier.isPublic(mods) || Modifier.isStatic(mods) || //
+                    !Modifier.isPublic(objMods) || Modifier.isStatic(objMods) || //
                     methodName.equals(objectM[i1].getName())) {
                 return true;
             } // end of comparing names with java general Object calls.
@@ -82,7 +82,8 @@ public class CLIReflectionUtil {
      public static boolean hasRightSignature(Method method) {
          int mods = method.getModifiers();
          Class pvec[] = method.getParameterTypes();
-         return mod.isPublic(mods) && !mod.isStatic(mods)  && pvec.length == 1 && pvec[0].equals(InputLine.class);
+
+         return Modifier.isPublic(mods) && !Modifier.isStatic(mods)  && pvec.length == 1 && pvec[0].equals(InputLine.class);
      }
 
 }
