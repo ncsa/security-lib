@@ -9,9 +9,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Modified to buildunder Java 17">
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="https://github.com/ncsa/security-lib/issues/75">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/core/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sas-server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/sas-server/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/util/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web-installer/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -1007,7 +1011,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="141" />
+    <option name="localTasksCounter" value="142" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1016,7 +1020,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="Finally tracked down and fixed https://github.com/ncsa/security-lib/issues/63!!" />
     <MESSAGE value="fixed https://github.com/ncsa/security-lib/issues/65" />
     <MESSAGE value="A few teweak, mostly website regeneration" />
     <MESSAGE value="Website straggler." />
@@ -1041,7 +1044,8 @@
     <MESSAGE value="Missing HTML files added to build." />
     <MESSAGE value="Small updates to the store commands -- support for time strings, e.g. setting one as &quot;24 hr&quot; rather than having to input milliseconds." />
     <MESSAGE value="Modified to buildunder Java 17" />
-    <option name="LAST_COMMIT_MESSAGE" value="Modified to buildunder Java 17" />
+    <MESSAGE value="https://github.com/ncsa/security-lib/issues/75" />
+    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/75" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">

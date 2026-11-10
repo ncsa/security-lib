@@ -29,18 +29,7 @@
             <artifactId>core</artifactId>
             <version>6.x-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>core</artifactId>
-            <version>6.x-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>edu.uiuc.ncsa.security</groupId>
-            <artifactId>core</artifactId>
-            <version>6.x-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
+
     </dependencies>
     <build>
         <plugins>
