@@ -968,7 +968,7 @@ public class WebInstaller {
     protected String createSecret(int length) {
         byte[] ba = new byte[length];
         secureRandom.nextBytes(ba);
-        String out = Base64.getEncoder().encodeToString(ba);
+        String out = StringUtils.base64ToString(ba);
         /*
         a URL-safe
          */

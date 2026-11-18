@@ -1,10 +1,10 @@
 package edu.uiuc.ncsa.security.util.pkcs;
 
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jasypt.util.text.BasicTextEncryptor;
 
 import java.security.SecureRandom;
-import java.util.Base64;
 
 /**
  * Utility to password protect files. This takes a password and any text
@@ -41,7 +41,7 @@ public class EncryptionUtil {
         byte[] bytes = new byte[200];
         SecureRandom secureRandom = new SecureRandom();
         secureRandom.nextBytes(bytes);
-        String original = Base64.getEncoder().encodeToString(bytes);
+        String original = StringUtils.base64ToString(bytes);
         String encrypted = encrypt(original, password);
         System.out.println(encrypted);
         String decrypted = decrypt(encrypted, password);

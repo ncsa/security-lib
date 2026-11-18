@@ -4,29 +4,40 @@ import edu.uiuc.ncsa.security.core.Store;
 
 import javax.inject.Provider;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 5/24/12 at  10:21 AM
  */
 public class AggregateStoreProvider implements Provider<AggregateStore> {
-    ArrayList<Provider<? extends Store>> providers = new ArrayList<Provider<? extends Store>>();
+    List<Store> writeStores = new ArrayList<Store>();
+    List<Store> readStores = new ArrayList<Store>();
 
-    public void addProvider(Provider<? extends Store> x) {
-        providers.add(x);
+    public List<Store> getWriteStores() {
+        return writeStores;
     }
 
-    AggregateStore<Store> store;
+    public void setWriteStores(List<Store> writeStores) {
+        this.writeStores = writeStores;
+    }
+
+    public List<Store> getReadStores() {
+        return readStores;
+    }
+
+    public void setReadStores(List<Store> readStores) {
+        this.readStores = readStores;
+    }
+
+
+
+    AggregateStore store = null; // so provider gives back same store
 
     @Override
     public AggregateStore get() {
-        Store[] stores = new Store[providers.size()];
-        int i = 0;
-        for (Provider p : providers) {
-            stores[i++] = (Store) p.get();
-        }
         if (store == null) {
-            store = new AggregateStore(stores);
+            store = new AggregateStore(writeStores, readStores);
         }
         return store;
     }

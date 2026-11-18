@@ -51,7 +51,7 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
     public void updateRS(List<Identifier> ids, Map<String, Object>  values) throws UnregisteredObjectException;
 
     /**
-     * MAss Update for list of entries. This batches up the entries if SQL.
+     * Mass Update for list of entries. This batches up the entries if SQL.
      * <h3>Nota Bene</h3>
      * The objects must exist first. If not, use {@link #putAll(Map)}
      * Only caveat is that all of the object must update date <i>same</i>

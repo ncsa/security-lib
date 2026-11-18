@@ -19,7 +19,7 @@ public class StringUtils {
     public static boolean JUSTIFY_LEFT = false;
     public static boolean JUSTIFY_RIGHT = true;
     public static String ELLIPSIS = "...";
-    public static String[] LOGICAL_TRUES = new String[]{"true",  "yes", "1", "on", "yup", "yeah", "enable", "enabled", "ok"};
+    public static String[] LOGICAL_TRUES = new String[]{"true", "yes", "1", "on", "yup", "yeah", "enable", "enabled", "ok"};
     public static String[] LOGICAL_FALSES = new String[]{"false", "no", "0", "off", "nope", "nay", "disable", "disabled"};
 
     /**
@@ -71,27 +71,29 @@ public class StringUtils {
      * repeatString("*", 1)
      * **********
      * </pre>
+     *
      * @param s
      * @param width
      * @return
      */
-    public static String repeatString(String s, int width){
+    public static String repeatString(String s, int width) {
         if (width <= 0) {
             return "";
         }
         char[] output = new char[width];
         char[] input = s.toCharArray();
-        int iterations = width / input.length ;
+        int iterations = width / input.length;
         for (int i = 0; i < iterations; i++) {
-            System.arraycopy(input, 0, output, i*input.length, input.length);
+            System.arraycopy(input, 0, output, i * input.length, input.length);
         }
         int remainder = width % input.length;
-        if(0 < remainder) {
+        if (0 < remainder) {
             System.arraycopy(input, 0, output, iterations * input.length, remainder);
         }
 
         return new String(output);
     }
+
     static String nbSpaces = "                          ";
 
     public static String getNBSpaces(int width) {
@@ -135,21 +137,23 @@ public class StringUtils {
 
     /**
      * Create a horizontal "line" of characters, repeating, for the given length.
+     *
      * @param s
      * @param length
      * @return
      */
-    public static String hLine(String s, int length){
-        double x = Math.ceil(length/(1.0d*s.length()));
+    public static String hLine(String s, int length) {
+        double x = Math.ceil(length / (1.0d * s.length()));
         BigDecimal bd = new BigDecimal(x);
         int count = bd.intValue(); // number of time to run the loop.
         StringBuilder sb = new StringBuilder();
-        for(int i=0; i<count; i++){
+        for (int i = 0; i < count; i++) {
             sb.append(s);
         }
         // might have added an extra character
         return sb.toString().substring(0, length);
     }
+
     /**
      * If the string is either null or empty. This is a very common idiom for testing strings
      * but the built in {@link String#isEmpty()} of course cannot be used on a null object...
@@ -168,7 +172,7 @@ public class StringUtils {
      * @param args
      */
     public static void main(String[] args) {
-        System.out.println("abcabcabcab".equals(repeatString("abc",11))?"repeatString: pass" : "repeatString: FAIL"); // 8 sec
+        System.out.println("abcabcabcab".equals(repeatString("abc", 11)) ? "repeatString: pass" : "repeatString: FAIL"); // 8 sec
 
         tests();
         tableTest();
@@ -209,14 +213,36 @@ public class StringUtils {
                 }
                 byte[] b = new byte[entryLength];
                 random.nextBytes(b);
-                row.add(Base64.getEncoder().encodeToString(b));
+                row.add(base64ToString(b));
             }
             table.add(row);
         }
         List<String> output = formatTable(null, table, -1, true);
         for (int i = 0; i < output.size(); i++) {
             System.out.println(output.get(i));
+
         }
+    }
+
+    /**
+     * Take the raw bytes for a string, base64 encode it and return the string. The result is URL
+     * safe.
+     *
+     * @param b
+     * @return
+     */
+    public static String base64ToString(byte[] b) {
+        return org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(b);
+    }
+
+    /**
+     * Take a string, base64 rncode it and return a URL safe base64 string.
+     *
+     * @param s
+     * @return
+     */
+    public static String toBase64String(String s) {
+        return base64ToString(s.getBytes());
     }
 
     private static void tests() {
@@ -232,10 +258,10 @@ public class StringUtils {
                 "Did gyre and gymble in þe wabe: " +
                 "All mimsy were þe borogoves; " +
                 "And þe mome raths outgrabe.";
-        System.out.println("Test break at spaces:\n-------------------------| 25\n"  + breakAtSpaces(lineIn, 25) );
+        System.out.println("Test break at spaces:\n-------------------------| 25\n" + breakAtSpaces(lineIn, 25));
         // 26 a's, 54 b's
-        String lineIn2 = "Twas bryllyg, and þe aaaaaaaaaaaaaaaaaaaaaaaaaa slythy toves bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb        Did gyre and gymble         " ;
-        System.out.println("Test break at spaces 2:\n-------------------------| 25\n"  + breakAtSpaces(lineIn2, 25) );
+        String lineIn2 = "Twas bryllyg, and þe aaaaaaaaaaaaaaaaaaaaaaaaaa slythy toves bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb        Did gyre and gymble         ";
+        System.out.println("Test break at spaces 2:\n-------------------------| 25\n" + breakAtSpaces(lineIn2, 25));
 
         List<String> y = new ArrayList<>();
         y.add("       foo : azxz");
@@ -713,9 +739,9 @@ public class StringUtils {
         }
         // Use the order of the tmap (so its sorted) but the XMLMap has information we need to get these.
         Collection keySet;
-        if(sortKeys) {
+        if (sortKeys) {
             keySet = tMap.keySet();
-        }else{
+        } else {
             keySet = map.keySet();
         }
         for (Object key : keySet) {
@@ -746,10 +772,10 @@ public class StringUtils {
                     }
 
                 }
-                if(omitLineNumbers) {
+                if (omitLineNumbers) {
                     outputList.add(formatMapEntry("", v, indent, displayWidth, width, multiLine));
 
-                }else{
+                } else {
                     outputList.add(formatMapEntry(key.toString(), v, indent, displayWidth, width, multiLine));
                 }
             }
@@ -802,9 +828,9 @@ public class StringUtils {
             List<String> flowedtext = wrap(0, StringUtils.toList(value), realWidth - leftColumWidth);
 
             StringBuffer stringBuffer = new StringBuffer();
-            if(omitLineNumbers) {
+            if (omitLineNumbers) {
                 stringBuffer.append(flowedtext.get(0) + ((flowedtext.size() <= 1 && shortLine) ? "" : "\n"));
-            }else{
+            } else {
                 stringBuffer.append(RJustify(key, leftColumWidth) + " : " + flowedtext.get(0) + ((flowedtext.size() <= 1 && shortLine) ? "" : "\n"));
             }
             boolean isFirstLine = true;
@@ -838,10 +864,10 @@ public class StringUtils {
                     truncate(value.replace("\n", "\n"+bbb).replace("\r", "\r"+bbb), realWidth);
         }
 */
-        if(omitLineNumbers) {
-            return  truncate(value.replace("\n", "").replace("\r", ""), realWidth);
-        }else{
-            return RJustify(key,indentWidth + leftColumWidth) + " : " +
+        if (omitLineNumbers) {
+            return truncate(value.replace("\n", "").replace("\r", ""), realWidth);
+        } else {
+            return RJustify(key, indentWidth + leftColumWidth) + " : " +
                     truncate(value.replace("\n", "").replace("\r", ""), realWidth);
         }
     }
@@ -1070,6 +1096,7 @@ public class StringUtils {
         int padLeft = (width - text.length()) / 2;
         return getBlanks(padLeft) + text + getBlanks(width - text.length() - padLeft);
     }
+
     public static String center(Integer value, int width) {
         return center(value.toString(), width);
     }
@@ -1085,16 +1112,18 @@ public class StringUtils {
      *  liddle lambsidivy
      * </pre>
      * N.B. that multiple spaces are converted to single spaces.
+     *
      * @param input
      * @param width
      * @return
      */
     public static String breakAtSpaces(String input, int width) {
-      return fromList(breakAtSpacesList(input,width));
+        return fromList(breakAtSpacesList(input, width));
     }
 
     /**
      * Same as {@link #breakAtSpaces(String, int)} but return a list.
+     *
      * @param input
      * @param width
      * @return
@@ -1106,32 +1135,32 @@ public class StringUtils {
         boolean firstPass = true;
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
-            if(width < token.length()) {
+            if (width < token.length()) {
                 output.add(sb.toString());
                 sb = new StringBuilder();
                 int i = 0;
-                String lastToken = token.substring(i*width,(i+1)*width);
-                while(width <= lastToken.length()) {
+                String lastToken = token.substring(i * width, (i + 1) * width);
+                while (width <= lastToken.length()) {
                     i++;
                     output.add(lastToken);
-                    if(token.length() < (i+1)*width){
+                    if (token.length() < (i + 1) * width) {
                         lastToken = token.substring(i * width);
-                    }else{
+                    } else {
                         lastToken = token.substring(i * width, (i + 1) * width);
                     }
                 }
                 output.add(lastToken);
                 continue;
             }
-            if(width <= sb.length() + token.length()) {
+            if (width <= sb.length() + token.length()) {
                 output.add(sb.toString());
                 sb = new StringBuilder();
                 sb.append(token);
-            }else{
-                if(firstPass) {
+            } else {
+                if (firstPass) {
                     firstPass = false;
-                }else{
-                    if(0 < sb.length()) {
+                } else {
+                    if (0 < sb.length()) {
                         sb.append(" ");
                     }
                 }
@@ -1145,6 +1174,7 @@ public class StringUtils {
     /**
      * Convert a string to a boolean if it parses, null otherwise. Case matters so "TRUE"
      * will fail. Uses {@link #LOGICAL_TRUES} and {@link #LOGICAL_FALSES}.
+     *
      * @param x
      * @return
      */
@@ -1155,27 +1185,34 @@ public class StringUtils {
     /**
      * Case insensitive conversion of a string to a boolean or null if it does not parse.
      * Both "TRUE" and "true" work. Uses {@link #LOGICAL_TRUES} and {@link #LOGICAL_FALSES}.
+     *
      * @param x
      * @param ignoreCase
      * @return
      */
     public static Boolean toBoolean(String x, boolean ignoreCase) {
-        for(String y : LOGICAL_TRUES){
-            if(ignoreCase){
-                if(x.equalsIgnoreCase(y)){return Boolean.TRUE;}
-            }else {
+        for (String y : LOGICAL_TRUES) {
+            if (ignoreCase) {
+                if (x.equalsIgnoreCase(y)) {
+                    return Boolean.TRUE;
+                }
+            } else {
                 if (x.equals(y)) {
                     return Boolean.TRUE;
                 }
             }
         }
-        for(String y : LOGICAL_FALSES){
-            if(ignoreCase){
-                if(x.equalsIgnoreCase(y)){return Boolean.FALSE;}
-            }else{
-                if(x.equals(y)){return Boolean.FALSE;}
+        for (String y : LOGICAL_FALSES) {
+            if (ignoreCase) {
+                if (x.equalsIgnoreCase(y)) {
+                    return Boolean.FALSE;
+                }
+            } else {
+                if (x.equals(y)) {
+                    return Boolean.FALSE;
+                }
             }
         }
-       return null;
+        return null;
     }
 }

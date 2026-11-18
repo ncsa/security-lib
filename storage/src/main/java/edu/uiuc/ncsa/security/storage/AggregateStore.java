@@ -12,18 +12,30 @@ import java.util.*;
 
 /**
  * A store of stores. This implements the store interface and passes through the
- * calls to each underlying store. This allows an application to treat a collection
+ * calls to each underlying store. This supports lists of read and write
+ * store, so it is possible to have one store for reading and anothe store for
+ * writing. If an item is not in a store, then the next store is checked.
+ * This allows an application to treat a collection
  * of stores as a one big logical store. Note that this works locally
  * at each stage, so, e.g. if an {@link #update(edu.uiuc.ncsa.security.core.Identifiable)}
  * is issued, the first store found containing the information is what is updated.
  * Not perfect, but will probably keep information more or less localized...
+ * <h2>Using this store to migrate stores</h2>
+ * <p>
+ *     If you judiciously set the read and write stores, so that exactly one is a target
+ *     and both are sources, then you will gradually migrate the data from source
+ *     to target. This is useful when you need to seamlessly migrate.. The
+ *     best part is that you amy check what is not migrated after a certain interval to
+ *     winnow out unused store objects.
+ * </p>
  * <p>Created by Jeff Gaynor<br>
  * on 5/24/12 at  9:16 AM
  */
 public class AggregateStore<V extends Store> implements Store {
-    public AggregateStore(V... stores) {
-        for (V s : stores) {
-            this.stores.add(s);
+    public AggregateStore(List<V> writeStores, List<V> readStores) {
+        for (V s : writeStores) {
+            this.writeStores.addAll(writeStores);
+            this.readStores.addAll(readStores);
         }
     }
 /*
@@ -33,16 +45,42 @@ public class AggregateStore<V extends Store> implements Store {
  */
     @Override
     public int[] update(List m) {
-        return new int[0];
+        // ToDO: If a target does not exist yet, this will bomb, so updating between stores is not possible.
+        // Make it so failures are checked for existence. This will probably slow it down considerably.
+        Throwable lastThrown = null;
+        int[] rc;
+        for(V s:writeStores){
+            try{
+                rc = s.update(m);
+            }catch (Throwable t){
+                lastThrown = t;
+            }
+        }
+        if(lastThrown instanceof RuntimeException){
+            throw (RuntimeException) lastThrown;
+        }
+        throw new GeneralException("Error: could not update any store", lastThrown);
     }
 
     @Override
     public int[] register(List value) {
+        for (V s : writeStores) {
+            try {
+                return s.register(value);
+            }catch (Throwable t){
+
+            }
+        }
         return new int[0];
     }
 
     @Override
     public int[] save(List value) {
+        for (V s : writeStores) {
+            try {
+                return s.save(value);
+            }catch(Throwable t){}
+        }
         return new int[0];
     }
 
@@ -61,15 +99,25 @@ public class AggregateStore<V extends Store> implements Store {
         throw new NotImplementedException("Error: This is not yet implemented for aggregate stores");
     }
 
-    protected List<V> stores = new ArrayList<V>();
+    protected List<V> writeStores = new ArrayList<V>();
+
+    public List<V> getReadStores() {
+        return readStores;
+    }
+
+    public void setReadStores(List<V> readStores) {
+        this.readStores = readStores;
+    }
+
+    protected List<V> readStores = new ArrayList<V>();
 
     /**
      * Gives access to the list of stores. Mostly for testing purposes.
      *
      * @return
      */
-    public List<V> stores() {
-        return stores;
+    public List<V> writeStores() {
+        return writeStores;
     }
 
     /**
@@ -79,28 +127,40 @@ public class AggregateStore<V extends Store> implements Store {
      *
      * @param store
      */
-    public void addStore(V store) {
-        stores.add(store);
+    public void addWriteStore(V store) {
+        writeStores.add(store);
     }
 
+    public void addReadStore(V store) {
+        readStores.add(store);
+    }
+
+    /**
+     * Adds a store for both reading and writing.
+     * @param store
+     */
+    public void addReadAndWriteStore(V store) {
+        addReadStore(store);
+        addWriteStore(store);
+    }
     @Override
     public int size(boolean includeVersions) {
         int x = 0;
-        for (Store s : stores) {
+        for (Store s : writeStores) {
             x = x + s.size(includeVersions);
         }
         return x;
     }
 
     protected void checkValid() {
-        if (0 == stores.size()) {
+        if (0 == writeStores.size()) {
             throw new GeneralException("Error: Aggregate store is empty. There must be at least one store in the aggregate.");
         }
     }
 
     public V defaultStore() {
         checkValid();
-        return stores.get(0);
+        return writeStores.get(0);
     }
 
     @Override
@@ -111,26 +171,25 @@ public class AggregateStore<V extends Store> implements Store {
     @Override
     public void update(Identifiable value) {
         checkValid();
-        for (Store s : stores) {
+        for (Store s : writeStores) {
             if (s.containsKey(value.getIdentifier())) {
-                s.update(value);
-                return;
-            }
+                    s.update(value);
+                    return;
+            } // end for
+            // If we get here, this does not exist.
+            // Assuming that the object is not registered, we will try to register it.
+            defaultStore().register(value);
         }
-        throw new UnregisteredObjectException("Error: cannot update non-existent object. You must register it first");
     }
 
     @Override
     public void register(Identifiable value) {
-        for (Store s : stores) {
-            if (s.containsKey(value.getIdentifier())) return;
-        }
         defaultStore().register(value);
     }
 
     @Override
     public void save(Identifiable value) {
-        for (Store s : stores) {
+        for (Store s : writeStores) {
             // try to get it to the right store.
             try {
                 if (s.containsKey(value.getIdentifier())) {
@@ -152,7 +211,7 @@ public class AggregateStore<V extends Store> implements Store {
     @Override
     public int size() {
         int x = 0;
-        for (Store s : stores) {
+        for (Store s : writeStores) {
             x = x + s.size();
         }
         return x;
@@ -166,7 +225,7 @@ public class AggregateStore<V extends Store> implements Store {
 
     @Override
     public boolean containsKey(Object key) {
-        for (Store s : stores) {
+        for (Store s : writeStores) {
             if (s.containsKey(key)) return true;
         }
         return false;
@@ -174,7 +233,7 @@ public class AggregateStore<V extends Store> implements Store {
 
     @Override
     public boolean containsValue(Object value) {
-        for (Store s : stores) {
+        for (Store s : writeStores) {
             if (s.containsValue(value)) return true;
         }
         return false;
@@ -188,7 +247,7 @@ public class AggregateStore<V extends Store> implements Store {
      */
     @Override
     public Object get(Object key) {
-        for (Store s : stores) {
+        for (Store s : readStores) {
             try {
                 Object obj = s.get(key);
                 if (obj != null) return obj;
@@ -201,16 +260,18 @@ public class AggregateStore<V extends Store> implements Store {
 
     @Override
     public Object put(Object key, Object value) {
-        for (Store s : stores) {
-            if (s.containsKey(key)) {
-                return s.put(key, value);
-            }
+        if(!(value instanceof Identifiable)){
+            throw new IllegalArgumentException("Error: value must be an Identifiable");
         }
-        return defaultStore().put(key, value);
-    }
+        if(!((Identifiable)value).getIdentifier().equals(key)){
+            throw new IllegalArgumentException("Error: identifier and value key must match");
+        }
+        save((Identifiable) value);
+        return value;
+        }
 
     /**
-     * This removes the object from every store.
+     * This removes the object from <b>every</b> store.
      *
      * @param key
      * @return
@@ -218,7 +279,13 @@ public class AggregateStore<V extends Store> implements Store {
     @Override
     public Object remove(Object key) {
         Object obj = null;
-        for (Store s : stores) {
+        for (Store s : writeStores) {
+            Object obj2 = s.remove(key);
+            if (obj2 != null) {
+                obj = obj2;
+            }
+        }
+        for (Store s : readStores) {
             Object obj2 = s.remove(key);
             if (obj2 != null) {
                 obj = obj2;
@@ -234,9 +301,10 @@ public class AggregateStore<V extends Store> implements Store {
      */
     @Override
     public void putAll(Map m) {
-        for (Object obj : m.keySet()) {
-            Identifier identifier = (Identifier) obj;
-            put(identifier, m.get(identifier));
+        for (Object obj : m.values()) {
+            if(obj instanceof Identifiable){
+                save((Identifiable) obj);
+            }
         }
     }
 
@@ -245,7 +313,11 @@ public class AggregateStore<V extends Store> implements Store {
      */
     @Override
     public void clear() {
-        for (Store s : stores) {
+        for (Store s : readStores) {
+            s.clear();
+        }
+
+        for (Store s : writeStores) {
             s.clear();
         }
     }
@@ -253,7 +325,7 @@ public class AggregateStore<V extends Store> implements Store {
     @Override
     public HashSet keySet() {
         HashSet<Identifier> set = new HashSet<Identifier>();
-        for (Store s : stores) {
+        for (Store s : writeStores) {
             set.addAll(s.keySet());
         }
         return set;
@@ -262,7 +334,7 @@ public class AggregateStore<V extends Store> implements Store {
     @Override
     public Collection values() {
         HashSet<Identifiable> set = new HashSet<Identifiable>();
-        for (Store s : stores) {
+        for (Store s : writeStores) {
             set.addAll(s.values());
         }
         return set;
@@ -271,7 +343,7 @@ public class AggregateStore<V extends Store> implements Store {
     @Override
     public Set entrySet() {
         HashSet set = new HashSet();
-        for (Store s : stores) {
+        for (Store s : writeStores) {
             set.addAll(s.entrySet());
         }
         return set;
@@ -288,7 +360,8 @@ public class AggregateStore<V extends Store> implements Store {
 
     @Override
     public XMLConverter getXMLConverter() {
-        throw new NotImplementedException("Error: Cannot have a single converter for an aggregate store");
+        checkValid();
+        return defaultStore().getXMLConverter();
     }
 
     @Override
