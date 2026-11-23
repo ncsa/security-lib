@@ -215,7 +215,7 @@ public class JWKUtil2 implements Serializable {
         JSONWebKeys newKeys = new JSONWebKeys(keys.getDefaultKeyID());
         for (String key : keys.keySet()) {
             JSONWebKey keyEntry = keys.get(key);
-            if(keyEntry == null) continue;
+            if (keyEntry == null) continue;
             newKeys.put(makePublic(keyEntry));
         }
         // now we have a clone with no private keys, we need to c
@@ -288,7 +288,9 @@ public class JWKUtil2 implements Serializable {
 
         JSONObject jsonKey = initToJSON(webKey);
         RSAPublicKey rsaPub = (RSAPublicKey) webKey.publicKey;
-        jsonKey.put(MODULUS, bigIntToString(rsaPub.getModulus()));
+        // As per note in https://www.rfc-editor.org/info/rfc7518/#section-6.3.1.1, *if* there
+        // is a lead sign bit (which will always be zero) strip it.
+        jsonKey.put(MODULUS, bigIntUnsignedToString(rsaPub.getModulus()));
         jsonKey.put(PUBLIC_EXPONENT, bigIntToString(rsaPub.getPublicExponent()));
         if (webKey.privateKey != null) {
             if (webKey.privateKey instanceof RSAPrivateCrtKey) {
@@ -437,13 +439,43 @@ public class JWKUtil2 implements Serializable {
     }
 
     protected String bigIntToString(BigInteger bigInteger) {
-        return Base64.encodeBase64URLSafeString(bigInteger.toByteArray());
+        //return Base64.encodeBase64URLSafeString(bigInteger.toByteArray());
+        return bigIntBytesToString(bigInteger.toByteArray());
     }
+
+    protected String bigIntBytesToString(byte[] bytes) {
+        //return Base64.encodeBase64URLSafeString(bigInteger.toByteArray());
+        return Base64.encodeBase64URLSafeString(bytes);
+    }
+
+    protected String bigIntUnsignedToString(BigInteger bigInteger) {
+        //return Base64.encodeBase64URLSafeString(bigInteger.toByteArray());
+        return Base64.encodeBase64URLSafeString(toUnsignedBytes(bigInteger));
+    }
+
+    /**
+     * Given a {@link BigInteger} return the bytes without the sign bit. This is
+     * critical for RFC 7518 compliance.
+     * @param bigInteger
+     * @return
+     */
+    protected byte[] toUnsignedBytes(BigInteger bigInteger) {
+        byte[] bytes = bigInteger.toByteArray();
+        // If the sign bit is set, remove it. If the value is zero, then just return it.
+        if (1 < bytes.length && bytes[0] == 0) {
+            byte[] newBytes = new byte[bytes.length - 1];
+            System.arraycopy(bytes, 1, newBytes, 0, newBytes.length);
+            return newBytes;
+        }
+        return bytes;
+    }
+
     /**
      * This will snoop the web keys and return the unexpired, valid key from the set.
      * If possible, it will set the default ID to the same algorithm as the previous
      * default. It is up to you to, e.g., update the keystore if the set has been normalized
      * (check the {@link JSONWebKeys#isNormalized()} method.)
+     *
      * @param jsonWebKeys
      * @return
      */
@@ -455,30 +487,52 @@ public class JWKUtil2 implements Serializable {
         String defaultAlg = null; // algorithm of current default
         JSONWebKeys normalizedJsonWebKeys = new JSONWebKeys(null);
         String fallbackDefaultID = null;
-        if(doDefaultID) {
+        if (doDefaultID) {
             defaultID = jsonWebKeys.getDefaultKeyID();
             defaultAlg = jsonWebKeys.getDefault().algorithm;
             defaultKeyValid = jsonWebKeys.getDefault().isValid();
             defaultKeyExpired = jsonWebKeys.getDefault().isExpired();
-            if(defaultKeyValid && !defaultKeyExpired) {
-               normalizedJsonWebKeys.setDefaultKeyID(defaultID); // should not change
+            if (defaultKeyValid && !defaultKeyExpired) {
+                normalizedJsonWebKeys.setDefaultKeyID(defaultID); // should not change
                 doDefaultID = false; // do it won't get reset below
             }
         }
-        for(String k : jsonWebKeys.keySet()){
+        for (String k : jsonWebKeys.keySet()) {
             JSONWebKey currentJWK = jsonWebKeys.get(k);
-            if(currentJWK.isValid() && !currentJWK.isExpired()){ // retain it
+            if (currentJWK.isValid() && !currentJWK.isExpired()) { // retain it
                 normalizedJsonWebKeys.put(currentJWK);
-                if(doDefaultID && !currentJWK.id.equals(defaultID)){
-                    if(defaultAlg.equals(currentJWK.algorithm)){
+                if (doDefaultID && !currentJWK.id.equals(defaultID)) {
+                    if (defaultAlg.equals(currentJWK.algorithm)) {
                         normalizedJsonWebKeys.setDefaultKeyID(currentJWK.id);
                     }
                 }
-            }else{
+            } else {
                 normalizedJsonWebKeys.setNormalized(true); // Something changed.
             }
         }
         return normalizedJsonWebKeys;
     }
 
-  }
+    public static void main(String[] args) throws Throwable {
+        // Debugging issue in https://github.com/ncsa/security-lib/issues/77
+        // Give tnis a path to a set of keys and it will read them, spit out what
+        // is there, then reserialize the RSA key so you can compare the moduli.
+        JWKUtil2 jwkUtil = new JWKUtil2();
+       // File f= new File("/home/ncsa/Desktop/key2.json");
+        File f= new File("/home/ncsa/dev/csd/config/keys.jwk");
+        JSONWebKeys keys = jwkUtil.fromJSON(f);
+        System.out.println(jwkUtil.toJSON(keys).toString(2));
+       // JSONWebKey key = keys.get("244B235F6B28E34108D101EAC7362C4E");
+        for (JSONWebKey xxx : keys.values()) {
+            System.out.println("=== " + xxx.id);
+            if(xxx.getJOSEJWK().getKeyType().equals(KeyType.RSA)) {
+                System.out.println("  b64 = " + xxx.getJOSEJWK().toRSAKey().getModulus());
+                System.out.println("  int = " + xxx.getJOSEJWK().toRSAKey().getModulus().decodeToBigInteger());
+                System.out.println(jwkUtil.toJSONRSA(xxx).toString(2));
+            }
+            xxx.setJOSEJWK(null);
+        }
+
+        System.out.println(jwkUtil.toJSON(keys).toString(2));
+    }
+}

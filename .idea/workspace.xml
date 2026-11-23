@@ -9,15 +9,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="https://github.com/ncsa/security-lib/issues/75">
+    <list default="true" id="b608774c-db6f-4d67-932c-4555a507d461" name="Changes" comment="Fix for https://github.com/ncsa/security-lib/issues/76.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/Store.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/Store.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/AggregateStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/AggregateStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/AggregateStoreProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/AggregateStoreProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/pkcs/EncryptionUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/pkcs/EncryptionUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JWKUtil2.java" beforeDir="false" afterPath="$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JWKUtil2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web-installer/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java" beforeDir="false" afterPath="$PROJECT_DIR$/web-installer/src/main/java/edu/uiuc/ncsa/security/installer/WebInstaller.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,62 +91,63 @@
     <option name="sortByType" value="true" />
     <option name="sortKey" value="BY_TYPE" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.CLIDriver.executor&quot;: &quot;Debug&quot;,
-    &quot;Application.CertUtil.executor&quot;: &quot;Run&quot;,
-    &quot;Application.DDParser.executor&quot;: &quot;Run&quot;,
-    &quot;Application.HeaderUtils.executor&quot;: &quot;Run&quot;,
-    &quot;Application.InputLine.executor&quot;: &quot;Run&quot;,
-    &quot;Application.SAS Client.executor&quot;: &quot;Run&quot;,
-    &quot;Application.SASCLIDriver.executor&quot;: &quot;Run&quot;,
-    &quot;Application.SASCommands.executor&quot;: &quot;Debug&quot;,
-    &quot;Application.SASWatcher.executor&quot;: &quot;Run&quot;,
-    &quot;Application.StoreArchiver.executor&quot;: &quot;Run&quot;,
-    &quot;Application.StringUtils.executor&quot;: &quot;Run&quot;,
-    &quot;Application.TestCCI.executor&quot;: &quot;Run&quot;,
-    &quot;Application.TestCommands.executor&quot;: &quot;Run&quot;,
-    &quot;Application.TestConfigLoader.executor&quot;: &quot;Run&quot;,
-    &quot;Application.UpkeepConfigUtils.executor&quot;: &quot;Debug&quot;,
-    &quot;Application.WebClientConfig.executor&quot;: &quot;Run&quot;,
-    &quot;Application.WebInstaller.executor&quot;: &quot;Debug&quot;,
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;JUnit.ApacheConfigInheritenceTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.ApacheMultipleInheritenceTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.CFMultipleInheritanceTest.executor&quot;: &quot;Debug&quot;,
-    &quot;JUnit.Configurations2Test.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.configuration in core.executor&quot;: &quot;Run&quot;,
-    &quot;Java Scratch.Scratch.executor&quot;: &quot;Run&quot;,
-    &quot;Java Scratch.Scratch_5.executor&quot;: &quot;Run&quot;,
-    &quot;Maven.core [clean,compile].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.security-lib [clean,compile].executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;11 (2)&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/ncsa/dev/ncsa-git/security-lib/docs/pdf&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.5883041&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.CLIDriver.executor": "Debug",
+    "Application.CertUtil.executor": "Run",
+    "Application.DDParser.executor": "Run",
+    "Application.HeaderUtils.executor": "Run",
+    "Application.InputLine.executor": "Run",
+    "Application.JWKUtil2.executor": "Run",
+    "Application.SAS Client.executor": "Run",
+    "Application.SASCLIDriver.executor": "Run",
+    "Application.SASCommands.executor": "Debug",
+    "Application.SASWatcher.executor": "Run",
+    "Application.StoreArchiver.executor": "Run",
+    "Application.StringUtils.executor": "Run",
+    "Application.TestCCI.executor": "Run",
+    "Application.TestCommands.executor": "Run",
+    "Application.TestConfigLoader.executor": "Run",
+    "Application.UpkeepConfigUtils.executor": "Debug",
+    "Application.WebClientConfig.executor": "Run",
+    "Application.WebInstaller.executor": "Debug",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "JUnit.ApacheConfigInheritenceTest.executor": "Run",
+    "JUnit.ApacheMultipleInheritenceTest.executor": "Run",
+    "JUnit.CFMultipleInheritanceTest.executor": "Debug",
+    "JUnit.Configurations2Test.executor": "Run",
+    "JUnit.configuration in core.executor": "Run",
+    "Java Scratch.Scratch.executor": "Run",
+    "Java Scratch.Scratch_5.executor": "Run",
+    "Maven.core [clean,compile].executor": "Run",
+    "Maven.security-lib [clean,compile].executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "master",
+    "jdk.selected.JAVA_MODULE": "11 (2)",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/ncsa/dev/ncsa-git/security-lib/docs/pdf",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.5883041",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;XML&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "XML"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/docs/pdf" />
@@ -189,7 +186,7 @@
       <recent name="edu.uiuc.ncsa.security.core.util" />
     </key>
   </component>
-  <component name="RunManager" selected="Java Scratch.Scratch_5">
+  <component name="RunManager" selected="Application.JWKUtil2">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
@@ -215,13 +212,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="InputLine" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.cli.InputLine" />
+    <configuration name="JWKUtil2" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.jwk.JWKUtil2" />
       <module name="util" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.util.cli.*" />
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.util.jwk.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -444,7 +441,7 @@
       <item itemvalue="Application.SASCLIDriver" />
       <item itemvalue="Application.SAS Client" />
       <item itemvalue="Application.WebInstaller" />
-      <item itemvalue="Application.InputLine" />
+      <item itemvalue="Application.JWKUtil2" />
       <item itemvalue="Application.UpkeepConfigUtils" />
       <item itemvalue="Java Scratch.Scratch_5" />
       <item itemvalue="JUnit.ApacheMultipleInheritenceTest" />
@@ -453,11 +450,11 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.JWKUtil2" />
         <item itemvalue="JUnit.ApacheConfigInheritenceTest" />
         <item itemvalue="JUnit.ApacheMultipleInheritenceTest" />
         <item itemvalue="Java Scratch.Scratch_5" />
         <item itemvalue="Application.UpkeepConfigUtils" />
-        <item itemvalue="Application.InputLine" />
       </list>
     </recent_temporary>
   </component>
@@ -1013,7 +1010,7 @@
       <option name="project" value="LOCAL" />
       <updated>1697148281335</updated>
     </task>
-    <option name="localTasksCounter" value="142" />
+    <option name="localTasksCounter" value="143" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1022,7 +1019,6 @@
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_NEW_TODO" value="false" />
-    <MESSAGE value="fixed https://github.com/ncsa/security-lib/issues/65" />
     <MESSAGE value="A few teweak, mostly website regeneration" />
     <MESSAGE value="Website straggler." />
     <MESSAGE value="Fix https://github.com/ncsa/security-lib/issues/66" />
@@ -1047,7 +1043,8 @@
     <MESSAGE value="Small updates to the store commands -- support for time strings, e.g. setting one as &quot;24 hr&quot; rather than having to input milliseconds." />
     <MESSAGE value="Modified to buildunder Java 17" />
     <MESSAGE value="https://github.com/ncsa/security-lib/issues/75" />
-    <option name="LAST_COMMIT_MESSAGE" value="https://github.com/ncsa/security-lib/issues/75" />
+    <MESSAGE value="Fix for https://github.com/ncsa/security-lib/issues/76." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix for https://github.com/ncsa/security-lib/issues/76." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -1207,6 +1204,31 @@
           <url>file://$PROJECT_DIR$/storage/src/main/java/edu/uiuc/ncsa/security/storage/cli/StoreCommands2.java</url>
           <line>2529</line>
           <option name="timeStamp" value="197" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JWKUtil2.java</url>
+          <line>288</line>
+          <option name="timeStamp" value="203" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JWKUtil2.java</url>
+          <line>239</line>
+          <option name="timeStamp" value="204" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JWKUtil2.java</url>
+          <line>441</line>
+          <option name="timeStamp" value="208" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JWKUtil2.java</url>
+          <line>235</line>
+          <option name="timeStamp" value="209" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/util/src/main/java/edu/uiuc/ncsa/security/util/jwk/JWKUtil2.java</url>
+          <line>225</line>
+          <option name="timeStamp" value="210" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

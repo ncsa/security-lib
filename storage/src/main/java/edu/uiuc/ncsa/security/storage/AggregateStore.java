@@ -38,11 +38,15 @@ public class AggregateStore<V extends Store> implements Store {
             this.readStores.addAll(readStores);
         }
     }
-/*
-    Partial implementation of the store interface. This should be completed if
-    we go back to using it, otherwise, we are keeping it for now pending more uses
-    and just want it to compile.
- */
+
+    public AggregateStore() {
+    }
+
+    /*
+        Partial implementation of the store interface. This should be completed if
+        we go back to using it, otherwise, we are keeping it for now pending more uses
+        and just want it to compile.
+     */
     @Override
     public int[] update(List m) {
         // ToDO: If a target does not exist yet, this will bomb, so updating between stores is not possible.
@@ -393,5 +397,6 @@ public class AggregateStore<V extends Store> implements Store {
     public List getMostRecent(int n, List attributes) {
         return null;
     }
+
 }
 
